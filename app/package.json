@@ -1,14 +1,16 @@
 {
-  "name": "my-project2",
-  "version": "0.0.0",
+  "name": "qiniu-Client",
+  "version": "0.0.1",
   "description": "An electron-vue project",
   "main": "./dist/main.js",
   "dependencies": {
     "axios": "^0.16.1",
+    "iview": "^2.0.0-rc.10",
+    "moment": "^2.18.1",
     "qiniu": "^6.1.13",
-    "vue": "^2.1.10",
+    "sync-request": "^4.0.2",
+    "vue": "^2.2.6",
     "vue-electron": "^1.0.6",
-    "vue-resource": "^1.0.3",
     "vue-router": "^2.1.2",
     "vuex": "^2.1.1"
   },

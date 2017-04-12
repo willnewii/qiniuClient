@@ -36,11 +36,11 @@ class API {
     }
 
     _request(url, type, param) {
-        if (type === 'get') {
+       /* if (type === 'get') {
             config.params = param;
         } else {
             config.data = param;
-        }
+        }*/
 
         config.headers.Authorization = qiniu.util.generateAccessToken(url, null);
 

@@ -16,7 +16,6 @@ let rendererConfig = {
     entry: {
         renderer: path.join(__dirname, 'app/src/renderer/main.js')
     },
-    externals: Object.keys(pkg.dependencies || {}),
     module: {
         rules: [
             {
@@ -94,41 +93,42 @@ let rendererConfig = {
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, 'app/dist')
     },
+    externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue', 'iview', 'sync-request'].includes(d)),
     resolve: {
-        alias: {
-            'components': path.join(__dirname, 'app/src/renderer/components'),
-            'renderer': path.join(__dirname, 'app/src/renderer'),
-            'vue$': 'vue/dist/vue'
-        },
-        extensions: ['.js', '.vue', '.json', '.css', '.node'],
         modules: [
             path.join(__dirname, 'app/node_modules'),
             path.join(__dirname, 'node_modules')
-        ]
+        ],
+        alias: {
+            'vue$': path.join(__dirname, 'app/node_modules/vue/dist/vue.esm.js'),
+            'sync-request$': path.join(__dirname, 'app/node_modules/sync-request/browser.js'),
+            'components': path.join(__dirname, 'app/src/renderer/components'),
+            'renderer': path.join(__dirname, 'app/src/renderer')
+        },
+        extensions: ['.js', '.vue', '.json', '.css', '.node']
     },
     target: 'electron-renderer'
 }
-
 
 /**
  * Adjust rendererConfig for production settings
  */
 /*if (process.env.NODE_ENV === 'production') {
-    rendererConfig.devtool = ''
+ rendererConfig.devtool = ''
 
-    rendererConfig.plugins.push(
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-        }),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
-        }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        })
-    )
-}*/
+ rendererConfig.plugins.push(
+ new webpack.DefinePlugin({
+ 'process.env.NODE_ENV': '"production"'
+ }),
+ new webpack.LoaderOptionsPlugin({
+ minimize: true
+ }),
+ new webpack.optimize.UglifyJsPlugin({
+ compress: {
+ warnings: false
+ }
+ })
+ )
+ }*/
 
 module.exports = rendererConfig

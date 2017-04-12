@@ -90,17 +90,23 @@
                         <Icon type="navicon" size="32"></Icon>
                     </i-button>
                     </Col>
-                    <Col span="16">
+                    <Col span="14">
                     <Tag type="border" v-for="item of domains">{{item}}</Tag>
                     </Col>
+                    <Col span="2">
+                    <i-button type="text" @click="uploadFile">
+                        <Icon type="ios-plus-outline" size="32"/>
+                    </i-button>
+                    </Col>
                     <Col span="6">
-                    <Input v-model="search" placeholder="搜索" @on-enter="doSearch(search)"></Input></Col>
+                    <Input v-model="search" placeholder="搜索" @on-enter="doSearch(search)"></Input>
+                    </Col>
                 </Row>
                 <div class="layout-tag">
                     <Tag type="border" v-for="item of dirs"><p v-on:click="doSearch(item)">{{item}}</p></Tag>
                 </div>
                 <div class="layout-content">
-                    <Table border :columns="columns" v-if="files.length > 0" :content="this" :height="tableHeight"
+                    <Table border :columns="columns" v-if="files.length > 0" :context="self" :height="tableHeight"
                            :data="files"></Table>
                 </div>
                 <div class="layout-copy">
@@ -108,6 +114,11 @@
                 </div>
             </i-col>
         </Row>
+        <Modal v-model="uploadModal" title="上传对话框" @on-ok="doQiniuUploadFile">
+            <p>对话框内容</p>
+            <p>对话框内容</p>
+            <p>对话框内容</p>
+        </Modal>
     </div>
 </template>
 <script>
@@ -119,9 +130,12 @@
     import api from '../api/API'
     const API = new api();
 
+    let ipc = null;
+
     export default {
         data () {
             return {
+                self: this,
                 buckets: [],
                 activeName: 'blog',
                 tableHeight: 100,
@@ -130,12 +144,32 @@
                 files: [],
                 columns: [
                     {title: '文件名', key: 'key'},
-                    {title: '大小', key: 'fsize'},
+                    {
+                        title: '大小', key: 'fsize',
+                        render (row, column, index) {
+                            if (row.fsize >= 1024 * 1024) {
+                                return (row.fsize / 1024 / 1024).toFixed(2) + ' MB'
+                            } else if (row.fsize >= 1024 && row.fsize < 1024 * 1024) {
+                                return (row.fsize / 1024).toFixed(2) + ' KB'
+                            } else {
+                                return (row.fsize).toFixed(2) + ' B'
+                            }
+                        }
+                    },
                     {title: '类型', key: 'mimeType'},
-                    {title: '创建日期', key: 'putTime'},
-                    {title: '操作', key: 'a',render () {
-                        return `<i-button type="text" size="small">查看</i-button><i-button type="text" size="small">编辑</i-button>`;
-                    }}],
+                    {
+                        title: '创建日期', key: 'putTime',
+                        render (row, column, index) {
+                            return moment(row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                    },
+                    {
+                        title: '操作', key: 'action',
+                        render (row, column, index) {
+                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="error" size="small" @click="remove(${index})">删除</i-button>`;
+                        }
+                    }],
+                uploadModal: false,
                 domains: [],
                 search: '',
                 spanLeft: 5,
@@ -154,6 +188,11 @@
             window.onresize = () => {
                 this.setTableSize();
             }
+
+            ipc = this.$electron.ipcRenderer;
+            ipc.on('selected-directory', (event, path) => {
+                this.uploadModal = true;
+            })
         },
         methods: {
             initKEY(callback){
@@ -163,6 +202,7 @@
                             if (callback) {
                                 qiniu.conf.ACCESS_KEY = data.access_key;
                                 qiniu.conf.SECRET_KEY = data.secret_key;
+
                                 callback(data);
                             }
                         } else {
@@ -199,23 +239,7 @@
                 }
 
                 API.post(API.method.getResources, data).then((response) => {
-
-                    for (let i = 0; i < response.data.items.length; i++) {//使用render 报错
-
-                        if (response.data.items[i].fsize >= 1024 * 1024) {
-                            response.data.items[i].fsize = (response.data.items[i].fsize / 1024 / 1024).toFixed(2) + ' MB'
-                        } else if (response.data.items[i].fsize >= 1024 && response.data.items[i].fsize < 1024 * 1024) {
-                            response.data.items[i].fsize = (response.data.items[i].fsize / 1024).toFixed(2) + ' KB'
-                        } else {
-                            response.data.items[i].fsize = (response.data.items[i].fsize).toFixed(2) + ' B'
-                        }
-                        response.data.items[i].putTime = moment(response.data.items[i].putTime / 1000).format('YYYY-MM-DD HH:mm:ss');
-//                        moment.
-                        response.data.items[i].a = '<i-button type="text" size="small">查看</i-button><i-button type="text" size="small">编辑</i-button>';
-                    }
-
                     this.files = response.data.items
-                    //{"key":"aaa.png","hash":"FjGiz4rvUSew7g4Wl2rDn_h8uzxj","fsize":480665,"mimeType":"image/png","putTime":14805851214418833}
                 });
             },
             getDir(marker){//获取目录
@@ -243,6 +267,35 @@
             doSearch: function (search) {
                 console.log(search);
                 this.getResources(search)
+            },
+            show(index) {
+                let url = this.domains[0] + '/' + this.files[index].key;
+                this.$electron.shell.openExternal('http://' + url)
+            },
+            uploadFile(){
+                ipc.send('open-file-dialog', {properties: ['openFile']});
+            },
+            doQiniuUploadFile(){
+
+            },
+            qiniuUploadFile(dir, path){
+                let key = path;
+                if (path.lastIndexOf('/') !== -1) {
+                    key = path.substring(path.lastIndexOf('/') + 1, path.length - 1);
+                }
+                let uptoken = new qiniu.rs.PutPolicy(this.activeName + ":" + key).token();
+                let extra = new qiniu.io.PutExtra();
+
+                qiniu.io.putFile(uptoken, key, path, extra, function (err, ret, res) {
+                    console.log(res);
+                    if (!err) {
+                        console.log(ret);
+                        console.log(ret.hash, ret.key);
+                    } else {
+                        // 上传失败， 处理返回代码
+                        console.log(err);
+                    }
+                });
             },
             setTableSize(){
                 this.tableHeight = this.$refs.spanRight.$el.clientHeight * 0.80 - 30;

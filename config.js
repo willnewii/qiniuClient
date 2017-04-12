@@ -5,7 +5,7 @@ const path = require('path')
 let config = {
   // Name of electron app
   // Will be used in production builds
-  name: 'my-project2',
+  name: 'qiniu-Client',
 
   // webpack-dev-server port
   port: 9080,

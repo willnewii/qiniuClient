@@ -1,19 +1,21 @@
 {
-  "name": "my-project2",
-  "version": "0.0.0",
+  "name": "qiniu-Client",
+  "version": "0.0.1",
   "description": "An electron-vue project",
   "scripts": {
     "build": "node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
-    "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
-    "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
-    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js",
     "dev": "node tasks/runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.renderer.config.js",
     "postinstall": "cd app && npm install"
+  },
+  "a": {
+    "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
+    "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
+    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js"
   },
   "author": "Greg Holguin <simulatedgreg@gmail.com>",
   "license": "MIT",
@@ -38,6 +40,9 @@
     "file-loader": "^0.9.0",
     "html-webpack-plugin": "^2.16.1",
     "json-loader": "^0.5.4",
+    "node-sass": "^4.5.2",
+    "qs": "^6.4.0",
+    "sass-loader": "^6.0.3",
     "style-loader": "^0.13.1",
     "tree-kill": "^1.1.0",
     "url-loader": "^0.5.7",
@@ -50,12 +55,6 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
-    "electron-json-storage": "^3.0.4",
-    "iview": "^2.0.0-rc.10",
-    "moment": "^2.18.1",
-    "node-sass": "^4.5.2",
-    "qs": "^6.4.0",
-    "sass-loader": "^6.0.3",
-    "vue": "^2.2.6"
+    "electron-json-storage": "^3.0.4"
   }
 }
