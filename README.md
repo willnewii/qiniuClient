@@ -19,6 +19,13 @@ npm run pack
 ```
 More information can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
+#### 功能
+1. 上传文件
+2. 转存文件
+3. 删除文件
+4. 展示目录 (根据list接口遍历  如果无目录文件较多 会有问题)
+
+
 ---
 
 This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about this project can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).

@@ -9,9 +9,13 @@ import Qs from 'qs'
 
 class API {
 
+    constructor(view){
+        this.that = view;
+    }
+
     method = {
         getBuckets: qiniu.conf.RS_HOST + '/buckets',
-        domains: qiniu.conf.API_HOST + '/v6/domain/list',
+        getDomains: qiniu.conf.API_HOST + '/v6/domain/list',
         getResources: qiniu.conf.RSF_HOST + '/list',
     }
 
@@ -36,6 +40,7 @@ class API {
     }
 
     _request(url, type, param) {
+        this.that.$Loading.start();
        /* if (type === 'get') {
             config.params = param;
         } else {
@@ -43,14 +48,21 @@ class API {
         }*/
 
         config.headers.Authorization = qiniu.util.generateAccessToken(url, null);
-
         config.method = type;
 
+        let request ;
         if (type === 'get') {
-            return axios.get(url, config)
+            request = axios.get(url, config)
         } else {
-            return axios[type](url, null, config)
+            request = axios[type](url, null, config)
         }
+
+        request.then((response)=>{
+            this.that.$Loading.finish();
+        }).catch((error)=>{
+            this.that.$Loading.error();
+        })
+        return request ;
     }
 
 }
