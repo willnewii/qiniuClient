@@ -1,15 +1,11 @@
 'use strict'
 
-const path = require('path')
 import {app, BrowserWindow, Menu, ipcMain, dialog, Tray} from 'electron'
+import notifier from 'node-notifier'
+import * as util from './util'
+import * as trayUtil from './trayUtil';
 
-const winURL = process.env.NODE_ENV === 'development'
-    ? `http://localhost:${require('../../../config').port}`
-    : `file://${__dirname}/index.html`
-
-const iconPath = path.join(__dirname, 'assets/');
-
-let mainWindow, trayWindow, mTray;
+let mainWindow;
 
 function initApp() {
     //注册菜单
@@ -20,8 +16,7 @@ function initApp() {
     createMainWindow();
 
     //托盘处理
-    initTray();
-    createTrayWindow();
+    trayUtil.createTray();
 
     registerIPC();
 }
@@ -38,8 +33,7 @@ function createMainWindow() {
         }
     })
 
-    console.log(winURL);
-    mainWindow.loadURL(winURL)
+    mainWindow.loadURL(util.winURL)
 
     mainWindow.on('closed', () => {
         mainWindow = null
@@ -51,7 +45,7 @@ function createMainWindow() {
 app.on('ready', initApp)
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
+    if (!util.isMac()) {
         app.quit()
     }
 })
@@ -61,72 +55,6 @@ app.on('activate', () => {
         createMainWindow()
     }
 })
-
-
-
-//托盘部分处理
-const initTray = function () {
-    mTray = new Tray(path.join(iconPath, (process.platform === 'win32' ? 'tray.png' : 'tray.png')));
-
-    mTray.on('click', () => {
-        toggleTrayWindow()
-    })
-}
-
-const toggleTrayWindow = () => {
-    if (trayWindow.isVisible()) {
-        trayWindow.hide()
-    } else {
-        showTrayWindow()
-    }
-}
-
-const showTrayWindow = () => {
-    const position = getTrayWindowPosition()
-    trayWindow.setPosition(position.x, position.y, false)
-    trayWindow.show()
-    trayWindow.focus()
-}
-
-const getTrayWindowPosition = () => {
-    const windowBounds = trayWindow.getBounds()
-    const trayBounds = mTray.getBounds()
-
-    // Center window horizontally below the tray icon
-    const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
-
-    // Position window 4 pixels vertically below the tray icon
-    const y = Math.round(trayBounds.y + trayBounds.height + 4)
-
-    return {x: x, y: y}
-}
-
-const createTrayWindow = () => {
-    trayWindow = new BrowserWindow({
-        width: 300,
-        height: 450,
-        show: false,
-        frame: false,
-        fullscreenable: false,
-        resizable: false,
-        transparent: true,
-        webPreferences: {
-            // Prevents renderer process code from not running when window is
-            // hidden
-            webSecurity: false,
-            backgroundThrottling: false
-        }
-    })
-
-    trayWindow.loadURL(winURL + '/#/tray')
-
-    // Hide the window when it loses focus
-    trayWindow.on('blur', () => {
-        if (!trayWindow.webContents.isDevToolsOpened()) {
-            trayWindow.hide()
-        }
-    })
-}
 
 /**
  * 注册IPC事件
@@ -140,27 +68,23 @@ const registerIPC = function () {
         })
     })
 
-    ipcMain.on('put-in-tray', function (event) {
-        const contextMenu = Menu.buildFromTemplate([{
-            label: 'Remove',
-            click: function () {
-                event.sender.send('tray-removed')
-            }
-        }])
-        mTray.setToolTip('Electron Demo in the tray.')
-        mTray.setContextMenu(contextMenu)
-    })
+    ipcMain.on('show-Notifier', function (event, option) {
+        if (option.icon) {
+            option.icon = util.getIconPath(option.icon);
+        }
+        mainWindow.webContents.send('log', option);
 
-    ipcMain.on('remove-tray', function () {
-        mTray.destroy()
+        notifier.notify(option, (err, response) => {
+            event.sender.send('log', err)
+        });
     })
 }
 
-
-
-//注册菜单
-
-function getMenuData() {
+/**
+ * 注册菜单
+ * @returns {[*,*,*,*]}
+ */
+const getMenuData = function () {
     const template = [
         {
             label: 'Edit',

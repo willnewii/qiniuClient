@@ -32,7 +32,7 @@
     const storage = require('electron-json-storage');
 
     import api from '../api/API'
-    let API = new api();
+    let API ;
 
     export default {
         data () {
@@ -55,6 +55,7 @@
             }
         },
         created: function () {
+            API = new api(this);
         },
         methods: {
             handleSubmit (name) {

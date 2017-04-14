@@ -6,11 +6,12 @@ const path = require('path')
 const pkg = require('./app/package.json')
 const settings = require('./config.js')
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 let mainConfig = {
     entry: {
-        main: path.join(__dirname, 'app/src/main/index.js'),
-        load: path.join(__dirname, 'app/src/main/load.js'),
+        main: path.join(__dirname, 'app/src/main/index.js')
+
     },
     externals: Object.keys(pkg.dependencies || {}),
     module: {
@@ -27,16 +28,6 @@ let mainConfig = {
             {
                 test: /\.node$/,
                 loader: 'node-loader'
-            },
-            {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                use: {
-                    loader: 'url-loader',
-                    query: {
-                        limit:0,
-                        name: 'assets/[name].[ext]'
-                    }
-                }
             }
         ]
     },
@@ -50,6 +41,10 @@ let mainConfig = {
         path: path.join(__dirname, 'app/dist')
     },
     plugins: [
+        new CopyWebpackPlugin([
+            {from: 'node_modules/node-notifier/vendor', to: 'vendor'},
+            {from: 'app/src/main/assets', to: 'assets'},
+        ]),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
@@ -63,7 +58,7 @@ let mainConfig = {
     resolve: {
         extensions: ['.js', '.json', '.node'],
         modules: [
-            path.join(__dirname, 'app/node_modules')
+            path.join(__dirname, 'node_modules')
         ]
     },
     target: 'electron-main'

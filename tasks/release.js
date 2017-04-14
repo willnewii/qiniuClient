@@ -1,11 +1,12 @@
 'use strict'
 
+const config = require('../config')
 const exec = require('child_process').exec
 const packager = require('electron-packager')
 
-if(process.env.PACK === 'no'){
+if (process.env.PACK === 'no') {
     build();
-    return ;
+    return;
 }
 
 if (process.env.PLATFORM_TARGET === 'clean') {
@@ -45,6 +46,7 @@ function build() {
             console.log('Build(s) successful!')
             console.log(appPaths)
 
+            exec('open ' + appPaths + '/' + config.name + '.app')
             console.log('\n\x1b[34mDONE\n\x1b[0m')
         }
     })
