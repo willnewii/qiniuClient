@@ -9,7 +9,8 @@ const webpack = require('webpack')
 
 let mainConfig = {
     entry: {
-        main: path.join(__dirname, 'app/src/main/index.js')
+        main: path.join(__dirname, 'app/src/main/index.js'),
+        load: path.join(__dirname, 'app/src/main/load.js'),
     },
     externals: Object.keys(pkg.dependencies || {}),
     module: {
@@ -26,6 +27,16 @@ let mainConfig = {
             {
                 test: /\.node$/,
                 loader: 'node-loader'
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+                use: {
+                    loader: 'url-loader',
+                    query: {
+                        limit:0,
+                        name: 'assets/[name].[ext]'
+                    }
+                }
             }
         ]
     },

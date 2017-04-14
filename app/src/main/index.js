@@ -3,13 +3,30 @@
 const path = require('path')
 import {app, BrowserWindow, Menu, ipcMain, dialog, Tray} from 'electron'
 
-let mainWindow, trayWindow, mTray;
-
 const winURL = process.env.NODE_ENV === 'development'
     ? `http://localhost:${require('../../../config').port}`
     : `file://${__dirname}/index.html`
 
-function createWindow() {
+const iconPath = path.join(__dirname, 'assets/');
+
+let mainWindow, trayWindow, mTray;
+
+function initApp() {
+    //注册菜单
+    const menu = Menu.buildFromTemplate(getMenuData())
+    Menu.setApplicationMenu(menu)
+
+    //创建主窗口
+    createMainWindow();
+
+    //托盘处理
+    initTray();
+    createTrayWindow();
+
+    registerIPC();
+}
+
+function createMainWindow() {
     /**
      * Initial window options
      */
@@ -28,17 +45,10 @@ function createWindow() {
         mainWindow = null
     })
 
-    //注册菜单
-    const menu = Menu.buildFromTemplate(getMenuData())
-    Menu.setApplicationMenu(menu)
-
-    initTray();
-    createTrayWindow();
-
     // eslint-disable-next-line no-console
     console.log('mainWindow opened')
 }
-app.on('ready', createWindow)
+app.on('ready', initApp)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -48,43 +58,37 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
     if (mainWindow === null) {
-        createWindow()
+        createMainWindow()
     }
 })
 
-ipcMain.on('open-file-dialog', function (event) {
-    dialog.showOpenDialog({
-        properties: ['openFile', 'openDirectory']
-    }, function (files) {
-        if (files) event.sender.send('selected-directory', files)
-    })
-})
+
 
 //托盘部分处理
 const initTray = function () {
-    mTray = new Tray(path.join(__dirname, '../../icons/' + (process.platform === 'win32' ? 'tray.png' : 'tray.png')));
+    mTray = new Tray(path.join(iconPath, (process.platform === 'win32' ? 'tray.png' : 'tray.png')));
 
     mTray.on('click', () => {
-        toggleWindow()
+        toggleTrayWindow()
     })
 }
 
-const toggleWindow = () => {
+const toggleTrayWindow = () => {
     if (trayWindow.isVisible()) {
         trayWindow.hide()
     } else {
-        showWindow()
+        showTrayWindow()
     }
 }
 
-const showWindow = () => {
-    const position = getWindowPosition()
+const showTrayWindow = () => {
+    const position = getTrayWindowPosition()
     trayWindow.setPosition(position.x, position.y, false)
     trayWindow.show()
     trayWindow.focus()
 }
 
-const getWindowPosition = () => {
+const getTrayWindowPosition = () => {
     const windowBounds = trayWindow.getBounds()
     const trayBounds = mTray.getBounds()
 
@@ -124,20 +128,35 @@ const createTrayWindow = () => {
     })
 }
 
-ipcMain.on('put-in-tray', function (event) {
-    const contextMenu = Menu.buildFromTemplate([{
-        label: 'Remove',
-        click: function () {
-            event.sender.send('tray-removed')
-        }
-    }])
-    mTray.setToolTip('Electron Demo in the tray.')
-    mTray.setContextMenu(contextMenu)
-})
+/**
+ * 注册IPC事件
+ */
+const registerIPC = function () {
+    ipcMain.on('open-file-dialog', function (event) {
+        dialog.showOpenDialog({
+            properties: ['openFile', 'openDirectory']
+        }, function (files) {
+            if (files) event.sender.send('selected-directory', files)
+        })
+    })
 
-ipcMain.on('remove-tray', function () {
-    mTray.destroy()
-})
+    ipcMain.on('put-in-tray', function (event) {
+        const contextMenu = Menu.buildFromTemplate([{
+            label: 'Remove',
+            click: function () {
+                event.sender.send('tray-removed')
+            }
+        }])
+        mTray.setToolTip('Electron Demo in the tray.')
+        mTray.setContextMenu(contextMenu)
+    })
+
+    ipcMain.on('remove-tray', function () {
+        mTray.destroy()
+    })
+}
+
+
 
 //注册菜单
 

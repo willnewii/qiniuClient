@@ -6,6 +6,8 @@
     "build": "node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
+    "build:pack_main_darwin": "cross-env PLATFORM_TARGET=darwin PACK=main node tasks/release.js",
+    "build:no_pack_darwin": "cross-env PLATFORM_TARGET=darwin PACK=no node tasks/release.js",
     "dev": "node tasks/runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
