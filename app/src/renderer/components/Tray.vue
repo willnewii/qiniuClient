@@ -49,8 +49,6 @@
             ipc.on('log', (event, log) => {
                 console.log(log);
             })
-
-            this.sendNotify();
         },
         methods: {
             updateStatus(title){
@@ -66,6 +64,7 @@
             doUploadFile(){
                 if (this.current > this.files.length) {
                     this.updateStatus('');
+                    this.sendNotify();
                 } else {
                     this.updateStatus(`${this.files.current}/${this.files.count}`);
                     this.uploadFile(this.files[this.current - 1]);

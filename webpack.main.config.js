@@ -42,7 +42,6 @@ let mainConfig = {
     },
     plugins: [
         new CopyWebpackPlugin([
-            {from: 'node_modules/node-notifier/vendor', to: 'vendor'},
             {from: 'app/src/main/assets', to: 'assets'},
         ]),
         new webpack.NoEmitOnErrorsPlugin(),
