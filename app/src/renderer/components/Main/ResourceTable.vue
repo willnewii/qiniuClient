@@ -46,7 +46,7 @@
                     {
                         title: '操作', key: 'action',
                         render (row, column, index) {
-                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="primary" size="small" @click="copy(${index})">复制</i-button>👾 <i-button type="error" size="small" @click="remove(${index})">删除</i-button>`;
+                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="primary" size="small" @click="copy(${index})">复制</i-button> <i-button type="error" size="small" @click="remove(${index})">💀删除</i-button>`;
                         }
                     }],
                 bucket: {

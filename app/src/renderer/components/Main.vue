@@ -36,12 +36,17 @@
         display: none;
     }
 
+    .ivu-menu-item {
+        display: flex;
+        align-items: center;
+    }
+
     .ivu-col {
         transition: width .2s ease-in-out;
     }
 </style>
 <template>
-    <div class="layout" >
+    <div class="layout">
         <Row type="flex">
             <i-col :span="spanLeft" class="layout-menu-left">
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets.length > 0" @on-select="selectBuckets"
@@ -51,10 +56,15 @@
                         <Icon type="ios-navigate" :size="iconSize"></Icon>
                         <span class="layout-text" :class="{'layout-hide-text': spanLeft < 5}">{{item}}</span>
                     </Menu-item>
+                    <Menu-item name="__app__setup__">
+                        <Icon type="gear-a" :size="iconSize"></Icon>
+                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 5}">设置</span>
+                    </Menu-item>
                 </Menu>
             </i-col>
             <i-col :span="spanRight" class="layout-menu-right">
-                <RightContent :bucketname="bucketname" @on-spanLeft="onSpanLeft"></RightContent>
+                <router-view></router-view>
+                <!--<RightContent :bucketname="bucketname" @on-spanLeft="onSpanLeft"></RightContent>-->
             </i-col>
         </Row>
     </div>
@@ -82,7 +92,7 @@
         components: {RightContent},
         computed: {
             iconSize () {
-                return this.spanLeft === 5 ? 14 : 24;
+                return this.spanLeft === 5 ? 18 : 24;
             }
         },
         created: function () {
@@ -91,6 +101,15 @@
             });
 
             API = new api(this);
+        },
+        watch: {
+            bucketname: function (val, oldvalue) {
+                if (val === '__app__setup__') {
+                    this.$router.push({path: '/setup'});
+                } else {
+                    this.$router.push({path: '/table', query: {bucketname: this.bucketname}});
+                }
+            }
         },
         methods: {
             initKEY(callback){

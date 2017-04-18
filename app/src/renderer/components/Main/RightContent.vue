@@ -59,9 +59,12 @@
         },
         mounted () {
             API = new api(this);
-            if (this.bucketname) {
-                this.bucket.name = this.bucketname;
-                this.initBucket();
+
+            if (this.$route.query && this.$route.query.bucketname) {
+                if (this.$route.query.bucketname !== this.bucket.name) {
+                    this.bucket.name = this.$route.query.bucketname;
+                    this.initBucket();
+                }
             }
         },
         methods: {
@@ -130,7 +133,8 @@
                 this.getResources(search)
             },
             toggleClick () {
-                this.$emit('on-spanLeft', event);
+                console.log(this.$refs);
+                //this.$emit('on-spanLeft', event);
             },
             onUpdate(ret, action){
                 console.log(ret, action);
