@@ -1,7 +1,6 @@
 'use strict'
 
 import {app, BrowserWindow, Menu, ipcMain, dialog, Tray} from 'electron'
-import notifier from 'node-notifier'
 import * as util from './util'
 import * as trayUtil from './trayUtil';
 
@@ -66,17 +65,6 @@ const registerIPC = function () {
         }, function (files) {
             if (files) event.sender.send('selected-directory', files)
         })
-    })
-
-    ipcMain.on('show-Notifier', function (event, option) {
-        if (option.icon) {
-            option.icon = util.getIconPath(option.icon);
-        }
-        mainWindow.webContents.send('log', option);
-
-        notifier.notify(option, (err, response) => {
-            event.sender.send('log', err)
-        });
     })
 }
 

@@ -2,6 +2,7 @@
  * Created by zhangweiwei on 2017/4/14.
  */
 import {BrowserWindow, Tray, ipcMain} from 'electron'
+import notifier from 'node-notifier'
 import * as util from './util'
 
 let mTray, mTrayWindow;
@@ -22,6 +23,16 @@ export const createTray = function () {
 
     ipcMain.on('upload-tray-title', function (event, title) {
         setTrayTitle(title)
+    })
+
+    ipcMain.on('show-Notifier', function (event, option) {
+        if (option.icon) {
+            option.icon = util.getIconPath(option.icon);
+        }
+
+        notifier.notify(option, (err, response) => {
+            event.sender.send('log', err)
+        });
     })
 
     return mTray;

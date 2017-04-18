@@ -10,7 +10,6 @@
 </template>
 
 <script>
-    import notifier from 'node-notifier'
     import qiniu from 'qiniu'
     import * as util from '../util/util'
     import * as types from '../vuex/mutation-types'
@@ -41,6 +40,7 @@
             });
 
             ipc.on('upload-Files', (event, files) => {
+                console.log(files);
                 this.files = files;
 
                 this.doUploadFile();
@@ -64,9 +64,10 @@
             doUploadFile(){
                 if (this.current > this.files.length) {
                     this.updateStatus('');
+                    this.current = 1;
                     this.sendNotify();
                 } else {
-                    this.updateStatus(`${this.files.current}/${this.files.count}`);
+                    this.updateStatus(`${this.current}/${this.files.length}`);
                     this.uploadFile(this.files[this.current - 1]);
                 }
             },
