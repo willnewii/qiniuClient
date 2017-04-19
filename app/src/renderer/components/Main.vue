@@ -49,7 +49,7 @@
     <div class="layout">
         <Row type="flex">
             <i-col :span="spanLeft" class="layout-menu-left">
-                <Menu ref='menu' theme="dark" width="auto" v-if="buckets.length > 0" @on-select="selectBuckets"
+                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0" @on-select="selectBuckets"
                       :active-name="bucketname">
                     <div class="layout-logo-left"></div>
                     <Menu-item v-for="(item,index) of buckets" :name="item">
@@ -70,6 +70,7 @@
     </div>
 </template>
 <script>
+    import {mapGetters, mapActions} from 'vuex'
     import qiniu from 'qiniu'
     import * as types from '../vuex/mutation-types'
     const storage = require('electron-json-storage');
@@ -85,22 +86,27 @@
                 spanLeft: 5,
                 spanRight: 19,
                 search: '',
-                buckets: [],
                 bucketname: ''
             }
         },
-        components: {RightContent},
         computed: {
+            ...mapGetters({
+                buckets: types.APP.app_buckets,
+            }),
             iconSize () {
                 return this.spanLeft === 5 ? 18 : 24;
             }
         },
+        components: {RightContent},
         created: function () {
-            this.initKEY((data) => {
-                this.getBuckets();
-            });
 
             API = new api(this);
+            this.initKEY(() => {
+                this.getBuckets();
+            });
+            this.$router.push({path: '/setup'});
+
+            this[types.APP.app_a_setup_init]();
         },
         watch: {
             bucketname: function (val, oldvalue) {
@@ -112,6 +118,10 @@
             }
         },
         methods: {
+            ...mapActions([
+                types.APP.app_a_buckets,
+                types.APP.app_a_setup_init,
+            ]),
             initKEY(callback){
                 storage.get(types.APP.qiniu_key, (error, data) => {
                     if (!error) {
@@ -130,8 +140,7 @@
             },
             getBuckets(){
                 API.get(API.method.getBuckets).then((response) => {
-                    this.buckets = response.data;
-
+                    this[types.APP.app_a_buckets](response.data);
                     this.bucketname = this.buckets[1];
                 });
             },

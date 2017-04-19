@@ -25,7 +25,7 @@
                 columns: [
                     {title: '文件名', key: 'key'},
                     {
-                        title: '大小', key: 'fsize',
+                        title: '大小', key: 'fsize', sortable: true,
                         render (row, column, index) {
                             if (row.fsize >= 1024 * 1024) {
                                 return (row.fsize / 1024 / 1024).toFixed(2) + ' MB'
@@ -38,7 +38,7 @@
                     },
                     {title: '类型', key: 'mimeType'},
                     {
-                        title: '创建日期', key: 'putTime',
+                        title: '创建日期', key: 'putTime', sortable: true,
                         render (row, column, index) {
                             return moment(row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
                         }

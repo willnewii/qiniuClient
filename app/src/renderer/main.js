@@ -1,9 +1,10 @@
 import Vue from 'vue'
-import Electron from 'vue-electron'
 import Router from 'vue-router'
+import Electron from 'vue-electron'
 
 import App from './App'
 import routes from './routes'
+import store from './vuex/store'
 
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
@@ -22,5 +23,6 @@ const router = new Router({
 /* eslint-disable no-new */
 new Vue({
     router,
+    store,
     ...App
 }).$mount('#app')
