@@ -8,7 +8,7 @@
 <template>
     <div class="layout">
         <ClientHeader :bucketname="bucket.name" :domains="bucket.domains" :dirs="bucket.dirs"
-                      @on-update="onUpdate" @on-Navicon="toggleClick" @on-search="doSearch"></ClientHeader>
+                      @on-update="onUpdate" @on-navicon="toggleClick" @on-search="doSearch"></ClientHeader>
 
         <DirTag :tags="bucket.dirs" :currentTag="bucket.currentDir" @on-click="doDirSearch"></DirTag>
 
@@ -21,6 +21,7 @@
     </div>
 </template>
 <script>
+    import * as types from '../../vuex/mutation-types'
     import DirTag from './DirTag.vue'
     import ClientHeader from './ClientHeader.vue'
     import ResourceTable from './ResourceTable.vue'
@@ -133,7 +134,6 @@
                 this.getResources(search)
             },
             toggleClick () {
-                console.log(this.$refs);
                 //this.$emit('on-spanLeft', event);
             },
             onUpdate(ret, action){

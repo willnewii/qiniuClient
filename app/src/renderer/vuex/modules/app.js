@@ -6,14 +6,18 @@ import * as types from '../mutation-types'
 import * as util from '../../util/util'
 const storage = require('electron-json-storage');
 
-function setAppSetup(key, value) {
-    storage.get('app_setup', (error, app) => {
-        if (!error) {
-            app[key] = value;
-            storage.set('app_setup', app);
-        }
-    })
+/*function setAppSetup(key, value) {
+ storage.get('app_setup', (error, app) => {
+ if (!error) {
+ app[key] = value;
+ storage.set('app_setup', app);
+ }
+ })
+ }*/
+function setAppSetup(app) {
+    storage.set('app_setup', app);
 }
+
 
 export default {
     state: {
@@ -24,20 +28,21 @@ export default {
             bucket_dir: '',
         },
         app_buckets: [],
-        menuState:true
     },
     mutations: {
         [types.APP.setup_deleteNoAsk](state, value){
             state.setup.deleteNoAsk = value;
-            setAppSetup('deleteNoAsk', value);
+            setAppSetup(state.setup);
         },
         [types.APP.setup_copyType](state, value){
             state.setup.copyType = value;
-            setAppSetup('copyType', value);
+            setAppSetup(state.setup);
         },
-        [types.APP.setup_savedir](state, bucket_name, bucket_dir){
-            state.setup.bucket_name = bucket_name;
-            state.setup.bucket_dir = bucket_dir;
+        [types.APP.setup_savedir](state, value){
+            state.setup.bucket_name = value[0];
+            state.setup.bucket_dir = value[1];
+
+            setAppSetup(state.setup);
         },
         [types.APP.app_buckets](state, value){
             state.app_buckets = value;
@@ -59,8 +64,8 @@ export default {
         [types.APP.setup_a_copyType](context, json){
             context.commit(types.APP.setup_copyType, json);
         },
-        [types.APP.setup_a_savedir](context, value1, value2){
-            context.commit(types.APP.setup_savedir, value1, value2);
+        [types.APP.setup_a_savedir](context, value){
+            context.commit(types.APP.setup_savedir, value);
         },
         [types.APP.app_a_setup_init](context){
             storage.get('app_setup', (error, app) => {
@@ -79,12 +84,11 @@ export default {
         [types.APP.setup_copyType](state){
             return ('copyType' in state.setup) ? state.setup.copyType : 'url';
         },
-        [types.APP.setup_savedir](state){
-            if ('bucket_name' in state.setup) {
-                return state.setup.bucket_name;
-            } else {
-                return '';
-            }
+        [types.APP.setup_bucket_name](state){
+            return ('bucket_name' in state.setup) ? state.setup.bucket_name : '';
+        },
+        [types.APP.setup_bucket_dir](state){
+            return ('bucket_dir' in state.setup) ? state.setup.bucket_dir : '';
         },
         [types.APP.app_buckets](state){
             return state.app_buckets;

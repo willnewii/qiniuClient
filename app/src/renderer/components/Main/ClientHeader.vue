@@ -27,18 +27,18 @@
 <template>
     <div class="layout-header">
         <i-button type="text" @click="toggleClick">
-            <Icon type="navicon" size="32"></Icon>
+            <Icon :type="icon" size="32"></Icon>
         </i-button>
         <div class="full">
-            <Tag type="border" v-for="item of domains">{{item}}</Tag>
+            <Tag type="border" v-for="item of domains" v-if="bucketname">{{item}}</Tag>
         </div>
-        <i-button type="text" @click="actionBtn(0)">
+        <i-button type="text" @click="actionBtn(0)" v-if="bucketname">
             <Icon type="ios-plus-outline" size="32"/>
         </i-button>
-        <i-button type="text" @click="actionBtn(1)">
+        <i-button type="text" @click="actionBtn(1)" v-if="bucketname">
             <Icon type="arrow-swap" size="32"/>
         </i-button>
-        <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)"></Input>
+        <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)" v-if="bucketname"></Input>
         <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
@@ -77,6 +77,9 @@
             dirArray () {
                 return this.dirs.slice(2);
             },
+            icon () {
+                return this.bucketname ? 'pie-graph' : 'ios-cog';
+            },
         },
         props: {
             domains: {
@@ -108,8 +111,7 @@
         },
         methods: {
             toggleClick (){
-                this.$emit('on-Navicon', event);
-
+                this.$emit('on-navicon', event);
             },
             actionBtn (index, event) {
                 switch (index) {

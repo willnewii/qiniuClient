@@ -1,10 +1,16 @@
 <style scoped>
     .item {
-        padding: 20px 0 0 20px;
+        padding: 30px 0 0 30px;
+    }
+
+    .bucketdir {
+        width: 200px;
+        margin-right: 20px;
     }
 </style>
 <template>
     <div>
+        <ClientHeader domains="[]"></ClientHeader>
         <div class="item">
             直接删除,不需要确认：
             <i-switch v-model="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
@@ -22,12 +28,15 @@
                 <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
             </Select>
             /
-            {{setup_savedir}}
+            <Input class='bucketdir' v-model="bucketdir" size="small" placeholder="路径"></Input>
+            <Button @click="saveDir" size="small">保存</Button>
+            提示：默认文件将会被上传到:{{setup_bucket_name}}/{{setup_bucket_dir}}/
         </div>
     </div>
 </template>
 
 <script>
+    import ClientHeader from './Main/ClientHeader.vue'
     import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
 
@@ -35,16 +44,23 @@
         name: 'setup-page',
         data (){
             return {
-                bucketname: ''
+                bucketname: '',
+                bucketdir: '',
             }
         },
         computed: {
             ...mapGetters({
+                buckets: types.APP.app_buckets,
                 setup_copyType: types.APP.setup_copyType,
                 setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-                setup_savedir: types.APP.setup_savedir,
-                buckets: types.APP.app_buckets
+                setup_bucket_name: types.APP.setup_bucket_name,
+                setup_bucket_dir: types.APP.setup_bucket_dir,
             })
+        },
+        components: {ClientHeader},
+        created: function () {
+            this.bucketname = this.setup_bucket_name;
+            this.bucketdir = this.setup_bucket_dir;
         },
         methods: {
             ...mapActions([
@@ -58,6 +74,10 @@
             copyTypeChange: function (model) {
                 console.log(model);
                 this[types.APP.setup_a_copyType](model);
+            },
+            saveDir: function () {
+                console.log(this.bucketname + '/' + this.bucketdir);
+                this[types.APP.setup_a_savedir]([this.bucketname, this.bucketdir]);
             }
         }
     }

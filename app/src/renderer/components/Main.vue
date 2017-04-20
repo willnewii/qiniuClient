@@ -42,16 +42,20 @@
     }
 
     .ivu-col {
-        transition: width .2s ease-in-out;
+        //will-change: transition;
+        //transition: width .2s ease-in-out;
     }
 </style>
 <template>
     <div class="layout">
         <Row type="flex">
             <i-col :span="spanLeft" class="layout-menu-left">
-                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0" @on-select="selectBuckets"
+                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
+                      @on-select="selectBuckets"
                       :active-name="bucketname">
-                    <div class="layout-logo-left"></div>
+                    <i-button type="text" @click="toggleClick">
+                        <Icon type="navicon" size="32"></Icon>
+                    </i-button>
                     <Menu-item v-for="(item,index) of buckets" :name="item">
                         <Icon type="ios-navigate" :size="iconSize"></Icon>
                         <span class="layout-text" :class="{'layout-hide-text': spanLeft < 5}">{{item}}</span>
@@ -83,10 +87,9 @@
     export default {
         data () {
             return {
-                spanLeft: 5,
-                spanRight: 19,
                 search: '',
-                bucketname: ''
+                bucketname: '',
+                menuState: true,
             }
         },
         computed: {
@@ -94,17 +97,22 @@
                 buckets: types.APP.app_buckets,
             }),
             iconSize () {
-                return this.spanLeft === 5 ? 18 : 24;
+                return this.menuState ? 24 : 18;
+            },
+            spanLeft () {
+                return this.menuState ? 5 : 2;
+            },
+            spanRight () {
+                return this.menuState ? 19 : 22;
             }
         },
         components: {RightContent},
         created: function () {
-
             API = new api(this);
             this.initKEY(() => {
                 this.getBuckets();
             });
-            this.$router.push({path: '/setup'});
+            //this.$router.push({path: '/setup'});
 
             this[types.APP.app_a_setup_init]();
         },
@@ -147,14 +155,8 @@
             selectBuckets(name){
                 this.bucketname = name;
             },
-            onSpanLeft(){
-                if (this.spanLeft === 5) {
-                    this.spanLeft = 2;
-                    this.spanRight = 22;
-                } else {
-                    this.spanLeft = 5;
-                    this.spanRight = 19;
-                }
+            toggleClick(){
+                this.menuState = !this.menuState;
             }
         }
     }

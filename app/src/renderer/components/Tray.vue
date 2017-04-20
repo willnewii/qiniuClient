@@ -10,9 +10,10 @@
 </template>
 
 <script>
-    import qiniu from 'qiniu'
-    import * as util from '../util/util'
+    import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
+    import * as util from '../util/util'
+    import qiniu from 'qiniu'
     import storage from 'electron-json-storage'
 
     let ipc;
@@ -23,10 +24,16 @@
                 files: [],
                 logs: [],
                 current: 1,
-                bucketname: 'blog'
             }
         },
+        computed: {
+            ...mapGetters({
+                bucket_name: types.APP.setup_bucket_name,
+                bucket_dir: types.APP.setup_bucket_dir,
+            })
+        },
         created(){
+            this[types.APP.app_a_setup_init]();
             ipc = this.$electron.ipcRenderer;
 
             storage.get(types.APP.qiniu_key, (error, data) => {
@@ -51,6 +58,9 @@
             })
         },
         methods: {
+            ...mapActions([
+                types.APP.app_a_setup_init,
+            ]),
             updateStatus(title){
                 ipc.send('upload-tray-title', title);
             },
@@ -72,8 +82,8 @@
                 }
             },
             uploadFile(filePath){
-                let key = 'test/' + util.getName(filePath);
-                let uptoken = new qiniu.rs.PutPolicy(this.bucketname + ":" + key).token();
+                let key = this.bucket_dir + '/' + util.getName(filePath);
+                let uptoken = new qiniu.rs.PutPolicy(this.bucket_name + ":" + key).token();
                 let extra = new qiniu.io.PutExtra();
 
                 let log = {

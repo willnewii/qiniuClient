@@ -1,7 +1,7 @@
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
-import {BrowserWindow, Tray, ipcMain} from 'electron'
+import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron'
 import notifier from 'node-notifier'
 import * as util from './util'
 
@@ -34,6 +34,14 @@ export const createTray = function () {
             event.sender.send('log', err)
         });
     })
+
+ /*   setInterval(() => {
+        console.log("clipboard:", clipboard.readText());
+        console.log("clipboard:", clipboard.readHtml());
+        console.log("clipboard:", clipboard.readImage().toDataURL());
+        console.log("clipboard:", clipboard.readRtf());
+        console.log("clipboard:", clipboard.availableFormats());
+    }, 10000);*/
 
     return mTray;
 }

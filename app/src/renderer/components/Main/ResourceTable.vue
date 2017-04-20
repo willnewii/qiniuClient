@@ -5,13 +5,36 @@
         background: #fff;
     }
 </style>
+<style lang="scss">
+    .layout-content {
+        margin: 15px;
+        overflow: scroll;
+        background: #fff;
+    }
+
+    .ivu-table-header > table {
+        width: 100% !important;
+    }
+
+    .ivu-table-body > table {
+        width: 100% !important;
+    }
+</style>
 <template>
     <div class="layout-content">
         <Table border :columns="columns" :context="self"
                :height="tableHeight" :data="files" no-data-text="没有数据呀~"></Table>
+        <Modal
+                v-model="deleteNoAskModel"
+                title="确认删除文件？"
+                @on-ok="doRemove">
+            <p>{{deleteKey}}</p>
+        </Modal>
     </div>
 </template>
 <script>
+    import {mapGetters} from 'vuex'
+    import * as types from '../../vuex/mutation-types'
     import qiniu from 'qiniu'
     import moment from 'moment'
 
@@ -22,6 +45,8 @@
                 self: this,
                 tableHeight: 100,
                 tableWidth: 100,
+                deleteKey: '',
+                deleteNoAskModel: false,
                 columns: [
                     {title: '文件名', key: 'key'},
                     {
@@ -59,6 +84,13 @@
                 }
             }
         },
+        computed: {
+            ...mapGetters({
+                menuState: types.APP.menu_state,
+                setup_copyType: types.APP.setup_copyType,
+                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
+            })
+        },
         props: {
             files: {
                 type: Array,
@@ -87,16 +119,30 @@
                 this.$electron.shell.openExternal('http://' + url)
             },
             copy(index){
-                let url = this.domains[0] + '/' + this.files[index].key;
-                this.$electron.clipboard.writeText('http://' + url);
+                let url = 'http://' + this.domains[0] + '/' + encodeURIComponent(this.files[index].key);
+
+                if (this.setup_copyType == 'url') {
+                    this.$electron.clipboard.writeText(url);
+                } else if (this.setup_copyType == 'markdown') {
+                    this.$electron.clipboard.writeText('![' + this.files[index].key + '](' + url + ')');
+                }
             },
             remove(index) {
-                new qiniu.rs.Client().remove(this.bucketname, this.files[index].key, (err, ret) => {
+                this.deleteKey = this.files[index].key
+                if (this.setup_deleteNoAsk) {
+                    this.deleteNoAskModel = true;
+                    console.log(this.setup_deleteNoAsk);
+                }else{
+                    this.doRemove();
+                }
+            },
+            doRemove(){
+                new qiniu.rs.Client().remove(this.bucketname, this.deleteKey, (err, ret) => {
                     if (!err) {
                         this.$Message.info('移除成功');
                         if (!ret) {
                             ret = {
-                                key: this.files[index].key
+                                key: this.deleteKey
                             }
                         }
                         this.$emit('on-update', ret, 'remove', event);
@@ -107,14 +153,19 @@
             },
             setTableSize(){
                 if (this.$parent) {
-                    this.tableHeight = this.$parent.$el.clientHeight * 0.85 - 30;
-                }
-                /*                this.tableWidth = this.$refs.spanRight.$el.clientWidth - 30;
+                    let that = this;
+                    that.tableHeight = that.$parent.$el.clientHeight * 0.85 - 30;
+                    //that.tableWidth = that.$parent.$el.getBoundingClientRect().width - 30;
+                    //console.log(that.$parent.$el.getBoundingClientRect().width);
 
-                 this.columns[0].width = this.tableWidth * 0.5;
-                 this.columns[1].width = this.tableWidth * 0.1;
-                 this.columns[2].width = this.tableWidth * 0.2;
-                 this.columns[3].width = this.tableWidth * 0.2;*/
+                    /*               this.columns[0].width = this.tableWidth * 0.5;
+                     this.columns[1].width = this.tableWidth * 0.1;
+                     this.columns[2].width = this.tableWidth * 0.2;
+                     this.columns[3].width = this.tableWidth * 0.2;*/
+                }
+                /*
+
+                 */
             },
         }
     };
