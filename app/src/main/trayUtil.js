@@ -5,11 +5,14 @@ import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron'
 import notifier from 'node-notifier'
 import * as util from './util'
 
+const icon_tray = 'tray.png';
+const icon_upload = 'upload.png';
+
 let mTray, mTrayWindow;
 
 //托盘部分处理
 export const createTray = function () {
-    mTray = new Tray(util.getIconPath('tray.png'));
+    mTray = new Tray(util.getIconPath(icon_tray));
 
     mTrayWindow = createTrayWindow();
 
@@ -18,10 +21,14 @@ export const createTray = function () {
     })
 
     mTray.on('drop-files', (event, files) => {
+        setTrayIcon(icon_upload);
         mTrayWindow.webContents.send('upload-Files', files);
     })
 
     ipcMain.on('upload-tray-title', function (event, title) {
+        if(title.length == 0){
+            setTrayIcon(icon_tray);
+        }
         setTrayTitle(title)
     })
 
@@ -35,13 +42,13 @@ export const createTray = function () {
         });
     })
 
- /*   setInterval(() => {
-        console.log("clipboard:", clipboard.readText());
-        console.log("clipboard:", clipboard.readHtml());
-        console.log("clipboard:", clipboard.readImage().toDataURL());
-        console.log("clipboard:", clipboard.readRtf());
-        console.log("clipboard:", clipboard.availableFormats());
-    }, 10000);*/
+    /*   setInterval(() => {
+     console.log("clipboard:", clipboard.readText());
+     console.log("clipboard:", clipboard.readHtml());
+     console.log("clipboard:", clipboard.readImage().toDataURL());
+     console.log("clipboard:", clipboard.readRtf());
+     console.log("clipboard:", clipboard.availableFormats());
+     }, 10000);*/
 
     return mTray;
 }
@@ -104,5 +111,9 @@ export const setTrayTitle = function (title) {
     if (util.isMac()) {
         mTray.setTitle(title);
     }
+}
+
+export const setTrayIcon = function (image) {
+    mTray.setImage(util.getIconPath(image))
 }
 

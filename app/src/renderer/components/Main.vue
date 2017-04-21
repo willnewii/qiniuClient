@@ -20,15 +20,13 @@
                 background: #5b6270;
                 border-radius: 3px;
                 margin: 15px auto;
-
-                .layout-hide-text .layout-text {
-                    display: none;
-                }
+            }
+            .layout-text {
+                margin-left: 10px;
             }
         }
 
         .layout-menu-right {
-
         }
     }
 
@@ -57,18 +55,17 @@
                         <Icon type="navicon" size="32"></Icon>
                     </i-button>
                     <Menu-item v-for="(item,index) of buckets" :name="item">
-                        <Icon type="ios-navigate" :size="iconSize"></Icon>
-                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 5}">{{item}}</span>
+                        <Icon type="ios-box" :size="iconSize"></Icon>
+                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
                     </Menu-item>
                     <Menu-item name="__app__setup__">
                         <Icon type="gear-a" :size="iconSize"></Icon>
-                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 5}">设置</span>
+                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">设置</span>
                     </Menu-item>
                 </Menu>
             </i-col>
             <i-col :span="spanRight" class="layout-menu-right">
-                <router-view></router-view>
-                <!--<RightContent :bucketname="bucketname" @on-spanLeft="onSpanLeft"></RightContent>-->
+                <router-view :bucketname="bucketname"></router-view>
             </i-col>
         </Row>
     </div>
@@ -100,10 +97,10 @@
                 return this.menuState ? 24 : 18;
             },
             spanLeft () {
-                return this.menuState ? 5 : 2;
+                return this.menuState ? 4 : 1;
             },
             spanRight () {
-                return this.menuState ? 19 : 22;
+                return this.menuState ? 20 : 23;
             }
         },
         components: {RightContent},
@@ -115,15 +112,6 @@
             //this.$router.push({path: '/setup'});
 
             this[types.APP.app_a_setup_init]();
-        },
-        watch: {
-            bucketname: function (val, oldvalue) {
-                if (val === '__app__setup__') {
-                    this.$router.push({path: '/setup'});
-                } else {
-                    this.$router.push({path: '/table', query: {bucketname: this.bucketname}});
-                }
-            }
         },
         methods: {
             ...mapActions([
@@ -154,6 +142,11 @@
             },
             selectBuckets(name){
                 this.bucketname = name;
+                if (name === '__app__setup__') {
+                    this.$router.push({path: '/setup'});
+                } else {
+                    this.$router.push({path: '/table', query: {bucketname: name}});
+                }
             },
             toggleClick(){
                 this.menuState = !this.menuState;

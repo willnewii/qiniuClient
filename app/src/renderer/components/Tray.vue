@@ -1,11 +1,34 @@
-<style scoped>
+<style lang="scss" scoped>
+    .ivu-menu-horizontal {
+        height: 40px;
+        line-height: 40px;
+    }
+
+    .list {
+        height: 260px;
+        overflow: scroll;
+        .item {
+            padding: 10px;
+            border-bottom: 1px #CCC solid;
+        }
+    }
 
 </style>
 <template>
     <div>
-        <div>上传记录</div>
-        <div></div>
-        <div>{{logs}}</div>
+        <Menu mode="horizontal" active-name="1">
+            <Menu-item name="1">
+                上传记录
+            </Menu-item>
+        </Menu>
+        <div class="list">
+            <div class='item' v-for="item of logs">
+                <i-button type="primary" size="small" @click="open(item.key)">查看</i-button>
+                <i-button type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
+                <i-button type="primary" size="small" @click="openInFolder(item.path)">源文件</i-button>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -15,12 +38,14 @@
     import * as util from '../util/util'
     import qiniu from 'qiniu'
     import storage from 'electron-json-storage'
+    import api from '../api/API'
+    let API, ipc;
 
-    let ipc;
     export default {
         name: 'tray-page',
         data(){
             return {
+                domains: [],
                 files: [],
                 logs: [],
                 current: 1,
@@ -30,17 +55,26 @@
             ...mapGetters({
                 bucket_name: types.APP.setup_bucket_name,
                 bucket_dir: types.APP.setup_bucket_dir,
+                setup_copyType: types.APP.setup_copyType,
             })
         },
         created(){
             this[types.APP.app_a_setup_init]();
             ipc = this.$electron.ipcRenderer;
 
+            API = new api(this);
+
+            let that = this;
             storage.get(types.APP.qiniu_key, (error, data) => {
                 if (!error) {
                     if (data.access_key && data.secret_key) {
                         qiniu.conf.ACCESS_KEY = data.access_key;
                         qiniu.conf.SECRET_KEY = data.secret_key;
+
+                        API.get(API.method.getDomains, {tbl: this.bucket_name}).then((response) => {
+                            that.domains = response.data;
+                            console.log(that.domains);
+                        });
                     } else {
                     }
                 }
@@ -110,6 +144,17 @@
                 this.logs.push(log);
                 this.current = this.current + 1;
                 this.doUploadFile();
+            },
+            show(key){
+                let url = util.getQiniuUrl(this.domains[0], key);
+                this.$electron.shell.openExternal(url);
+            },
+            copy(key){
+                let url = util.getQiniuUrl(this.domains[0], key);
+                util.setClipboardText(this, this.setup_copyType, url);
+            },
+            openInFolder(path){
+                this.$electron.shell.showItemInFolder(path);
             }
         }
     }

@@ -61,6 +61,7 @@
         mounted () {
             API = new api(this);
 
+            console.log(this.$route.query.bucketname);
             if (this.$route.query && this.$route.query.bucketname) {
                 if (this.$route.query.bucketname !== this.bucket.name) {
                     this.bucket.name = this.$route.query.bucketname;

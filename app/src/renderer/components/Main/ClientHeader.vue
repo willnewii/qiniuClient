@@ -78,7 +78,7 @@
                 return this.dirs.slice(2);
             },
             icon () {
-                return this.bucketname ? 'pie-graph' : 'ios-cog';
+                return this.bucketname ? 'ios-box' : 'ios-cog';
             },
         },
         props: {

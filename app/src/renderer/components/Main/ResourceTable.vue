@@ -35,6 +35,7 @@
 <script>
     import {mapGetters} from 'vuex'
     import * as types from '../../vuex/mutation-types'
+    import * as util from '../../util/util'
     import qiniu from 'qiniu'
     import moment from 'moment'
 
@@ -71,7 +72,7 @@
                     {
                         title: '操作', key: 'action',
                         render (row, column, index) {
-                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="primary" size="small" @click="copy(${index})">复制</i-button> <i-button type="error" size="small" @click="remove(${index})">💀删除</i-button>`;
+                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="primary" size="small" @click="copy(${index})">复制</i-button> <i-button type="error" size="small" @click="remove(${index})">💀 删除</i-button>`;
                         }
                     }],
                 bucket: {
@@ -115,24 +116,18 @@
         },
         methods: {
             show(index) {
-                let url = this.domains[0] + '/' + this.files[index].key;
-                this.$electron.shell.openExternal('http://' + url)
+                this.$electron.shell.openExternal(util.getQiniuUrl(this.domains[0], this.files[index].key))
             },
             copy(index){
-                let url = 'http://' + this.domains[0] + '/' + encodeURIComponent(this.files[index].key);
-
-                if (this.setup_copyType == 'url') {
-                    this.$electron.clipboard.writeText(url);
-                } else if (this.setup_copyType == 'markdown') {
-                    this.$electron.clipboard.writeText('![' + this.files[index].key + '](' + url + ')');
-                }
+                let url = util.getQiniuUrl(this.domains[0], this.files[index].key);
+                util.setClipboardText(this, this.setup_copyType, url);
             },
             remove(index) {
                 this.deleteKey = this.files[index].key
                 if (this.setup_deleteNoAsk) {
                     this.deleteNoAskModel = true;
                     console.log(this.setup_deleteNoAsk);
-                }else{
+                } else {
                     this.doRemove();
                 }
             },
