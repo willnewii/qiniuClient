@@ -1,6 +1,16 @@
-# my-project2
+# qiniuClien
 
-> An electron-vue project
+> 七牛文件管理客户端
+
+#### 功能
+1. 文件的增、删、查
+2. 显示虚拟目录 
+3. 转存文件
+3. 文件按日期/大小 排序
+4. 托盘上传
+
+#### 截图
+![qiniu-Client_和_qiniu-Client_和_README_md_-_my-project2_-____Downloads_Web_Vue_my-project2_.jpg](http://obfmtiyt5.bkt.clouddn.com/11111%2Fqiniu-Client_%E5%92%8C_qiniu-Client_%E5%92%8C_README_md_-_my-project2_-____Downloads_Web_Vue_my-project2_.jpg)
 
 ## Build Setup
 
@@ -19,18 +29,8 @@ npm run pack
 ```
 More information can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
-#### 功能
-1. 上传文件
-2. 转存文件
-3. 删除文件
-4. 展示目录 (根据list接口遍历  如果无目录文件较多 会有问题)
 
-
----
-
-This project was generated from [electron-vue](https://github.com/SimulatedGREG/electron-vue) using [vue-cli](https://github.com/vuejs/vue-cli). Documentation about this project can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/index.html).
-
-#### fix
+#### issue
 - vue package.json
 ```
 "main": "dist/vue.common.js",
@@ -41,7 +41,7 @@ This project was generated from [electron-vue](https://github.com/SimulatedGREG/
 "main": "./browser.js"
 ```
 
-#### iView + Electron [独立构建-vs-运行时构建](https://cn.vuejs.org/v2/guide/installation.html#独立构建-vs-运行时构建)
+##### iView + Electron [独立构建-vs-运行时构建](https://cn.vuejs.org/v2/guide/installation.html#独立构建-vs-运行时构建)
 ```
 TypeError: _vue2.default.compile is not a function at VueComponent.compile
 //官网提示可以在webpack添加
@@ -53,11 +53,9 @@ resolve: {
 我的没有效果...我直接修改了vue的package.json
 ```
 
-
-### [中文文档-gitbook](https://wizardforcel.gitbooks.io/electron-doc/content/index.html)
+#### 参考资料 
+- [中文文档-gitbook](https://wizardforcel.gitbooks.io/electron-doc/content/index.html)
 - [中文文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
 - [electron-cn-docs](https://github.com/amhoho/electron-cn-docs/)
-
 - [qiniu api](https://developer.qiniu.com/kodo/api/1731/api-overview)
-
 - [webpack2 中文文档](https://doc.webpack-china.org)
