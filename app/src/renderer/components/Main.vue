@@ -137,7 +137,9 @@
             getBuckets(){
                 API.get(API.method.getBuckets).then((response) => {
                     this[types.APP.app_a_buckets](response.data);
-                    this.bucketname = this.buckets[1];
+                    this.bucketname = this.buckets[0];
+
+                    this.selectBuckets(this.bucketname);
                 });
             },
             selectBuckets(name){
