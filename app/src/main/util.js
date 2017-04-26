@@ -19,3 +19,10 @@ export const isMac = function () {
     }
     return false;
 }
+
+export const isWin = function () {
+    if (process.platform === 'win32') {
+        return true;
+    }
+    return false;
+}

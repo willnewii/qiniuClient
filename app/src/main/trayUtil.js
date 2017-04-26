@@ -5,8 +5,8 @@ import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron'
 import notifier from 'node-notifier'
 import * as util from './util'
 
-const icon_tray = 'tray.png';
-const icon_upload = 'upload.png';
+const icon_tray = util.isWin() ? 'win_' : '' + 'tray.png';
+const icon_upload = util.isWin() ? 'win_' : '' + 'upload.png';
 
 let mTray, mTrayWindow;
 
@@ -26,7 +26,7 @@ export const createTray = function () {
     })
 
     ipcMain.on('upload-tray-title', function (event, title) {
-        if(title.length == 0){
+        if (title.length == 0) {
             setTrayIcon(icon_tray);
         }
         setTrayTitle(title)
@@ -98,11 +98,18 @@ const showTrayWindow = () => {
 }
 
 const getTrayWindowPosition = () => {
-    const windowBounds = mTrayWindow.getBounds()
     const trayBounds = mTray.getBounds()
+    const windowBounds = mTrayWindow.getBounds()
 
-    const x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
-    const y = Math.round(trayBounds.y + trayBounds.height + 4)
+    let x, y;
+    if (util.isMac()) {
+        x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
+        y = Math.round(trayBounds.y + trayBounds.height + 4)
+    } else {
+        x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2))
+        y = Math.round(trayBounds.y - (windowBounds.height))
+    }
+
 
     return {x: x, y: y}
 }
