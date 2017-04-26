@@ -5,8 +5,8 @@ import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron'
 import notifier from 'node-notifier'
 import * as util from './util'
 
-const icon_tray = util.isWin() ? 'win_' : '' + 'tray.png';
-const icon_upload = util.isWin() ? 'win_' : '' + 'upload.png';
+const icon_tray = util.isWin() ? 'win_tray.png' : 'tray.png';
+const icon_upload = util.isWin() ? 'win_upload.png' : 'upload.png';
 
 let mTray, mTrayWindow;
 
