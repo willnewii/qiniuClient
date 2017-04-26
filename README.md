@@ -1,10 +1,16 @@
 # qiniuClien
 
-> 七牛文件管理客户端
+> 七牛存储文件管理客户端.跟官网比主要多了一个托盘上传功能.可以更便捷的上传文件.
+
+#### Technologies
+- [electron](https://github.com/electron/electron)
+- [electron-vue](https://github.com/SimulatedGREG/electron-vue)
+- [vue2.0 + axios + router + vuex](https://github.com/vuejs/vue)
+- [iview 2.0](https://github.com/iview/iview)
 
 #### 功能
 1. 文件的增、删、查
-2. 显示虚拟目录 
+2. 显示目录 
 3. 转存文件
 3. 文件按日期/大小 排序
 4. 托盘上传
@@ -16,6 +22,9 @@
 
 ``` bash
 # install dependencies
+cd app
+npm install
+cd ..
 npm install
 
 # serve with hot reload at localhost:9080
@@ -57,5 +66,5 @@ resolve: {
 - [中文文档-gitbook](https://wizardforcel.gitbooks.io/electron-doc/content/index.html)
 - [中文文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
 - [electron-cn-docs](https://github.com/amhoho/electron-cn-docs/)
-- [qiniu api](https://developer.qiniu.com/kodo/api/1731/api-overview)
+- [七牛API](https://developer.qiniu.com/kodo/api/1731/api-overview)
 - [webpack2 中文文档](https://doc.webpack-china.org)
