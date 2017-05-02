@@ -24,8 +24,15 @@
 # install dependencies
 cd app
 npm install
+
+--fix--
+修改 app/node_modules/qiniu/node_modules/sync-request/package.json  入口文件为./browser.js
+加入一行
+"main": "./browser.js"
+--fix--
+
 cd ..
-npm install
+cnpm install   //electron 需要的文件下载巨慢,经常卡死 这里推荐用cnpm 
 
 # serve with hot reload at localhost:9080
 npm run dev
