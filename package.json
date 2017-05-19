@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "electron-json-storage": "^3.0.4",
-    "node-notifier": "^5.1.2"
+    "node-notifier": "^5.1.2",
+    "prepack-webpack-plugin": "^1.0.1"
   }
 }

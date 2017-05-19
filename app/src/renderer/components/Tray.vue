@@ -10,6 +10,10 @@
         .item {
             padding: 10px;
             border-bottom: 1px #CCC solid;
+            .image {
+                width: 50px;
+                height: 50px;
+            }
         }
     }
 
@@ -23,6 +27,7 @@
         </Menu>
         <div class="list">
             <div class='item' v-for="item of logs">
+                <img class='image' :src="'http://' + domains[0]+'/'+item.key" alt="">
                 <i-button type="primary" size="small" @click="open(item.key)">查看</i-button>
                 <i-button type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
                 <i-button type="primary" size="small" @click="openInFolder(item.path)">源文件</i-button>
@@ -49,6 +54,7 @@
                 files: [],
                 logs: [],
                 current: 1,
+                config: {}
             }
         },
         computed: {
@@ -73,7 +79,6 @@
 
                         API.get(API.method.getDomains, {tbl: this.bucket_name}).then((response) => {
                             that.domains = response.data;
-                            console.log(that.domains);
                         });
                     } else {
                     }
@@ -84,7 +89,13 @@
                 console.log(files);
                 this.files = files;
 
-                this.doUploadFile();
+                storage.get('app_setup', (error, app) => {
+                    if (!error) {
+                        console.log(app);
+                        this.config = app;
+                        this.doUploadFile();
+                    }
+                });
             });
 
             ipc.on('log', (event, log) => {
@@ -116,8 +127,8 @@
                 }
             },
             uploadFile(filePath){
-                let key = this.bucket_dir + '/' + util.getName(filePath);
-                let uptoken = new qiniu.rs.PutPolicy(this.bucket_name + ":" + key).token();
+                let key = this.config.bucket_dir + '/' + util.getName(filePath);
+                let uptoken = new qiniu.rs.PutPolicy(this.config.bucket_name + ":" + key).token();
                 let extra = new qiniu.io.PutExtra();
 
                 let log = {
@@ -141,7 +152,7 @@
                     log.code = err.statusCode;
                     log.error = err.body;
                 }
-                this.logs.push(log);
+                this.logs.unshift(log);
                 this.current = this.current + 1;
                 this.doUploadFile();
             },
@@ -151,7 +162,7 @@
             },
             copy(key){
                 let url = util.getQiniuUrl(this.domains[0], key);
-                util.setClipboardText(this, this.setup_copyType, url);
+                util.setClipboardText(this, this.config.setup_copyType, url);
             },
             openInFolder(path){
                 this.$electron.shell.showItemInFolder(path);

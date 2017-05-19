@@ -42,14 +42,6 @@ export const createTray = function () {
         });
     })
 
-    /*   setInterval(() => {
-     console.log("clipboard:", clipboard.readText());
-     console.log("clipboard:", clipboard.readHtml());
-     console.log("clipboard:", clipboard.readImage().toDataURL());
-     console.log("clipboard:", clipboard.readRtf());
-     console.log("clipboard:", clipboard.availableFormats());
-     }, 10000);*/
-
     return mTray;
 }
 
