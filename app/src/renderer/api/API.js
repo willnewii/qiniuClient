@@ -4,27 +4,28 @@
 
 import axios from 'axios'
 import config from './config'
-import qiniu from 'qiniu'
+import * as cloudStorage from '../util/cloudStorage'
+
 import Qs from 'qs'
 
 class API {
 
-    constructor(view){
+    constructor(view) {
         this.that = view;
     }
 
     method = {
-        getBuckets: qiniu.conf.RS_HOST + '/buckets',
-        getDomains: qiniu.conf.API_HOST + '/v6/domain/list',
-        getResources: qiniu.conf.RSF_HOST + '/list',
-    }
+        getBuckets: 'http://rs.qbox.me/buckets',
+        getDomains: 'http://api.qiniu.com/v6/domain/list',
+        getResources: 'http://rsf.qbox.me/list',
+    };
 
     post(url, param) {
         //config.data = param;
         // return axios.post("", null, config);
         let _url = url;
         if (param)
-            _url = _url + '?' + Qs.stringify(param)
+            _url = _url + '?' + Qs.stringify(param);
         return this._request(_url, 'post')
     }
 
@@ -34,35 +35,34 @@ class API {
 
         let _url = url;
         if (param)
-            _url = _url + '?' + Qs.stringify(param)
+            _url = _url + '?' + Qs.stringify(param);
 
         return this._request(_url, 'get')
     }
 
     _request(url, type, param) {
         this.that.$Loading.start();
-       /* if (type === 'get') {
-            config.params = param;
-        } else {
-            config.data = param;
-        }*/
-
-        config.headers.Authorization = qiniu.util.generateAccessToken(url, null);
+        /* if (type === 'get') {
+         config.params = param;
+         } else {
+         config.data = param;
+         }*/
+        config.headers.Authorization = cloudStorage.httpAuthorization(url);
         config.method = type;
 
-        let request ;
+        let request;
         if (type === 'get') {
             request = axios.get(url, config)
         } else {
             request = axios[type](url, null, config)
         }
 
-        request.then((response)=>{
+        request.then((response) => {
             this.that.$Loading.finish();
-        }).catch((error)=>{
+        }).catch((error) => {
             this.that.$Loading.error();
-        })
-        return request ;
+        });
+        return request;
     }
 
 }

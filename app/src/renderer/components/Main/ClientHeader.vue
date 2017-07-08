@@ -38,7 +38,8 @@
         <i-button type="text" @click="actionBtn(1)" v-if="bucketname">
             <Icon type="arrow-swap" size="32"/>
         </i-button>
-        <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)" v-if="bucketname"></Input>
+        <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)"
+               v-if="bucketname"></Input>
         <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
@@ -56,7 +57,7 @@
     </div>
 </template>
 <script>
-    import qiniu from 'qiniu'
+    import * as cloudStorage from '../../util/cloudStorage'
 
     let ipc;
     export default {
@@ -147,20 +148,29 @@
                 let that = this;
                 let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
 
+                this.$Notice.info({
+                    title: '文件上传中...',
+                    desc: this.uploadModal.path,
+                });
+
+                let param = {
+                    bucket: this.bucketname,
+                    key: key,
+                    path: this.uploadModal.path
+                };
+
+                let callback = (err, ret) => {
+                    that.uploadResult(err, ret);
+                };
+
                 if (this.uploadModal.type === 'fetch') {
-                    new qiniu.rs.Client().fetch(this.uploadModal.path, this.bucketname, key, (err, ret, res) => {
-                        that.uploadResult(err, ret, res);
-                    });
+                    cloudStorage.fetch(param, callback)
                 } else {
-                    let uptoken = new qiniu.rs.PutPolicy(this.bucketname + ":" + key).token();
-                    let extra = new qiniu.io.PutExtra();
-                    qiniu.io.putFile(uptoken, key, this.uploadModal.path, extra, function (err, ret, res) {
-                        that.uploadResult(err, ret, res);
-                    });
+                    cloudStorage.upload(param, callback);
                 }
             },
-            uploadResult(err, ret, res){
-                let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
+            uploadResult(err, ret){
+                //let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
 
                 this.uploadModal.input = '';
                 this.uploadModal.prepend = '';

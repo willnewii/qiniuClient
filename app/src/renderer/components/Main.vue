@@ -76,7 +76,7 @@
 </template>
 <script>
     import {mapGetters, mapActions} from 'vuex'
-    import qiniu from 'qiniu'
+    import * as cloudStorage from '../util/cloudStorage'
     import * as types from '../vuex/mutation-types'
     import storage from 'electron-json-storage'
 
@@ -127,9 +127,7 @@
                     if (!error) {
                         if (data.access_key && data.secret_key) {
                             if (callback) {
-                                qiniu.conf.ACCESS_KEY = data.access_key;
-                                qiniu.conf.SECRET_KEY = data.secret_key;
-
+                                cloudStorage.init({access_key: data.access_key, secret_key: data.secret_key});
                                 callback(data);
                             }
                         } else {

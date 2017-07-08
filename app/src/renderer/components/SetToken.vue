@@ -28,11 +28,11 @@
     </div>
 </template>
 <script>
-    import qiniu from 'qiniu'
+    import * as cloudStorage from '../util/cloudStorage'
     const storage = require('electron-json-storage');
 
     import api from '../api/API'
-    let API ;
+    let API;
 
     export default {
         data () {
@@ -71,8 +71,7 @@
                 this.$refs[name].resetFields();
             },
             validateToken(access_key, secret_key){
-                qiniu.conf.ACCESS_KEY = access_key;
-                qiniu.conf.SECRET_KEY = secret_key;
+                cloudStorage.init({access_key: access_key, secret_key: secret_key});
 
                 API.get(API.method.getBuckets).then((response) => {
                     storage.set('qiniu_key', {
@@ -80,7 +79,7 @@
                         secret_key: secret_key
                     }, (error) => {
                         console.log(error);
-                        if (!error){
+                        if (!error) {
                             this.$router.push({path: '/'});
                         }
                     });

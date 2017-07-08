@@ -36,7 +36,8 @@
     import {mapGetters} from 'vuex'
     import * as types from '../../vuex/mutation-types'
     import * as util from '../../util/util'
-    import qiniu from 'qiniu'
+    import * as cloudStorage from '../../util/cloudStorage'
+
     import moment from 'moment'
 
     export default {
@@ -162,7 +163,7 @@
                 this.$Message.info('文件路径以复制到剪贴板');
             },
             remove(index) {
-                this.deleteKey = this.files[index].key
+                this.deleteKey = this.files[index].key;
                 if (this.setup_deleteNoAsk) {
                     this.deleteNoAskModel = true;
                     console.log(this.setup_deleteNoAsk);
@@ -171,19 +172,18 @@
                 }
             },
             doRemove(){
-                new qiniu.rs.Client().remove(this.bucketname, this.deleteKey, (err, ret) => {
-                    if (!err) {
-                        this.$Message.info('移除成功');
-                        if (!ret) {
-                            ret = {
-                                key: this.deleteKey
-                            }
+                cloudStorage.remove({
+                    bucket: this.bucketname,
+                    key: this.deleteKey
+                }, (ret) => {
+                    this.$Message.info('移除成功');
+                    if (!ret) {
+                        ret = {
+                            key: this.deleteKey
                         }
-                        this.$emit('on-update', ret, 'remove', event);
-                    } else {
-                        console.log(err);
                     }
-                });
+                    this.$emit('on-update', ret, 'remove', event);
+                })
             },
             setTableSize(){
                 if (this.$parent) {

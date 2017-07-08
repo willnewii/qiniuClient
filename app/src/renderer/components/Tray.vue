@@ -38,9 +38,10 @@
                 <div>
                     <div>{{item.key}}</div>
                     <div>
-                        <i-button class='btn' type="primary" size="small" @click="open(item.key)">查看</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="show(item.key)">查看</i-button>
                         <i-button class='btn' type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
-                        <i-button class='btn' type="primary" size="small" @click="openInFolder(item.path)">源文件</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="openInFolder(item.path)">源文件
+                        </i-button>
                     </div>
                 </div>
 
@@ -54,7 +55,7 @@
     import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
     import * as util from '../util/util'
-    import qiniu from 'qiniu'
+    import * as cloudStorage from '../util/cloudStorage'
     import storage from 'electron-json-storage'
     import api from '../api/API'
     let API, ipc;
@@ -87,8 +88,7 @@
             storage.get(types.APP.qiniu_key, (error, data) => {
                 if (!error) {
                     if (data.access_key && data.secret_key) {
-                        qiniu.conf.ACCESS_KEY = data.access_key;
-                        qiniu.conf.SECRET_KEY = data.secret_key;
+                        cloudStorage.init({access_key: data.access_key, secret_key: data.secret_key});
 
                         API.get(API.method.getDomains, {tbl: this.bucket_name}).then((response) => {
                             that.domains = response.data;
@@ -104,7 +104,6 @@
 
                 storage.get('app_setup', (error, app) => {
                     if (!error) {
-                        console.log(app);
                         this.config = app;
                         this.doUploadFile();
                     }
@@ -141,16 +140,17 @@
             },
             uploadFile(filePath){
                 let key = this.config.bucket_dir + '/' + util.getName(filePath);
-                let uptoken = new qiniu.rs.PutPolicy(this.config.bucket_name + ":" + key).token();
-                let extra = new qiniu.io.PutExtra();
 
                 let log = {
                     path: filePath,
                     key: key
                 };
                 try {
-                    qiniu.io.putFile(uptoken, key, filePath, extra, (err, ret, res) => {
-                        console.log(err, ret, res);
+                    cloudStorage.upload({
+                        bucket: this.config.bucket_name,
+                        key: key,
+                        path: filePath
+                    }, (err, ret) => {
                         this.handleResult(log, err);
                     });
                 } catch (err) {
@@ -175,7 +175,7 @@
             },
             copy(key){
                 let url = util.getQiniuUrl(this.domains[0], key);
-                util.setClipboardText(this, this.config.setup_copyType, url);
+                util.setClipboardText(this, this.config.copyType, url);
             },
             openInFolder(path){
                 this.$electron.shell.showItemInFolder(path);
