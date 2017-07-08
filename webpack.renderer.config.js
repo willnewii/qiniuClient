@@ -7,6 +7,7 @@ const pkg = require('./app/package.json')
 const settings = require('./config.js')
 const webpack = require('webpack')
 
+const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -49,6 +50,7 @@ let rendererConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
+                        extractCSS: process.env.NODE_ENV === 'production',
                         loaders: {
                             sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
                             scss: 'vue-style-loader!css-loader!sass-loader'
@@ -95,10 +97,6 @@ let rendererConfig = {
     },
     externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue', 'iview'].includes(d)),
     resolve: {
-        modules: [
-            path.join(__dirname, 'app/node_modules'),
-            path.join(__dirname, 'node_modules')
-        ],
         alias: {
             'vue$': path.join(__dirname, 'app/node_modules/vue/dist/vue.esm.js'),
             'components': path.join(__dirname, 'app/src/renderer/components'),
@@ -113,21 +111,24 @@ let rendererConfig = {
  * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-    //   rendererConfig.devtool = ''
+    rendererConfig.devtool = ''
 
     rendererConfig.plugins.push(
+        new BabiliWebpackPlugin({
+            removeConsole: true,
+            removeDebugger: true
+        }),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
-        })
-        /*,
-         new webpack.optimize.UglifyJsPlugin({
-         compress: {
-         warnings: false
-         }
-         })*/
+        })/*,
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        })*/
     )
 }
 

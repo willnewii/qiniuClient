@@ -11,9 +11,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 let mainConfig = {
     entry: {
         main: path.join(__dirname, 'app/src/main/index.js')
-
     },
-    externals: Object.keys(pkg.dependencies || {}),
+    //externals: Object.keys(pkg.dependencies || {}),
     module: {
         rules: [
             {
