@@ -3,7 +3,6 @@
   "version": "0.0.2",
   "description": "An electron-vue project",
   "scripts": {
-    "build": "node tasks/release.js",
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
     "build:pack_main_darwin": "cross-env PLATFORM_TARGET=darwin PACK=main node tasks/release.js",
@@ -12,7 +11,8 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.renderer.config.js",
-    "postinstall": "cd app && npm install"
+    "postinstall": "cd app && npm install",
+    "build": "node tasks/release.js"
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",

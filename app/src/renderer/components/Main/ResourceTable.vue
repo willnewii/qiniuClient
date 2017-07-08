@@ -51,8 +51,9 @@
                 columns: [
                     {title: '文件名', key: 'key'},
                     {
-                        title: '大小', key: 'fsize', sortable: true,
-                        render (row, column, index) {
+                        title: '大小', key: 'fsize', sortable: true, width: 120,
+                        render (h, item) {
+                            let row = item.row;
                             if (row.fsize >= 1024 * 1024) {
                                 return (row.fsize / 1024 / 1024).toFixed(2) + ' MB'
                             } else if (row.fsize >= 1024 && row.fsize < 1024 * 1024) {
@@ -62,17 +63,53 @@
                             }
                         }
                     },
-                    {title: '类型', key: 'mimeType'},
+                    {title: '类型', key: 'mimeType', width: 150},
                     {
-                        title: '创建日期', key: 'putTime', sortable: true,
-                        render (row, column, index) {
-                            return moment(row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
+                        title: '创建日期', key: 'putTime', sortable: true, width: 150,
+                        render (h, item) {
+                            return moment(item.row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
                         }
                     },
                     {
-                        title: '操作', key: 'action',
-                        render (row, column, index) {
-                            return `<i-button type="primary" size="small" @click="show(${index})">查看</i-button> <i-button type="primary" size="small" @click="copy(${index})">复制</i-button> <i-button type="error" size="small" @click="remove(${index})">💀 删除</i-button>`;
+                        title: '操作', key: 'action', width: 200,
+                        render: (h, item) => {
+                            return h('div', [
+                                h('i-button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.show(item.index)
+                                        }
+                                    }
+                                }, '查看'),
+                                h('span', {}, ' '),
+                                h('i-button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.copy(item.index)
+                                        }
+                                    }
+                                }, '复制'),
+                                h('span', {}, ' '),
+                                h('i-button', {
+                                    props: {
+                                        type: 'error',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.remove(item.index)
+                                        }
+                                    }
+                                }, '💀 删除')
+                            ])
                         }
                     }],
                 bucket: {
@@ -121,6 +158,8 @@
             copy(index){
                 let url = util.getQiniuUrl(this.domains[0], this.files[index].key);
                 util.setClipboardText(this, this.setup_copyType, url);
+
+                this.$Message.info('文件路径以复制到剪贴板');
             },
             remove(index) {
                 this.deleteKey = this.files[index].key

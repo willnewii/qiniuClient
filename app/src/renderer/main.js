@@ -20,6 +20,16 @@ const router = new Router({
     routes
 })
 
+//拦截器
+import axios from 'axios'
+axios.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    if (error.response.status == 401) {
+        router.push({path: '/login'});
+    }
+});
+
 /* eslint-disable no-new */
 new Vue({
     router,

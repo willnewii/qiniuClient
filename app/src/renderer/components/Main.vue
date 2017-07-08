@@ -55,12 +55,16 @@
                         <Icon type="navicon" size="32"></Icon>
                     </i-button>
                     <Menu-item v-for="(item,index) of buckets" :name="item">
-                        <Icon type="ios-box" :size="iconSize"></Icon>
+                        <Icon :style="{width:iconSize + 'px'}" type="ios-box" :size="iconSize"></Icon>
                         <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
                     </Menu-item>
                     <Menu-item name="__app__setup__">
-                        <Icon type="gear-a" :size="iconSize"></Icon>
+                        <Icon :style="{width:iconSize + 'px'}" type="ios-gear" :size="iconSize"></Icon>
                         <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">设置</span>
+                    </Menu-item>
+                    <Menu-item name="__app__logout__">
+                        <Icon :style="{width:iconSize + 'px'}" type="android-exit" :size="iconSize"></Icon>
+                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">注销</span>
                     </Menu-item>
                 </Menu>
             </i-col>
@@ -74,7 +78,7 @@
     import {mapGetters, mapActions} from 'vuex'
     import qiniu from 'qiniu'
     import * as types from '../vuex/mutation-types'
-    const storage = require('electron-json-storage');
+    import storage from 'electron-json-storage'
 
     import RightContent from './Main/RightContent.vue'
 
@@ -94,7 +98,7 @@
                 buckets: types.APP.app_buckets,
             }),
             iconSize () {
-                return this.menuState ? 24 : 18;
+                return this.menuState ? 25 : 20;
             },
             spanLeft () {
                 return this.menuState ? 4 : 1;
@@ -146,6 +150,17 @@
                 this.bucketname = name;
                 if (name === '__app__setup__') {
                     this.$router.push({path: '/setup'});
+                } else if (name === '__app__logout__') {
+                    console.log(storage);
+                    this.$Modal.info({
+                        title: '登出该账号?',
+                        content: `如果有不满意的地方,记得提个<a href='https://github.com/willnewii/qiniuClient/issues'>issue</a>`,
+                        onOk: () => {
+                            storage.clear(() => {
+                                this.$router.push({path: '/login'});
+                            });
+                        }
+                    });
                 } else {
                     this.$router.push({path: '/table', query: {bucketname: name}});
                 }

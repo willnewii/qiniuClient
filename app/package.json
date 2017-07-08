@@ -5,7 +5,7 @@
   "main": "./dist/main.js",
   "dependencies": {
     "axios": "^0.16.1",
-    "iview": "^2.0.0-rc.10",
+    "iview": "^2.0.0-rc.18",
     "moment": "^2.18.1",
     "qiniu": "^6.1.13",
     "vue": "^2.2.6",

@@ -8,11 +8,18 @@
         height: 260px;
         overflow: scroll;
         .item {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
             padding: 10px;
             border-bottom: 1px #CCC solid;
             .image {
                 width: 50px;
                 height: 50px;
+                margin-right: 10px;
+            }
+            .btn {
+                margin-right: 5px;
             }
         }
     }
@@ -27,13 +34,19 @@
         </Menu>
         <div class="list">
             <div class='item' v-for="item of logs">
-                <img class='image' :src="'http://' + domains[0]+'/'+item.key" alt="">
-                <i-button type="primary" size="small" @click="open(item.key)">查看</i-button>
-                <i-button type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
-                <i-button type="primary" size="small" @click="openInFolder(item.path)">源文件</i-button>
+                <img v-if="isImg(item.key)" class='image' :src="'http://' + domains[0]+'/'+item.key" alt="">
+                <div>
+                    <div>{{item.key}}</div>
+                    <div>
+                        <i-button class='btn' type="primary" size="small" @click="open(item.key)">查看</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="openInFolder(item.path)">源文件</i-button>
+                    </div>
+                </div>
+
+
             </div>
         </div>
-
     </div>
 </template>
 
@@ -137,6 +150,7 @@
                 };
                 try {
                     qiniu.io.putFile(uptoken, key, filePath, extra, (err, ret, res) => {
+                        console.log(err, ret, res);
                         this.handleResult(log, err);
                     });
                 } catch (err) {
@@ -148,7 +162,6 @@
                 if (!err) {//ret.key
                     log.code = 0;
                 } else {
-                    console.log(err);
                     log.code = err.statusCode;
                     log.error = err.body;
                 }
@@ -166,6 +179,9 @@
             },
             openInFolder(path){
                 this.$electron.shell.showItemInFolder(path);
+            },
+            isImg(file){
+                return new RegExp(/\.(png|jpe?g|gif|svg)(\?.*)?$/).test(file);
             }
         }
     }

@@ -13,7 +13,7 @@
 <template>
     <div class="layout">
         <h3 class="title">设置七牛KEY信息</h3>
-        <Form :model="formItem" ref="formItem" :rules="ruleItem" :label-width="100">
+        <Form :model="formItem" ref="formItem" :rules="ruleItem" :label-width="150">
             <Form-item label="ACCESS_KEY" prop="access_key">
                 <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"></Input>
             </Form-item>
