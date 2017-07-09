@@ -36,7 +36,7 @@
 </template>
 
 <script>
-    import ClientHeader from './Main/ClientHeader.vue'
+    import ClientHeader from '../components/Main/ClientHeader.vue'
     import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
 

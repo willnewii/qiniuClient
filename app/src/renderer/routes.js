@@ -2,7 +2,7 @@ export default [
     {
         path: '/',
         name: 'main',
-        component: require('components/Main.vue'),
+        component: require('pages/Main.vue'),
         children: [
             {
                 path: 'table',
@@ -12,18 +12,18 @@ export default [
             {
                 path: 'setup',
                 name: 'setup',
-                component: require('components/Setup.vue')
+                component: require('pages/Setup.vue')
             }
         ]
     },
     {
         path: '/login',
         name: 'login',
-        component: require('components/SetToken.vue')
+        component: require('pages/Login.vue')
     },
     {
         path: '/tray',
         name: 'tray',
-        component: require('components/Tray.vue')
+        component: require('pages/Tray.vue')
     }
 ]

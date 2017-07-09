@@ -5,6 +5,7 @@
   "main": "./dist/main.js",
   "dependencies": {
     "axios": "^0.16.1",
+    "electron-json-storage": "^3.0.6",
     "iview": "^2.0.0-rc.18",
     "moment": "^2.18.1",
     "qiniu": "^7.0.4",

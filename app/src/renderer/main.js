@@ -1,10 +1,9 @@
 import Vue from 'vue'
+
 import Router from 'vue-router'
 import Electron from 'vue-electron'
 
-import App from './App'
-import routes from './routes'
-import store from './vuex/store'
+import axios from 'axios';
 
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
@@ -14,6 +13,8 @@ Vue.use(Router);
 Vue.use(iView);
 Vue.config.debug = false;
 
+import routes from './routes'
+import store from './vuex/store'
 
 const router = new Router({
     scrollBehavior: () => ({y: 0}),
@@ -21,7 +22,7 @@ const router = new Router({
 });
 
 //拦截器
-import axios from 'axios';
+
 axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
@@ -30,7 +31,8 @@ axios.interceptors.response.use((response) => {
     }
 });
 
-/* eslint-disable no-new */
+import App from './App';
+/!* eslint-disable no-new *!/
 new Vue({
     router,
     store,

@@ -80,7 +80,7 @@
     import * as types from '../vuex/mutation-types'
     import storage from 'electron-json-storage'
 
-    import RightContent from './Main/RightContent.vue'
+    import RightContent from '../components/Main/RightContent.vue'
 
     import api from '../api/API'
     let API = null;

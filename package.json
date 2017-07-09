@@ -59,7 +59,6 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
-    "electron-json-storage": "^3.0.4",
     "node-notifier": "^5.1.2"
   }
 }

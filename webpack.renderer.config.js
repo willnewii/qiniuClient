@@ -95,11 +95,12 @@ let rendererConfig = {
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, 'app/dist')
     },
-    externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue', 'iview'].includes(d)),
+    externals: Object.keys(pkg.dependencies || {}).filter(d => !['vue'].includes(d)),
     resolve: {
         alias: {
             'vue$': path.join(__dirname, 'app/node_modules/vue/dist/vue.esm.js'),
             'components': path.join(__dirname, 'app/src/renderer/components'),
+            'pages': path.join(__dirname, 'app/src/renderer/pages'),
             'renderer': path.join(__dirname, 'app/src/renderer')
         },
         extensions: ['.js', '.vue', '.json', '.css', '.node']
@@ -123,12 +124,12 @@ if (process.env.NODE_ENV === 'production') {
         }),
         new webpack.LoaderOptionsPlugin({
             minimize: true
-        })/*,
+        }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
             }
-        })*/
+        })
     )
 }
 
