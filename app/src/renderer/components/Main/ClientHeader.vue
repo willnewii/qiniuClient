@@ -156,10 +156,14 @@
                 let param = {
                     bucket: this.bucketname,
                     key: key,
-                    path: this.uploadModal.path
+                    path: this.uploadModal.path,
+                    progressCallback: (progress) => {
+                        this.$Loading.update(progress);
+                    }
                 };
 
                 let callback = (err, ret) => {
+                    this.$Loading.finish();
                     that.uploadResult(err, ret);
                 };
 

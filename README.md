@@ -2,6 +2,10 @@
 
 > 七牛存储文件管理客户端.跟官网比主要多了一个托盘上传功能.可以更便捷的上传文件.
 
+#### todo
+- 大文件上传超时
+- 上传进度
+
 #### Technologies
 - [electron](https://github.com/electron/electron)
 - [electron-vue](https://github.com/SimulatedGREG/electron-vue)

@@ -150,9 +150,25 @@
                     this.$router.push({path: '/setup'});
                 } else if (name === '__app__logout__') {
                     console.log(storage);
-                    this.$Modal.info({
+                    this.$Modal.confirm({
                         title: '登出该账号?',
-                        content: `如果有不满意的地方,记得提个<a href='https://github.com/willnewii/qiniuClient/issues'>issue</a>`,
+                        content: `如果有不满意的地方,记得提个<span @click="openIssues">issue</span>`,
+                        render: (h) => {
+                            return h('div', {
+                                style:{
+                                    'padding-top':'10px'
+                                }
+                            }, [
+                                '如果有不满意的地方,记得提个',
+                                h('a', {
+                                    on: {
+                                        click: () => {
+                                            this.openIssues();
+                                        }
+                                    }
+                                }, ' issues')
+                            ])
+                        },
                         onOk: () => {
                             storage.clear(() => {
                                 this.$router.push({path: '/login'});
@@ -165,6 +181,9 @@
             },
             toggleClick(){
                 this.menuState = !this.menuState;
+            },
+            openIssues(){
+                this.$electron.shell.openExternal('https://github.com/willnewii/qiniuClient/issues')
             }
         }
     }

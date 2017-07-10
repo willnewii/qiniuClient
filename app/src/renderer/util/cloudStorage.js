@@ -3,6 +3,8 @@ import qiniu from 'qiniu';
 function init(param) {
     qiniu.conf.ACCESS_KEY = param.access_key;
     qiniu.conf.SECRET_KEY = param.secret_key;
+
+    qiniu.conf.RPC_TIMEOUT = 180000;
 }
 
 function getToken() {
@@ -46,15 +48,31 @@ function upload(params, callback) {
     let uploadToken = putPolicy.uploadToken(getToken());
 
     let config = new qiniu.conf.Config();
-    let formUploader = new qiniu.form_up.FormUploader(config);
-    let putExtra = new qiniu.form_up.PutExtra();
 
-    formUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
+    let resumeUploader = new qiniu.resume_up.ResumeUploader(config);
+    let putExtra = new qiniu.resume_up.PutExtra();
+    putExtra.progressCallback = (progress) => {
+        if (params.progressCallback) {
+            params.progressCallback(progress.progress * 100)
+        }
+    };
+
+    resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
         if (respErr) {
             throw respErr;
         }
         callback(respErr, respBody);
-    });
+    })
+
+    /*    let formUploader = new qiniu.form_up.FormUploader(config);
+     let putExtra = new qiniu.form_up.PutExtra();
+
+     formUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
+     if (respErr) {
+     throw respErr;
+     }
+     callback(respErr, respBody);
+     });*/
 }
 
 /**
