@@ -51,9 +51,9 @@ function upload(params, callback) {
 
     let resumeUploader = new qiniu.resume_up.ResumeUploader(config);
     let putExtra = new qiniu.resume_up.PutExtra();
-    putExtra.progressCallback = (progress) => {
+    putExtra.progressCallback = (uploadBytes, totalBytes) => {
         if (params.progressCallback) {
-            params.progressCallback(progress.progress * 100)
+            params.progressCallback(parseInt((uploadBytes / totalBytes * 10000)) / 100)
         }
     };
 

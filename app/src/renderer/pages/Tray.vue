@@ -134,7 +134,6 @@
                     this.current = 1;
                     this.sendNotify();
                 } else {
-                    this.updateStatus(`${this.current}/${this.files.length}`);
                     this.uploadFile(this.files[this.current - 1]);
                 }
             },
@@ -149,7 +148,10 @@
                     cloudStorage.upload({
                         bucket: this.config.bucket_name,
                         key: key,
-                        path: filePath
+                        path: filePath,
+                        progressCallback: (progress) => {
+                            this.updateStatus(`(${progress}%)${this.current}/${this.files.length}`);
+                        }
                     }, (err, ret) => {
                         this.handleResult(log, err);
                     });
