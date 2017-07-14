@@ -12,7 +12,7 @@
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config webpack.renderer.config.js",
     "postinstall": "cd app && npm install",
-    "build": "node tasks/release.js"
+    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js"
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",

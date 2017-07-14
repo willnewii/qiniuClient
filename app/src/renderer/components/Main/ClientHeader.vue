@@ -99,6 +99,20 @@
         created(){
             ipc = this.$electron.ipcRenderer;
             ipc.on('selected-directory', (event, path) => {
+                this.handleFile(path);
+            });
+
+            let that = this;
+            window.ondrop = function (e) {
+                e.preventDefault();
+                if (e.dataTransfer.files.length > 0) {
+                    that.handleFile([e.dataTransfer.files[0].path]);
+                }
+                return false
+            };
+        },
+        methods: {
+            handleFile(path){
                 this.uploadModal.isShow = true;
                 this.uploadModal.type = 'upload';
                 //仅处理单个文件
@@ -108,9 +122,7 @@
                 if (currentPath.lastIndexOf('/') !== -1) {
                     this.uploadModal.fileName = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
                 }
-            })
-        },
-        methods: {
+            },
             toggleClick (){
                 this.$emit('on-navicon', event);
             },

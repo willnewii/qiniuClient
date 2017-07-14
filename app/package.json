@@ -1,6 +1,6 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "An electron-vue project",
   "main": "./dist/main.js",
   "dependencies": {

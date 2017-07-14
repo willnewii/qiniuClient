@@ -31,6 +31,11 @@ axios.interceptors.response.use((response) => {
     }
 });
 
+window.ondragover = function (e) {
+    e.preventDefault();
+    return false
+};
+
 import App from './App';
 /!* eslint-disable no-new *!/
 new Vue({
@@ -38,3 +43,4 @@ new Vue({
     store,
     ...App
 }).$mount('#app');
+
