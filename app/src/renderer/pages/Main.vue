@@ -100,6 +100,7 @@
     import * as cloudStorage from '../util/cloudStorage'
     import * as types from '../vuex/mutation-types'
     import storage from 'electron-json-storage'
+    import pkg from'../../../package.json'
 
     import RightContent from '../components/Main/RightContent.vue'
 
@@ -113,7 +114,7 @@
                 search: '',
                 bucketname: '',
                 menuState: true,
-                appVersion: `${process.env.npm_package_version}`
+                appVersion: pkg.version
             }
         },
         computed: {
