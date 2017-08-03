@@ -38,7 +38,7 @@
         <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
             <Icon type="arrow-swap" size="32"/>
         </i-button>
-        <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)"
+        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="doSearch(search)"
                v-if="bucket.name"></Input>
         <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile">
 
@@ -83,6 +83,17 @@
             icon() {
                 return this.bucket.name ? 'ios-box' : 'ios-cog';
             },
+            placeholder(){
+                return '搜索' + this.currentDir;
+            },
+            currentDir(){
+                if (this.bucket.currentDir == '__withoutDelimiter__') {
+                    return '';
+                } else {
+                    return this.bucket.currentDir;
+                }
+
+            }
         },
         props: {
             bucket: {
@@ -113,11 +124,12 @@
                 this.uploadModal.isShow = true;
                 this.uploadModal.type = 'upload';
                 //默认选择当前目录
-                if (this.bucket.currentDir == '__withoutDelimiter__') {
-                    this.uploadModal.prepend = '';
-                } else {
-                    this.uploadModal.prepend = this.bucket.currentDir;
-                }
+                /*        if (this.bucket.currentDir == '__withoutDelimiter__') {
+                 this.uploadModal.prepend = '';
+                 } else {
+                 this.uploadModal.prepend = this.currentDir;
+                 }*/
+                this.uploadModal.prepend = this.currentDir;
 
                 //仅处理单个文件
                 let currentPath = path[0];
@@ -144,7 +156,7 @@
                 //this.$emit('on-ActionBtn', index, event);
             },
             doSearch(search) {
-                this.$emit('on-search', search, event);
+                this.$emit('on-search', this.currentDir + search, event);
             },
             handlePath() {
                 let currentPath = this.uploadModal.path;

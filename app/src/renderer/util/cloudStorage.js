@@ -3,7 +3,7 @@ import qiniu from 'qiniu';
 function init(param) {
     qiniu.conf.ACCESS_KEY = param.access_key;
     qiniu.conf.SECRET_KEY = param.secret_key;
-
+    // qiniu.conf.BLOCK_SIZE = 512 * 1024;
     qiniu.conf.RPC_TIMEOUT = 180000;
 }
 
@@ -58,9 +58,6 @@ function upload(params, callback) {
     };
 
     resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
-/*        if (respErr) {
-            throw respErr;
-        }*/
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }

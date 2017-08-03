@@ -70,18 +70,22 @@
                     <i-button type="text" @click="toggleClick" class="navicon_btn">
                         <Icon type="navicon" size="32"></Icon>
                     </i-button>
-                    <Menu-item v-for="(item,index) of buckets" :name="item">
-                        <Icon :style="{width:iconSize + 'px'}" type="ios-box" :size="iconSize"></Icon>
-                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
-                    </Menu-item>
-                    <Menu-item name="__app__setup__">
-                        <Icon :style="{width:iconSize + 'px'}" type="ios-gear" :size="iconSize"></Icon>
-                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">设置</span>
-                    </Menu-item>
-                    <Menu-item name="__app__logout__">
-                        <Icon :style="{width:iconSize + 'px'}" type="android-exit" :size="iconSize"></Icon>
-                        <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">注销</span>
-                    </Menu-item>
+                    <Menu-group title="存储空间">
+                        <Menu-item v-for="(item,index) of buckets" :name="item">
+                            <Icon :style="{width:iconSize + 'px'}" type="ios-box" :size="iconSize"></Icon>
+                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
+                        </Menu-item>
+                    </Menu-group>
+                    <Menu-group title="设置">
+                        <Menu-item name="__app__setup__">
+                            <Icon :style="{width:iconSize + 'px'}" type="ios-gear" :size="iconSize"></Icon>
+                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">设置</span>
+                        </Menu-item>
+                        <Menu-item name="__app__logout__">
+                            <Icon :style="{width:iconSize + 'px'}" type="android-exit" :size="iconSize"></Icon>
+                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">注销</span>
+                        </Menu-item>
+                    </Menu-group>
                 </Menu>
                 <div class="version" @click="openBrowser(0)">version:{{appVersion}} </div>
             </i-col>
@@ -109,7 +113,7 @@
                 search: '',
                 bucketname: '',
                 menuState: true,
-                appVersion: process.env.npm_package_version
+                appVersion: `${process.env.npm_package_version}`
             }
         },
         computed: {
