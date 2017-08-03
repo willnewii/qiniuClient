@@ -1,6 +1,6 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "An electron-vue project",
   "scripts": {
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",

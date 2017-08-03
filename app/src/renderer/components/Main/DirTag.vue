@@ -10,7 +10,7 @@
 </style>
 <template>
     <div class="layout-tag">
-        <Tag type="border" v-for="item of tags" :class="currentTag == item ? 'blue-tag' : ''">
+        <Tag type="border" v-for="item of bucket.dirs" :class="bucket.currentDir == item ? 'blue-tag' : ''">
             <p v-on:click="doSearch(item)">{{item == '' ? '全部' : item == '__withoutDelimiter__' ? '其他' : item}}</p>
         </Tag>
     </div>
@@ -19,17 +19,12 @@
     export default {
         name: 'DirTag',
         props: {
-            tags: {
-                type: Array,
-                default: ['', '__withoutDelimiter__']
-            },
-            currentTag: {
-                type: String,
-                default: ''
+            bucket: {
+                type: Object
             }
         },
         methods: {
-            doSearch (tag, event) {
+            doSearch(tag, event) {
                 this.$emit('on-click', tag, event);
             }
         }

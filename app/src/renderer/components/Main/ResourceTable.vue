@@ -113,14 +113,6 @@
                             ])
                         }
                     }],
-                bucket: {
-                    name: '',
-                    domains: [],
-                    dirs: [],
-                    currentDir: '',
-                    files: [],
-                    withoutDelimiterFiles: []
-                }
             }
         },
         computed: {

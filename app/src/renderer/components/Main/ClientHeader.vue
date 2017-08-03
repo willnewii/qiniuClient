@@ -30,16 +30,16 @@
             <Icon :type="icon" size="32"></Icon>
         </i-button>
         <div class="full">
-            <Tag type="border" v-for="item of domains" v-if="bucketname">{{item}}</Tag>
+            <Tag type="border" v-for="item of bucket.domains" v-if="bucket.name">{{item}}</Tag>
         </div>
-        <i-button type="text" @click="actionBtn(0)" v-if="bucketname">
+        <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
             <Icon type="ios-plus-outline" size="32"/>
         </i-button>
-        <i-button type="text" @click="actionBtn(1)" v-if="bucketname">
+        <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
             <Icon type="arrow-swap" size="32"/>
         </i-button>
         <Input class="input-search" v-model="search" placeholder="搜索" @on-enter="doSearch(search)"
-               v-if="bucketname"></Input>
+               v-if="bucket.name"></Input>
         <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
@@ -52,7 +52,9 @@
             </Select>
             <Button slot="append">{{uploadModal.fileName}}</Button>
             </Input>
-            <div class="modal-filekey">文件KEY：{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{uploadModal.fileName}}</div>
+            <div class="modal-filekey">
+                文件名：{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{uploadModal.fileName}}
+            </div>
         </Modal>
     </div>
 </template>
@@ -62,7 +64,7 @@
     let ipc;
     export default {
         name: 'ClientHeader',
-        data(){
+        data() {
             return {
                 uploadModal: {
                     isShow: false,
@@ -75,28 +77,19 @@
             }
         },
         computed: {
-            dirArray () {
-                return this.dirs.slice(2);
+            dirArray() {
+                return this.bucket.dirs.slice(2);
             },
-            icon () {
-                return this.bucketname ? 'ios-box' : 'ios-cog';
+            icon() {
+                return this.bucket.name ? 'ios-box' : 'ios-cog';
             },
         },
         props: {
-            domains: {
-                type: Array,
-                default: []
-            },
-            dirs: {
-                type: Array,
-                default: []
-            },
-            bucketname: {
-                type: String,
-                default: ''
+            bucket: {
+                type: Object
             }
         },
-        created(){
+        created() {
             ipc = this.$electron.ipcRenderer;
             ipc.on('selected-directory', (event, path) => {
                 this.handleFile(path);
@@ -112,9 +105,16 @@
             };
         },
         methods: {
-            handleFile(path){
+            handleFile(path) {
                 this.uploadModal.isShow = true;
                 this.uploadModal.type = 'upload';
+                //默认选择当前目录
+                if (this.bucket.currentDir == '__withoutDelimiter__') {
+                    this.uploadModal.prepend = '';
+                } else {
+                    this.uploadModal.prepend = this.bucket.currentDir;
+                }
+
                 //仅处理单个文件
                 let currentPath = path[0];
                 this.uploadModal.path = currentPath;
@@ -123,10 +123,10 @@
                     this.uploadModal.fileName = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
                 }
             },
-            toggleClick (){
+            toggleClick() {
                 this.$emit('on-navicon', event);
             },
-            actionBtn (index, event) {
+            actionBtn(index, event) {
                 switch (index) {
                     case 0:
                         ipc.send('open-file-dialog', {properties: ['openFile']});
@@ -139,10 +139,10 @@
                 }
                 //this.$emit('on-ActionBtn', index, event);
             },
-            doSearch(search){
+            doSearch(search) {
                 this.$emit('on-search', search, event);
             },
-            handlePath(){
+            handlePath() {
                 let currentPath = this.uploadModal.path;
 
                 this.uploadModal.fileName = currentPath;
@@ -150,13 +150,13 @@
                     this.uploadModal.fileName = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
                 }
             },
-            doQiniuUploadFile(){
+            doQiniuUploadFile() {
                 if (this.uploadModal.input)
                     this.uploadModal.input = this.uploadModal.input + '/';
 
                 this.qiniuUploadFile();
             },
-            qiniuUploadFile(){
+            qiniuUploadFile() {
                 let that = this;
                 let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
 
@@ -166,7 +166,7 @@
                 });
 
                 let param = {
-                    bucket: this.bucketname,
+                    bucket: this.bucket.name,
                     key: key,
                     path: this.uploadModal.path,
                     progressCallback: (progress) => {
@@ -185,9 +185,7 @@
                     cloudStorage.upload(param, callback);
                 }
             },
-            uploadResult(err, ret){
-                //let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
-
+            uploadResult(err, ret) {
                 this.uploadModal.input = '';
                 this.uploadModal.prepend = '';
                 this.uploadModal.fileName = '';

@@ -7,10 +7,10 @@
 </style>
 <template>
     <div class="layout">
-        <ClientHeader :bucketname="bucket.name" :domains="bucket.domains" :dirs="bucket.dirs"
-                      @on-update="onUpdate" @on-navicon="toggleClick" @on-search="doSearch"></ClientHeader>
+        <ClientHeader :bucket="bucket" @on-update="onUpdate" @on-navicon="toggleClick"
+                      @on-search="doSearch"></ClientHeader>
 
-        <DirTag :tags="bucket.dirs" :currentTag="bucket.currentDir" @on-click="doDirSearch"></DirTag>
+        <DirTag :bucket="bucket" @on-click="doDirSearch"></DirTag>
 
         <ResourceTable :bucketname="bucket.name" :files="bucket.files" :domains="bucket.domains"
                        @on-update="onUpdate"></ResourceTable>
@@ -27,6 +27,7 @@
     import ResourceTable from './ResourceTable.vue'
     import * as util from '../../util/util'
     import api from '../../api/API'
+
     let API;
 
     export default {
@@ -38,7 +39,7 @@
                 default: ''
             }
         },
-        data () {
+        data() {
             return {
                 bucket: {
                     name: '',
@@ -58,7 +59,7 @@
                 }
             }
         },
-        mounted () {
+        mounted() {
             API = new api(this);
 
             console.log(this.$route.query.bucketname);
@@ -70,7 +71,7 @@
             }
         },
         methods: {
-            initBucket(){
+            initBucket() {
                 this.getDomains();
                 this.bucket.dirs = [];
                 this.bucket.dirs.push('');
@@ -79,12 +80,12 @@
                 this.getDir();
                 this.getResources();
             },
-            getDomains(){
+            getDomains() {
                 API.get(API.method.getDomains, {tbl: this.bucket.name}).then((response) => {
                     this.bucket.domains = response.data;
                 });
             },
-            getResources(keyword){
+            getResources(keyword) {
                 let data = {
                     bucket: this.bucket.name,
                     limit: 100
@@ -98,7 +99,11 @@
                     this.bucket.files = response.data.items
                 });
             },
-            getDir(marker){//获取目录
+            /**
+             * 获取该bucket下的目录
+             * @param marker 上一次列举返回的位置标记，作为本次列举的起点信息。
+             */
+            getDir(marker) {//获取目录
                 let data = {
                     bucket: this.bucket.name,
                     delimiter: '/',
@@ -113,7 +118,7 @@
                         this.bucket.dirs = this.bucket.dirs.concat(response.data.commonPrefixes);
                     }
 
-                    if (response.data.items) {//不包含目录文件
+                    if (response.data.items) {//不包含公共前缀的文件列表
                         this.bucket.withoutDelimiterFiles = this.bucket.withoutDelimiterFiles.concat(response.data.items);
                     }
 
@@ -122,6 +127,10 @@
                     }
                 });
             },
+            /**
+             * Dir 组件 搜索
+             * @param search
+             */
             doDirSearch: function (search) {
                 this.bucket.currentDir = search;
 
@@ -134,10 +143,10 @@
             doSearch: function (search) {
                 this.getResources(search)
             },
-            toggleClick () {
+            toggleClick() {
                 //this.$emit('on-spanLeft', event);
             },
-            onUpdate(ret, action){
+            onUpdate(ret, action) {
                 console.log(ret, action);
                 let keyword = '';
                 if (ret && ret.key) {
