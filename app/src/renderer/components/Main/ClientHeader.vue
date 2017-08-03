@@ -103,6 +103,10 @@
                 }
                 return false
             };
+            window.ondragenter = (e) => {
+                e.preventDefault();
+                this.$Message.info('我已经感受到你传来的文件啦 😎');
+            }
         },
         methods: {
             handleFile(path) {
@@ -200,6 +204,10 @@
                 } else {
                     // 上传失败， 处理返回代码
                     console.log(err);
+                    this.$Notice.error({
+                        title: '上传失败',
+                        desc: err.error,
+                    });
                 }
             }
         }

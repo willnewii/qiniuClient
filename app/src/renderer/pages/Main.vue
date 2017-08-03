@@ -13,6 +13,17 @@
 
         .layout-menu-left {
             background: #464c5b;
+            display: flex;
+            flex-direction: column;
+            .ivu-menu-vertical {
+                flex-grow: 1;
+            }
+            .navicon_btn {
+                color: #c5c5c5;
+            }
+            .navicon_btn:hover {
+                color: #57a3f3;
+            }
 
             .layout-logo-left {
                 width: 90%;
@@ -23,6 +34,11 @@
             }
             .layout-text {
                 margin-left: 10px;
+            }
+
+            .version {
+                padding: 10px 20px;
+                color: #c5c5c5;
             }
         }
 
@@ -51,7 +67,7 @@
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="selectBuckets"
                       :active-name="bucketname">
-                    <i-button type="text" @click="toggleClick">
+                    <i-button type="text" @click="toggleClick" class="navicon_btn">
                         <Icon type="navicon" size="32"></Icon>
                     </i-button>
                     <Menu-item v-for="(item,index) of buckets" :name="item">
@@ -67,6 +83,7 @@
                         <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">注销</span>
                     </Menu-item>
                 </Menu>
+                <div class="version" @click="openBrowser(0)">version:{{appVersion}} </div>
             </i-col>
             <i-col :span="spanRight" class="layout-menu-right">
                 <router-view :bucketname="bucketname"></router-view>
@@ -83,27 +100,29 @@
     import RightContent from '../components/Main/RightContent.vue'
 
     import api from '../api/API'
+
     let API = null;
 
     export default {
-        data () {
+        data() {
             return {
                 search: '',
                 bucketname: '',
                 menuState: true,
+                appVersion: process.env.npm_package_version
             }
         },
         computed: {
             ...mapGetters({
                 buckets: types.APP.app_buckets,
             }),
-            iconSize () {
+            iconSize() {
                 return this.menuState ? 25 : 20;
             },
-            spanLeft () {
+            spanLeft() {
                 return this.menuState ? 4 : 1;
             },
-            spanRight () {
+            spanRight() {
                 return this.menuState ? 20 : 23;
             }
         },
@@ -122,7 +141,7 @@
                 types.APP.app_a_buckets,
                 types.APP.app_a_setup_init,
             ]),
-            initKEY(callback){
+            initKEY(callback) {
                 storage.get(types.APP.qiniu_key, (error, data) => {
                     if (!error) {
                         if (data.access_key && data.secret_key) {
@@ -136,7 +155,7 @@
                     }
                 })
             },
-            getBuckets(){
+            getBuckets() {
                 API.get(API.method.getBuckets).then((response) => {
                     this[types.APP.app_a_buckets](response.data);
                     this.bucketname = this.buckets[0];
@@ -144,26 +163,25 @@
                     this.selectBuckets(this.bucketname);
                 });
             },
-            selectBuckets(name){
+            selectBuckets(name) {
                 this.bucketname = name;
                 if (name === '__app__setup__') {
                     this.$router.push({path: '/setup'});
                 } else if (name === '__app__logout__') {
-                    console.log(storage);
                     this.$Modal.confirm({
                         title: '登出该账号?',
                         content: `如果有不满意的地方,记得提个<span @click="openIssues">issue</span>`,
                         render: (h) => {
                             return h('div', {
-                                style:{
-                                    'padding-top':'10px'
+                                style: {
+                                    'padding-top': '10px'
                                 }
                             }, [
                                 '如果有不满意的地方,记得提个',
                                 h('a', {
                                     on: {
                                         click: () => {
-                                            this.openIssues();
+                                            this.openBrowser(1);
                                         }
                                     }
                                 }, ' issues')
@@ -179,11 +197,17 @@
                     this.$router.push({path: '/table', query: {bucketname: name}});
                 }
             },
-            toggleClick(){
+            toggleClick() {
                 this.menuState = !this.menuState;
             },
-            openIssues(){
-                this.$electron.shell.openExternal('https://github.com/willnewii/qiniuClient/issues')
+            openBrowser(type) {
+                let url = 'https://github.com/willnewii/qiniuClient';
+                switch (type) {
+                    case 1:
+                        url = 'https://github.com/willnewii/qiniuClient/issues';
+                        break;
+                }
+                this.$electron.shell.openExternal(url);
             }
         }
     }

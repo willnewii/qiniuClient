@@ -7,17 +7,14 @@
 </style>
 <template>
     <div class="layout">
-        <ClientHeader :bucket="bucket" @on-update="onUpdate" @on-navicon="toggleClick"
+        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onUpdate" @on-navicon="toggleClick"
                       @on-search="doSearch"></ClientHeader>
 
-        <DirTag :bucket="bucket" @on-click="doDirSearch"></DirTag>
+        <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
 
-        <ResourceTable :bucketname="bucket.name" :files="bucket.files" :domains="bucket.domains"
+        <ResourceTable v-if="endable" :bucketname="bucket.name" :files="bucket.files" :domains="bucket.domains"
                        @on-update="onUpdate"></ResourceTable>
 
-        <div class="layout-copy">
-            2011-2016 &copy; TalkingData
-        </div>
     </div>
 </template>
 <script>
@@ -48,7 +45,8 @@
                     currentDir: '',
                     files: [],
                     withoutDelimiterFiles: []
-                }
+                },
+                endable: true
             }
         },
         watch: {
@@ -62,7 +60,6 @@
         mounted() {
             API = new api(this);
 
-            console.log(this.$route.query.bucketname);
             if (this.$route.query && this.$route.query.bucketname) {
                 if (this.$route.query.bucketname !== this.bucket.name) {
                     this.bucket.name = this.$route.query.bucketname;
@@ -72,13 +69,18 @@
         },
         methods: {
             initBucket() {
-                this.getDomains();
                 this.bucket.dirs = [];
-                this.bucket.dirs.push('');
-                this.bucket.dirs.push('__withoutDelimiter__');
-                this.bucket.withoutDelimiterFiles = [];
-                this.getDir();
-                this.getResources();
+                this.endable = false;
+                if (this.bucket.name.indexOf('__app__') !== 0) {
+                    this.getDomains();
+                    this.bucket.dirs.push('');
+                    this.bucket.dirs.push('__withoutDelimiter__');
+                    this.bucket.withoutDelimiterFiles = [];
+                    this.getDir();
+                    this.getResources();
+
+                    this.endable = true;
+                }
             },
             getDomains() {
                 API.get(API.method.getDomains, {tbl: this.bucket.name}).then((response) => {
@@ -147,7 +149,6 @@
                 //this.$emit('on-spanLeft', event);
             },
             onUpdate(ret, action) {
-                console.log(ret, action);
                 let keyword = '';
                 if (ret && ret.key) {
                     keyword = util.getPrefix(ret.key)

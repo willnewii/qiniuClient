@@ -58,21 +58,15 @@ function upload(params, callback) {
     };
 
     resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
-        if (respErr) {
+/*        if (respErr) {
             throw respErr;
+        }*/
+        if (respBody.error) {
+            respErr = {"error": respBody.error};
         }
+
         callback(respErr, respBody);
     })
-
-    /*    let formUploader = new qiniu.form_up.FormUploader(config);
-     let putExtra = new qiniu.form_up.PutExtra();
-
-     formUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
-     if (respErr) {
-     throw respErr;
-     }
-     callback(respErr, respBody);
-     });*/
 }
 
 /**

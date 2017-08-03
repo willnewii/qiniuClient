@@ -10,7 +10,6 @@
 </style>
 <template>
     <div>
-        <ClientHeader domains="[]"></ClientHeader>
         <div class="item">
             直接删除,不需要确认：
             <i-switch v-model="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
