@@ -46,3 +46,11 @@ export function getPrefix(key) {
         return '';
     }
 }
+
+export function getPostfix(path) {
+    if (path.lastIndexOf('/') !== -1) {
+        return path.substring(path.lastIndexOf('/') + 1, path.length);
+    } else {
+        return path;
+    }
+}

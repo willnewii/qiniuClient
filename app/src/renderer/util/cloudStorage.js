@@ -28,8 +28,8 @@ function fetch(params, callback) {
     let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
 
     bucketManager.fetch(params.path, params.bucket, params.key, function (respErr, respBody, respInfo) {
-        if (respErr) {
-            throw respErr;
+        if (respBody.error) {
+            respErr = {"error": respBody.error};
         }
         callback(respErr, respBody);
     });
@@ -61,7 +61,7 @@ function upload(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }
-
+        console.log(respErr, respBody, respInfo);
         callback(respErr, respBody);
     })
 }

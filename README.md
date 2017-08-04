@@ -39,8 +39,7 @@ npm run pack
 ```
 More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
-## 参考资料 
-- [electron-doc 中文文档-gitbook](https://wizardforcel.gitbooks.io/electron-doc/content/index.html)
-- [中文文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
+## 参考资料
+- [electron 中文文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
 - [七牛API](https://developer.qiniu.com/kodo/api/1731/api-overview)
 - [webpack2 中文文档](https://doc.webpack-china.org)

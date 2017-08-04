@@ -60,7 +60,7 @@ app.on('activate', () => {
 const registerIPC = function () {
     ipcMain.on('open-file-dialog', function (event) {
         dialog.showOpenDialog({
-            properties: ['openFile', 'openDirectory']
+            properties: ['openFile', 'multiSelections']
         }, function (files) {
             if (files) event.sender.send('selected-directory', files)
         })

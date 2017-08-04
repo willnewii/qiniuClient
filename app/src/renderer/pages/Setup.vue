@@ -22,14 +22,14 @@
             </Radio-group>
         </div>
         <div class="item">
-            默认上传位置：
+            默认托盘上传位置：
             <Select v-model="bucketname" size="small" style="width:100px">
                 <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
             </Select>
             /
             <Input class='bucketdir' v-model="bucketdir" size="small" placeholder="路径"></Input>
             <Button @click="saveDir" size="small">保存</Button>
-            提示：默认文件将会被上传到:{{setup_bucket_name}}/{{setup_bucket_dir}}/
+            <br>提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/ 目录下
         </div>
     </div>
 </template>

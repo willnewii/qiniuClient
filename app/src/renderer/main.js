@@ -21,8 +21,14 @@ const router = new Router({
     routes
 });
 
-//拦截器
 
+import * as util from './util/util';
+
+Vue.filter('getfileNameByPath', function (value) {
+    return util.getPostfix(value);
+});
+
+//拦截器
 axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
@@ -37,6 +43,7 @@ window.ondragover = function (e) {
 };
 
 import App from './App';
+
 /!* eslint-disable no-new *!/
 new Vue({
     router,

@@ -16,8 +16,9 @@
     }
 
     .modal-filekey {
-        padding: 10px 0;
-        font-size: 14px;
+        padding: 5px 0 0 0;
+        line-height: 1;
+        font-size: 12px;
     }
 
     .modal-url {
@@ -38,28 +39,32 @@
         <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
             <Icon type="arrow-swap" size="32"/>
         </i-button>
-        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="doSearch(search)"
+        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
                v-if="bucket.name"></Input>
-        <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile">
+
+        <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile"
+               @on-cancel="initModal">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
-                   placeholder="请输入你要上传的文件链接" @on-change="handlePath"></Input>
+                   placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"></Input>
 
             <Input v-model="uploadModal.input">
-            <Select v-model="uploadModal.prepend" slot="prepend" style="width: 80px">
+            <Select slot="prepend" v-model="uploadModal.prepend" style="width: 80px">
                 <Option value="">无</Option>
-                <Option v-for="item of dirArray" :value="item">{{item}}</Option>
+                <Option v-for="item of dirs" :value="item">{{item}}</Option>
             </Select>
-            <Button slot="append">{{uploadModal.fileName}}</Button>
+            <!--<Button slot="append">{{uploadModal.fileName}}</Button>-->
             </Input>
-            <div class="modal-filekey">
-                文件名：{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{uploadModal.fileName}}
+
+            <div class="modal-filekey" v-for="_path of filePaths">
+                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByPath}}
             </div>
         </Modal>
     </div>
 </template>
 <script>
     import * as cloudStorage from '../../util/cloudStorage'
+    import * as util from '../../util/util'
 
     let ipc;
     export default {
@@ -73,26 +78,27 @@
                     path: '',
                     fileName: '',
                 },
-                search: ''
+                search: '',
+                filePaths: [],
+                messageFlag: false
             }
         },
         computed: {
-            dirArray() {
+            dirs() {
                 return this.bucket.dirs.slice(2);
             },
             icon() {
                 return this.bucket.name ? 'ios-box' : 'ios-cog';
             },
-            placeholder(){
+            placeholder() {
                 return '搜索' + this.currentDir;
             },
-            currentDir(){
+            currentDir() {
                 if (this.bucket.currentDir == '__withoutDelimiter__') {
                     return '';
                 } else {
                     return this.bucket.currentDir;
                 }
-
             }
         },
         props: {
@@ -107,84 +113,91 @@
             });
 
             let that = this;
+
             window.ondrop = function (e) {
                 e.preventDefault();
                 if (e.dataTransfer.files.length > 0) {
-                    that.handleFile([e.dataTransfer.files[0].path]);
+                    let paths = [];
+                    Array.from(e.dataTransfer.files).forEach((item) => {
+                        paths.push(item.path);
+                    });
+                    that.handleFile(paths);
                 }
                 return false
             };
             window.ondragenter = (e) => {
                 e.preventDefault();
-                this.$Message.info('我已经感受到你传来的文件啦 😎');
+                if (!this.messageFlag) {
+                    this.messageFlag = true;
+                    this.$Message.info('我已经感受到你传来的文件啦 😎');
+                    setTimeout(()=>{
+                        this.messageFlag = false
+                    },2000);
+                }
             }
         },
         methods: {
-            handleFile(path) {
-                this.uploadModal.isShow = true;
-                this.uploadModal.type = 'upload';
-                //默认选择当前目录
-                /*        if (this.bucket.currentDir == '__withoutDelimiter__') {
-                 this.uploadModal.prepend = '';
-                 } else {
-                 this.uploadModal.prepend = this.currentDir;
-                 }*/
-                this.uploadModal.prepend = this.currentDir;
-
-                //仅处理单个文件
-                let currentPath = path[0];
-                this.uploadModal.path = currentPath;
-                this.uploadModal.fileName = currentPath;
-                if (currentPath.lastIndexOf('/') !== -1) {
-                    this.uploadModal.fileName = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
-                }
-            },
+            //无调用
             toggleClick() {
                 this.$emit('on-navicon', event);
             },
-            actionBtn(index, event) {
+            /**
+             *
+             * @param index
+             */
+            actionBtn(index) {
+                this.uploadModal.prepend = this.currentDir;
                 switch (index) {
-                    case 0:
+                    case 0://调用文件选取对话框
+                        this.filePaths = [];
                         ipc.send('open-file-dialog', {properties: ['openFile']});
                         break;
-                    case 1:
-                        //抓取文件
+                    case 1://抓取文件
+                        //this.filePaths = [];
                         this.uploadModal.type = 'fetch';
                         this.uploadModal.isShow = true;
                         break;
+                    case 2://搜索事件
+                        this.$emit('on-search', this.currentDir + this.search, event);
+                        break;
                 }
-                //this.$emit('on-ActionBtn', index, event);
             },
-            doSearch(search) {
-                this.$emit('on-search', this.currentDir + search, event);
+            initModal() {
+                this.uploadModal.input = '';
+                this.uploadModal.path = '';
             },
-            handlePath() {
-                let currentPath = this.uploadModal.path;
+            handleURLPath() {//处理URL上传的路径
+                this.filePaths[0] = this.uploadModal.path;
+            },
+            handleFile(paths) {
+                //多文件上传
+                this.filePaths = paths;
 
-                this.uploadModal.fileName = currentPath;
-                if (currentPath.lastIndexOf('/') !== -1) {
-                    this.uploadModal.fileName = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
-                }
+                this.uploadModal.type = 'upload';
+                this.uploadModal.isShow = true;
             },
             doQiniuUploadFile() {
                 if (this.uploadModal.input)
                     this.uploadModal.input = this.uploadModal.input + '/';
 
+
+                console.log(this.uploadModal.prepend, '-', this.uploadModal.input, '-', this.filePaths);
                 this.qiniuUploadFile();
             },
             qiniuUploadFile() {
                 let that = this;
-                let key = this.uploadModal.prepend + this.uploadModal.input + this.uploadModal.fileName;
+                let filePath = this.filePaths[0];
+                let key = this.uploadModal.prepend + this.uploadModal.input + util.getPostfix(filePath);
 
                 this.$Notice.info({
                     title: '文件上传中...',
-                    desc: this.uploadModal.path,
+                    desc: filePath,
                 });
 
                 let param = {
                     bucket: this.bucket.name,
                     key: key,
-                    path: this.uploadModal.path,
+                    path: filePath,
                     progressCallback: (progress) => {
                         this.$Loading.update(progress);
                     }
@@ -202,17 +215,14 @@
                 }
             },
             uploadResult(err, ret) {
-                this.uploadModal.input = '';
-                this.uploadModal.prepend = '';
-                this.uploadModal.fileName = '';
                 this.uploadModal.path = '';
+                this.uploadModal.input = '';
 
                 if (!err) {
                     this.$Notice.success({
                         title: '上传成功',
                         desc: ret.key,
                     });
-                    this.$emit('on-update', ret, 'upload', event);
                 } else {
                     // 上传失败， 处理返回代码
                     console.log(err);
@@ -220,6 +230,12 @@
                         title: '上传失败',
                         desc: err.error,
                     });
+                }
+                this.filePaths.shift();
+                if (this.filePaths.length > 0) {
+                    this.qiniuUploadFile();
+                } else {
+                    this.$emit('on-update', ret, 'upload', event);
                 }
             }
         }
