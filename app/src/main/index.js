@@ -1,15 +1,17 @@
 'use strict'
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, Tray} from 'electron'
+import {app, BrowserWindow, Menu, ipcMain, dialog} from 'electron'
 import * as util from './util'
 import * as trayUtil from './trayUtil';
 
 let mainWindow;
 
+app.on('ready', initApp);
+
 function initApp() {
     //注册菜单
-    const menu = Menu.buildFromTemplate(getMenuData())
-    Menu.setApplicationMenu(menu)
+    const menu = Menu.buildFromTemplate(getMenuData());
+    Menu.setApplicationMenu(menu);
 
     //创建主窗口
     createMainWindow();
@@ -23,7 +25,7 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         height: 750,
         width: 1000,
-        frame: false,
+        // frame: false,
         webPreferences: {
             webSecurity: false
         }
@@ -33,25 +35,20 @@ function createMainWindow() {
 
     mainWindow.on('closed', () => {
         mainWindow = null
-    })
-
-    // eslint-disable-next-line no-console
-    console.log('mainWindow opened')
+    });
 }
-
-app.on('ready', initApp)
 
 app.on('window-all-closed', () => {
     if (!util.isMac()) {
         app.quit()
     }
-})
+});
 
 app.on('activate', () => {
     if (mainWindow === null) {
         createMainWindow()
     }
-})
+});
 
 /**
  * 注册IPC事件
@@ -63,8 +60,32 @@ const registerIPC = function () {
         }, function (files) {
             if (files) event.sender.send('selected-directory', files)
         })
-    })
-}
+    });
+
+/*    ipcMain.on('window-close', function (event) {
+        console.log('aaaaaa');
+        if (mainWindow) {
+            mainWindow.close();
+        }
+    });
+
+    ipcMain.on('window-minimize', function (event) {
+        if (mainWindow) {
+            mainWindow.minimize();
+        }
+    });
+
+    ipcMain.on('window-maximize', function (event) {
+        if (mainWindow) {
+            mainWindow.unmaximize();
+        }
+    });
+    ipcMain.on('window-fullscreen', function (event) {
+        if (mainWindow) {
+            mainWindow.maximize();
+        }
+    });*/
+};
 
 /**
  * 注册菜单
@@ -158,5 +179,5 @@ const getMenuData = function () {
         ]
     }
     return template;
-}
+};
 
