@@ -20,18 +20,16 @@ function initApp() {
 }
 
 function createMainWindow() {
-    /**
-     * Initial window options
-     */
     mainWindow = new BrowserWindow({
         height: 750,
         width: 1000,
+        frame: false,
         webPreferences: {
             webSecurity: false
         }
-    })
+    });
 
-    mainWindow.loadURL(util.winURL)
+    mainWindow.loadURL(util.winURL);
 
     mainWindow.on('closed', () => {
         mainWindow = null
@@ -40,6 +38,7 @@ function createMainWindow() {
     // eslint-disable-next-line no-console
     console.log('mainWindow opened')
 }
+
 app.on('ready', initApp)
 
 app.on('window-all-closed', () => {
@@ -113,7 +112,7 @@ const getMenuData = function () {
             submenu: [
                 {
                     label: 'Learn More',
-                    click () {
+                    click() {
                         require('electron').shell.openExternal('https://electron.atom.io')
                     }
                 }

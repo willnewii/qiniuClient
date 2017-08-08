@@ -5,9 +5,9 @@ export default [
         component: require('pages/Main.vue'),
         children: [
             {
-                path: 'table',
-                name: 'table',
-                component: require('components/Main/RightContent.vue')
+                path: 'bucketPage',
+                name: 'bucketPage',
+                component: require('pages/bucketPage.vue')
             },
             {
                 path: 'setup',

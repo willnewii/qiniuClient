@@ -18,12 +18,12 @@
     </div>
 </template>
 <script>
-    import * as types from '../../vuex/mutation-types'
-    import DirTag from './DirTag.vue'
-    import ClientHeader from './ClientHeader.vue'
-    import ResourceTable from './ResourceTable.vue'
-    import * as util from '../../util/util'
-    import api from '../../api/API'
+    import * as types from '../vuex/mutation-types'
+    import DirTag from '../components/Main/DirTag.vue'
+    import ClientHeader from '../components/Main/ClientHeader.vue'
+    import ResourceTable from '../components/Main/ResourceTable.vue'
+    import * as util from '../util/util'
+    import api from '../api/API'
 
     let API;
 

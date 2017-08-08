@@ -42,6 +42,11 @@ window.ondragover = function (e) {
     return false
 };
 
+import titlebar from "titlebar";
+
+let t = titlebar();
+t.appendTo(document.getElementById('title'));
+
 import App from './App';
 
 /!* eslint-disable no-new *!/

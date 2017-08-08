@@ -1,16 +1,16 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An electron-vue project",
   "main": "./dist/main.js",
   "dependencies": {
     "axios": "^0.16.1",
     "electron-json-storage": "^3.0.6",
-    "iview": "^2.0.0-rc.18",
+    "iview": "^2.0.0",
     "moment": "^2.18.1",
     "qiniu": "^7.0.5",
     "qs": "^6.4.0",
-    "vue": "^2.2.6",
+    "vue": "^2.4.1",
     "vue-electron": "^1.0.6",
     "vue-router": "^2.1.2",
     "vuex": "^2.1.1"

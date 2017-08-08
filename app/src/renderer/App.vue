@@ -1,37 +1,30 @@
 <template>
-    <div id="app">
+    <div id="app" :style="{height:appHeight}">
         <router-view></router-view>
     </div>
 </template>
 
 <script>
     import store from 'renderer/vuex/store'
+
     export default {
-        store
+        store,
+        computed: {
+            appHeight() {
+                if(document.getElementById('title'))
+                    return (window.innerHeight - document.getElementById('title').offsetHeight) + 'px';
+                else
+                    return '100%';
+            }
+        },
+        mounted() {
+
+        }
     }
 </script>
 
 <style lang="scss">
     @import url(https://fonts.googleapis.com/css?family=Lato:500);
-
-    * {
-        margin: 0;
-        padding: 0;
-
-    }
-
-    html,
-    body {
-        height: 100%;
-        font-family: Lato, Helvetica, sans-serif;
-
-    }
-
-    #app {
-        width: 100%;
-        height: 100%;
-
-    }
 
     .vertical-center-modal {
         display: flex;

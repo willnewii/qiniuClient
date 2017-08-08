@@ -100,9 +100,9 @@
     import * as cloudStorage from '../util/cloudStorage'
     import * as types from '../vuex/mutation-types'
     import storage from 'electron-json-storage'
-    import pkg from'../../../package.json'
+    import pkg from '../../../package.json'
 
-    import RightContent from '../components/Main/RightContent.vue'
+    import RightContent from './bucketPage.vue'
 
     import api from '../api/API'
 
@@ -199,7 +199,7 @@
                         }
                     });
                 } else {
-                    this.$router.push({path: '/table', query: {bucketname: name}});
+                    this.$router.push({path: '/bucketPage', query: {bucketname: name}});
                 }
             },
             toggleClick() {

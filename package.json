@@ -1,6 +1,6 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An electron-vue project",
   "scripts": {
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
@@ -59,6 +59,7 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
-    "node-notifier": "^5.1.2"
+    "node-notifier": "^5.1.2",
+    "titlebar": "^1.4.0"
   }
 }

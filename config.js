@@ -5,7 +5,7 @@ const path = require('path')
 let config = {
     // Name of electron app
     // Will be used in production builds
-    name: 'qiniu-Client',
+    name: '七牛云管理客户端',
 
     // webpack-dev-server port
     port: 9080,
@@ -22,8 +22,8 @@ let config = {
         overwrite: true,
         platform: process.env.PLATFORM_TARGET || 'all'
     }
-}
+};
 
-config.building.name = config.name
+config.building.name = config.name;
 
-module.exports = config
+module.exports = config;

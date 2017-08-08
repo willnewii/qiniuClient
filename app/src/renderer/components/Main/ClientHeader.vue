@@ -15,6 +15,11 @@
         }
     }
 
+    .modal-input {
+        display: flex;
+        flex-direction: row;
+    }
+
     .modal-filekey {
         padding: 5px 0 0 0;
         line-height: 1;
@@ -27,34 +32,38 @@
 </style>
 <template>
     <div class="layout-header">
-        <i-button type="text" @click="toggleClick">
+        <i-button type="text">
             <Icon :type="icon" size="32"></Icon>
         </i-button>
         <div class="full">
             <Tag type="border" v-for="item of bucket.domains" v-if="bucket.name">{{item}}</Tag>
         </div>
         <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
-            <Icon type="ios-plus-outline" size="32"/>
+            <Tooltip content="文件上传(支持多选)" placement="bottom">
+                <Icon type="ios-plus-outline" size="32"/>
+            </Tooltip>
         </i-button>
         <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
-            <Icon type="arrow-swap" size="32"/>
+            <Tooltip content="通过url直接上传文件" placement="bottom">
+                <Icon type="arrow-swap" size="32"/>
+            </Tooltip>
         </i-button>
         <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
                v-if="bucket.name"></Input>
 
-        <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="doQiniuUploadFile"
+        <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="preUploadFile"
                @on-cancel="initModal">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
                    placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"></Input>
 
-            <Input v-model="uploadModal.input">
-            <Select slot="prepend" v-model="uploadModal.prepend" style="width: 80px">
-                <Option value="">无</Option>
-                <Option v-for="item of dirs" :value="item">{{item}}</Option>
-            </Select>
-            <!--<Button slot="append">{{uploadModal.fileName}}</Button>-->
-            </Input>
+            <div class="modal-input">
+                <Select v-model="uploadModal.prepend" style="width: 100px">
+                    <Option value="">无</Option>
+                    <Option v-for="item of dirs" :value="item">{{item}}</Option>
+                </Select>
+                <Input v-model="uploadModal.input"></Input>
+            </div>
 
             <div class="modal-filekey" v-for="_path of filePaths">
                 文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByPath}}
@@ -130,21 +139,13 @@
                 if (!this.messageFlag) {
                     this.messageFlag = true;
                     this.$Message.info('我已经感受到你传来的文件啦 😎');
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         this.messageFlag = false
-                    },2000);
+                    }, 2000);
                 }
             }
         },
         methods: {
-            //无调用
-            toggleClick() {
-                this.$emit('on-navicon', event);
-            },
-            /**
-             *
-             * @param index
-             */
             actionBtn(index) {
                 this.uploadModal.prepend = this.currentDir;
                 switch (index) {
@@ -153,7 +154,7 @@
                         ipc.send('open-file-dialog', {properties: ['openFile']});
                         break;
                     case 1://抓取文件
-                        //this.filePaths = [];
+                        this.filePaths = [];
                         this.uploadModal.type = 'fetch';
                         this.uploadModal.isShow = true;
                         break;
@@ -176,16 +177,13 @@
                 this.uploadModal.type = 'upload';
                 this.uploadModal.isShow = true;
             },
-            doQiniuUploadFile() {
+            preUploadFile() {
                 if (this.uploadModal.input)
                     this.uploadModal.input = this.uploadModal.input + '/';
 
-
-                console.log(this.uploadModal.prepend, '-', this.uploadModal.input, '-', this.filePaths);
-                this.qiniuUploadFile();
+                this.uploadFile();
             },
-            qiniuUploadFile() {
-                let that = this;
+            uploadFile() {
                 let filePath = this.filePaths[0];
                 let key = this.uploadModal.prepend + this.uploadModal.input + util.getPostfix(filePath);
 
@@ -203,20 +201,13 @@
                     }
                 };
 
-                let callback = (err, ret) => {
-                    this.$Loading.finish();
-                    that.uploadResult(err, ret);
-                };
-
                 if (this.uploadModal.type === 'fetch') {
-                    cloudStorage.fetch(param, callback)
+                    cloudStorage.fetch(param, this.handleResult)
                 } else {
-                    cloudStorage.upload(param, callback);
+                    cloudStorage.upload(param, this.handleResult);
                 }
             },
-            uploadResult(err, ret) {
-                this.uploadModal.path = '';
-                this.uploadModal.input = '';
+            handleResult(err, ret) {
 
                 if (!err) {
                     this.$Notice.success({
@@ -224,17 +215,20 @@
                         desc: ret.key,
                     });
                 } else {
-                    // 上传失败， 处理返回代码
-                    console.log(err);
                     this.$Notice.error({
                         title: '上传失败',
                         desc: err.error,
                     });
                 }
+
                 this.filePaths.shift();
                 if (this.filePaths.length > 0) {
-                    this.qiniuUploadFile();
+                    this.uploadFile();
                 } else {
+                    this.$Loading.finish();
+                    this.uploadModal.path = '';
+                    this.uploadModal.input = '';
+
                     this.$emit('on-update', ret, 'upload', event);
                 }
             }
