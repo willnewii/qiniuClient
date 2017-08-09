@@ -7,7 +7,7 @@
 <script>
     import store from 'renderer/vuex/store'
 
-//    import titlebar from "titlebar";
+    //    import titlebar from "titlebar";
 
     export default {
         store,
@@ -40,8 +40,6 @@
 </script>
 
 <style lang="scss">
-    @import url(https://fonts.googleapis.com/css?family=Lato:500);
-
     .vertical-center-modal {
         display: flex;
         align-items: center;

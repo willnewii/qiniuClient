@@ -1,7 +1,6 @@
 <style lang="scss" scoped>
     .layout {
         height: 100%;
-        border: 1px solid #d7dde4;
         background: #f5f7f9;
         position: relative;
         border-radius: 4px;
@@ -72,7 +71,7 @@
                     </i-button>
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :name="item">
-                            <Icon :style="{width:iconSize + 'px'}" type="ios-box" :size="iconSize"></Icon>
+                            <Icon :style="{width:iconSize + 'px'}" type="folder" :size="iconSize"></Icon>
                             <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
                         </Menu-item>
                     </Menu-group>

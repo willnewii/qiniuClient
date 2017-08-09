@@ -8,10 +8,12 @@
 
         .full {
             flex-grow: 1;
+            margin-left: 16px;
         }
 
         .input-search {
-            width: 300px;
+            width: 165px;
+            margin: 10px 0;
         }
     }
 
@@ -32,20 +34,17 @@
 </style>
 <template>
     <div class="layout-header">
-        <i-button type="text">
-            <Icon :type="icon" size="32"></Icon>
-        </i-button>
         <div class="full">
             <Tag type="border" v-for="item of bucket.domains" v-if="bucket.name">{{item}}</Tag>
         </div>
         <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
             <Tooltip content="文件上传(支持多选)" placement="bottom">
-                <Icon type="ios-plus-outline" size="32"/>
+                <Icon type="ios-plus-outline" size="24"/>
             </Tooltip>
         </i-button>
         <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
             <Tooltip content="通过url直接上传文件" placement="bottom">
-                <Icon type="arrow-swap" size="32"/>
+                <Icon type="arrow-swap" size="24"/>
             </Tooltip>
         </i-button>
         <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
@@ -97,10 +96,14 @@
                 return this.bucket.dirs.slice(2);
             },
             icon() {
-                return this.bucket.name ? 'ios-box' : 'ios-cog';
+                return this.bucket.name ? 'ios-at' : 'ios-cog';
             },
             placeholder() {
-                return '搜索' + this.currentDir;
+                if (this.currentDir) {
+                    return '搜索' + this.currentDir + '目录下文件';
+                } else {
+                    return '搜索';
+                }
             },
             currentDir() {
                 if (this.bucket.currentDir == '__withoutDelimiter__') {

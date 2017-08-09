@@ -42,7 +42,7 @@
 
     export default {
         name: 'ResourceTable',
-        data(){
+        data() {
             return {
                 self: this,
                 tableHeight: 100,
@@ -52,8 +52,8 @@
                 columns: [
                     {title: '文件名', key: 'key'},
                     {
-                        title: '大小', key: 'fsize', sortable: true, width: 120,
-                        render (h, item) {
+                        title: '大小', key: 'fsize', sortable: true, width: 150,
+                        render(h, item) {
                             let row = item.row;
                             if (row.fsize >= 1024 * 1024) {
                                 return (row.fsize / 1024 / 1024).toFixed(2) + ' MB'
@@ -67,12 +67,12 @@
                     {title: '类型', key: 'mimeType', width: 150},
                     {
                         title: '创建日期', key: 'putTime', sortable: true, width: 150,
-                        render (h, item) {
+                        render(h, item) {
                             return moment(item.row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
                         }
                     },
                     {
-                        title: '操作', key: 'action', width: 200,
+                        title: '操作', key: 'action', width: 165,
                         render: (h, item) => {
                             return h('div', [
                                 h('i-button', {
@@ -109,7 +109,7 @@
                                             this.remove(item.index)
                                         }
                                     }
-                                }, '💀 删除')
+                                }, '删除')
                             ])
                         }
                     }],
@@ -136,9 +136,9 @@
                 default: ''
             }
         },
-        created(){
+        created() {
         },
-        mounted(){
+        mounted() {
             this.setTableSize();
             window.onresize = () => {
                 this.setTableSize();
@@ -148,7 +148,7 @@
             show(index) {
                 this.$electron.shell.openExternal(util.getQiniuUrl(this.domains[0], this.files[index].key))
             },
-            copy(index){
+            copy(index) {
                 let url = util.getQiniuUrl(this.domains[0], this.files[index].key);
                 util.setClipboardText(this, this.setup_copyType, url);
 
@@ -163,7 +163,7 @@
                     this.doRemove();
                 }
             },
-            doRemove(){
+            doRemove() {
                 cloudStorage.remove({
                     bucket: this.bucketname,
                     key: this.deleteKey
@@ -177,7 +177,7 @@
                     this.$emit('on-update', ret, 'remove', event);
                 })
             },
-            setTableSize(){
+            setTableSize() {
                 if (this.$parent) {
                     let that = this;
                     that.tableHeight = that.$parent.$el.clientHeight * 0.85 - 30;
