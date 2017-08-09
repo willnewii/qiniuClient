@@ -1,3 +1,6 @@
+<style lang="scss">
+    @import '../style/base';
+</style>
 <style lang="scss" scoped>
     .layout {
         height: 100%;
@@ -17,22 +20,20 @@
             .ivu-menu-vertical {
                 flex-grow: 1;
             }
+
             .navicon_btn {
+                text-align: left;
                 color: #c5c5c5;
             }
             .navicon_btn:hover {
                 color: #57a3f3;
             }
 
-            .layout-logo-left {
-                width: 90%;
-                height: 30px;
-                background: #5b6270;
-                border-radius: 3px;
-                margin: 15px auto;
-            }
-            .layout-text {
-                margin-left: 10px;
+            .ivu-menu-item {
+                padding: 8px 24px;
+                .layout-text {
+                    margin-left: 0px;
+                }
             }
 
             .version {
@@ -63,12 +64,12 @@
     <div class="layout">
         <Row type="flex">
             <i-col :span="spanLeft" class="layout-menu-left">
+                <i-button type="text" @click="toggleClick" class="navicon_btn">
+                    <Icon type="navicon" size="32"></Icon>
+                </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="selectBuckets"
                       :active-name="bucketname">
-                    <i-button type="text" @click="toggleClick" class="navicon_btn">
-                        <Icon type="navicon" size="32"></Icon>
-                    </i-button>
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :name="item">
                             <Icon :style="{width:iconSize + 'px'}" type="folder" :size="iconSize"></Icon>

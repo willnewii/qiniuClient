@@ -1,0 +1,18 @@
+// 样式调整
+
+.ivu-menu-item-group-title {
+  font-size: 12px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+  padding-left: 24px !important;
+}
+
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
+  color: #2d8cf0;
+  border-right: 5px solid #2d8cf0;
+}
+
+.layout-menu-left {
+  background: #495060 !important;
+  //box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
