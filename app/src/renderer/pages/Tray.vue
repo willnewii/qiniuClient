@@ -79,6 +79,8 @@
             })
         },
         created(){
+            document.getElementById('title').remove();
+
             this[types.APP.app_a_setup_init]();
             ipc = this.$electron.ipcRenderer;
 

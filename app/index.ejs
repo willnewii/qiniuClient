@@ -17,8 +17,8 @@
 
           html,
           body {
+              user-select: none;
               height: 100%;
-              font-family: Lato, Helvetica, sans-serif;
               display: flex;
               flex-direction: column;
           }
@@ -28,6 +28,7 @@
             height: 22px;
             line-height: 22px;
             text-align: center;
+            -webkit-app-region: drag;
           }
 
           #app {

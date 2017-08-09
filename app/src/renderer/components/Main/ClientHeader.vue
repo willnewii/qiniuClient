@@ -1,6 +1,5 @@
 <style lang="scss" scoped>
     .layout-header {
-        -webkit-app-region: drag;
         background: #fff;
         box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
         display: flex;
