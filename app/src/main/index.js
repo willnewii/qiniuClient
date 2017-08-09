@@ -26,6 +26,7 @@ function createMainWindow() {
         height: 750,
         width: 1000,
         // frame: false,
+        titleBarStyle: 'hidden',
         webPreferences: {
             webSecurity: false
         }
@@ -62,29 +63,29 @@ const registerIPC = function () {
         })
     });
 
-/*    ipcMain.on('window-close', function (event) {
-        console.log('aaaaaa');
-        if (mainWindow) {
-            mainWindow.close();
-        }
-    });
+    /*    ipcMain.on('window-close', function (event) {
+            console.log('aaaaaa');
+            if (mainWindow) {
+                mainWindow.close();
+            }
+        });
 
-    ipcMain.on('window-minimize', function (event) {
-        if (mainWindow) {
-            mainWindow.minimize();
-        }
-    });
+        ipcMain.on('window-minimize', function (event) {
+            if (mainWindow) {
+                mainWindow.minimize();
+            }
+        });
 
-    ipcMain.on('window-maximize', function (event) {
-        if (mainWindow) {
-            mainWindow.unmaximize();
-        }
-    });
-    ipcMain.on('window-fullscreen', function (event) {
-        if (mainWindow) {
-            mainWindow.maximize();
-        }
-    });*/
+        ipcMain.on('window-maximize', function (event) {
+            if (mainWindow) {
+                mainWindow.unmaximize();
+            }
+        });
+        ipcMain.on('window-fullscreen', function (event) {
+            if (mainWindow) {
+                mainWindow.maximize();
+            }
+        });*/
 };
 
 /**

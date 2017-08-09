@@ -1,5 +1,6 @@
 <style lang="scss" scoped>
     .layout-header {
+        -webkit-app-region: drag;
         background: #fff;
         box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
         display: flex;
@@ -13,7 +14,7 @@
 
         .input-search {
             width: 165px;
-            margin: 10px 0;
+            margin: 8px 0;
         }
     }
 
