@@ -1,7 +1,6 @@
 <style lang="scss" scoped>
     .layout-tag {
-        padding: 15px 15px 0 15px;
-
+        flex-grow: 1;
         .blue-tag {
             color: #39f !important;
             border: 1px solid #39f !important;

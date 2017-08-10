@@ -73,17 +73,17 @@
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :name="item">
                             <Icon :style="{width:iconSize + 'px'}" type="folder" :size="iconSize"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">{{item}}</span>
+                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
                         <Menu-item name="__app__setup__">
                             <Icon :style="{width:iconSize + 'px'}" type="ios-gear" :size="iconSize"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">设置</span>
+                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">设置</span>
                         </Menu-item>
                         <Menu-item name="__app__logout__">
                             <Icon :style="{width:iconSize + 'px'}" type="android-exit" :size="iconSize"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': spanLeft < 4}">注销</span>
+                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">注销</span>
                         </Menu-item>
                     </Menu-group>
                 </Menu>
@@ -122,13 +122,14 @@
                 buckets: types.APP.app_buckets,
             }),
             iconSize() {
-                return this.menuState ? 25 : 20;
+                //return this.menuState ? 25 : 25;
+                return 25;
             },
             spanLeft() {
-                return this.menuState ? 4 : 1;
+                return this.menuState ? 5 : 2;
             },
             spanRight() {
-                return this.menuState ? 20 : 23;
+                return this.menuState ? 19 : 22;
             }
         },
         components: {RightContent},

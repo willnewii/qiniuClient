@@ -5,14 +5,13 @@
 
     .title {
         width: 100%;
-
         text-align: center;
         padding: 10px;
     }
 </style>
 <template>
     <div class="layout">
-        <h3 class="title">设置七牛KEY信息</h3>
+        <h3 class="title">设置七牛云密钥</h3>
         <Form :model="formItem" ref="formItem" :rules="ruleItem" :label-width="150">
             <Form-item label="ACCESS_KEY" prop="access_key">
                 <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"></Input>
@@ -24,18 +23,22 @@
                 <Button type="primary" @click="handleSubmit('formItem')">设置</Button>
                 <Button type="ghost" @click="handleReset('formItem')" style="margin-left: 8px">重置</Button>
             </Form-item>
+            <div style="margin-left: 150px">＊如何获取密钥信息:<a @click="openBrowser">登录七牛云</a>->个人面板->密钥管理
+            </div>
         </Form>
     </div>
 </template>
 <script>
     import * as cloudStorage from '../util/cloudStorage'
+
     const storage = require('electron-json-storage');
 
     import api from '../api/API'
+
     let API;
 
     export default {
-        data () {
+        data() {
             return {
                 formItem: {
                     access_key: '',
@@ -44,21 +47,15 @@
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
-                },
-                spanLeft: 5,
-                spanRight: 19
+                }
             }
         },
-        computed: {
-            iconSize () {
-                return this.spanLeft === 5 ? 14 : 24;
-            }
-        },
+        computed: {},
         created: function () {
             API = new api(this);
         },
         methods: {
-            handleSubmit (name) {
+            handleSubmit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         this.validateToken(this.formItem.access_key, this.formItem.secret_key)
@@ -67,10 +64,10 @@
                     }
                 })
             },
-            handleReset (name) {
+            handleReset(name) {
                 this.$refs[name].resetFields();
             },
-            validateToken(access_key, secret_key){
+            validateToken(access_key, secret_key) {
                 cloudStorage.init({access_key: access_key, secret_key: secret_key});
 
                 API.get(API.method.getBuckets).then((response) => {
@@ -91,14 +88,8 @@
                     });
                 });
             },
-            toggleClick () {
-                if (this.spanLeft === 5) {
-                    this.spanLeft = 2;
-                    this.spanRight = 22;
-                } else {
-                    this.spanLeft = 5;
-                    this.spanRight = 19;
-                }
+            openBrowser() {
+                this.$electron.shell.openExternal('https://portal.qiniu.com/signin');
             }
         }
     }

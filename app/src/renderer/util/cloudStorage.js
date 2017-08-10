@@ -29,7 +29,7 @@ function fetch(params, callback) {
 
     bucketManager.fetch(params.path, params.bucket, params.key, function (respErr, respBody, respInfo) {
         if (respBody.error) {
-            respErr = {"error": respBody.error};
+            respErr = {"error": respBody.error, 'status': respBody.status};
         }
         callback(respErr, respBody);
     });

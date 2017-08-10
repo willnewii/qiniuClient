@@ -94,7 +94,7 @@ const registerIPC = function () {
  */
 const getMenuData = function () {
     const template = [
-        {
+/*        {
             label: 'Edit',
             submenu: [
                 {role: 'undo'},
@@ -107,11 +107,18 @@ const getMenuData = function () {
                 {role: 'delete'},
                 {role: 'selectall'}
             ]
-        },
+        },*/
         {
-            label: 'View',
+            label: '视图',
             submenu: [
-                {role: 'reload'},
+                {
+                    label: '重新加载',
+                    click() {
+                        if (mainWindow) {
+                            mainWindow.loadURL(util.winURL);
+                        }
+                    }
+                },
                 {role: 'forcereload'},
                 {role: 'toggledevtools'},
                 {type: 'separator'},
@@ -123,24 +130,30 @@ const getMenuData = function () {
             ]
         },
         {
-            role: 'window',
+            label: '窗口',
             submenu: [
                 {role: 'minimize'},
                 {role: 'close'}
             ]
         },
         {
-            role: 'help',
+            label: '帮助',
             submenu: [
                 {
-                    label: 'Learn More',
+                    label: '关于项目',
                     click() {
-                        require('electron').shell.openExternal('https://electron.atom.io')
+                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient')
+                    }
+                },
+                {
+                    label: '提交异常或需求',
+                    click() {
+                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient/issues')
                     }
                 }
             ]
         }
-    ]
+    ];
 
     if (process.platform === 'darwin') {
         template.unshift({
@@ -158,7 +171,7 @@ const getMenuData = function () {
             ]
         })
 
-        // Edit menu
+/*        // Edit menu
         template[1].submenu.push(
             {type: 'separator'},
             {
@@ -168,10 +181,10 @@ const getMenuData = function () {
                     {role: 'stopspeaking'}
                 ]
             }
-        )
+        )*/
 
         // Window menu
-        template[3].submenu = [
+        template[2].submenu = [
             {role: 'close'},
             {role: 'minimize'},
             {role: 'zoom'},

@@ -35,7 +35,7 @@
         <div class="list">
             <div class='item' v-for="item of logs">
                 <img v-if="isImg(item.key)" class='image' :src="'http://' + domains[0]+'/'+item.key" alt="">
-                <div>
+                <div v-if="item.code == 0">
                     <div>{{item.key}}</div>
                     <div>
                         <i-button class='btn' type="primary" size="small" @click="show(item.key)">查看</i-button>
@@ -44,8 +44,9 @@
                         </i-button>
                     </div>
                 </div>
-
-
+                <div v-else>
+                    {{item.error}}
+                </div>
             </div>
         </div>
     </div>
@@ -58,11 +59,12 @@
     import * as cloudStorage from '../util/cloudStorage'
     import storage from 'electron-json-storage'
     import api from '../api/API'
+
     let API, ipc;
 
     export default {
         name: 'tray-page',
-        data(){
+        data() {
             return {
                 domains: [],
                 files: [],
@@ -78,7 +80,7 @@
                 setup_copyType: types.APP.setup_copyType,
             })
         },
-        created(){
+        created() {
             document.getElementById('title').remove();
 
             this[types.APP.app_a_setup_init]();
@@ -101,10 +103,19 @@
             });
 
             ipc.on('upload-Files', (event, files) => {
-                console.log(files);
                 this.files = files;
 
                 storage.get('app_setup', (error, app) => {
+
+                    if(!app.bucket_name || !app.bucket_dir){
+                        ipc.send('show-Notifier', {
+                            title: 'qiniu-client',
+                            message: '请先设置上传空间',
+                        });
+                        this.updateStatus('');
+                        return ;
+                    }
+
                     if (!error) {
                         this.config = app;
                         this.doUploadFile();
@@ -120,17 +131,18 @@
             ...mapActions([
                 types.APP.app_a_setup_init,
             ]),
-            updateStatus(title){
+            updateStatus(title) {
+                console.log('title:', title);
                 ipc.send('upload-tray-title', title);
             },
-            sendNotify(){
+            sendNotify() {
                 ipc.send('show-Notifier', {
                     title: 'qiniu-client',
                     message: '上传完成  (＾－＾)V',
                     icon: 'notify-success.png'
                 });
             },
-            doUploadFile(){
+            doUploadFile() {
                 if (this.current > this.files.length) {
                     this.updateStatus('');
                     this.current = 1;
@@ -139,7 +151,7 @@
                     this.uploadFile(this.files[this.current - 1]);
                 }
             },
-            uploadFile(filePath){
+            uploadFile(filePath) {
                 let key = this.config.bucket_dir + '/' + util.getName(filePath);
 
                 let log = {
@@ -152,7 +164,9 @@
                         key: key,
                         path: filePath,
                         progressCallback: (progress) => {
-                            this.updateStatus(`(${progress}%)${this.current}/${this.files.length}`);
+                            if (progress !== 100) {
+                                this.updateStatus(`(${progress}%)${this.current}/${this.files.length}`);
+                            }
                         }
                     }, (err, ret) => {
                         this.handleResult(log, err);
@@ -161,30 +175,30 @@
                     this.handleResult(log, err);
                 }
             },
-            handleResult(log, err){
-                window.error = err;
+            handleResult(log, err) {
                 if (!err) {//ret.key
                     log.code = 0;
                 } else {
-                    log.code = err.statusCode;
-                    log.error = err.body;
+                    log.code = err.status;
+                    log.error = err.error;
                 }
+
                 this.logs.unshift(log);
                 this.current = this.current + 1;
                 this.doUploadFile();
             },
-            show(key){
+            show(key) {
                 let url = util.getQiniuUrl(this.domains[0], key);
                 this.$electron.shell.openExternal(url);
             },
-            copy(key){
+            copy(key) {
                 let url = util.getQiniuUrl(this.domains[0], key);
                 util.setClipboardText(this, this.config.copyType, url);
             },
-            openInFolder(path){
+            openInFolder(path) {
                 this.$electron.shell.showItemInFolder(path);
             },
-            isImg(file){
+            isImg(file) {
                 return new RegExp(/\.(png|jpe?g|gif|svg)(\?.*)?$/).test(file);
             }
         }

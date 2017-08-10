@@ -23,7 +23,7 @@
 <template>
     <div class="layout-content">
         <Table border :columns="columns" :context="self"
-               :height="tableHeight" :data="files" no-data-text="没有数据呀~"></Table>
+               :height="tableHeight" :data="files" no-data-text="暂无数据"></Table>
         <Modal
                 v-model="deleteNoAskModel"
                 title="确认删除文件？"
@@ -50,9 +50,9 @@
                 deleteKey: '',
                 deleteNoAskModel: false,
                 columns: [
-                    {title: '文件名', key: 'key'},
+                    {title: '文件名', key: 'key', ellipsis: false},
                     {
-                        title: '大小', key: 'fsize', sortable: true, width: 150,
+                        title: '大小', key: 'fsize', sortable: true, width: 100,
                         render(h, item) {
                             let row = item.row;
                             if (row.fsize >= 1024 * 1024) {
@@ -64,9 +64,9 @@
                             }
                         }
                     },
-                    {title: '类型', key: 'mimeType', width: 150},
+                    {title: '类型', key: 'mimeType', width: 100},
                     {
-                        title: '创建日期', key: 'putTime', sortable: true, width: 150,
+                        title: '上传日期', key: 'putTime', sortable: true, sortType: 'desc', width: 150,
                         render(h, item) {
                             return moment(item.row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
                         }

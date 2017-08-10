@@ -4,13 +4,26 @@
         padding: 10px 0 20px;
         color: #9ea7b4;
     }
+
+    .dir-layout {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 15px 15px 0 15px;
+    }
 </style>
 <template>
     <div class="layout">
         <ClientHeader v-if="endable" :bucket="bucket" @on-update="onUpdate" @on-navicon="toggleClick"
                       @on-search="doSearch"></ClientHeader>
 
-        <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
+        <div class="dir-layout">
+            <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
+            <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
+                <!--<Button type="ghost" icon="chevron-left"></Button>-->
+                <Button type="ghost" @click="getResources" icon="chevron-right"></Button>
+            </Button-group>
+        </div>
 
         <ResourceTable v-if="endable" :bucketname="bucket.name" :files="bucket.files" :domains="bucket.domains"
                        @on-update="onUpdate"></ResourceTable>
@@ -43,6 +56,7 @@
                     domains: [],
                     dirs: [],
                     currentDir: '',
+                    marker: '',
                     files: [],
                     withoutDelimiterFiles: []
                 },
@@ -52,8 +66,7 @@
         watch: {
             bucketname: function (val, oldVal) {
                 if (val && oldVal !== val) {
-                    this.bucket.name = val;
-                    this.initBucket();
+                    this.initBucket(val);
                 }
             }
         },
@@ -62,14 +75,15 @@
 
             if (this.$route.query && this.$route.query.bucketname) {
                 if (this.$route.query.bucketname !== this.bucket.name) {
-                    this.bucket.name = this.$route.query.bucketname;
-                    this.bucket.currentDir = '';
-                    this.initBucket();
+                    this.initBucket(this.$route.query.bucketname);
                 }
             }
         },
         methods: {
-            initBucket() {
+            initBucket(bucketname) {
+                this.bucket.name = bucketname;
+                this.bucket.currentDir = '';
+
                 this.bucket.dirs = [];
                 this.endable = false;
                 if (this.bucket.name.indexOf('__app__') !== 0) {
@@ -92,14 +106,28 @@
                 let data = {
                     bucket: this.bucket.name,
                     limit: 100
-                }
+                };
 
                 if (keyword) {
-                    data.prefix = keyword;
+                    data.prefix = this.bucket.currentDir;
+                }
+
+                if (this.bucket.marker) {
+                    data.marker = this.bucket.marker;
                 }
 
                 API.post(API.method.getResources, data).then((response) => {
-                    this.bucket.files = response.data.items
+
+                    if(this.bucket.marker){
+                        this.bucket.files = this.bucket.files.concat(response.data.items);
+                    }else{
+                        this.bucket.files = response.data.items;
+                    }
+                    if (response.data.marker) {
+                        this.bucket.marker = response.data.marker
+                    } else {
+                        this.bucket.marker = '';
+                    }
                 });
             },
             /**
@@ -111,7 +139,7 @@
                     bucket: this.bucket.name,
                     delimiter: '/',
                     limit: 1000
-                }
+                };
                 if (marker) {
                     data.marker = marker;
                 }
@@ -136,6 +164,7 @@
              */
             doDirSearch: function (search) {
                 this.bucket.currentDir = search;
+                this.bucket.marker = '';
 
                 if (search === '__withoutDelimiter__') {
                     this.bucket.files = this.bucket.withoutDelimiterFiles;

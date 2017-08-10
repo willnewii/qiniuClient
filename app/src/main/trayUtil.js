@@ -30,7 +30,7 @@ export const createTray = function () {
             setTrayIcon(icon_tray);
         }
         setTrayTitle(title)
-    })
+    });
 
     ipcMain.on('show-Notifier', function (event, option) {
         if (option.icon) {
