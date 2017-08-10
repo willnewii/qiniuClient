@@ -87,7 +87,7 @@
                         </Menu-item>
                     </Menu-group>
                 </Menu>
-                <div class="version" @click="openBrowser(0)">version:{{appVersion}} </div>
+                <div class="version" @click="open_Browser(0)">version:{{appVersion}} </div>
             </i-col>
             <i-col :span="spanRight" class="layout-menu-right">
                 <router-view :bucketname="bucketname"></router-view>
@@ -97,18 +97,18 @@
 </template>
 <script>
     import {mapGetters, mapActions} from 'vuex'
-    import * as cloudStorage from '../util/cloudStorage'
+    import * as cloudStorage from '../service/cloudStorage'
     import * as types from '../vuex/mutation-types'
     import storage from 'electron-json-storage'
     import pkg from '../../../package.json'
 
+    import mixin_base from "../mixins/mixin-base";
     import RightContent from './bucketPage.vue'
 
-    import api from '../api/API'
-
-    let API = null;
+    import {Constants}  from '../service/index'
 
     export default {
+        mixins: [mixin_base],
         data() {
             return {
                 search: '',
@@ -134,7 +134,6 @@
         },
         components: {RightContent},
         created: function () {
-            API = new api(this);
             this.initKEY(() => {
                 this.getBuckets();
             });
@@ -147,6 +146,12 @@
                 types.APP.app_a_buckets,
                 types.APP.app_a_setup_init,
             ]),
+            toggleClick() {
+                this.menuState = !this.menuState;
+            },
+            open_Browser(){
+              this.openBrowser(Constants.URL.github)
+            },
             initKEY(callback) {
                 storage.get(types.APP.qiniu_key, (error, data) => {
                     if (!error) {
@@ -162,7 +167,7 @@
                 })
             },
             getBuckets() {
-                API.get(API.method.getBuckets).then((response) => {
+                this.doRequset(Constants.method.getBuckets, null, (response) => {
                     this[types.APP.app_a_buckets](response.data);
                     this.bucketname = this.buckets[0];
 
@@ -176,7 +181,6 @@
                 } else if (name === '__app__logout__') {
                     this.$Modal.confirm({
                         title: '登出该账号?',
-                        content: `如果有不满意的地方,记得提个<span @click="openIssues">issue</span>`,
                         render: (h) => {
                             return h('div', {
                                 style: {
@@ -187,7 +191,7 @@
                                 h('a', {
                                     on: {
                                         click: () => {
-                                            this.openBrowser(1);
+                                            this.openBrowser(Constants.URL.issue);
                                         }
                                     }
                                 }, ' issues')
@@ -203,18 +207,6 @@
                     this.$router.push({path: '/bucketPage', query: {bucketname: name}});
                 }
             },
-            toggleClick() {
-                this.menuState = !this.menuState;
-            },
-            openBrowser(type) {
-                let url = 'https://github.com/willnewii/qiniuClient';
-                switch (type) {
-                    case 1:
-                        url = 'https://github.com/willnewii/qiniuClient/issues';
-                        break;
-                }
-                this.$electron.shell.openExternal(url);
-            }
         }
     }
 </script>

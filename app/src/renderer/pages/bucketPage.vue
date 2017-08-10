@@ -25,24 +25,27 @@
             </Button-group>
         </div>
 
-        <ResourceTable v-if="endable" :bucketname="bucket.name" :files="bucket.files" :domains="bucket.domains"
+        <ResourceTable v-if="endable" :bucket="bucket" :bucketname="bucket.name" :files="bucket.files"
+                       :domains="bucket.domains"
                        @on-update="onUpdate"></ResourceTable>
 
     </div>
 </template>
 <script>
-    import * as types from '../vuex/mutation-types'
     import DirTag from '../components/Main/DirTag.vue'
     import ClientHeader from '../components/Main/ClientHeader.vue'
     import ResourceTable from '../components/Main/ResourceTable.vue'
-    import * as util from '../util/util'
-    import api from '../api/API'
 
-    let API;
+    import * as types from '../vuex/mutation-types'
+
+    import mixin_base from "../mixins/mixin-base";
+    import {Constants, util} from '../service/index'
+
 
     export default {
         name: 'RightContent',
         components: {DirTag, ClientHeader, ResourceTable},
+        mixins: [mixin_base],
         props: {
             bucketname: {
                 type: String,
@@ -71,8 +74,6 @@
             }
         },
         mounted() {
-            API = new api(this);
-
             if (this.$route.query && this.$route.query.bucketname) {
                 if (this.$route.query.bucketname !== this.bucket.name) {
                     this.initBucket(this.$route.query.bucketname);
@@ -98,7 +99,7 @@
                 }
             },
             getDomains() {
-                API.get(API.method.getDomains, {tbl: this.bucket.name}).then((response) => {
+                this.doRequsetGet(Constants.method.getDomains, {tbl: this.bucket.name}, (response) => {
                     this.bucket.domains = response.data;
                 });
             },
@@ -116,11 +117,10 @@
                     data.marker = this.bucket.marker;
                 }
 
-                API.post(API.method.getResources, data).then((response) => {
-
-                    if(this.bucket.marker){
+                this.doRequset(Constants.method.getResources, data, (response) => {
+                    if (this.bucket.marker) {
                         this.bucket.files = this.bucket.files.concat(response.data.items);
-                    }else{
+                    } else {
                         this.bucket.files = response.data.items;
                     }
                     if (response.data.marker) {
@@ -144,7 +144,7 @@
                     data.marker = marker;
                 }
 
-                API.post(API.method.getResources, data).then((response) => {
+                this.doRequset(Constants.method.getResources, data, (response) => {
                     if (response.data.commonPrefixes) {
                         this.bucket.dirs = this.bucket.dirs.concat(response.data.commonPrefixes);
                     }

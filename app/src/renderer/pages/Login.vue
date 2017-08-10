@@ -29,7 +29,7 @@
     </div>
 </template>
 <script>
-    import * as cloudStorage from '../util/cloudStorage'
+    import * as cloudStorage from '../service/cloudStorage'
 
     const storage = require('electron-json-storage');
 

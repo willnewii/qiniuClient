@@ -4,7 +4,7 @@
 
 import axios from 'axios'
 import config from './config'
-import * as cloudStorage from '../util/cloudStorage'
+import * as cloudStorage from '../service/cloudStorage'
 
 import Qs from 'qs'
 

@@ -56,7 +56,7 @@
     import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
     import * as util from '../util/util'
-    import * as cloudStorage from '../util/cloudStorage'
+    import * as cloudStorage from '../service/cloudStorage'
     import storage from 'electron-json-storage'
     import api from '../api/API'
 

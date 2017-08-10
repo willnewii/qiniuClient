@@ -71,7 +71,7 @@
     </div>
 </template>
 <script>
-    import * as cloudStorage from '../../util/cloudStorage'
+    import * as cloudStorage from '../../service/cloudStorage'
     import * as util from '../../util/util'
 
     let ipc;

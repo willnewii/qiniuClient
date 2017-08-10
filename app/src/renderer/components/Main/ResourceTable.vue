@@ -23,7 +23,7 @@
 <template>
     <div class="layout-content">
         <Table border :columns="columns" :context="self"
-               :height="tableHeight" :data="files" no-data-text="暂无数据"></Table>
+               :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"></Table>
         <Modal
                 v-model="deleteNoAskModel"
                 title="确认删除文件？"
@@ -36,7 +36,7 @@
     import {mapGetters} from 'vuex'
     import * as types from '../../vuex/mutation-types'
     import * as util from '../../util/util'
-    import * as cloudStorage from '../../util/cloudStorage'
+    import * as cloudStorage from '../../service/cloudStorage'
 
     import moment from 'moment'
 
@@ -123,17 +123,8 @@
             })
         },
         props: {
-            files: {
-                type: Array,
-                default: []
-            },
-            domains: {
-                type: Array,
-                default: []
-            },
-            bucketname: {
-                type: String,
-                default: ''
+            bucket: {
+                type: Object
             }
         },
         created() {
@@ -146,26 +137,25 @@
         },
         methods: {
             show(index) {
-                this.$electron.shell.openExternal(util.getQiniuUrl(this.domains[0], this.files[index].key))
+                this.$electron.shell.openExternal(util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key))
             },
             copy(index) {
-                let url = util.getQiniuUrl(this.domains[0], this.files[index].key);
+                let url = util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key);
                 util.setClipboardText(this, this.setup_copyType, url);
 
                 this.$Message.info('文件路径以复制到剪贴板');
             },
             remove(index) {
-                this.deleteKey = this.files[index].key;
+                this.deleteKey = this.bucket.files[index].key;
                 if (this.setup_deleteNoAsk) {
                     this.deleteNoAskModel = true;
-                    console.log(this.setup_deleteNoAsk);
                 } else {
                     this.doRemove();
                 }
             },
             doRemove() {
                 cloudStorage.remove({
-                    bucket: this.bucketname,
+                    bucket: this.bucket.name,
                     key: this.deleteKey
                 }, (ret) => {
                     this.$Message.info('移除成功');
