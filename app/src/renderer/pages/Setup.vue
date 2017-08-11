@@ -31,6 +31,12 @@
             <Button @click="saveDir" size="small">保存</Button>
             <br>提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/ 目录下
         </div>
+        <div class="item">
+            预览图片样式：
+            <Input class='bucketdir' v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 40%;"></Input>
+            <Button @click="saveImagestyle" size="small">保存</Button>
+            <Button @click="openBrowser" size="small">关于图片样式</Button>
+        </div>
     </div>
 </template>
 
@@ -41,7 +47,7 @@
 
     export default {
         name: 'setup-page',
-        data (){
+        data() {
             return {
                 bucketname: '',
                 bucketdir: '',
@@ -54,18 +60,21 @@
                 setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
                 setup_bucket_name: types.APP.setup_bucket_name,
                 setup_bucket_dir: types.APP.setup_bucket_dir,
+                setup_imagestyle: types.APP.setup_imagestyle,
             })
         },
         components: {ClientHeader},
         created: function () {
             this.bucketname = this.setup_bucket_name;
             this.bucketdir = this.setup_bucket_dir;
+            this.imagestyle = this.setup_imagestyle;
         },
         methods: {
             ...mapActions([
                 types.APP.setup_a_copyType,
                 types.APP.setup_a_deleteNoAsk,
                 types.APP.setup_a_savedir,
+                types.APP.setup_a_imagestyle,
             ]),
             deleteNoAskChange: function (state) {
                 this[types.APP.setup_a_deleteNoAsk](state);
@@ -75,8 +84,15 @@
                 this[types.APP.setup_a_copyType](model);
             },
             saveDir: function () {
-                console.log(this.bucketname + '/' + this.bucketdir);
                 this[types.APP.setup_a_savedir]([this.bucketname, this.bucketdir]);
+                this.$Message.success('默认托盘路径修改成功');
+            },
+            saveImagestyle: function () {
+                this[types.APP.setup_a_imagestyle]([this.imagestyle]);
+                this.$Message.success('图片样式修改成功');
+            },
+            openBrowser(){
+                this.$electron.shell.openExternal('https://developer.qiniu.com/dora/manual/1279/basic-processing-images-imageview2');
             }
         }
     }

@@ -14,20 +14,21 @@
 </style>
 <template>
     <div class="layout">
-        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onUpdate" @on-navicon="toggleClick"
-                      @on-search="doSearch"></ClientHeader>
+        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onUpdate" @on-search="doSearch"></ClientHeader>
 
         <div class="dir-layout">
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
+            <Button-group size="small" style="background: #FFF;margin-right: 10px">
+                <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)" icon="navicon-round"></Button>
+                <Button :type="bucket.showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
+            </Button-group>
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
-                <!--<Button type="ghost" icon="chevron-left"></Button>-->
                 <Button type="ghost" @click="getResources" icon="chevron-right"></Button>
             </Button-group>
         </div>
 
-        <ResourceTable v-if="endable" :bucket="bucket" :bucketname="bucket.name" :files="bucket.files"
-                       :domains="bucket.domains"
-                       @on-update="onUpdate"></ResourceTable>
+        <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket" @on-update="onUpdate"></resource-table>
+        <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket" @on-update="onUpdate"></resource-grid>
 
     </div>
 </template>
@@ -40,11 +41,14 @@
 
     import mixin_base from "../mixins/mixin-base";
     import {Constants, util} from '../service/index'
+    import ResourceGrid from "../components/Main/ResourceGrid.vue";
 
 
     export default {
-        name: 'RightContent',
-        components: {DirTag, ClientHeader, ResourceTable},
+        name: 'bucketPage',
+        components: {
+            ResourceGrid,
+            DirTag, ClientHeader, ResourceTable},
         mixins: [mixin_base],
         props: {
             bucketname: {
@@ -61,9 +65,10 @@
                     currentDir: '',
                     marker: '',
                     files: [],
+                    showType: 0,
                     withoutDelimiterFiles: []
                 },
-                endable: true
+                endable: false
             }
         },
         watch: {
@@ -106,7 +111,7 @@
             getResources(keyword) {
                 let data = {
                     bucket: this.bucket.name,
-                    limit: 100
+                    limit: 30
                 };
 
                 if (keyword) {
@@ -175,13 +180,13 @@
             doSearch: function (search) {
                 this.getResources(search)
             },
-            toggleClick() {
-                //this.$emit('on-spanLeft', event);
+            showType(type) {
+                this.bucket.showType = type ;
             },
             onUpdate(ret, action) {
                 let keyword = '';
                 if (ret && ret.key) {
-                    keyword = util.getPrefix(ret.key)
+                    keyword = util.getPrefix(ret.key);
                     this.bucket.currentDir = keyword;
                 }
                 this.getResources(keyword);

@@ -4,6 +4,9 @@ export const INCREMENT_MAIN_COUNTER = 'INCREMENT_MAIN_COUNTER'
 export const APP = {
     qiniu_key: 'qiniu_Key',
 
+    setup_imagestyle: 'setup_imagestyle',
+    setup_a_imagestyle: 'setup_a_imagestyle',
+
     setup_deleteNoAsk: 'setup_deleteNoAsk',
     setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
 

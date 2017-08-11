@@ -8,8 +8,7 @@
 }
 
 .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
-  color: #2d8cf0;
-  border-right: 5px solid #2d8cf0;
+  border-right-width: 5px;
 }
 
 .ivu-loading-bar {
@@ -18,6 +17,6 @@
 
 .layout-menu-left {
   background: #495060 !important;
-  border-radius: 2px;
+  border-radius: 5px;
   //box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
 }

@@ -5,21 +5,6 @@
         background: #fff;
     }
 </style>
-<style lang="scss">
-    .layout-content {
-        margin: 15px;
-        overflow: scroll;
-        background: #fff;
-    }
-
-    .ivu-table-header > table {
-        width: 100% !important;
-    }
-
-    .ivu-table-body > table {
-        width: 100% !important;
-    }
-</style>
 <template>
     <div class="layout-content">
         <Table border :columns="columns" :context="self"
@@ -170,7 +155,7 @@
             setTableSize() {
                 if (this.$parent) {
                     let that = this;
-                    that.tableHeight = that.$parent.$el.clientHeight * 0.85 - 30;
+                    that.tableHeight = that.$parent.$el.clientHeight * 0.85 - 20;
                     //that.tableWidth = that.$parent.$el.getBoundingClientRect().width - 30;
                     //console.log(that.$parent.$el.getBoundingClientRect().width);
 

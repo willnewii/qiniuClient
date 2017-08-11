@@ -44,6 +44,10 @@ export default {
 
             setAppSetup(state.setup);
         },
+        [types.APP.setup_imagestyle](state, value){
+            state.setup.imagestyle = value;
+            setAppSetup(state.setup);
+        },
         [types.APP.app_buckets](state, value){
             state.app_buckets = value;
         },
@@ -54,6 +58,9 @@ export default {
     actions: {
         [types.APP.qiniu_key](context, json){
             context.commit(types.APP.qiniu_key, json);
+        },
+        [types.APP.setup_a_imagestyle](context, value){
+            context.commit(types.APP.setup_imagestyle, value);
         },
         [types.APP.app_a_buckets](context, value){
             context.commit(types.APP.app_buckets, value);
@@ -78,6 +85,9 @@ export default {
         },
     },
     getters: {
+        [types.APP.setup_imagestyle](state){
+            return ('imagestyle' in state.setup) ? state.setup.imagestyle : 'imageView2/1/w/100/h/100/format/webp/q/10';
+        },
         [types.APP.setup_deleteNoAsk](state){
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;
         },

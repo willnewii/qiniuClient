@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import Router from 'vue-router'
 import Electron from 'vue-electron'
-
+import VueLazyload from 'vue-lazyload'
 import axios from 'axios';
 
 import iView from 'iview';
@@ -11,6 +11,8 @@ import 'iview/dist/styles/iview.css';
 Vue.use(Electron);
 Vue.use(Router);
 Vue.use(iView);
+Vue.use(VueLazyload);
+
 Vue.config.debug = false;
 
 import routes from './routes'
