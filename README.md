@@ -16,12 +16,16 @@
 3. URL上传
     - 七牛提供了API,可以直接通过url抓取文件并保存到七牛.如果你经常干那种先下载,再上传的事,这个功能应该对你有帮助
 4. 托盘上传
-    - mac独有的功能,方便快捷,谁用谁知道
+    - mac的特性,方便快捷,谁用谁知道
 5. 拖拽上传
     - O__O "…  就是拖拽上传
+6. 图片模式
+    - 显示预览图,如果你有文章插图需要维护,应该可以方便查找
 
 ## 截图
-![qiniu-Client_和_qiniu-Client_和_README_md_-_my-project2_-____Downloads_Web_Vue_my-project2_.jpg](http://obfmtiyt5.bkt.clouddn.com/img/qiniuClient-0.0.4%E6%88%AA%E5%9B%BE.png)
+![qiniu-Client截图.jpg](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.5%E6%88%AA%E5%9B%BE.png)
+
+![qiniu-Client截图2.jpg](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.5%E6%88%AA%E5%9B%BE-2.png)
 
 ## Build Setup
 

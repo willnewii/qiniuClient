@@ -37,6 +37,17 @@
                         margin-top: 5px;
                         text-align: center;
                     }
+                    .btn {
+                        display: none;
+                        position: absolute;
+                        right: 15px;
+                        top: 80px;
+                    }
+                }
+                .view:hover {
+                    .btn {
+                        display: inline;
+                    }
                 }
             }
         }
@@ -47,14 +58,21 @@
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
             <Card v-for="file,index in bucket.files" class="card" :padding="10" :bordered="false">
                 <div class="view" @click="show(index)">
-                    <img  v-if="file.mimeType.indexOf('image')===0" class="image" v-lazy="'http://' + bucket.domains[0] + '/' + file.key + '?' + setup_imagestyle">
+                    <img v-if="file.mimeType.indexOf('image')===0" class="image"
+                         v-lazy="'http://' + bucket.domains[0] + '/' + file.key + '?' + setup_imagestyle">
                     <div v-else-if="file.mimeType.indexOf('audio')===0" class="audio">
-                        <Icon  type="music-note" size="32"></Icon>
+                        <Icon type="music-note" size="32"></Icon>
                     </div>
                     <div v-else class="audio">
-                        <Icon  type="help-circled" size="32"></Icon>
+                        <Icon type="help-circled" size="32"></Icon>
                     </div>
-                    <span  v-else class="image" >其他类型</span>
+                    <span v-else class="image">其他类型</span>
+                    <div class="btn">
+                        <Button type="ghost" shape="circle" size="small" icon="clipboard"
+                                @click="copy(index,$event)" style="background: #FFFFFF"></Button>
+                        <Button type="error" shape="circle" size="small" icon="trash-b"
+                                @click="remove(index,$event)"></Button>
+                    </div>
                     <span class="name">{{file.key | getfileNameByPath}}</span>
                 </div>
             </Card>
@@ -71,73 +89,21 @@
 <script>
     import {mapGetters} from 'vuex'
     import * as types from '../../vuex/mutation-types'
-    import {cloudStorage, util} from '../../service/index'
+    import mixin_resource from '../../mixins/mixin-resource'
 
-    import moment from 'moment'
+    import {cloudStorage} from '../../service/index'
 
     export default {
         name: 'ResourceGrid',
-        data() {
-            return {
-                self: this,
-                deleteKey: '',
-                deleteNoAskModel: false,
-            }
-        },
+        mixins: [mixin_resource],
         computed: {
-            ...mapGetters({
-                setup_copyType: types.APP.setup_copyType,
-                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-                setup_imagestyle: types.APP.setup_imagestyle,
-            }),
             tableHeight() {
                 return this.$parent.$el.clientHeight * 0.85 - 20;
             }
         },
-        props: {
-            bucket: {
-                type: Object
-            }
-        },
-        created() {
-        },
-        mounted() {
-            this.setTableSize();
-            window.onresize = () => {
-                this.setTableSize();
-            }
-        },
-        methods: {
-            show(index) {
-                this.$electron.shell.openExternal(util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key))
-            },
-            copy(index) {
-                let url = util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key);
-                util.setClipboardText(this, this.setup_copyType, url);
-
-                this.$Message.info('文件路径以复制到剪贴板');
-            },
-            remove(index) {
-                this.deleteKey = this.bucket.files[index].key;
-                if (this.setup_deleteNoAsk) {
-                    this.deleteNoAskModel = true;
-                } else {
-                    this.doRemove();
-                }
-            },
-            doRemove() {
-                cloudStorage.remove({
-                    bucket: this.bucket.name,
-                    key: this.deleteKey
-                }, (ret) => {
-                    this.$Message.info('移除成功');
-                    if (!ret) {
-                        ret = {
-                            key: this.deleteKey
-                        }
-                    }
-                    this.$emit('on-update', ret, 'remove', event);
-                })
+        data() {
+            return {
+                self: this,
             }
         }
     };

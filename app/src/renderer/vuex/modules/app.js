@@ -26,11 +26,12 @@ export default {
             copyType: 'markdown',
             bucket_name: '',
             bucket_dir: '',
+            imagestyle:'imageView2/1/w/100/h/100/format/webp/q/10',
         },
         app_buckets: [],
     },
     mutations: {
-        [types.APP.setup_deleteNoAsk](state, value){
+        [types.APP.setup_s_deleteNoAsk](state, value){
             state.setup.deleteNoAsk = value;
             setAppSetup(state.setup);
         },
@@ -66,7 +67,7 @@ export default {
             context.commit(types.APP.app_buckets, value);
         },
         [types.APP.setup_a_deleteNoAsk](context, json){
-            context.commit(types.APP.setup_deleteNoAsk, json);
+            context.commit(types.APP.setup_s_deleteNoAsk, json);
         },
         [types.APP.setup_a_copyType](context, json){
             context.commit(types.APP.setup_copyType, json);

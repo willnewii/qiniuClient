@@ -35,7 +35,7 @@ function createMainWindow() {
     mainWindow.loadURL(util.winURL);
 
     mainWindow.on('closed', () => {
-        mainWindow = null
+        //mainWindow = null
     });
 }
 
@@ -63,29 +63,11 @@ const registerIPC = function () {
         })
     });
 
-    /*    ipcMain.on('window-close', function (event) {
-            console.log('aaaaaa');
-            if (mainWindow) {
-                mainWindow.close();
-            }
-        });
-
-        ipcMain.on('window-minimize', function (event) {
-            if (mainWindow) {
-                mainWindow.minimize();
-            }
-        });
-
-        ipcMain.on('window-maximize', function (event) {
-            if (mainWindow) {
-                mainWindow.unmaximize();
-            }
-        });
-        ipcMain.on('window-fullscreen', function (event) {
-            if (mainWindow) {
-                mainWindow.maximize();
-            }
-        });*/
+    ipcMain.on('previewFile', function (event, filePath) {
+        if (mainWindow) {
+            mainWindow.previewFile(filePath);
+        }
+    });
 };
 
 /**
@@ -94,20 +76,20 @@ const registerIPC = function () {
  */
 const getMenuData = function () {
     const template = [
-/*        {
-            label: 'Edit',
-            submenu: [
-                {role: 'undo'},
-                {role: 'redo'},
-                {type: 'separator'},
-                {role: 'cut'},
-                {role: 'copy'},
-                {role: 'paste'},
-                {role: 'pasteandmatchstyle'},
-                {role: 'delete'},
-                {role: 'selectall'}
-            ]
-        },*/
+        /*        {
+                    label: 'Edit',
+                    submenu: [
+                        {role: 'undo'},
+                        {role: 'redo'},
+                        {type: 'separator'},
+                        {role: 'cut'},
+                        {role: 'copy'},
+                        {role: 'paste'},
+                        {role: 'pasteandmatchstyle'},
+                        {role: 'delete'},
+                        {role: 'selectall'}
+                    ]
+                },*/
         {
             label: '视图',
             submenu: [
@@ -171,17 +153,17 @@ const getMenuData = function () {
             ]
         })
 
-/*        // Edit menu
-        template[1].submenu.push(
-            {type: 'separator'},
-            {
-                label: 'Speech',
-                submenu: [
-                    {role: 'startspeaking'},
-                    {role: 'stopspeaking'}
-                ]
-            }
-        )*/
+        /*        // Edit menu
+                template[1].submenu.push(
+                    {type: 'separator'},
+                    {
+                        label: 'Speech',
+                        submenu: [
+                            {role: 'startspeaking'},
+                            {role: 'stopspeaking'}
+                        ]
+                    }
+                )*/
 
         // Window menu
         template[2].submenu = [

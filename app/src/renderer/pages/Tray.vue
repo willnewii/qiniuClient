@@ -137,7 +137,7 @@
             },
             sendNotify() {
                 ipc.send('show-Notifier', {
-                    title: 'qiniu-client',
+                    title: '上传完成',
                     message: '上传完成  (＾－＾)V',
                     icon: 'notify-success.png'
                 });

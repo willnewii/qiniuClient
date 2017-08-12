@@ -6,9 +6,11 @@ export const APP = {
 
     setup_imagestyle: 'setup_imagestyle',
     setup_a_imagestyle: 'setup_a_imagestyle',
+    setup_s_imagestyle: 'setup_s_imagestyle',
 
     setup_deleteNoAsk: 'setup_deleteNoAsk',
     setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
+    setup_s_deleteNoAsk: 'setup_s_deleteNoAsk',
 
     setup_copyType: 'setup_copyType',
     setup_a_copyType: 'setup_a_copyType',

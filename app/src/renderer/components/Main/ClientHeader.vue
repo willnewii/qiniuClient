@@ -5,6 +5,7 @@
         display: flex;
         align-items: center;
         padding-right: 15px;
+        -webkit-app-region: drag;
 
         .full {
             flex-grow: 1;

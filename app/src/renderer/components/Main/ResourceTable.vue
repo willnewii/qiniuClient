@@ -20,20 +20,19 @@
 <script>
     import {mapGetters} from 'vuex'
     import * as types from '../../vuex/mutation-types'
-    import * as util from '../../util/util'
-    import * as cloudStorage from '../../service/cloudStorage'
+
+    import mixin_resource from '../../mixins/mixin-resource'
 
     import moment from 'moment'
 
     export default {
         name: 'ResourceTable',
+        mixins: [mixin_resource],
         data() {
             return {
                 self: this,
                 tableHeight: 100,
                 tableWidth: 100,
-                deleteKey: '',
-                deleteNoAskModel: false,
                 columns: [
                     {title: '文件名', key: 'key', ellipsis: false},
                     {
@@ -100,18 +99,6 @@
                     }],
             }
         },
-        computed: {
-            ...mapGetters({
-                menuState: types.APP.menu_state,
-                setup_copyType: types.APP.setup_copyType,
-                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-            })
-        },
-        props: {
-            bucket: {
-                type: Object
-            }
-        },
         created() {
         },
         mounted() {
@@ -121,41 +108,9 @@
             }
         },
         methods: {
-            show(index) {
-                this.$electron.shell.openExternal(util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key))
-            },
-            copy(index) {
-                let url = util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key);
-                util.setClipboardText(this, this.setup_copyType, url);
-
-                this.$Message.info('文件路径以复制到剪贴板');
-            },
-            remove(index) {
-                this.deleteKey = this.bucket.files[index].key;
-                if (this.setup_deleteNoAsk) {
-                    this.deleteNoAskModel = true;
-                } else {
-                    this.doRemove();
-                }
-            },
-            doRemove() {
-                cloudStorage.remove({
-                    bucket: this.bucket.name,
-                    key: this.deleteKey
-                }, (ret) => {
-                    this.$Message.info('移除成功');
-                    if (!ret) {
-                        ret = {
-                            key: this.deleteKey
-                        }
-                    }
-                    this.$emit('on-update', ret, 'remove', event);
-                })
-            },
             setTableSize() {
                 if (this.$parent) {
-                    let that = this;
-                    that.tableHeight = that.$parent.$el.clientHeight * 0.85 - 20;
+                    this.tableHeight = this.$parent.$el.clientHeight * 0.85 - 20;
                     //that.tableWidth = that.$parent.$el.getBoundingClientRect().width - 30;
                     //console.log(that.$parent.$el.getBoundingClientRect().width);
 
@@ -164,9 +119,6 @@
                      this.columns[2].width = this.tableWidth * 0.2;
                      this.columns[3].width = this.tableWidth * 0.2;*/
                 }
-                /*
-
-                 */
             },
         }
     };

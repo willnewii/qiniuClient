@@ -19,7 +19,8 @@
         <div class="dir-layout">
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
             <Button-group size="small" style="background: #FFF;margin-right: 10px">
-                <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)" icon="navicon-round"></Button>
+                <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
+                        icon="navicon-round"></Button>
                 <Button :type="bucket.showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
             </Button-group>
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
@@ -28,7 +29,8 @@
         </div>
 
         <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket" @on-update="onUpdate"></resource-table>
-        <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket" @on-update="onUpdate"></resource-grid>
+        <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket"
+                       @on-update="onUpdate"></resource-grid>
 
     </div>
 </template>
@@ -48,7 +50,8 @@
         name: 'bucketPage',
         components: {
             ResourceGrid,
-            DirTag, ClientHeader, ResourceTable},
+            DirTag, ClientHeader, ResourceTable
+        },
         mixins: [mixin_base],
         props: {
             bucketname: {
@@ -91,6 +94,8 @@
                 this.bucket.currentDir = '';
 
                 this.bucket.dirs = [];
+                this.bucket.files = [];
+                this.bucket.marker = '';
                 this.endable = false;
                 if (this.bucket.name.indexOf('__app__') !== 0) {
                     this.getDomains();
@@ -181,7 +186,7 @@
                 this.getResources(search)
             },
             showType(type) {
-                this.bucket.showType = type ;
+                this.bucket.showType = type;
             },
             onUpdate(ret, action) {
                 let keyword = '';
