@@ -19,6 +19,14 @@
                     return '100%';
             }
         },
+        data() {
+            return {}
+        },
+        created: function () {
+            if (process.platform !== 'darwin') {
+                document.getElementById('title').remove();
+            }
+        },
         mounted() {
             /*            let t = titlebar();
              t.appendTo(document.getElementById('title'));

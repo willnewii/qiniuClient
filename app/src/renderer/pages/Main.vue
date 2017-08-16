@@ -168,10 +168,15 @@
             },
             getBuckets() {
                 this.doRequset(Constants.method.getBuckets, null, (response) => {
-                    this[types.APP.app_a_buckets](response.data);
-                    this.bucketname = this.buckets[0];
+                    if(response.data){
+                        this[types.APP.app_a_buckets](response.data);
+                        this.bucketname = this.buckets[0];
 
-                    this.selectBuckets(this.bucketname);
+                        this.selectBuckets(this.bucketname);
+                    }else{
+                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且有至少一个存储空间');
+                        this.$router.push({path: 'login'});
+                    }
                 });
             },
             selectBuckets(name) {

@@ -8,9 +8,14 @@
  * @returns {*}
  */
 export function getName(path) {
+    let separator = '/';
+    if (process.platform !== 'darwin') {
+        separator = '\\';
+    }
+
     path = decodeURIComponent(path);
-    if (path.lastIndexOf('/') !== -1) {
-        path = path.substring(path.lastIndexOf('/') + 1, path.length);
+    if (path.lastIndexOf(separator) !== -1) {
+        path = path.substring(path.lastIndexOf(separator) + 1, path.length);
     }
     return path;
 }

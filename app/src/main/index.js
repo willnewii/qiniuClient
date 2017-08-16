@@ -76,20 +76,20 @@ const registerIPC = function () {
  */
 const getMenuData = function () {
     const template = [
-        /*        {
-                    label: 'Edit',
-                    submenu: [
-                        {role: 'undo'},
-                        {role: 'redo'},
-                        {type: 'separator'},
-                        {role: 'cut'},
-                        {role: 'copy'},
-                        {role: 'paste'},
-                        {role: 'pasteandmatchstyle'},
-                        {role: 'delete'},
-                        {role: 'selectall'}
-                    ]
-                },*/
+        {
+            label: '修改',
+            submenu: [
+                {role: 'undo'},
+                {role: 'redo'},
+                {type: 'separator'},
+                {role: 'cut'},
+                {role: 'copy'},
+                {role: 'paste'},
+                {role: 'pasteandmatchstyle'},
+                {role: 'delete'},
+                {role: 'selectall'}
+            ]
+        },
         {
             label: '视图',
             submenu: [
@@ -166,7 +166,7 @@ const getMenuData = function () {
                 )*/
 
         // Window menu
-        template[2].submenu = [
+        template[3].submenu = [
             {role: 'close'},
             {role: 'minimize'},
             {role: 'zoom'},

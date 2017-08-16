@@ -11,18 +11,12 @@ const iconPath = path.join(__dirname, 'assets/');
 
 export const getIconPath = function (filename) {
     return path.join(iconPath, (process.platform === 'win32' ? filename : filename))
-}
+};
 
 export const isMac = function () {
-    if (process.platform === 'darwin') {
-        return true;
-    }
-    return false;
-}
+    return process.platform === 'darwin';
+};
 
 export const isWin = function () {
-    if (process.platform === 'win32') {
-        return true;
-    }
-    return false;
-}
+    return process.platform === 'win32';
+};
