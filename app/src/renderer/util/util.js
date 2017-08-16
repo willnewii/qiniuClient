@@ -2,17 +2,17 @@
  * Created by zhangweiwei on 2017/4/13.
  */
 
+let separator = '/';
+if (process.platform !== 'darwin') {
+    separator = '\\';
+}
+
 /**
  * 获取图片名
  * @param path
  * @returns {*}
  */
 export function getName(path) {
-    let separator = '/';
-    if (process.platform !== 'darwin') {
-        separator = '\\';
-    }
-
     path = decodeURIComponent(path);
     if (path.lastIndexOf(separator) !== -1) {
         path = path.substring(path.lastIndexOf(separator) + 1, path.length);
@@ -53,8 +53,8 @@ export function getPrefix(key) {
 }
 
 export function getPostfix(path) {
-    if (path.lastIndexOf('/') !== -1) {
-        return path.substring(path.lastIndexOf('/') + 1, path.length);
+    if (path.lastIndexOf(separator) !== -1) {
+        return path.substring(path.lastIndexOf(separator) + 1, path.length);
     } else {
         return path;
     }
