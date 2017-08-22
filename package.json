@@ -1,6 +1,7 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.5",
+  "cnname": "七牛云管理客户端",
+  "version": "0.0.6",
   "description": "An electron-vue project",
   "scripts": {
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
@@ -11,8 +12,7 @@
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config webpack.renderer.config.js",
-    "postinstall": "cd app && npm install",
-    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js"
+    "postinstall": "cd app && npm install"
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",

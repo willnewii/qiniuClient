@@ -20,7 +20,7 @@ export default {
     data() {
         return {
             deleteKey: '',
-            deleteNoAskModel: false,
+            deleteNoAskModel: false
         }
     },
     created: function () {
@@ -37,6 +37,19 @@ export default {
             this.$Message.info('文件路径以复制到剪贴板');
             event.stopPropagation();
         },
+        removes() {
+            console.log(this.bucket.selection);
+            this.deleteKey = this.bucket.selection[0].key;
+            if (this.bucket.selection.length === 1) {
+                this.doRemove();
+            } else {
+                this.doRemove(() => {
+                    this.bucket.selection.shift();
+                    if (this.bucket.selection.length > 0)
+                        this.removes();
+                });
+            }
+        },
         remove(index, event) {
             this.deleteKey = this.bucket.files[index].key;
 
@@ -47,18 +60,23 @@ export default {
             }
             event.stopPropagation();
         },
-        doRemove() {
+        doRemove(callback) {
             cloudStorage.remove({
                 bucket: this.bucket.name,
                 key: this.deleteKey
             }, (ret) => {
-                this.$Message.info('移除成功');
-                if (!ret) {
-                    ret = {
-                        key: this.deleteKey
+                if (callback) {
+                    callback();
+                } else {
+                    this.$Message.info('移除成功');
+                    if (!ret) {
+                        ret = {
+                            key: this.deleteKey
+                        }
                     }
+                    this.$emit('on-update', ret, 'remove', event);
                 }
-                this.$emit('on-update', ret, 'remove', event);
+
             })
         },
     }

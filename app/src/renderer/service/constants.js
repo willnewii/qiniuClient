@@ -11,3 +11,7 @@ export const URL = {
     github: 'https://github.com/willnewii/qiniuClient',
     issue: 'https://github.com/willnewii/qiniuClient/issues',
 };
+
+export const Event = {
+    removes: 'removes',
+};

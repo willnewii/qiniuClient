@@ -45,7 +45,7 @@
         </i-button>
         <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
             <Tooltip content="通过url直接上传文件" placement="bottom">
-                <Icon type="arrow-swap" size="24"/>
+                <Icon type="ios-cloud-upload-outline" size="24"/>
             </Tooltip>
         </i-button>
         <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
@@ -72,10 +72,10 @@
     </div>
 </template>
 <script>
-    import * as cloudStorage from '../../service/cloudStorage'
-    import * as util from '../../util/util'
+    import {util, cloudStorage, Constants} from '../../service/index';
 
     let ipc;
+
     export default {
         name: 'ClientHeader',
         data() {
@@ -125,19 +125,20 @@
                 this.handleFile(path);
             });
 
-            let that = this;
-
-            window.ondrop = function (e) {
+            window.ondrop = (e) => {
                 e.preventDefault();
                 if (e.dataTransfer.files.length > 0) {
+                    this.uploadModal.prepend = this.currentDir;
+
                     let paths = [];
                     Array.from(e.dataTransfer.files).forEach((item) => {
                         paths.push(item.path);
                     });
-                    that.handleFile(paths);
+                    this.handleFile(paths);
                 }
                 return false
             };
+
             window.ondragenter = (e) => {
                 e.preventDefault();
                 if (!this.messageFlag) {

@@ -18,11 +18,18 @@
 
         <div class="dir-layout">
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
-            <Button-group size="small" style="background: #FFF;margin-right: 10px">
+
+            <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;"
+                          v-if="bucket.selection.length > 0">
+                <Button type="error" @click="removes()" icon="trash-b">{{bucket.selection.length}}</Button>
+            </Button-group>
+
+            <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
                 <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
                         icon="navicon-round"></Button>
                 <Button :type="bucket.showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
             </Button-group>
+
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
                 <Button type="ghost" @click="getResources" icon="chevron-right"></Button>
             </Button-group>
@@ -42,7 +49,7 @@
     import * as types from '../vuex/mutation-types'
 
     import mixin_base from "../mixins/mixin-base";
-    import {Constants, util} from '../service/index'
+    import {Constants, util, EventBus} from '../service/index'
     import ResourceGrid from "../components/Main/ResourceGrid.vue";
 
 
@@ -69,6 +76,7 @@
                     marker: '',
                     files: [],
                     showType: 0,
+                    selection: [],
                     withoutDelimiterFiles: []
                 },
                 endable: false
@@ -114,6 +122,8 @@
                 });
             },
             getResources(keyword) {
+                this.bucket.selection = [];
+
                 let data = {
                     bucket: this.bucket.name,
                     limit: 30
@@ -185,7 +195,15 @@
             doSearch: function (search) {
                 this.getResources(search)
             },
+            removes() {
+                EventBus.$emit(Constants.Event.removes);
+            },
+            /**
+             * 表单模式/图片模式
+             * @param type
+             */
             showType(type) {
+                this.bucket.selection = [];
                 this.bucket.showType = type;
             },
             onUpdate(ret, action) {

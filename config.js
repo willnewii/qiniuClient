@@ -1,18 +1,23 @@
 'use strict'
 
-const path = require('path')
+const path = require('path');
+const pkg = require('./package.json');
+
 
 let config = {
     // Name of electron app
     // Will be used in production builds
-    name: '七牛云管理客户端',
+    name: pkg.cnname,
 
     // webpack-dev-server port
     port: 9080,
 
     // electron-packager options
+    // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md
     // Docs: https://simulatedgreg.gitbooks.io/electron-vue/content/docs/building_your_app.html
     building: {
+        name: pkg.cnname,
+        productName: pkg.cnname,
         arch: 'x64',
         asar: false,
         dir: path.join(__dirname, 'app'),

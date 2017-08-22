@@ -8,7 +8,8 @@
 <template>
     <div class="layout-content">
         <Table border :columns="columns" :context="self"
-               :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"></Table>
+               :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"
+               @on-selection-change="onSelectionChange"></Table>
         <Modal
                 v-model="deleteNoAskModel"
                 title="确认删除文件？"
@@ -19,10 +20,9 @@
 </template>
 <script>
     import {mapGetters} from 'vuex'
+    import {Constants, EventBus} from '../../service/index'
     import * as types from '../../vuex/mutation-types'
-
     import mixin_resource from '../../mixins/mixin-resource'
-
     import moment from 'moment'
 
     export default {
@@ -34,6 +34,11 @@
                 tableHeight: 100,
                 tableWidth: 100,
                 columns: [
+                    {
+                        type: 'selection',
+                        width: 50,
+                        align: 'center'
+                    },
                     {title: '文件名', key: 'key', ellipsis: false},
                     {
                         title: '大小', key: 'fsize', sortable: true, width: 100,
@@ -100,6 +105,9 @@
             }
         },
         created() {
+            EventBus.$on(Constants.Event.removes, () => {
+                this.removes();
+            });
         },
         mounted() {
             this.setTableSize();
@@ -108,6 +116,9 @@
             }
         },
         methods: {
+            onSelectionChange(selection) {
+                this.bucket.selection = selection;
+            },
             setTableSize() {
                 if (this.$parent) {
                     this.tableHeight = this.$parent.$el.clientHeight * 0.85 - 20;
