@@ -1,6 +1,9 @@
 'use strict'
 
 import {app, BrowserWindow, Menu, ipcMain, dialog} from 'electron'
+
+const {download} = require('electron-dl');
+
 import * as util from './util'
 import * as trayUtil from './trayUtil';
 
@@ -55,7 +58,8 @@ app.on('activate', () => {
  * 注册IPC事件
  */
 const registerIPC = function () {
-    ipcMain.on('open-file-dialog', function (event) {
+    //选择文件
+    ipcMain.on('open-file-dialog', function (event, option) {
         dialog.showOpenDialog({
             properties: ['openFile', 'multiSelections']
         }, function (files) {
@@ -63,11 +67,37 @@ const registerIPC = function () {
         })
     });
 
-    ipcMain.on('previewFile', function (event, filePath) {
-        if (mainWindow) {
-            mainWindow.previewFile(filePath);
-        }
+    //选择目录
+    ipcMain.on('choiceFolder', function (event, option) {
+        dialog.showOpenDialog(option, function (files) {
+            if (files) event.sender.send('choiceFolder', files)
+        })
     });
+
+    //下载文件
+    ipcMain.on('downloadFile', function (event, file, option) {
+        option.onProgress = function (num) {
+            if (num !== 1) {
+                event.sender.send('updateDownloadProgress', num);
+            }
+        };
+
+        download(BrowserWindow.getFocusedWindow(), file, option)
+            .then(dl => {
+                console.log('getSavePath:' + dl.getSavePath());
+                event.sender.send('updateDownloadProgress', 1);
+            })
+            .catch(error => {
+                console.error(error);
+                event.sender.send('updateDownloadProgress', 1);
+            });
+    });
+
+    /*    ipcMain.on('previewFile', function (event, filePath) {
+            if (mainWindow) {
+                mainWindow.previewFile(filePath);
+            }
+        });*/
 };
 
 /**

@@ -1,4 +1,9 @@
 <style scoped>
+    .title {
+        padding: 10px 0;
+        font-size: 16px;
+    }
+
     .item {
         padding: 30px 0 0 30px;
     }
@@ -22,8 +27,8 @@
             </Radio-group>
         </div>
         <div class="item">
-            默认托盘上传位置：
-            <Select v-model="bucketname" size="small" style="width:100px">
+            默认托盘上传位置：<br>
+            <Select v-model="bucketname" size="small" style="width:100px" placeholder="空间名称">
                 <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
             </Select>
             /
@@ -31,8 +36,16 @@
             <Button @click="saveDir" size="small">保存</Button>
             <br>提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/ 目录下
         </div>
+
         <div class="item">
-            预览图片样式：
+            下载目录：<br>
+            <Input class='bucketdir' v-model="downloaddir" size="small" placeholder="默认下载目录" style="width: 40%;"
+                   disabled></Input>
+            <Button @click="choiceDownloadolder" size="small" icon="ios-folder-outline"></Button>
+        </div>
+
+        <div class="item">
+            预览图片样式：<br>
             <Input class='bucketdir' v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 40%;"></Input>
             <Button @click="saveImagestyle" size="small">保存</Button>
             <Button @click="openBrowser" size="small">关于图片样式</Button>
@@ -45,12 +58,16 @@
     import {mapGetters, mapActions} from 'vuex'
     import * as types from '../vuex/mutation-types'
 
+    let ipc;
+
     export default {
         name: 'setup-page',
         data() {
             return {
                 bucketname: '',
                 bucketdir: '',
+                imagestyle: '',
+                downloaddir: ''
             }
         },
         computed: {
@@ -61,6 +78,7 @@
                 setup_bucket_name: types.APP.setup_bucket_name,
                 setup_bucket_dir: types.APP.setup_bucket_dir,
                 setup_imagestyle: types.APP.setup_imagestyle,
+                setup_downloaddir: types.APP.setup_downloaddir
             })
         },
         components: {ClientHeader},
@@ -68,6 +86,14 @@
             this.bucketname = this.setup_bucket_name;
             this.bucketdir = this.setup_bucket_dir;
             this.imagestyle = this.setup_imagestyle;
+            this.downloaddir = this.setup_downloaddir;
+
+            ipc = this.$electron.ipcRenderer;
+            ipc.on('choiceFolder', (event, path) => {
+                this.downloaddir = path[0];
+
+                this.saveDownloadolder();
+            });
         },
         methods: {
             ...mapActions([
@@ -75,12 +101,12 @@
                 types.APP.setup_a_deleteNoAsk,
                 types.APP.setup_a_savedir,
                 types.APP.setup_a_imagestyle,
+                types.APP.setup_a_downloaddir,
             ]),
             deleteNoAskChange: function (state) {
                 this[types.APP.setup_a_deleteNoAsk](state);
             },
             copyTypeChange: function (model) {
-                console.log(model);
                 this[types.APP.setup_a_copyType](model);
             },
             saveDir: function () {
@@ -91,7 +117,13 @@
                 this[types.APP.setup_a_imagestyle]([this.imagestyle]);
                 this.$Message.success('图片样式修改成功');
             },
-            openBrowser(){
+            choiceDownloadolder() {
+                ipc.send('choiceFolder', {properties: ['openDirectory']});
+            },
+            saveDownloadolder() {
+                this[types.APP.setup_a_downloaddir](this.downloaddir);
+            },
+            openBrowser() {
                 this.$electron.shell.openExternal('https://developer.qiniu.com/dora/manual/1279/basic-processing-images-imageview2');
             }
         }

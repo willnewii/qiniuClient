@@ -44,8 +44,15 @@ npm run pack
 More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
 ## issue
+- 小文件下载状态更新异常
 - 上传进度不灵敏.七牛上传文件块设置的是4M.调小以后,进度条反应比较正常,但是会提示上传失败 😂,所以会感觉明明上传了,但是半天没响应.
-- 小文件上传失败.没有详细测试,大概范围是小于100KB的文件上传会失败.
+- ~~小文件上传失败.没有详细测试,大概范围是小于100KB的文件上传会失败.~~ 解决啦~ 🤓
+
+## tips
+### npm 安装git分支
+```shell
+npm i --save git://github.com/willnewii/nodejs-sdk.git#patch-1
+```
 
 ## 参考资料
 - [electron 中文文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)

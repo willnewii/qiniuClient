@@ -14,4 +14,5 @@ export const URL = {
 
 export const Event = {
     removes: 'removes',
+    download: 'download'
 };

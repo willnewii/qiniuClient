@@ -25,6 +25,8 @@
     import mixin_resource from '../../mixins/mixin-resource'
     import moment from 'moment'
 
+    let tempNum;
+
     export default {
         name: 'ResourceTable',
         mixins: [mixin_resource],
@@ -105,8 +107,24 @@
             }
         },
         created() {
+            EventBus.$off(Constants.Event.removes);
             EventBus.$on(Constants.Event.removes, () => {
                 this.removes();
+            });
+
+            EventBus.$off(Constants.Event.download);
+            EventBus.$on(Constants.Event.download, () => {
+                this.downloadFiles();
+            });
+
+            this.$electron.ipcRenderer.removeAllListeners('updateDownloadProgress');
+            this.$electron.ipcRenderer.on('updateDownloadProgress', (event, num) => {
+                this.$Loading.update(num * 100);
+                if (num === 1) {
+                    this.$Loading.finish();
+                    console.log(this.bucket.selection.length + ':' + this.bucket.name);
+                    this.downloadFiles();
+                }
             });
         },
         mounted() {

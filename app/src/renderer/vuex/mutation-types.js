@@ -1,8 +1,9 @@
-export const DECREMENT_MAIN_COUNTER = 'DECREMENT_MAIN_COUNTER'
-export const INCREMENT_MAIN_COUNTER = 'INCREMENT_MAIN_COUNTER'
-
 export const APP = {
     qiniu_key: 'qiniu_Key',
+
+    setup_downloaddir: 'setup_downloaddir',
+    setup_a_downloaddir: 'setup_a_downloaddir',
+    setup_s_downloaddir: 'setup_s_downloaddir',
 
     setup_imagestyle: 'setup_imagestyle',
     setup_a_imagestyle: 'setup_a_imagestyle',

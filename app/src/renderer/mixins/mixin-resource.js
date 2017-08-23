@@ -10,6 +10,7 @@ export default {
             setup_copyType: types.APP.setup_copyType,
             setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
             setup_imagestyle: types.APP.setup_imagestyle,
+            setup_downloaddir: types.APP.setup_downloaddir,
         })
     },
     props: {
@@ -27,7 +28,6 @@ export default {
     },
     methods: {
         show(index) {
-            //this.$electron.ipcRenderer.send('previewFile', util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key));
             this.$electron.shell.openExternal(util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key))
         },
         copy(index) {
@@ -38,7 +38,6 @@ export default {
             event.stopPropagation();
         },
         removes() {
-            console.log(this.bucket.selection);
             this.deleteKey = this.bucket.selection[0].key;
             if (this.bucket.selection.length === 1) {
                 this.doRemove();
@@ -48,6 +47,20 @@ export default {
                     if (this.bucket.selection.length > 0)
                         this.removes();
                 });
+            }
+        },
+        downloadFiles() {
+            console.log('selection.length:' + this.bucket.selection.length + ':' + this.bucket.name);
+            if (this.bucket.selection.length > 0) {
+                this.$Loading.start();
+                let option = {};
+                if (this.setup_downloaddir) {
+                    option.directory = this.setup_downloaddir;
+                }
+                this.$electron.ipcRenderer.send('downloadFile', util.getQiniuUrl(this.bucket.domains[0], this.bucket.selection[0].key), option);
+                this.bucket.selection.shift();
+            } else {
+                this.$Message.info('文件下载完成');
             }
         },
         remove(index, event) {

@@ -1,6 +1,9 @@
 <style lang="scss" scoped>
     .layout-tag {
         flex-grow: 1;
+        overflow-x: scroll;
+        white-space: nowrap;
+        margin-right: 10px;
         .blue-tag {
             color: #39f !important;
             border: 1px solid #39f !important;

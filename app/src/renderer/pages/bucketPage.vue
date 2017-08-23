@@ -19,10 +19,14 @@
         <div class="dir-layout">
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
 
-            <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;"
-                          v-if="bucket.selection.length > 0">
-                <Button type="error" @click="removes()" icon="trash-b">{{bucket.selection.length}}</Button>
-            </Button-group>
+
+            <Button type="ghost" size="small" @click="downloads()" icon="ios-download" style="margin-right: 10px;"
+                    v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
+            </Button>
+
+            <Button type="error" size="small" @click="removes()" icon="trash-b" style="margin-right: 10px;"
+                    v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
+            </Button>
 
             <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
                 <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
@@ -197,6 +201,9 @@
             },
             removes() {
                 EventBus.$emit(Constants.Event.removes);
+            },
+            downloads() {
+                EventBus.$emit(Constants.Event.download);
             },
             /**
              * 表单模式/图片模式

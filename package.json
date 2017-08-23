@@ -59,6 +59,7 @@
     "webpack-dev-server": "^2.3.0"
   },
   "dependencies": {
+    "electron-dl": "^1.10.0",
     "node-notifier": "^5.1.2",
     "titlebar": "^1.4.0",
     "vue-lazyload": "^1.0.6"

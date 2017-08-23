@@ -156,7 +156,7 @@
                 switch (index) {
                     case 0://调用文件选取对话框
                         this.filePaths = [];
-                        ipc.send('open-file-dialog', {properties: ['openFile']});
+                        ipc.send('open-file-dialog', {properties: ['openFile', 'multiSelections']});
                         break;
                     case 1://抓取文件
                         this.filePaths = [];
