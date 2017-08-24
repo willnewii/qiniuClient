@@ -60,6 +60,8 @@ export default {
                 this.$electron.ipcRenderer.send('downloadFile', util.getQiniuUrl(this.bucket.domains[0], this.bucket.selection[0].key), option);
                 this.bucket.selection.shift();
             } else {
+                this.$refs['table'] && this.$refs['table'].selectAll(false);
+
                 this.$Message.info('文件下载完成');
             }
         },

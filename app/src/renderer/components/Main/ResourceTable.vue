@@ -7,7 +7,7 @@
 </style>
 <template>
     <div class="layout-content">
-        <Table border :columns="columns" :context="self"
+        <Table ref="table" border :columns="columns" :context="self"
                :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"
                @on-selection-change="onSelectionChange"></Table>
         <Modal

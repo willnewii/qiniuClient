@@ -68,6 +68,8 @@
                     </div>
                     <span v-else class="image">其他类型</span>
                     <div class="btn">
+                        <Button type="ghost" shape="circle" size="small" icon="ios-download"
+                                @click="handleDownload(index,$event)" style="background: #FFFFFF"></Button>
                         <Button type="ghost" shape="circle" size="small" icon="clipboard"
                                 @click="copy(index,$event)" style="background: #FFFFFF"></Button>
                         <Button type="error" shape="circle" size="small" icon="trash-b"
@@ -104,6 +106,16 @@
         data() {
             return {
                 self: this,
+            }
+        },
+        methods: {
+            handleDownload(index) {
+                let item = this.bucket.files[index];
+
+                this.bucket.selection = [item];
+                this.downloadFiles();
+
+                event.stopPropagation();
             }
         }
     };
