@@ -18,6 +18,11 @@ let mainConfig = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader',
+                include: [path.join(__dirname, 'node_modules/electron-dl'), path.join(__dirname, 'node_modules/ext-name'), path.join(__dirname, 'node_modules/pupa'),path.join(__dirname, 'node_modules/unused-filename')],
+            },
+            {
+                test: /\.js$/,
+                loader: 'babel-loader',
                 exclude: /node_modules/
             },
             {
