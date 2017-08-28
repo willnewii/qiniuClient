@@ -72,7 +72,7 @@
                       :active-name="bucketname">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :name="item">
-                            <Icon :style="{width:iconSize + 'px'}" type="folder" :size="iconSize"></Icon>
+                            <Icon :style="{width:iconSize + 'px'}" :type="privatebucket.indexOf(item) !==  -1 ? 'locked' : 'folder'" :size="iconSize"></Icon>
                             <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
                         </Menu-item>
                     </Menu-group>
@@ -120,6 +120,7 @@
         computed: {
             ...mapGetters({
                 buckets: types.APP.app_buckets,
+                privatebucket: types.APP.setup_privatebucket,
             }),
             iconSize() {
                 //return this.menuState ? 25 : 25;

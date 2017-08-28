@@ -20,6 +20,15 @@ function httpAuthorization(url) {
     return qiniu.util.generateAccessToken(getToken(), url, null)
 }
 
+function getPrivateUrl(domain, key, deadline) {
+    let config = new qiniu.conf.Config();
+    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
+
+    deadline = parseInt(Date.now() / 1000) + deadline;
+
+    return bucketManager.privateDownloadUrl('http://' + domain, key, deadline);
+}
+
 /**
  * 通过url抓取文件
  */
@@ -83,4 +92,4 @@ function remove(params, callback) {
     });
 }
 
-export {init, httpAuthorization, remove, upload, fetch}
+export {init, httpAuthorization, getPrivateUrl, remove, upload, fetch}

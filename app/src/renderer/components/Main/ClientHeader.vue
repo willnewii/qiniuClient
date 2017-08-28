@@ -36,7 +36,9 @@
 <template>
     <div class="layout-header">
         <div class="full">
-            <Tag type="border" v-for="item of bucket.domains" v-if="bucket.name">{{item}}</Tag>
+            <Select v-model="bucket.domain" style="width:220px" v-if="bucket.name">
+                <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
+            </Select>
         </div>
         <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
             <Tooltip content="文件上传(支持多选)" placement="bottom">

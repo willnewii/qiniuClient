@@ -28,11 +28,21 @@ export default {
             bucket_name: '',
             bucket_dir: '',
             imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',
-            downloaddir: ''
+            downloaddir: '',
+            privatebucket: [],
+            privatedeadline: 3600//默认1小时
         },
         app_buckets: [],
     },
     mutations: {
+        [types.APP.setup_s_privatebucket](state, value) {
+            state.setup.privatebucket = value;
+            setAppSetup(state.setup);
+        },
+        [types.APP.setup_s_deadline](state, value) {
+            state.setup.privatedeadline = value;
+            setAppSetup(state.setup);
+        },
         [types.APP.setup_s_downloaddir](state, value) {
             state.setup.downloaddir = value;
             setAppSetup(state.setup);
@@ -66,6 +76,12 @@ export default {
         [types.APP.qiniu_key](context, json) {
             context.commit(types.APP.qiniu_key, json);
         },
+        [types.APP.setup_a_deadline](context, value) {
+            context.commit(types.APP.setup_s_deadline, value);
+        },
+        [types.APP.setup_a_privatebucket](context, value) {
+            context.commit(types.APP.setup_s_privatebucket, value);
+        },
         [types.APP.setup_a_imagestyle](context, value) {
             context.commit(types.APP.setup_imagestyle, value);
         },
@@ -95,6 +111,12 @@ export default {
         },
     },
     getters: {
+        [types.APP.setup_deadline](state) {
+            return ('privatedeadline' in state.setup) ? state.setup.privatedeadline : 3600;
+        },
+        [types.APP.setup_privatebucket](state) {
+            return ('privatebucket' in state.setup) ? state.setup.privatebucket : [];
+        },
         [types.APP.setup_downloaddir](state) {
             return ('downloaddir' in state.setup) ? state.setup.downloaddir : '';
         },

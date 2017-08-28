@@ -50,6 +50,7 @@
     import ClientHeader from '../components/Main/ClientHeader.vue'
     import ResourceTable from '../components/Main/ResourceTable.vue'
 
+    import {mapGetters} from 'vuex'
     import * as types from '../vuex/mutation-types'
 
     import mixin_base from "../mixins/mixin-base";
@@ -75,8 +76,10 @@
                 bucket: {
                     name: '',
                     domains: [],
+                    domain: '',
                     dirs: [],
                     currentDir: '',
+                    isprivate: false,
                     marker: '',
                     files: [],
                     showType: 0,
@@ -85,6 +88,11 @@
                 },
                 endable: false
             }
+        },
+        computed: {
+            ...mapGetters({
+                privatebucket: types.APP.setup_privatebucket
+            })
         },
         watch: {
             bucketname: function (val, oldVal) {
@@ -103,6 +111,13 @@
         methods: {
             initBucket(bucketname) {
                 this.bucket.name = bucketname;
+
+                if (this.privatebucket && this.privatebucket.length > 0 && this.privatebucket.indexOf(this.bucket.name) !== -1) {
+                    this.bucket.isprivate = true;
+                }else{
+                    this.bucket.isprivate = false;
+                }
+
                 this.bucket.currentDir = '';
 
                 this.bucket.dirs = [];
@@ -123,6 +138,8 @@
             getDomains() {
                 this.doRequsetGet(Constants.method.getDomains, {tbl: this.bucket.name}, (response) => {
                     this.bucket.domains = response.data;
+                    //默认选择第一个域名
+                    this.bucket.domain = this.bucket.domains[0];
                 });
             },
             getResources(keyword) {

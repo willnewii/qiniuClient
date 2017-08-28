@@ -59,7 +59,7 @@
             <Card v-for="file,index in bucket.files" class="card" :padding="10" :bordered="false">
                 <div class="view" @click="show(index)">
                     <img v-if="file.mimeType.indexOf('image')===0" class="image"
-                         v-lazy="'http://' + bucket.domains[0] + '/' + file.key + '?' + setup_imagestyle">
+                         v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
                     <div v-else-if="file.mimeType.indexOf('audio')===0" class="audio">
                         <Icon type="music-note" size="32"></Icon>
                     </div>

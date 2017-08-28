@@ -1,6 +1,14 @@
 export const APP = {
     qiniu_key: 'qiniu_Key',
 
+    setup_deadline: 'setup_deadline',
+    setup_a_deadline: 'setup_a_deadline',
+    setup_s_deadline: 'setup_s_deadline',
+
+    setup_privatebucket: 'setup_privatebucket',
+    setup_a_privatebucket: 'setup_a_privatebucket',
+    setup_s_privatebucket: 'setup_s_privatebucket',
+
     setup_downloaddir: 'setup_downloaddir',
     setup_a_downloaddir: 'setup_a_downloaddir',
     setup_s_downloaddir: 'setup_s_downloaddir',

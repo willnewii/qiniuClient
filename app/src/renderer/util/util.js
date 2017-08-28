@@ -33,7 +33,7 @@ export function isEmptyObject(e) {
 }
 
 export function getQiniuUrl(domain, key) {
-    return 'http://' + domain + '/' + encodeURIComponent(key);
+    return 'http://' + domain + '/' + encodeURI(key);
 }
 
 export function setClipboardText(that, type, url) {

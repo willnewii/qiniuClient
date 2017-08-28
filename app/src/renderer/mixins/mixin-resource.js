@@ -11,6 +11,7 @@ export default {
             setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
             setup_imagestyle: types.APP.setup_imagestyle,
             setup_downloaddir: types.APP.setup_downloaddir,
+            setup_deadline: types.APP.setup_deadline,
         })
     },
     props: {
@@ -27,15 +28,46 @@ export default {
     created: function () {
     },
     methods: {
+        getResoureUrl(index, key) {
+            let fileName;
+            if (key) {
+                fileName = key;
+            } else {
+                fileName = this.bucket.files[index].key;
+            }
+            let url;
+            if (this.bucket.isprivate) {
+                url = cloudStorage.getPrivateUrl(this.bucket.domain, fileName, this.setup_deadline);
+            } else {
+                url = util.getQiniuUrl(this.bucket.domain, this.bucket.files[index].key);
+            }
+            return url;
+        },
         show(index) {
-            this.$electron.shell.openExternal(util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key))
+            console.log(this.getResoureUrl(index));
+            this.$electron.shell.openExternal(this.getResoureUrl(index))
         },
         copy(index) {
-            let url = util.getQiniuUrl(this.bucket.domains[0], this.bucket.files[index].key);
-            util.setClipboardText(this, this.setup_copyType, url);
+            util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(index));
 
             this.$Message.info('文件路径以复制到剪贴板');
             event.stopPropagation();
+        },
+        downloadFiles() {
+            if (this.bucket.selection.length > 0) {
+                this.$Loading.start();
+                let option = {};
+                if (this.setup_downloaddir) {
+                    option.directory = this.setup_downloaddir;
+                }
+
+                this.$electron.ipcRenderer.send('downloadFile', getResoureUrl(null, this.bucket.selection[0].key), option);
+                this.bucket.selection.shift();
+            } else {
+                this.$refs['table'] && this.$refs['table'].selectAll(false);
+
+                this.$Message.info('文件下载完成');
+            }
         },
         removes() {
             this.deleteKey = this.bucket.selection[0].key;
@@ -47,22 +79,6 @@ export default {
                     if (this.bucket.selection.length > 0)
                         this.removes();
                 });
-            }
-        },
-        downloadFiles() {
-            console.log('selection.length:' + this.bucket.selection.length + ':' + this.bucket.name);
-            if (this.bucket.selection.length > 0) {
-                this.$Loading.start();
-                let option = {};
-                if (this.setup_downloaddir) {
-                    option.directory = this.setup_downloaddir;
-                }
-                this.$electron.ipcRenderer.send('downloadFile', util.getQiniuUrl(this.bucket.domains[0], this.bucket.selection[0].key), option);
-                this.bucket.selection.shift();
-            } else {
-                this.$refs['table'] && this.$refs['table'].selectAll(false);
-
-                this.$Message.info('文件下载完成');
             }
         },
         remove(index, event) {
