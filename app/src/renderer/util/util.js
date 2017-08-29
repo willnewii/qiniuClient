@@ -1,3 +1,5 @@
+import * as Constants from '../service/constants'
+
 /**
  * Created by zhangweiwei on 2017/4/13.
  */
@@ -33,14 +35,17 @@ export function isEmptyObject(e) {
 }
 
 export function getQiniuUrl(domain, key) {
-    return 'http://' + domain + '/' + encodeURI(key);
+    return Constants.protocol + domain + '/' + encodeURI(key);
 }
 
 export function setClipboardText(that, type, url) {
-    if (type == 'url') {
-        that.$electron.clipboard.writeText(url);
-    } else if (type == 'markdown') {
-        that.$electron.clipboard.writeText('![' + getName(url) + '](' + url + ')');
+    switch (type) {
+        case Constants.CopyType.URL:
+            that.$electron.clipboard.writeText(url);
+            break;
+        case Constants.CopyType.MARKDOWN:
+            that.$electron.clipboard.writeText('![' + getName(url) + '](' + url + ')');
+            break;
     }
 }
 

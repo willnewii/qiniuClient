@@ -100,7 +100,9 @@
         mixins: [mixin_resource],
         computed: {
             tableHeight() {
-                return this.$parent.$el.clientHeight * 0.85 - 20;
+                let layout = this.$parent.$el;
+                let style = window.getComputedStyle(layout.children[2]);
+                return layout.clientHeight - layout.children[0].clientHeight - layout.children[1].clientHeight - parseInt(style.marginTop) - parseInt(style.marginBottom);
             }
         },
         data() {

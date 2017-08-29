@@ -1,7 +1,7 @@
 <style lang="scss" scoped>
     .layout-content {
         margin: 15px;
-        overflow: scroll;
+        //overflow: scroll;
         background: #fff;
     }
 </style>
@@ -139,14 +139,12 @@
             },
             setTableSize() {
                 if (this.$parent) {
-                    this.tableHeight = this.$parent.$el.clientHeight * 0.85 - 20;
-                    //that.tableWidth = that.$parent.$el.getBoundingClientRect().width - 30;
-                    //console.log(that.$parent.$el.getBoundingClientRect().width);
+                    let layout = this.$parent.$el;
 
-                    /*               this.columns[0].width = this.tableWidth * 0.5;
-                     this.columns[1].width = this.tableWidth * 0.1;
-                     this.columns[2].width = this.tableWidth * 0.2;
-                     this.columns[3].width = this.tableWidth * 0.2;*/
+                    //window.a = this.$parent.$el;
+                    let style = window.getComputedStyle(layout.children[2]);
+
+                    this.tableHeight = layout.clientHeight - layout.children[0].clientHeight - layout.children[1].clientHeight - parseInt(style.marginTop) - parseInt(style.marginBottom);
                 }
             },
         }

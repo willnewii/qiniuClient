@@ -1,3 +1,5 @@
+export const protocol = 'http://';
+
 export const method = {
     //列举一个账号的所有空间
     getBuckets: 'http://rs.qbox.me/buckets',
@@ -15,4 +17,9 @@ export const URL = {
 export const Event = {
     removes: 'removes',
     download: 'download'
+};
+
+export const CopyType = {
+    URL: 'url',
+    MARKDOWN: 'markdown'
 };

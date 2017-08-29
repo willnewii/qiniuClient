@@ -1,4 +1,5 @@
 import qiniu from 'qiniu';
+import * as Constants from '../service/constants'
 
 function init(param) {
     qiniu.conf.ACCESS_KEY = param.access_key;
@@ -26,7 +27,7 @@ function getPrivateUrl(domain, key, deadline) {
 
     deadline = parseInt(Date.now() / 1000) + deadline;
 
-    return bucketManager.privateDownloadUrl('http://' + domain, key, deadline);
+    return bucketManager.privateDownloadUrl(Constants.protocol + domain, key, deadline);
 }
 
 /**

@@ -20,7 +20,7 @@
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
 
 
-            <Button type="ghost" size="small" @click="downloads()" icon="ios-download" style="margin-right: 10px;"
+            <Button type="ghost" size="small" @click="downloads()" icon="ios-download" style="margin-right: 10px;background: #FFFFFF;"
                     v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
             </Button>
 

@@ -22,7 +22,14 @@
 6. 图片模式
     - 显示预览图,如果你有图片维护的需求,这个功能应该对你有帮助
 7. 批量上传,删除,下载
-8. 支持私有空间操作.(目前没有看到能读取空间是不是私有的状态,需要用户自行在设置页面勾选一下私有空间.)
+8. 支持私有空间操作.
+
+## tips
+1. 如果你经常使用markdown写文档并配图的话,可以在设置的'复制到粘贴板格式'中,勾选'markdown'.
+
+2. 七牛的空间有私有/公开两种状态.但是并没有提供获取相应状态的api 🤣 .如果你需要操作私有空间,请先在设置页面,勾选相对应的空间.
+
+
 ## 截图
 ![qiniuClient-0.0.6截图1.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE1.png)
 
@@ -49,7 +56,7 @@ More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/e
 - 上传进度不灵敏.七牛上传文件块设置的是4M.调小以后,进度条反应比较正常,但是会提示上传失败 😂,所以会感觉明明上传了,但是半天没响应.
 - ~~小文件上传失败.没有详细测试,大概范围是小于100KB的文件上传会失败.~~ 解决啦~ 🤓
 
-## tips
+## dev tips
 ### npm 安装git分支
 ```shell
 npm i --save git://github.com/willnewii/nodejs-sdk.git#patch-1

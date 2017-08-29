@@ -19,7 +19,7 @@
             <i-switch v-model="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
         <div class="item">
-            默认复制格式：
+            复制到粘贴板格式：
             <Radio-group v-model="setup_copyType" @on-change="copyTypeChange">
                 <Radio label="url"></Radio>
                 <Radio label="markdown"></Radio>

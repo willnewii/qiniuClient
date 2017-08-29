@@ -1,6 +1,6 @@
 {
   "name": "qiniu-Client",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An electron-vue project",
   "main": "./dist/main.js",
   "dependencies": {
@@ -16,5 +16,5 @@
     "vuex": "^2.1.1"
   },
   "devDependencies": {},
-  "author": "诗人的咸鱼 <willnewii@gmail.com>"
+  "author": "诗人的咸鱼 <willnewii@163.com>"
 }

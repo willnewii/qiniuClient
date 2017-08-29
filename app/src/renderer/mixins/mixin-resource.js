@@ -39,12 +39,11 @@ export default {
             if (this.bucket.isprivate) {
                 url = cloudStorage.getPrivateUrl(this.bucket.domain, fileName, this.setup_deadline);
             } else {
-                url = util.getQiniuUrl(this.bucket.domain, this.bucket.files[index].key);
+                url = util.getQiniuUrl(this.bucket.domain, fileName);
             }
             return url;
         },
         show(index) {
-            console.log(this.getResoureUrl(index));
             this.$electron.shell.openExternal(this.getResoureUrl(index))
         },
         copy(index) {
@@ -61,7 +60,7 @@ export default {
                     option.directory = this.setup_downloaddir;
                 }
 
-                this.$electron.ipcRenderer.send('downloadFile', getResoureUrl(null, this.bucket.selection[0].key), option);
+                this.$electron.ipcRenderer.send('downloadFile', this.getResoureUrl(null, this.bucket.selection[0].key), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);
