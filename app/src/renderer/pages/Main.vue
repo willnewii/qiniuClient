@@ -90,7 +90,7 @@
                 </Menu>
                 <div class="version">
                     <span @click="open_Browser(0)">v{{appVersion}}</span>
-                    <Poptip trigger="hover" v-if="version.url" placement="top" :title="version.version">
+                    <Poptip trigger="hover" v-if="version.url" placement="top-start" :title="version.version">
                         <pre slot="content" class="version-info">{{version.info}}</pre>
                         <span class="new-version" @click="open_Browser(1)">有新版啦~</span>
                     </Poptip>

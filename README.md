@@ -61,6 +61,11 @@ More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/e
 ```shell
 npm i --save git://github.com/willnewii/nodejs-sdk.git#patch-1
 ```
+### electron-winstaller 构建失败
+```shell
+The Product/@Version attribute's value, '!(bind.FileVersion.qiniu-Client.exe)', is not a valid version.
+```
+检查package.name 是否包含'-' . [windows-installer-#203](https://github.com/electron/windows-installer/issues/203)
 
 ## 参考资料
 - [electron 文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)

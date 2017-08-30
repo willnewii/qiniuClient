@@ -1,5 +1,5 @@
 {
-  "name": "qiniu-Client",
+  "name": "qiniuClient",
   "version": "0.0.7",
   "description": "An electron-vue project",
   "main": "./dist/main.js",

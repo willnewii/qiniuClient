@@ -1,5 +1,5 @@
 {
-  "name": "qiniu-Client",
+  "name": "qiniuClient",
   "cnname": "七牛云管理客户端",
   "version": "0.0.7",
   "description": "An electron-vue project",
@@ -8,6 +8,8 @@
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
     "build:pack_main_darwin": "cross-env PLATFORM_TARGET=darwin PACK=main node tasks/release.js",
     "build:no_pack_darwin": "cross-env PLATFORM_TARGET=darwin PACK=no node tasks/release.js",
+    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js",
+    "build:exe": "npm run build:win32 && node tasks/buildexe.js",
     "dev": "node tasks/runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
@@ -16,8 +18,7 @@
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
-    "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
-    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js"
+    "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js"
   },
   "author": "诗人的咸鱼 <willnewii@163.com>",
   "license": "MIT",
@@ -60,6 +61,7 @@
   },
   "dependencies": {
     "electron-dl": "^1.10.0",
+    "electron-winstaller": "^2.6.3",
     "node-notifier": "^5.1.2",
     "titlebar": "^1.4.0",
     "vue-lazyload": "^1.0.6"
