@@ -153,16 +153,10 @@
 
             this.doRequsetGet(Constants.URL.releases, null, (response) => {
                 let result = response.data;
-                console.log(result);
-
-                console.log(result.tag_name, pkg.version);
-
                 if (result.tag_name > pkg.version) {
                     this.version.url = result.html_url;
                     this.version.version = result.tag_name;
                     this.version.info = result.body;
-                } else {
-                    console.log('无影响');
                 }
             });
         },

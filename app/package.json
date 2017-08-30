@@ -1,7 +1,7 @@
 {
   "name": "qiniuClient",
   "version": "0.0.7",
-  "description": "An electron-vue project",
+  "description": "一个七牛云文件管理客户端",
   "main": "./dist/main.js",
   "dependencies": {
     "axios": "^0.16.1",

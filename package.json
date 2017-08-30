@@ -2,7 +2,7 @@
   "name": "qiniuClient",
   "cnname": "七牛云管理客户端",
   "version": "0.0.7",
-  "description": "An electron-vue project",
+  "description": "一个七牛云文件管理客户端",
   "scripts": {
     "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
     "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
