@@ -34,7 +34,7 @@ Vue.filter('getfileNameByPath', function (value) {
 axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
-    if (error.response.status == 401) {
+    if (error.response.status === 401) {
         router.push({path: '/login'});
     }
 });

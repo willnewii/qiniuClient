@@ -12,7 +12,11 @@
 }
 
 .ivu-loading-bar {
-  margin-top: 22px;
+  top: 22px;
+}
+
+.ivu-loading-bar-win {
+  top: 0;
 }
 
 .layout-menu-left {
@@ -24,7 +28,7 @@
 //表格 多选 图标边距修改
 .ivu-table-cell {
   .ivu-checkbox-wrapper {
-    margin-right: 0px;
+    margin-right: 0;
   }
 }
 

@@ -11,7 +11,7 @@ import Qs from 'qs'
 class API {
 
     constructor(view) {
-        this.that = view;
+        this.view = view;
     }
 
     method = {
@@ -32,7 +32,7 @@ class API {
         return this._request(_url, 'post')
     }
 
-    get(url, param) {
+    get (url, param) {
         // config.params = param;
         //return axios.get("", config);
 
@@ -44,13 +44,23 @@ class API {
     }
 
     _request(url, type, param) {
-        this.that.$Loading.start();
+        this.view.$Loading.start();
+        /*        let element = document.getElementsByClassName('ivu-loading-bar')[0]; //会产生位置抖动
+                if (process.platform !== 'darwin') {
+                    if (element.className.indexOf('ivu-loading-bar-win') === -1) {
+                        element.className += ' ivu-loading-bar-win';
+                    }
+                }*/
         /* if (type === 'get') {
          config.params = param;
          } else {
          config.data = param;
          }*/
-        config.headers.Authorization = cloudStorage.httpAuthorization(url);
+        if (url.indexOf('github.com') === -1) {
+            config.headers.Authorization = cloudStorage.httpAuthorization(url);
+        } else {
+            delete config.headers.Authorization;
+        }
         config.method = type;
 
         let request;
@@ -61,12 +71,13 @@ class API {
         }
 
         request.then((response) => {
-            this.that.$Loading.finish();
+            this.view.$Loading.finish();
         }).catch((error) => {
-            this.that.$Loading.error();
+            this.view.$Loading.error();
         });
         return request;
     }
 
 }
+
 export default API;

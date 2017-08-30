@@ -12,6 +12,7 @@ export const method = {
 export const URL = {
     github: 'https://github.com/willnewii/qiniuClient',
     issue: 'https://github.com/willnewii/qiniuClient/issues',
+    releases: 'https://api.github.com/repos/willnewii/qiniuClient/releases/latest'
 };
 
 export const Event = {

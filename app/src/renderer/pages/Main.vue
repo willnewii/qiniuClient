@@ -17,48 +17,47 @@
             background: #464c5b;
             display: flex;
             flex-direction: column;
-            .ivu-menu-vertical {
-                flex-grow: 1;
-            }
 
             .navicon_btn {
                 text-align: left;
                 color: #c5c5c5;
+                &:hover {
+                    color: #57a3f3;
+                }
             }
-            .navicon_btn:hover {
-                color: #57a3f3;
+
+            .ivu-menu-vertical {
+                flex-grow: 1;
             }
 
             .ivu-menu-item {
                 padding: 8px 24px;
+                display: flex;
+                align-items: center;
                 .layout-text {
                     margin-left: 0px;
                 }
+            }
+
+            .layout-hide-text {
+                display: none;
             }
 
             .version {
                 padding: 10px 20px;
                 color: #c5c5c5;
             }
+            .new-version {
+                color: #ff3605;
+                cursor: pointer;
+            }
+
+            .version-info {
+                color: #555;
+            }
         }
-
-        .layout-menu-right {
-        }
     }
 
-    .layout-hide-text {
-        display: none;
-    }
-
-    .ivu-menu-item {
-        display: flex;
-        align-items: center;
-    }
-
-    .ivu-col {
-        //will-change: transition;
-        //transition: width .2s ease-in-out;
-    }
 </style>
 <template>
     <div class="layout">
@@ -72,7 +71,9 @@
                       :active-name="bucketname">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :name="item">
-                            <Icon :style="{width:iconSize + 'px'}" :type="privatebucket.indexOf(item) !==  -1 ? 'locked' : 'folder'" :size="iconSize"></Icon>
+                            <Icon :style="{width:iconSize + 'px'}"
+                                  :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"
+                                  :size="iconSize"></Icon>
                             <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
                         </Menu-item>
                     </Menu-group>
@@ -87,9 +88,15 @@
                         </Menu-item>
                     </Menu-group>
                 </Menu>
-                <div class="version" @click="open_Browser(0)">version:{{appVersion}} </div>
+                <div class="version">
+                    <span @click="open_Browser(0)">v{{appVersion}}</span>
+                    <Poptip trigger="hover" v-if="version.url" placement="top" :title="version.version">
+                        <pre slot="content" class="version-info">{{version.info}}</pre>
+                        <span class="new-version" @click="open_Browser(1)">有新版啦~</span>
+                    </Poptip>
+                </div>
             </i-col>
-            <i-col :span="spanRight" class="layout-menu-right">
+            <i-col :span="spanRight">
                 <router-view :bucketname="bucketname"></router-view>
             </i-col>
         </Row>
@@ -105,7 +112,7 @@
     import mixin_base from "../mixins/mixin-base";
     import RightContent from './bucketPage.vue'
 
-    import {Constants}  from '../service/index'
+    import {Constants} from '../service/index'
 
     export default {
         mixins: [mixin_base],
@@ -114,7 +121,13 @@
                 search: '',
                 bucketname: '',
                 menuState: true,
-                appVersion: pkg.version
+                iconSize: 25,
+                appVersion: pkg.version,
+                version: {
+                    url: '',
+                    version: '',
+                    info: ''
+                }
             }
         },
         computed: {
@@ -122,10 +135,6 @@
                 buckets: types.APP.app_buckets,
                 privatebucket: types.APP.setup_privatebucket,
             }),
-            iconSize() {
-                //return this.menuState ? 25 : 25;
-                return 25;
-            },
             spanLeft() {
                 return this.menuState ? 5 : 2;
             },
@@ -141,6 +150,21 @@
             //this.$router.push({path: '/setup'});
 
             this[types.APP.app_a_setup_init]();
+
+            this.doRequsetGet(Constants.URL.releases, null, (response) => {
+                let result = response.data;
+                console.log(result);
+
+                console.log(result.tag_name, pkg.version);
+
+                if (result.tag_name > pkg.version) {
+                    this.version.url = result.html_url;
+                    this.version.version = result.tag_name;
+                    this.version.info = result.body;
+                } else {
+                    console.log('无影响');
+                }
+            });
         },
         methods: {
             ...mapActions([
@@ -150,8 +174,17 @@
             toggleClick() {
                 this.menuState = !this.menuState;
             },
-            open_Browser(){
-              this.openBrowser(Constants.URL.github)
+            open_Browser(index) {
+                let url;
+                switch (index) {
+                    case 0:
+                        url = Constants.URL.github;
+                        break;
+                    case 1:
+                        url = this.version.url;
+                        break;
+                }
+                this.openBrowser(url)
             },
             initKEY(callback) {
                 storage.get(types.APP.qiniu_key, (error, data) => {
@@ -169,13 +202,13 @@
             },
             getBuckets() {
                 this.doRequset(Constants.method.getBuckets, null, (response) => {
-                    if(response.data){
+                    if (response.data) {
                         this[types.APP.app_a_buckets](response.data);
                         this.bucketname = this.buckets[0];
 
                         this.selectBuckets(this.bucketname);
-                    }else{
-                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且有至少一个存储空间');
+                    } else {
+                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
                         this.$router.push({path: 'login'});
                     }
                 });

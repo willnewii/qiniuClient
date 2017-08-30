@@ -28,7 +28,7 @@ export function getName(path) {
  * @returns {boolean}
  */
 export function isEmptyObject(e) {
-    var t;
+    let t;
     for (t in e)
         return !1;
     return !0
