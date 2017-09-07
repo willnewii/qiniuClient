@@ -20,7 +20,8 @@
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
 
 
-            <Button type="ghost" size="small" @click="downloads()" icon="ios-download" style="margin-right: 10px;background: #FFFFFF;"
+            <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
+                    style="margin-right: 10px;background: #FFFFFF;"
                     v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
             </Button>
 
@@ -114,7 +115,7 @@
 
                 if (this.privatebucket && this.privatebucket.length > 0 && this.privatebucket.indexOf(this.bucket.name) !== -1) {
                     this.bucket.isprivate = true;
-                }else{
+                } else {
                     this.bucket.isprivate = false;
                 }
 
@@ -140,35 +141,6 @@
                     this.bucket.domains = response.data;
                     //默认选择第一个域名
                     this.bucket.domain = this.bucket.domains[0];
-                });
-            },
-            getResources(keyword) {
-                this.bucket.selection = [];
-
-                let data = {
-                    bucket: this.bucket.name,
-                    limit: 30
-                };
-
-                if (keyword) {
-                    data.prefix = this.bucket.currentDir;
-                }
-
-                if (this.bucket.marker) {
-                    data.marker = this.bucket.marker;
-                }
-
-                this.doRequset(Constants.method.getResources, data, (response) => {
-                    if (this.bucket.marker) {
-                        this.bucket.files = this.bucket.files.concat(response.data.items);
-                    } else {
-                        this.bucket.files = response.data.items;
-                    }
-                    if (response.data.marker) {
-                        this.bucket.marker = response.data.marker
-                    } else {
-                        this.bucket.marker = '';
-                    }
                 });
             },
             /**
@@ -199,6 +171,43 @@
                     }
                 });
             },
+            getResources(keyword) {
+                this.bucket.selection = [];
+
+                let data = {
+                    bucket: this.bucket.name,
+                    limit: 30
+                };
+
+                if (keyword) {
+                    data.prefix = keyword;
+                }
+
+                if (this.bucket.marker) {
+                    data.marker = this.bucket.marker;
+                }
+
+                this.doRequset(Constants.method.getResources, data, (response) => {
+                    if (this.bucket.marker) {
+                        this.bucket.files = this.bucket.files.concat(response.data.items);
+                    } else {
+                        this.bucket.files = response.data.items;
+                    }
+                    if (response.data.marker) {
+                        this.bucket.marker = response.data.marker
+                    } else {
+                        this.bucket.marker = '';
+                    }
+                });
+            },
+            /**
+             *  dir：目录
+             *  search：关键字
+             */
+            doSearch: function (dir, search) {
+                this.bucket.marker = '';
+                this.getResources(search ? dir + search : dir)
+            },
             /**
              * Dir 组件 搜索
              * @param search
@@ -210,11 +219,8 @@
                 if (search === '__withoutDelimiter__') {
                     this.bucket.files = this.bucket.withoutDelimiterFiles;
                 } else {
-                    this.doSearch(search);
+                    this.doSearch(this.bucket.currentDir);
                 }
-            },
-            doSearch: function (search) {
-                this.getResources(search)
             },
             removes() {
                 EventBus.$emit(Constants.Event.removes);

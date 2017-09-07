@@ -1,4 +1,5 @@
 <style lang="scss">
+    @import '../style/animate';
     @import '../style/base';
 </style>
 <style lang="scss" scoped>

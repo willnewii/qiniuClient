@@ -40,16 +40,23 @@
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
         </div>
-        <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
-            <Tooltip content="文件上传(支持多选)" placement="bottom">
-                <Icon type="ios-plus-outline" size="24"/>
-            </Tooltip>
-        </i-button>
-        <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
-            <Tooltip content="通过url直接上传文件" placement="bottom">
-                <Icon type="ios-cloud-upload-outline" size="24"/>
-            </Tooltip>
-        </i-button>
+
+        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
+                <Tooltip content="文件上传(支持多选)" placement="bottom">
+                    <Icon type="ios-plus-outline" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
+        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
+                <Tooltip content="通过url直接上传文件" placement="bottom">
+                    <Icon type="ios-cloud-upload-outline" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
         <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
                v-if="bucket.name"></Input>
 
@@ -153,6 +160,21 @@
             }
         },
         methods: {
+            toggleShow($event) {
+                let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
+                let className = target.className;
+
+                let animationIn = 'animated _rotateIn';
+                let animationOut = 'animated _rotateOut';
+
+                if (className.indexOf(animationIn) !== -1) {
+                    target.className = target.className.replace(animationIn, animationOut);
+                } else if (className.indexOf(animationOut) !== -1) {
+                    target.className = target.className.replace(animationOut, animationIn);
+                } else {
+                    target.className += ' ' + animationIn;
+                }
+            },
             actionBtn(index) {
                 this.uploadModal.prepend = this.currentDir;
                 switch (index) {
@@ -166,7 +188,7 @@
                         this.uploadModal.isShow = true;
                         break;
                     case 2://搜索事件
-                        this.$emit('on-search', this.currentDir + this.search, event);
+                        this.$emit('on-search', this.currentDir, this.search, event);
                         break;
                 }
             },

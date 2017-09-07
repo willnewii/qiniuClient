@@ -4,6 +4,7 @@
   "description": "一个七牛云文件管理客户端",
   "main": "./dist/main.js",
   "dependencies": {
+    "animate.css": "^3.5.2",
     "axios": "^0.16.1",
     "electron-json-storage": "^3.0.6",
     "iview": "^2.2.0",
