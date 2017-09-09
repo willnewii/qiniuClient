@@ -19,7 +19,7 @@ function initApp() {
     //创建主窗口
     createMainWindow();
     //托盘处理
-    util.isMac() && trayUtil.createTray();
+    util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
 }
