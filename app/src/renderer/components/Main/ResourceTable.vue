@@ -4,6 +4,19 @@
         //overflow: scroll;
         background: #fff;
     }
+
+</style>
+<style lang="scss" >
+    .primary-line-btn {
+/*        background: #FFFFFF;
+        color: #333333;
+        border-color: rgba(45, 156, 255, 0.45);*/
+    }
+    .error-line-btn {
+/*        background: #FFFFFF;
+        color: #333333;
+        border-color: rgba(255, 66, 20, 0.45);*/
+    }
 </style>
 <template>
     <div class="layout-content">
@@ -67,6 +80,7 @@
                         render: (h, item) => {
                             return h('div', [
                                 h('i-button', {
+                                    class:'primary-line-btn',
                                     props: {
                                         type: 'primary',
                                         size: 'small'
@@ -79,6 +93,7 @@
                                 }, '查看'),
                                 h('span', {}, ' '),
                                 h('i-button', {
+                                    class:'primary-line-btn',
                                     props: {
                                         type: 'primary',
                                         size: 'small'
@@ -91,6 +106,7 @@
                                 }, '复制'),
                                 h('span', {}, ' '),
                                 h('i-button', {
+                                    class:'error-line-btn',
                                     props: {
                                         type: 'error',
                                         size: 'small'

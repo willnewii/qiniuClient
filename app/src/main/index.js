@@ -38,7 +38,7 @@ function createMainWindow() {
     mainWindow.loadURL(util.winURL);
 
     mainWindow.on('closed', () => {
-        //mainWindow = null
+        mainWindow = null
     });
 }
 
