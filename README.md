@@ -1,15 +1,14 @@
-# qiniuClien v0.0.6
+# qiniuClien v0.0.8
+![](http://ou62js7ck.bkt.clouddn.com/niu_128.png)
+> 七牛存储文件管理客户端.跟官网相比,增加了按目录显示,托盘上传,URL上传,文件排序 .我觉得还不错 😂
 
-> 七牛存储文件管理客户端.跟官网相比,增加了目录显示,托盘上传,URL上传,文件排序 .我觉得还不错 😂
+## 效果图
+![qiniuClient-0.0.6截图1.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE1.png)
 
-## Technologies
-- [electron](https://github.com/electron/electron)
-- [electron-vue](https://github.com/SimulatedGREG/electron-vue)
-- [vue2.0 + axios + router + vuex](https://github.com/vuejs/vue)
-- [iview 2.0](https://github.com/iview/iview)
+![qiniuClient-0.0.6截图2.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE2.png)
 
 ## 功能
-1. 文件的增、删、查
+1. 文件的增、删、文件(文件前缀搜索)
 2. 目录显示
     - 七牛web页面没有这个功能,我觉得还挺实用,方便归类
 3. 文件按日期/大小 排序(方便查找)
@@ -20,21 +19,25 @@
 5. 拖拽上传
     - O__O "… 本来是看别人有才做的...后来发现还挺好用 😂
 6. 图片模式
-    - 显示预览图,如果你有图片维护的需求,这个功能应该对你有帮助
+    - 显示预览图,如果你有维护图片的需求,这个功能应该对你有帮助
 7. 批量上传,删除,下载
-8. 支持私有空间操作.
+8. 私有空间操作
 
-## tips
-1. 如果你经常使用markdown写文档并配图的话,可以在设置的'复制到粘贴板格式'中,勾选'markdown'.
+## 说明
+1. 如果你经常使用markdown写文档并配图的话,可以将设置中的'复制到粘贴板格式',勾选为'markdown'.
 
-2. 七牛的空间有私有/公开两种状态.但是并没有提供获取相应状态的api 🤣 .如果你需要操作私有空间,请先在设置页面,勾选相对应的空间.
+2. 七牛的空间有私有/公开两种状态.但是并没有提供获取相应状态的api 🤣 .如果你需要操作私有空间,请先在设置页面'私有空间'选项,勾选相对应的空间.
 
-3. [building-windows-apps-from-non-windows-platforms](https://github.com/electron-userland/electron-packager#building-windows-apps-from-non-windows-platforms)
+3. 七牛的搜索api是按照前缀搜索,并非模糊.所以关键字一定要匹配前缀.如果你点击了相应的目录.
 
-## 截图
-![qiniuClient-0.0.6截图1.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE1.png)
+4. [building-windows-apps-from-non-windows-platforms](https://github.com/electron-userland/electron-packager#building-windows-apps-from-non-windows-platforms)
 
-![qiniuClient-0.0.6截图2.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE2.png)
+
+## Technologies
+- [electron](https://github.com/electron/electron)
+- [electron-vue](https://github.com/SimulatedGREG/electron-vue)
+- [vue2.0 + axios + router + vuex](https://github.com/vuejs/vue)
+- [iview 2.0](https://github.com/iview/iview)
 
 ## Build Setup
 
@@ -53,8 +56,8 @@ npm run pack
 More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
 ## issue
-- ~~小文件下载状态更新异常~~ 解决啦~ 🤓
 - 上传进度不灵敏.七牛上传文件块设置的是4M.调小以后,进度条反应比较正常,但是会提示上传失败 😂,所以会感觉明明上传了,但是半天没响应.
+- ~~小文件下载状态更新异常~~ 解决啦~ 🤓
 - ~~小文件上传失败.没有详细测试,大概范围是小于100KB的文件上传会失败.~~ 解决啦~ 🤓
 
 ## dev tips
@@ -69,6 +72,7 @@ The Product/@Version attribute's value, '!(bind.FileVersion.qiniu-Client.exe)', 
 检查package.name 是否包含'-' . [windows-installer-#203](https://github.com/electron/windows-installer/issues/203)
 
 ## 参考资料
+- [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)
 - [electron 文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
 - [七牛API](https://developer.qiniu.com/kodo/api/1731/api-overview)
 - [webpack2 文档](https://doc.webpack-china.org)
