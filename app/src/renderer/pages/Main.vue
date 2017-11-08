@@ -48,12 +48,12 @@
                 padding: 10px 20px;
                 color: #c5c5c5;
             }
+
             .new-version {
                 color: #ff3605;
                 cursor: pointer;
             }
-
-            .version-info {
+            .new-version-info {
                 color: #555;
             }
         }
@@ -92,7 +92,7 @@
                 <div class="version">
                     <span @click="open_Browser(0)">v{{appVersion}}</span>
                     <Poptip trigger="hover" v-if="version.url" placement="top-start" :title="version.version">
-                        <pre slot="content" class="version-info">{{version.info}}</pre>
+                        <pre slot="content" class="new-version-info">{{version.info}}</pre>
                         <span class="new-version" @click="open_Browser(1)">有新版啦~</span>
                     </Poptip>
                 </div>

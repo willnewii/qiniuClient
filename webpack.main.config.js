@@ -52,11 +52,11 @@ let mainConfig = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),
-        new webpack.optimize.UglifyJsPlugin({
+/*        new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
             }
-        })
+        })*/
     ],
     resolve: {
         extensions: ['.js', '.json', '.node'],
