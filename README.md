@@ -71,6 +71,11 @@ The Product/@Version attribute's value, '!(bind.FileVersion.qiniu-Client.exe)', 
 ```
 检查package.name 是否包含'-' . [windows-installer-#203](https://github.com/electron/windows-installer/issues/203)
 
+### electron-builder 打包windows程序
+```shell
+npm run package-win32
+```
+
 ## 参考资料
 - [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)
 - [electron 文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
