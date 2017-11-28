@@ -16,6 +16,50 @@
     "vue-router": "^2.1.2",
     "vuex": "^2.1.1"
   },
+  "build": {
+    "productName": "qiniu client",
+    "appId": "com.github.willnewii.qiniuClient",
+    "compression": "maximum",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "target": "nsis",
+      "icon": "./icons/icon.ico"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "title": "qiniu client ${version}"
+    },
+    "mac": {
+      "icon": "./icons/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "icon": "./icons"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "../release"
+    }
+  },
   "devDependencies": {},
   "author": "诗人的咸鱼 <willnewii@163.com>"
 }
