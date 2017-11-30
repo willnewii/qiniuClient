@@ -48,14 +48,14 @@ npm i  //electron 需要的文件下载巨慢,经常卡死,耐心,不行就翻�
 npm run dev
 
 # build electron app for production
-npm run build
-
-# run webpack in production
-npm run pack
+npm run package-mac
+npm run package-win32
 ```
+
 More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
 ## issue
+- 获取不到授权空间domain.因为七牛api的设计,如果在您有授权空间的情况下,是可以进行文件的列表读取/上传/删除操作,但是在获取domains时总返回为空,导致无法拼接完整的url,而无法访问.
 - 上传进度不灵敏.七牛上传文件块设置的是4M.调小以后,进度条反应比较正常,但是会提示上传失败 😂,所以会感觉明明上传了,但是半天没响应.
 - ~~小文件下载状态更新异常~~ 解决啦~ 🤓
 - ~~小文件上传失败.没有详细测试,大概范围是小于100KB的文件上传会失败.~~ 解决啦~ 🤓
@@ -71,10 +71,6 @@ The Product/@Version attribute's value, '!(bind.FileVersion.qiniu-Client.exe)', 
 ```
 检查package.name 是否包含'-' . [windows-installer-#203](https://github.com/electron/windows-installer/issues/203)
 
-### electron-builder 打包windows程序
-```shell
-npm run package-win32
-```
 
 ## 参考资料
 - [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)
@@ -82,3 +78,4 @@ npm run package-win32
 - [七牛API](https://developer.qiniu.com/kodo/api/1731/api-overview)
 - [webpack2 文档](https://doc.webpack-china.org)
 - [Node.js 文档](http://nodejs.cn/api/)
+- [electron.build cli doc](https://www.electron.build/cli)

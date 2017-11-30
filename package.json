@@ -15,7 +15,8 @@
     "pack:main": "cross-env NODE_ENV=production webpack  --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config webpack.renderer.config.js",
     "postinstall": "cd app && npm install",
-    "package-win32": "npm run pack && cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' build --win --ia32 --projectDir ./app"
+    "package-win32": "npm run pack && cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' build --win --ia32 --projectDir ./app",
+    "package-mac": "npm run pack && cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' build --mac --projectDir ./app"
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",

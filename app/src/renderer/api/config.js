@@ -7,7 +7,7 @@ import Qs from 'qs'
 export default {
     url: '',
     method: 'post',
-    baseURL: 'https://anxinmuying.applinzi.com/Public/demo',
+    baseURL: '',
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     transformRequest: [function (data) {
         if (data) {
