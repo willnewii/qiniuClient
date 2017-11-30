@@ -12,9 +12,10 @@
     "build:exe": "npm run build:win32 && node tasks/buildexe.js",
     "dev": "node tasks/runner.js",
     "pack": "npm run pack:main && npm run pack:renderer",
-    "pack:main": "cross-env NODE_ENV=production webpack -p --progress --colors --config webpack.main.config.js",
+    "pack:main": "cross-env NODE_ENV=production webpack  --progress --colors --config webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config webpack.renderer.config.js",
-    "postinstall": "cd app && npm install"
+    "postinstall": "cd app && npm install",
+    "package-win32": "npm run pack && cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' build --win --ia32 --projectDir ./app"
   },
   "a": {
     "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
@@ -37,6 +38,7 @@
     "del": "^2.2.1",
     "devtron": "^1.1.0",
     "electron": "^1.7.8",
+    "electron-builder": "^19.46.9",
     "electron-debug": "^1.1.0",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^8.7.2",
@@ -64,5 +66,49 @@
     "electron-winstaller": "^2.6.3",
     "node-notifier": "^5.1.2",
     "vue-lazyload": "^1.0.6"
+  },
+  "build": {
+    "productName": "qiniu client",
+    "appId": "com.github.willnewii.qiniuClient",
+    "compression": "maximum",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "target": "nsis",
+      "icon": "./app/icons/icon.ico"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "title": "qiniu client ${version}"
+    },
+    "mac": {
+      "icon": "./app/icons/icon.icns"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "AppImage"
+      ],
+      "icon": "./app/icons"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "./release"
+    }
   }
 }
