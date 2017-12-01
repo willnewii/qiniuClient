@@ -1,9 +1,9 @@
 /**
  * Created by zhangweiwei on 2017/2/28.
  */
-import * as types from '../mutation-types'
+import * as types from '../mutation-types';
 
-import * as util from '../../util/util'
+import * as util from '../../util/util';
 
 const storage = require('electron-json-storage');
 
@@ -30,6 +30,7 @@ export default {
             imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',
             downloaddir: '',
             privatebucket: [],
+            customedomain: {},
             privatedeadline: 3600//默认1小时
         },
         app_buckets: [],
@@ -53,6 +54,13 @@ export default {
         },
         [types.APP.setup_copyType](state, value) {
             state.setup.copyType = value;
+            setAppSetup(state.setup);
+        },
+        [types.APP.setup_s_customedomain](state, value) {
+            if (!state.setup.customedomain) {
+                state.setup.customedomain = {};
+            }
+            state.setup.customedomain = Object.assign(state.setup.customedomain, value);
             setAppSetup(state.setup);
         },
         [types.APP.setup_savedir](state, value) {
@@ -100,6 +108,9 @@ export default {
         [types.APP.setup_a_savedir](context, value) {
             context.commit(types.APP.setup_savedir, value);
         },
+        [types.APP.setup_a_customedomain](context, value) {
+            context.commit(types.APP.setup_s_customedomain, value);
+        },
         [types.APP.app_a_setup_init](context) {
             storage.get('app_setup', (error, app) => {
                 if (!error) {
@@ -107,7 +118,7 @@ export default {
                         context.commit(types.APP.app_setup_init, app);
                     }
                 }
-            })
+            });
         },
     },
     getters: {
@@ -135,8 +146,11 @@ export default {
         [types.APP.setup_bucket_dir](state) {
             return ('bucket_dir' in state.setup) ? state.setup.bucket_dir : '';
         },
+        [types.APP.setup_customedomain](state) {
+            return ('customedomain' in state.setup) ? state.setup.customedomain : {};
+        },
         [types.APP.app_buckets](state) {
             return state.app_buckets;
         }
     }
-}
+};
