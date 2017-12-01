@@ -30,6 +30,10 @@ export const APP = {
     setup_savedir: 'setup_savedir',
     setup_a_savedir: 'setup_a_savedir',
 
+    setup_customedomain: 'setup_customedomain',
+    setup_a_customedomain: 'setup_a_customedomain',
+    setup_s_customedomain: 'setup_s_customedomain',
+
     app_setup_init: 'app_setup_init',
     app_a_setup_init: 'app_a_setup_init',
 
@@ -38,4 +42,4 @@ export const APP = {
 
     menu_state: 'menu_state',
     menu_a_state: 'menu_a_state',
-}
+};

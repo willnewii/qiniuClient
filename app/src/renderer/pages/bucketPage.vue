@@ -47,17 +47,16 @@
     </div>
 </template>
 <script>
-    import DirTag from '../components/Main/DirTag.vue'
-    import ClientHeader from '../components/Main/ClientHeader.vue'
-    import ResourceTable from '../components/Main/ResourceTable.vue'
+    import DirTag from '../components/Main/DirTag.vue';
+    import ClientHeader from '../components/Main/ClientHeader.vue';
+    import ResourceTable from '../components/Main/ResourceTable.vue';
 
-    import {mapGetters} from 'vuex'
-    import * as types from '../vuex/mutation-types'
+    import {mapGetters} from 'vuex';
+    import * as types from '../vuex/mutation-types';
 
     import mixin_base from "../mixins/mixin-base";
-    import {Constants, util, EventBus} from '../service/index'
+    import {Constants, util, EventBus} from '../service/index';
     import ResourceGrid from "../components/Main/ResourceGrid.vue";
-
 
     export default {
         name: 'bucketPage',
@@ -88,11 +87,12 @@
                     withoutDelimiterFiles: []
                 },
                 endable: false
-            }
+            };
         },
         computed: {
             ...mapGetters({
-                privatebucket: types.APP.setup_privatebucket
+                privatebucket: types.APP.setup_privatebucket,
+                customedomain: types.APP.setup_customedomain
             })
         },
         watch: {
@@ -138,9 +138,21 @@
             },
             getDomains() {
                 this.doRequsetGet(Constants.method.getDomains, {tbl: this.bucket.name}, (response) => {
+                    if (!response)
+                        return;
+
                     this.bucket.domains = response.data;
-                    //默认选择第一个域名
-                    this.bucket.domain = this.bucket.domains[0];
+
+                    if (this.bucket.domains && this.bucket.domains.length > 0) {
+                        //默认选择第一个域名
+                        this.bucket.domain = this.bucket.domains[0];
+                    } else {
+                        if (this.customedomain && this.customedomain[this.bucket.name]) {
+                            this.bucket.domain = this.customedomain[this.bucket.name];
+                        } else {
+                            this.bucket.domain = '';
+                        }
+                    }
                 });
             },
             /**
@@ -158,6 +170,9 @@
                 }
 
                 this.doRequset(Constants.method.getResources, data, (response) => {
+                    if (!response)
+                        return;
+
                     if (response.data.commonPrefixes) {
                         this.bucket.dirs = this.bucket.dirs.concat(response.data.commonPrefixes);
                     }
@@ -188,13 +203,16 @@
                 }
 
                 this.doRequset(Constants.method.getResources, data, (response) => {
+                    if (!response)
+                        return;
+
                     if (this.bucket.marker) {
                         this.bucket.files = this.bucket.files.concat(response.data.items);
                     } else {
                         this.bucket.files = response.data.items;
                     }
                     if (response.data.marker) {
-                        this.bucket.marker = response.data.marker
+                        this.bucket.marker = response.data.marker;
                     } else {
                         this.bucket.marker = '';
                     }
@@ -206,7 +224,7 @@
              */
             doSearch: function (dir, search) {
                 this.bucket.marker = '';
-                this.getResources(search ? dir + search : dir)
+                this.getResources(search ? dir + search : dir);
             },
             /**
              * Dir 组件 搜索

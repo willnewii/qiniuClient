@@ -36,9 +36,12 @@
 <template>
     <div class="layout-header">
         <div class="full">
-            <Select v-model="bucket.domain" style="width:220px" v-if="bucket.name">
+            <Select v-model="bucket.domain" style="width:250px"
+                    v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
+            <Input v-if="bucket.domains.length == 0" v-model="bucket.domain" placeholder="请填入空间域名"
+                   style="width:250px"></Input>
         </div>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
@@ -69,7 +72,7 @@
             <div class="modal-input">
                 <Select v-model="uploadModal.prepend" style="width: 100px">
                     <Option value="">无</Option>
-                    <Option v-for="item of dirs" :value="item">{{item}}</Option>
+                    <Option v-for="item of dirs" :key="item" :value="item">{{item}}</Option>
                 </Select>
                 <Input v-model="uploadModal.input"></Input>
             </div>
@@ -82,6 +85,8 @@
 </template>
 <script>
     import {util, cloudStorage, Constants} from '../../service/index';
+    import {mapGetters, mapActions} from 'vuex';
+    import * as types from '../../vuex/mutation-types';
 
     let ipc;
 
@@ -99,7 +104,7 @@
                 search: '',
                 filePaths: [],
                 messageFlag: false
-            }
+            };
         },
         computed: {
             dirs() {
@@ -123,6 +128,16 @@
                 }
             }
         },
+        watch: {
+            'bucket.domain': function (val, oldVal) {
+                //在domains为空时,保存 bucket.domain
+                if (this.bucket && this.bucket.domains.length === 0) {
+                    let obj = {};
+                    obj[this.bucket.name] = val;
+                    this[types.APP.setup_a_customedomain](obj);
+                }
+            },
+        },
         props: {
             bucket: {
                 type: Object
@@ -145,7 +160,7 @@
                     });
                     this.handleFile(paths);
                 }
-                return false
+                return false;
             };
 
             window.ondragenter = (e) => {
@@ -154,12 +169,15 @@
                     this.messageFlag = true;
                     this.$Message.info('我已经感受到你传来的文件啦 😎');
                     setTimeout(() => {
-                        this.messageFlag = false
+                        this.messageFlag = false;
                     }, 2000);
                 }
-            }
+            };
         },
         methods: {
+            ...mapActions([
+                types.APP.setup_a_customedomain,
+            ]),
             toggleShow($event) {
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
                 let className = target.className;
@@ -231,7 +249,7 @@
                 };
 
                 if (this.uploadModal.type === 'fetch') {
-                    cloudStorage.fetch(param, this.handleResult)
+                    cloudStorage.fetch(param, this.handleResult);
                 } else {
                     cloudStorage.upload(param, this.handleResult);
                 }
