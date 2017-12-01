@@ -71,7 +71,7 @@
                       @on-select="selectBuckets"
                       :active-name="bucketname">
                     <Menu-group title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets" :name="item">
+                        <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
                             <Icon :style="{width:iconSize + 'px'}"
                                   :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"
                                   :size="iconSize"></Icon>

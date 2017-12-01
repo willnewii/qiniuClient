@@ -2,14 +2,14 @@
   "comments": false,
   "env": {
     "main": {
-      "presets": ["es2015", "stage-0"]
+      "presets": ["env"]
     },
     "renderer": {
       "presets": [
-        ["es2015", { "modules": false }],
+        ["env", { "modules": false }],
         "stage-0"
       ]
     }
   },
-  "plugins": ["transform-runtime"]
+  "plugins": ["transform-runtime","syntax-dynamic-import","transform-object-rest-spread"]
 }

@@ -72,7 +72,7 @@
             <div class="modal-input">
                 <Select v-model="uploadModal.prepend" style="width: 100px">
                     <Option value="">无</Option>
-                    <Option v-for="item of dirs" :value="item">{{item}}</Option>
+                    <Option v-for="item of dirs" :key="item" :value="item">{{item}}</Option>
                 </Select>
                 <Input v-model="uploadModal.input"></Input>
             </div>

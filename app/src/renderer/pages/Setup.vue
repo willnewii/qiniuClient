@@ -75,7 +75,7 @@
             <Button @click="openBrowser(1)" size="small">什么是私有空间</Button>
             <br>
             <CheckboxGroup v-model="privates" @on-change="privatesChange">
-                <Checkbox v-for="item in buckets" :label="item">
+                <Checkbox v-for="item,index in buckets" :key="index" :label="item">
                     <span>{{item}}</span>
                 </Checkbox>
             </CheckboxGroup>

@@ -56,7 +56,7 @@
 <template>
     <div class="layout-content">
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
-            <Card v-for="file,index in bucket.files" class="card" :padding="10" :bordered="false">
+            <Card v-for="file,index in bucket.files" :key="index" class="card" :padding="10" :bordered="false">
                 <div class="view" @click="show(index)">
                     <img v-if="file.mimeType.indexOf('image')===0" class="image"
                          v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
