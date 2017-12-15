@@ -1,7 +1,7 @@
-import {mapGetters} from 'vuex'
-import * as types from '../vuex/mutation-types'
-import * as util from '../util/util'
-import {cloudStorage} from '../service/index'
+import {mapGetters} from 'vuex';
+import * as types from '../vuex/mutation-types';
+import * as util from '../util/util';
+import {cloudStorage} from '../service/index';
 
 export default {
     computed: {
@@ -23,7 +23,7 @@ export default {
         return {
             deleteKey: '',
             deleteNoAskModel: false
-        }
+        };
     },
     created: function () {
     },
@@ -44,7 +44,7 @@ export default {
             return url;
         },
         show(index) {
-            this.$electron.shell.openExternal(this.getResoureUrl(index))
+            this.$electron.shell.openExternal(this.getResoureUrl(index));
         },
         copy(index) {
             util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(index));
@@ -70,6 +70,7 @@ export default {
         },
         removes() {
             this.deleteKey = this.bucket.selection[0].key;
+
             if (this.bucket.selection.length === 1) {
                 this.doRemove();
             } else {
@@ -82,7 +83,6 @@ export default {
         },
         remove(index, event) {
             this.deleteKey = this.bucket.files[index].key;
-
             if (this.setup_deleteNoAsk) {
                 this.doRemove();
             } else {
@@ -102,12 +102,12 @@ export default {
                     if (!ret) {
                         ret = {
                             key: this.deleteKey
-                        }
+                        };
                     }
                     this.$emit('on-update', ret, 'remove', event);
                 }
 
-            })
+            });
         },
     }
-}
+};
