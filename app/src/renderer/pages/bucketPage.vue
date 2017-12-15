@@ -43,7 +43,12 @@
         <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket" @on-update="onUpdate"></resource-table>
         <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket"
                        @on-update="onUpdate"></resource-grid>
-
+        <Modal
+                v-model="deleteNoAskModel"
+                title="确认删除文件？"
+                @on-ok="doRemove">
+            <p v-for="file in bucket.selection">{{file.key}}</p>
+        </Modal>
     </div>
 </template>
 <script>
@@ -86,12 +91,14 @@
                     selection: [],
                     withoutDelimiterFiles: []
                 },
-                endable: false
+                endable: false,
+                deleteNoAskModel: false
             };
         },
         computed: {
             ...mapGetters({
                 privatebucket: types.APP.setup_privatebucket,
+                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
                 customedomain: types.APP.setup_customedomain
             })
         },
@@ -241,6 +248,13 @@
                 }
             },
             removes() {
+                if (this.setup_deleteNoAsk) {
+                    this.doRemove();
+                } else {
+                    this.deleteNoAskModel = true;
+                }
+            },
+            doRemove() {
                 EventBus.$emit(Constants.Event.removes);
             },
             downloads() {
