@@ -1,11 +1,6 @@
-# qiniuClien v0.0.8
+# qiniuClien v0.0.9
 ![](http://ou62js7ck.bkt.clouddn.com/niu_128.png)
 > 七牛存储文件管理客户端.跟官网相比,增加了按目录显示,托盘上传,URL上传,文件排序 .我觉得还不错 😂
-
-## 效果图
-![qiniuClient-0.0.6截图1.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE1.png)
-
-![qiniuClient-0.0.6截图2.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE2.png)
 
 ## 功能
 1. 文件的增、删、文件(文件前缀搜索)
@@ -45,6 +40,11 @@
 > 感谢[relzhong](https://github.com/relzhong) 提供的 [electron-builder](https://github.com/electron-userland/electron-builder) 打包方式.打包过程中,可能会出现超时,多试几次,或者翻个墙试试 😂
 
 - 如果你经常使用markdown写文档并配图的话,可以将设置中的'复制到粘贴板格式',勾选为'markdown'.这样复制出来的格式就是 '[filename](url)'
+
+## 效果图
+![qiniuClient-0.0.6截图1.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE1.png)
+
+![qiniuClient-0.0.6截图2.png](http://obfmtiyt5.bkt.clouddn.com/img%2FqiniuClient-0.0.6%E6%88%AA%E5%9B%BE2.png)
 
 
 ## Technologies
