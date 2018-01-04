@@ -2,11 +2,18 @@ export const protocol = 'http://';
 
 export const method = {
     //列举一个账号的所有空间
-    getBuckets: 'http://rs.qbox.me/buckets',
+    getBuckets: 'https://rs.qbox.me/buckets',
     //获取一个空间绑定的域名列表
-    getDomains: 'http://api.qiniu.com/v6/domain/list',
+    getDomains: 'https://api.qiniu.com/v6/domain/list',
     //获取目录(是通过公共前缀模拟出的效果)
-    getResources: 'http://rsf.qbox.me/list',
+    getResources: 'https://rsf.qbox.me/list',
+};
+
+export const PageName = {
+    login: 'login',
+    tray: 'tray',
+    bucketPage: 'bucketPage',
+    setup: 'setup',
 };
 
 export const URL = {

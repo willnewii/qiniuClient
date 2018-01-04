@@ -1,3 +1,5 @@
+import * as Constants from './service/constants';
+
 export default [
     {
         path: '/',
@@ -6,24 +8,24 @@ export default [
         children: [
             {
                 path: 'bucketPage',
-                name: 'bucketPage',
+                name: Constants.PageName.bucketPage,
                 components: require('pages/bucketPage.vue')
             },
             {
                 path: 'setup',
-                name: 'setup',
+                name: Constants.PageName.setup,
                 components: require('pages/Setup.vue')
             }
         ]
     },
     {
         path: '/login',
-        name: 'login',
+        name: Constants.PageName.login,
         components: require('pages/Login.vue')
     },
     {
         path: '/tray',
-        name: 'tray',
+        name: Constants.PageName.tray,
         components: require('pages/Tray.vue')
     }
-]
+];

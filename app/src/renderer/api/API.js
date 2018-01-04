@@ -2,11 +2,11 @@
  * Created by zhangweiwei on 2017/04/10.
  */
 
-import axios from 'axios'
-import config from './config'
-import * as cloudStorage from '../service/cloudStorage'
+import axios from 'axios';
+import config from './config';
+import * as cloudStorage from '../service/cloudStorage';
 
-import Qs from 'qs'
+import Qs from 'qs';
 
 class API {
 
@@ -29,10 +29,10 @@ class API {
         let _url = url;
         if (param)
             _url = _url + '?' + Qs.stringify(param);
-        return this._request(_url, 'post')
+        return this._request(_url, 'post');
     }
 
-    get (url, param) {
+    get(url, param) {
         // config.params = param;
         //return axios.get("", config);
 
@@ -40,34 +40,26 @@ class API {
         if (param)
             _url = _url + '?' + Qs.stringify(param);
 
-        return this._request(_url, 'get')
+        return this._request(_url, 'get');
     }
 
     _request(url, type, param) {
         this.view.$Loading.start();
-        /*        let element = document.getElementsByClassName('ivu-loading-bar')[0]; //会产生位置抖动
-                if (process.platform !== 'darwin') {
-                    if (element.className.indexOf('ivu-loading-bar-win') === -1) {
-                        element.className += ' ivu-loading-bar-win';
-                    }
-                }*/
-        /* if (type === 'get') {
-         config.params = param;
-         } else {
-         config.data = param;
-         }*/
-        if (url.indexOf('github.com') === -1) {
+
+        let regStr = /^http.*(qiniu.com|qbox.me)/g;
+        if(regStr.test(url)){
             config.headers.Authorization = cloudStorage.httpAuthorization(url);
-        } else {
+        }else{
             delete config.headers.Authorization;
         }
+
         config.method = type;
 
         let request;
         if (type === 'get') {
-            request = axios.get(url, config)
+            request = axios.get(url, config);
         } else {
-            request = axios[type](url, null, config)
+            request = axios[type](url, null, config);
         }
 
         request.then((response) => {

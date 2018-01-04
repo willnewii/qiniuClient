@@ -255,7 +255,6 @@
                 }
             },
             handleResult(err, ret) {
-
                 if (!err) {
                     this.$Notice.success({
                         title: '上传成功',

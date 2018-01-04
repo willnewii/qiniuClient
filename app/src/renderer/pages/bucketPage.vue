@@ -14,7 +14,7 @@
 </style>
 <template>
     <div class="layout">
-        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onUpdate" @on-search="doSearch"></ClientHeader>
+        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></ClientHeader>
 
         <div class="dir-layout">
             <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
@@ -40,9 +40,10 @@
             </Button-group>
         </div>
 
-        <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket" @on-update="onUpdate"></resource-table>
+        <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket"
+                        @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket"
-                       @on-update="onUpdate"></resource-grid>
+                       @on-update="onTableUpdate"></resource-grid>
         <Modal
                 v-model="deleteNoAskModel"
                 title="确认删除文件？"
@@ -62,6 +63,9 @@
     import mixin_base from "../mixins/mixin-base";
     import {Constants, util, EventBus} from '../service/index';
     import ResourceGrid from "../components/Main/ResourceGrid.vue";
+
+    //其它文件列表标记
+    const withoutDelimiter = '__withoutDelimiter__';
 
     export default {
         name: 'bucketPage',
@@ -117,25 +121,22 @@
             }
         },
         methods: {
+            /**
+             * 初始化空间信息
+             */
             initBucket(bucketname) {
                 this.bucket.name = bucketname;
-
-                if (this.privatebucket && this.privatebucket.length > 0 && this.privatebucket.indexOf(this.bucket.name) !== -1) {
-                    this.bucket.isprivate = true;
-                } else {
-                    this.bucket.isprivate = false;
-                }
-
                 this.bucket.currentDir = '';
-
+                this.bucket.marker = '';
                 this.bucket.dirs = [];
                 this.bucket.files = [];
-                this.bucket.marker = '';
                 this.endable = false;
+                this.bucket.isprivate = (this.privatebucket && this.privatebucket.length > 0 && this.privatebucket.indexOf(this.bucket.name) !== -1);
+
                 if (this.bucket.name.indexOf('__app__') !== 0) {
                     this.getDomains();
                     this.bucket.dirs.push('');
-                    this.bucket.dirs.push('__withoutDelimiter__');
+                    this.bucket.dirs.push(withoutDelimiter);
                     this.bucket.withoutDelimiterFiles = [];
                     this.getDir();
                     this.getResources();
@@ -151,8 +152,8 @@
                     this.bucket.domains = response.data;
 
                     if (this.bucket.domains && this.bucket.domains.length > 0) {
-                        //默认选择第一个域名
-                        this.bucket.domain = this.bucket.domains[0];
+                        //默认选择最后一个域名
+                        this.bucket.domain = this.bucket.domains[this.bucket.domains.length - 1];
                     } else {
                         if (this.customedomain && this.customedomain[this.bucket.name]) {
                             this.bucket.domain = this.customedomain[this.bucket.name];
@@ -164,7 +165,7 @@
             },
             /**
              * 获取该bucket下的目录
-             * @param marker 上一次列举返回的位置标记，作为本次列举的起点信息。
+             * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
              */
             getDir(marker) {//获取目录
                 let data = {
@@ -184,7 +185,7 @@
                         this.bucket.dirs = this.bucket.dirs.concat(response.data.commonPrefixes);
                     }
 
-                    if (response.data.items) {//不包含公共前缀的文件列表
+                    if (response.data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
                         this.bucket.withoutDelimiterFiles = this.bucket.withoutDelimiterFiles.concat(response.data.items);
                     }
 
@@ -193,6 +194,9 @@
                     }
                 });
             },
+            /**
+             * 获取指定前缀文件列表
+             */
             getResources(keyword) {
                 this.bucket.selection = [];
 
@@ -208,21 +212,13 @@
                 if (this.bucket.marker) {
                     data.marker = this.bucket.marker;
                 }
-
                 this.doRequset(Constants.method.getResources, data, (response) => {
                     if (!response)
                         return;
 
-                    if (this.bucket.marker) {
-                        this.bucket.files = this.bucket.files.concat(response.data.items);
-                    } else {
-                        this.bucket.files = response.data.items;
-                    }
-                    if (response.data.marker) {
-                        this.bucket.marker = response.data.marker;
-                    } else {
-                        this.bucket.marker = '';
-                    }
+                    this.bucket.files = this.bucket.marker ? this.bucket.files.concat(response.data.items) : response.data.items;
+
+                    this.bucket.marker = response.data.marker ? response.data.marker : '';
                 });
             },
             /**
@@ -241,7 +237,7 @@
                 this.bucket.currentDir = search;
                 this.bucket.marker = '';
 
-                if (search === '__withoutDelimiter__') {
+                if (search === withoutDelimiter) {
                     this.bucket.files = this.bucket.withoutDelimiterFiles;
                 } else {
                     this.doSearch(this.bucket.currentDir);
@@ -268,7 +264,13 @@
                 this.bucket.selection = [];
                 this.bucket.showType = type;
             },
-            onUpdate(ret, action) {
+            /**
+             * table数据项更新回调
+             * @param ret 变更的资源
+             * @param action 触发的动作,upload/remove
+             */
+            onTableUpdate(ret, action) {
+                console.log(ret, action);
                 let keyword = '';
                 if (ret && ret.key) {
                     keyword = util.getPrefix(ret.key);

@@ -116,8 +116,6 @@
 
                 this.bucket.selection = [item];
                 this.downloadFiles();
-
-                event.stopPropagation();
             }
         }
     };

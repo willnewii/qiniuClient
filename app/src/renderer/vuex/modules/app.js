@@ -81,9 +81,6 @@ export default {
         },
     },
     actions: {
-        [types.APP.qiniu_key](context, json) {
-            context.commit(types.APP.qiniu_key, json);
-        },
         [types.APP.setup_a_deadline](context, value) {
             context.commit(types.APP.setup_s_deadline, value);
         },
@@ -92,9 +89,6 @@ export default {
         },
         [types.APP.setup_a_imagestyle](context, value) {
             context.commit(types.APP.setup_imagestyle, value);
-        },
-        [types.APP.app_a_buckets](context, value) {
-            context.commit(types.APP.app_buckets, value);
         },
         [types.APP.setup_a_deleteNoAsk](context, json) {
             context.commit(types.APP.setup_s_deleteNoAsk, json);
@@ -110,6 +104,9 @@ export default {
         },
         [types.APP.setup_a_customedomain](context, value) {
             context.commit(types.APP.setup_s_customedomain, value);
+        },
+        [types.APP.app_a_buckets](context, value) {
+            context.commit(types.APP.app_buckets, value);
         },
         [types.APP.app_a_setup_init](context) {
             storage.get('app_setup', (error, app) => {

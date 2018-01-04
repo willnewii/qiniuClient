@@ -6,7 +6,6 @@ import {cloudStorage} from '../service/index';
 export default {
     computed: {
         ...mapGetters({
-            menuState: types.APP.menu_state,
             setup_copyType: types.APP.setup_copyType,
             setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
             setup_imagestyle: types.APP.setup_imagestyle,
@@ -28,13 +27,12 @@ export default {
     created: function () {
     },
     methods: {
+        /**
+         * 获取资源链接
+         */
         getResoureUrl(index, key) {
-            let fileName;
-            if (key) {
-                fileName = key;
-            } else {
-                fileName = this.bucket.files[index].key;
-            }
+            let fileName = key ? key : this.bucket.files[index].key;
+
             let url;
             if (this.bucket.isprivate) {
                 url = cloudStorage.getPrivateUrl(this.bucket.domain, fileName, this.setup_deadline);
@@ -50,7 +48,6 @@ export default {
             util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(index));
 
             this.$Message.info('文件路径以复制到剪贴板');
-            event.stopPropagation();
         },
         downloadFiles() {
             if (this.bucket.selection.length > 0) {
@@ -88,7 +85,6 @@ export default {
             } else {
                 this.deleteNoAskModel = true;
             }
-            event.stopPropagation();
         },
         doRemove(callback) {
             cloudStorage.remove({
