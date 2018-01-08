@@ -46,7 +46,6 @@ window.ondragover = function (e) {
 
 import App from './App';
 
-/!* eslint-disable no-new *!/
 new Vue({
     router,
     store,

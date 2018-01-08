@@ -6,16 +6,17 @@
     }
 
 </style>
-<style lang="scss" >
+<style lang="scss">
     .primary-line-btn {
-/*        background: #FFFFFF;
-        color: #333333;
-        border-color: rgba(45, 156, 255, 0.45);*/
+        /*        background: #FFFFFF;
+                color: #333333;
+                border-color: rgba(45, 156, 255, 0.45);*/
     }
+
     .error-line-btn {
-/*        background: #FFFFFF;
-        color: #333333;
-        border-color: rgba(255, 66, 20, 0.45);*/
+        /*        background: #FFFFFF;
+                color: #333333;
+                border-color: rgba(255, 66, 20, 0.45);*/
     }
 </style>
 <template>
@@ -32,13 +33,11 @@
     </div>
 </template>
 <script>
-    import {mapGetters} from 'vuex'
-    import {Constants, EventBus} from '../../service/index'
-    import * as types from '../../vuex/mutation-types'
-    import mixin_resource from '../../mixins/mixin-resource'
-    import moment from 'moment'
-
-    let tempNum;
+    import {mapGetters} from 'vuex';
+    import {Constants, EventBus} from '../../service/index';
+    import * as types from '../../vuex/mutation-types';
+    import mixin_resource from '../../mixins/mixin-resource';
+    import moment from 'moment';
 
     export default {
         name: 'ResourceTable',
@@ -60,11 +59,11 @@
                         render(h, item) {
                             let row = item.row;
                             if (row.fsize >= 1024 * 1024) {
-                                return (row.fsize / 1024 / 1024).toFixed(2) + ' MB'
+                                return (row.fsize / 1024 / 1024).toFixed(2) + ' MB';
                             } else if (row.fsize >= 1024 && row.fsize < 1024 * 1024) {
-                                return (row.fsize / 1024).toFixed(2) + ' KB'
+                                return (row.fsize / 1024).toFixed(2) + ' KB';
                             } else {
-                                return (row.fsize).toFixed(2) + ' B'
+                                return (row.fsize).toFixed(2) + ' B';
                             }
                         }
                     },
@@ -80,47 +79,47 @@
                         render: (h, item) => {
                             return h('div', [
                                 h('i-button', {
-                                    class:'primary-line-btn',
+                                    class: 'primary-line-btn',
                                     props: {
                                         type: 'primary',
                                         size: 'small'
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(item.index)
+                                            this.show(item.index);
                                         }
                                     }
                                 }, '查看'),
                                 h('span', {}, ' '),
                                 h('i-button', {
-                                    class:'primary-line-btn',
+                                    class: 'primary-line-btn',
                                     props: {
                                         type: 'primary',
                                         size: 'small'
                                     },
                                     on: {
                                         click: () => {
-                                            this.copy(item.index)
+                                            this.copy(item.index);
                                         }
                                     }
                                 }, '复制'),
                                 h('span', {}, ' '),
                                 h('i-button', {
-                                    class:'error-line-btn',
+                                    class: 'error-line-btn',
                                     props: {
                                         type: 'error',
                                         size: 'small'
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(item.index)
+                                            this.remove(item.index);
                                         }
                                     }
                                 }, '删除')
-                            ])
+                            ]);
                         }
                     }],
-            }
+            };
         },
         created() {
             EventBus.$off(Constants.Event.removes);
@@ -138,7 +137,6 @@
                 this.$Loading.update(num * 100);
                 if (num === 1) {
                     this.$Loading.finish();
-                    console.log(this.bucket.selection.length + ':' + this.bucket.name);
                     this.downloadFiles();
                 }
             });
@@ -147,7 +145,7 @@
             this.setTableSize();
             window.onresize = () => {
                 this.setTableSize();
-            }
+            };
         },
         methods: {
             onSelectionChange(selection) {
@@ -157,9 +155,7 @@
                 if (this.$parent) {
                     let layout = this.$parent.$el;
 
-                    //window.a = this.$parent.$el;
                     let style = window.getComputedStyle(layout.children[2]);
-
                     this.tableHeight = layout.clientHeight - layout.children[0].clientHeight - layout.children[1].clientHeight - parseInt(style.marginTop) - parseInt(style.marginBottom);
                 }
             },

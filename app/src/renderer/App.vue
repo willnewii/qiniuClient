@@ -5,10 +5,7 @@
 </template>
 
 <script>
-    import store from 'renderer/vuex/store'
-
     export default {
-        store,
         computed: {
             appHeight() {
                 if (document.getElementById('title'))
@@ -29,16 +26,3 @@
         }
     }
 </script>
-
-<style lang="scss">
-    .vertical-center-modal {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .ivu-modal {
-            top: 0;
-
-        }
-    }
-</style>

@@ -68,15 +68,20 @@ export default {
         removes() {
             this.deleteKey = this.bucket.selection[0].key;
 
-            if (this.bucket.selection.length === 1) {
-                this.doRemove();
-            } else {
-                this.doRemove(() => {
-                    this.bucket.selection.shift();
-                    if (this.bucket.selection.length > 0)
-                        this.removes();
-                });
-            }
+            this.doRemove(() => {
+                this.bucket.selection.shift();
+                if (this.bucket.selection.length > 0) {
+                    this.removes();
+                } else {
+                    this.$Message.info('移除成功');
+                    if (!ret) {
+                        ret = {
+                            key: this.deleteKey
+                        };
+                    }
+                    this.$emit('on-update', ret, 'remove', event);
+                }
+            });
         },
         remove(index, event) {
             this.deleteKey = this.bucket.files[index].key;
@@ -92,17 +97,8 @@ export default {
                 key: this.deleteKey
             }, (ret) => {
                 if (callback) {
-                    callback();
-                } else {
-                    this.$Message.info('移除成功');
-                    if (!ret) {
-                        ret = {
-                            key: this.deleteKey
-                        };
-                    }
-                    this.$emit('on-update', ret, 'remove', event);
+                    callback(ret);
                 }
-
             });
         },
     }

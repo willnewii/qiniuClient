@@ -9,6 +9,10 @@ export const method = {
     getResources: 'https://rsf.qbox.me/list',
 };
 
+export const Key = {
+    withoutDelimiter: '__withoutDelimiter__'
+};
+
 export const PageName = {
     login: 'login',
     tray: 'tray',

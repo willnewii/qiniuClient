@@ -36,12 +36,11 @@
 <template>
     <div class="layout-header">
         <div class="full">
-            <Select v-model="bucket.domain" style="width:250px"
+            <Select style="width:250px" v-model="bucket.domain"
                     v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
-            <Input v-if="bucket.domains.length == 0" v-model="bucket.domain" placeholder="请填入空间域名"
-                   style="width:250px"></Input>
+            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0"  placeholder="请填入空间域名" />
         </div>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
@@ -60,21 +59,21 @@
             </i-button>
         </div>
 
-        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
-               v-if="bucket.name"></Input>
+        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)" v-if="bucket.name"/>
 
-        <Modal v-model="uploadModal.isShow" class-name='vertical-center-modal' title="上传对话框" @on-ok="preUploadFile"
+        <Modal v-model="uploadModal.isShow" title="上传对话框" @on-ok="preUploadFile"
                @on-cancel="initModal">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
-                   placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"></Input>
+                   placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"
+                   icon="trash-b" @on-click="uploadModal.path = ''"/>
 
             <div class="modal-input">
                 <Select v-model="uploadModal.prepend" style="width: 100px">
                     <Option value="">无</Option>
                     <Option v-for="item of dirs" :key="item" :value="item">{{item}}</Option>
                 </Select>
-                <Input v-model="uploadModal.input"></Input>
+                <Input v-model="uploadModal.input"/>
             </div>
 
             <div class="modal-filekey" v-for="_path of filePaths">
@@ -87,8 +86,6 @@
     import {util, cloudStorage, Constants} from '../../service/index';
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../../vuex/mutation-types';
-
-    let ipc;
 
     export default {
         name: 'ClientHeader',
@@ -121,7 +118,7 @@
                 }
             },
             currentDir() {
-                if (this.bucket.currentDir == '__withoutDelimiter__') {
+                if (this.bucket.currentDir == Constants.Key.withoutDelimiter) {
                     return '';
                 } else {
                     return this.bucket.currentDir;
@@ -144,8 +141,7 @@
             }
         },
         created() {
-            ipc = this.$electron.ipcRenderer;
-            ipc.on('selected-directory', (event, path) => {
+            this.$electron.ipcRenderer.on('selected-directory', (event, path) => {
                 this.handleFile(path);
             });
 
@@ -178,7 +174,7 @@
             ...mapActions([
                 types.APP.setup_a_customedomain,
             ]),
-            toggleShow($event) {
+            toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
                 let className = target.className;
 
@@ -198,10 +194,12 @@
                 switch (index) {
                     case 0://调用文件选取对话框
                         this.filePaths = [];
-                        ipc.send('open-file-dialog', {properties: ['openFile', 'multiSelections']});
+                        this.$electron.ipcRenderer.send('open-file-dialog', {properties: ['openFile', 'multiSelections']});
                         break;
                     case 1://抓取文件
                         this.filePaths = [];
+
+                        this.uploadModal.path = this.$electron.clipboard.readText();
                         this.uploadModal.type = 'fetch';
                         this.uploadModal.isShow = true;
                         break;

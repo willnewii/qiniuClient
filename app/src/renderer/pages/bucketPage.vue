@@ -13,12 +13,11 @@
     }
 </style>
 <template>
-    <div class="layout">
-        <ClientHeader v-if="endable" :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></ClientHeader>
+    <div class="layout" v-if="bucket">
+        <ClientHeader :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></ClientHeader>
 
         <div class="dir-layout">
-            <DirTag v-if="endable" :bucket="bucket" @on-click="doDirSearch"></DirTag>
-
+            <DirTag :bucket="bucket" @on-click="doDirTag"></DirTag>
 
             <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
                     style="margin-right: 10px;background: #FFFFFF;"
@@ -40,12 +39,12 @@
             </Button-group>
         </div>
 
-        <resource-table v-if="endable && bucket.showType === 0" :bucket="bucket"
+        <resource-table v-if="isLoaded && bucket.showType === 0" :bucket="bucket"
                         @on-update="onTableUpdate"></resource-table>
-        <resource-grid v-else-if="endable && bucket.showType === 1" :bucket="bucket"
+        <resource-grid v-else-if="isLoaded && bucket.showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
         <Modal
-                v-model="deleteNoAskModel"
+                v-model="Model_DeleteAsk"
                 title="确认删除文件？"
                 @on-ok="doRemove">
             <p v-for="file in bucket.selection">{{file.key}}</p>
@@ -56,16 +55,15 @@
     import DirTag from '../components/Main/DirTag.vue';
     import ClientHeader from '../components/Main/ClientHeader.vue';
     import ResourceTable from '../components/Main/ResourceTable.vue';
+    import ResourceGrid from "../components/Main/ResourceGrid.vue";
 
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
     import mixin_base from "../mixins/mixin-base";
     import {Constants, util, EventBus} from '../service/index';
-    import ResourceGrid from "../components/Main/ResourceGrid.vue";
 
-    //其它文件列表标记
-    const withoutDelimiter = '__withoutDelimiter__';
+    import Bucket from "../bean/Bucket";
 
     export default {
         name: 'bucketPage',
@@ -82,28 +80,17 @@
         },
         data() {
             return {
-                bucket: {
-                    name: '',
-                    domains: [],
-                    domain: '',
-                    dirs: [],
-                    currentDir: '',
-                    isprivate: false,
-                    marker: '',
-                    files: [],
-                    showType: 0,
-                    selection: [],
-                    withoutDelimiterFiles: []
-                },
-                endable: false,
-                deleteNoAskModel: false
+                bucket: null,
+                //控制显示时机,不然resource-table/grid 组件在初始化时会出现高度计算错误.
+                isLoaded: false,
+                Model_DeleteAsk: false
             };
         },
         computed: {
             ...mapGetters({
                 privatebucket: types.APP.setup_privatebucket,
                 setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-                customedomain: types.APP.setup_customedomain
+                customeDomains: types.APP.setup_customedomain
             })
         },
         watch: {
@@ -115,7 +102,7 @@
         },
         mounted() {
             if (this.$route.query && this.$route.query.bucketname) {
-                if (this.$route.query.bucketname !== this.bucket.name) {
+                if (this.bucket && this.$route.query.bucketname !== this.bucket.name) {
                     this.initBucket(this.$route.query.bucketname);
                 }
             }
@@ -125,42 +112,19 @@
              * 初始化空间信息
              */
             initBucket(bucketname) {
-                this.bucket.name = bucketname;
-                this.bucket.currentDir = '';
-                this.bucket.marker = '';
-                this.bucket.dirs = [];
-                this.bucket.files = [];
-                this.endable = false;
-                this.bucket.isprivate = (this.privatebucket && this.privatebucket.length > 0 && this.privatebucket.indexOf(this.bucket.name) !== -1);
+                this.bucket = new Bucket(bucketname);
+                this.bucket.checkPrivate(this.privatebucket);
 
-                if (this.bucket.name.indexOf('__app__') !== 0) {
-                    this.getDomains();
-                    this.bucket.dirs.push('');
-                    this.bucket.dirs.push(withoutDelimiter);
-                    this.bucket.withoutDelimiterFiles = [];
-                    this.getDir();
-                    this.getResources();
-
-                    this.endable = true;
-                }
+                this.getDomains();
+                this.getDir();
+                this.getResources();
             },
             getDomains() {
                 this.doRequsetGet(Constants.method.getDomains, {tbl: this.bucket.name}, (response) => {
                     if (!response)
                         return;
 
-                    this.bucket.domains = response.data;
-
-                    if (this.bucket.domains && this.bucket.domains.length > 0) {
-                        //默认选择最后一个域名
-                        this.bucket.domain = this.bucket.domains[this.bucket.domains.length - 1];
-                    } else {
-                        if (this.customedomain && this.customedomain[this.bucket.name]) {
-                            this.bucket.domain = this.customedomain[this.bucket.name];
-                        } else {
-                            this.bucket.domain = '';
-                        }
-                    }
+                    this.bucket.setDomains(response.data, this.customeDomains);
                 });
             },
             /**
@@ -181,17 +145,9 @@
                     if (!response)
                         return;
 
-                    if (response.data.commonPrefixes) {
-                        this.bucket.dirs = this.bucket.dirs.concat(response.data.commonPrefixes);
-                    }
+                    this.bucket.setDirs(response.data);
 
-                    if (response.data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
-                        this.bucket.withoutDelimiterFiles = this.bucket.withoutDelimiterFiles.concat(response.data.items);
-                    }
-
-                    if (response.data.marker) {
-                        this.getDir(response.data.marker);
-                    }
+                    response.data.marker && this.getDir(response.data.marker);
                 });
             },
             /**
@@ -216,9 +172,8 @@
                     if (!response)
                         return;
 
-                    this.bucket.files = this.bucket.marker ? this.bucket.files.concat(response.data.items) : response.data.items;
-
-                    this.bucket.marker = response.data.marker ? response.data.marker : '';
+                    this.bucket.setResources(response.data);
+                    this.isLoaded = true;
                 });
             },
             /**
@@ -233,11 +188,11 @@
              * Dir 组件 搜索
              * @param search
              */
-            doDirSearch: function (search) {
+            doDirTag: function (search) {
                 this.bucket.currentDir = search;
                 this.bucket.marker = '';
 
-                if (search === withoutDelimiter) {
+                if (search === Constants.Key.withoutDelimiter) {
                     this.bucket.files = this.bucket.withoutDelimiterFiles;
                 } else {
                     this.doSearch(this.bucket.currentDir);
@@ -247,7 +202,7 @@
                 if (this.setup_deleteNoAsk) {
                     this.doRemove();
                 } else {
-                    this.deleteNoAskModel = true;
+                    this.Model_DeleteAsk = true;
                 }
             },
             doRemove() {
@@ -270,7 +225,6 @@
              * @param action 触发的动作,upload/remove
              */
             onTableUpdate(ret, action) {
-                console.log(ret, action);
                 let keyword = '';
                 if (ret && ret.key) {
                     keyword = util.getPrefix(ret.key);
