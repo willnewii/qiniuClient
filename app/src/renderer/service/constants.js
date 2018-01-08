@@ -10,7 +10,9 @@ export const method = {
 };
 
 export const Key = {
-    withoutDelimiter: '__withoutDelimiter__'
+    withoutDelimiter: '__withoutDelimiter__',
+    app_setup: '__app__setup__',
+    app_logout: '__app__logout__'
 };
 
 export const PageName = {

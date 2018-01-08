@@ -14,15 +14,6 @@ class API {
         this.view = view;
     }
 
-    method = {
-        //列举一个账号的所有空间
-        getBuckets: 'http://rs.qbox.me/buckets',
-        //获取一个空间绑定的域名列表
-        getDomains: 'http://api.qiniu.com/v6/domain/list',
-        //获取目录(是通过公共前缀模拟出的效果)
-        getResources: 'http://rsf.qbox.me/list',
-    };
-
     post(url, param) {
         //config.data = param;
         // return axios.post("", null, config);
@@ -47,9 +38,9 @@ class API {
         this.view.$Loading.start();
 
         let regStr = /^http.*(qiniu.com|qbox.me)/g;
-        if(regStr.test(url)){
+        if (regStr.test(url)) {
             config.headers.Authorization = cloudStorage.httpAuthorization(url);
-        }else{
+        } else {
             delete config.headers.Authorization;
         }
 

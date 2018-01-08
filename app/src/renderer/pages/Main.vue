@@ -127,11 +127,11 @@
                     info: ''
                 },
                 menus: [{
-                    name: '__app__setup__',
+                    name: Constants.Key.app_setup,
                     icon: 'ios-gear',
                     title: '设置'
                 }, {
-                    name: '__app__logout__',
+                    name: Constants.Key.app_logout,
                     icon: 'android-exit',
                     title: '注销'
                 }]
@@ -191,7 +191,7 @@
                                 callback(data);
                             }
                         } else {
-                            this.$router.push({path: 'login'});
+                            this.$router.push({path: Constants.PageName.login});
                         }
                     }
                 });
@@ -203,13 +203,13 @@
                         this.selectBuckets(this.buckets[0]);
                     } else {
                         this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
-                        this.$router.push({path: 'login'});
+                        this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
             selectBuckets(name) {
                 this.bucketname = name;
-                if (name === '__app__logout__') {
+                if (name === Constants.Key.app_logout) {
                     this.$Modal.confirm({
                         title: '登出该账号?',
                         render: (h) => {
@@ -230,11 +230,11 @@
                         },
                         onOk: () => {
                             storage.clear(() => {
-                                this.$router.push({path: '/login'});
+                                this.$router.push({path: Constants.PageName.login});
                             });
                         }
                     });
-                } else if (name === '__app__setup__') {
+                } else if (name === Constants.Key.app_setup) {
                     this.$router.push({name: Constants.PageName.setup});
                 } else {
                     this.$router.push({name: Constants.PageName.bucketPage, query: {bucketname: name}});

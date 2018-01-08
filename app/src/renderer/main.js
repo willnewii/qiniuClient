@@ -1,8 +1,8 @@
-import Vue from 'vue'
+import Vue from 'vue';
 
-import Router from 'vue-router'
-import Electron from 'vue-electron'
-import VueLazyload from 'vue-lazyload'
+import Router from 'vue-router';
+import Electron from 'vue-electron';
+import VueLazyload from 'vue-lazyload';
 import axios from 'axios';
 
 import iView from 'iview';
@@ -15,8 +15,8 @@ Vue.use(VueLazyload);
 
 Vue.config.debug = false;
 
-import routes from './routes'
-import store from './vuex/store'
+import routes from './routes';
+import store from './vuex/store';
 
 const router = new Router({
     scrollBehavior: () => ({y: 0}),
@@ -34,14 +34,16 @@ Vue.filter('getfileNameByPath', function (value) {
 axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
-    if (error.response.status === 401) {
+    if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
+    } else {
+        return Promise.reject(error);
     }
 });
 
 window.ondragover = function (e) {
     e.preventDefault();
-    return false
+    return false;
 };
 
 import App from './App';

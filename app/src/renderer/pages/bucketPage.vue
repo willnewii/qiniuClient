@@ -102,8 +102,10 @@
         },
         mounted() {
             if (this.$route.query && this.$route.query.bucketname) {
-                if (this.bucket && this.$route.query.bucketname !== this.bucket.name) {
+                if (!this.bucket || this.$route.query.bucketname !== this.bucket.name) {
                     this.initBucket(this.$route.query.bucketname);
+                } else {
+                    console.log('mounted: error');
                 }
             }
         },
@@ -120,61 +122,20 @@
                 this.getResources();
             },
             getDomains() {
-                this.doRequsetGet(Constants.method.getDomains, {tbl: this.bucket.name}, (response) => {
-                    if (!response)
-                        return;
-
-                    this.bucket.setDomains(response.data, this.customeDomains);
-                });
+                this.bucket.getDomains(this);
             },
             /**
              * 获取该bucket下的目录
              * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
              */
             getDir(marker) {//获取目录
-                let data = {
-                    bucket: this.bucket.name,
-                    delimiter: '/',
-                    limit: 1000
-                };
-                if (marker) {
-                    data.marker = marker;
-                }
-
-                this.doRequset(Constants.method.getResources, data, (response) => {
-                    if (!response)
-                        return;
-
-                    this.bucket.setDirs(response.data);
-
-                    response.data.marker && this.getDir(response.data.marker);
-                });
+                this.bucket.getDirs(this);
             },
             /**
              * 获取指定前缀文件列表
              */
             getResources(keyword) {
-                this.bucket.selection = [];
-
-                let data = {
-                    bucket: this.bucket.name,
-                    limit: 30
-                };
-
-                if (keyword) {
-                    data.prefix = keyword;
-                }
-
-                if (this.bucket.marker) {
-                    data.marker = this.bucket.marker;
-                }
-                this.doRequset(Constants.method.getResources, data, (response) => {
-                    if (!response)
-                        return;
-
-                    this.bucket.setResources(response.data);
-                    this.isLoaded = true;
-                });
+                this.bucket.getResources(this, keyword);
             },
             /**
              *  dir：目录

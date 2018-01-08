@@ -51,12 +51,12 @@ class Bucket {
      * @param domains
      * @param customeDomains
      */
-    setDomains(domains , customeDomains) {
-        if(domains && domains.length > 0){
+    setDomains(domains, customeDomains) {
+        if (domains && domains.length > 0) {
             this.domains = domains;
             //默认选择最后一个域名
             this.domain = this.domains[this.domains.length - 1];
-        }else{
+        } else {
             if (customeDomains && customeDomains[this.name]) {
                 this.domain = customeDomains[this.name];
             } else {
@@ -65,11 +65,20 @@ class Bucket {
         }
     }
 
+    getDomains(vm) {
+        vm.doRequsetGet(Constants.method.getDomains, {tbl: this.name}, (response) => {
+            if (!response)
+                return;
+
+            this.setDomains(response.data, vm.customeDomains);
+        });
+    }
+
     /**
      * 添加dirs
      * @param data
      */
-    setDirs(data){
+    setDirs(data) {
         if (data.commonPrefixes) {
             this.dirs = this.dirs.concat(data.commonPrefixes);
         }
@@ -80,12 +89,62 @@ class Bucket {
     }
 
     /**
+     * 获取dirs
+     * @param marker
+     */
+    getDirs(vm, marker) {//获取目录
+        let data = {
+            bucket: this.name,
+            delimiter: '/',
+            limit: 1000
+        };
+        if (marker) {
+            data.marker = marker;
+        }
+
+        vm.doRequset(Constants.method.getResources, data, (response) => {
+            if (!response)
+                return;
+
+            this.setDirs(response.data);
+
+            response.data.marker && this.getDirs(vm, response.data.marker);
+        });
+    }
+
+    /**
      * 添加files
      * @param data
      */
-    setResources(data){
+    setResources(data) {
         this.files = this.marker ? this.files.concat(data.items) : data.items;
         this.marker = data.marker ? data.marker : '';
+    }
+
+    getResources(vm, keyword) {
+        //重置多选数组
+        this.selection = [];
+
+        let param = {
+            bucket: this.name,
+            limit: 30
+        };
+
+        if (keyword) {
+            param.prefix = keyword;
+        }
+
+        if (this.marker) {
+            param.marker = this.marker;
+        }
+
+        vm.doRequset(Constants.method.getResources, param, (response) => {
+            if (!response)
+                return;
+
+            this.setResources(response.data);
+            vm.isLoaded = true;
+        });
     }
 }
 
