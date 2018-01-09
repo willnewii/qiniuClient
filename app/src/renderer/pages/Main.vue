@@ -236,7 +236,7 @@
                 } else if (name === Constants.Key.app_setup) {
                     this.$router.push({name: Constants.PageName.setup});
                 } else {
-                    this.$router.push({name: Constants.PageName.bucketPage, query: {bucketname: name}});
+                    this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                 }
             },
         }
