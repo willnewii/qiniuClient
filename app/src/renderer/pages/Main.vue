@@ -67,17 +67,18 @@
                     <Icon type="navicon" size="32"></Icon>
                 </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
-                      @on-select="selectBuckets" :active-name="bucketname">
+                      @on-select="selectBuckets" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
-                            <Icon :style="iconWidth" :size="iconSize"
+                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
                                   :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"></Icon>
                             <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
                         <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
-                            <Icon :style="iconWidth" :size="iconSize" :type="item.icon"></Icon>
+                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
+                                  :type="item.icon"></Icon>
                             <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item.title}}</span>
                         </Menu-item>
                     </Menu-group>
@@ -91,7 +92,7 @@
                 </div>
             </i-col>
             <i-col :span="menuSpace.right">
-                <router-view :bucketname="bucketname"></router-view>
+                <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
     </div>
@@ -112,14 +113,12 @@
         mixins: [mixin_base],
         data() {
             return {
-                search: '',
-                bucketname: '',
-                iconSize: 25,
-                iconWidth: {
+                bucketName: '',
+                menuState: true,
+                iconStyle: {
                     width: '25px'
                 },
                 appVersion: pkg.version,
-                menuState: true,
                 version: {
                     github: Constants.URL.github,
                     url: '',
@@ -208,7 +207,7 @@
                 });
             },
             selectBuckets(name) {
-                this.bucketname = name;
+                this.bucketName = name;
                 if (name === Constants.Key.app_logout) {
                     this.$Modal.confirm({
                         title: '登出该账号?',

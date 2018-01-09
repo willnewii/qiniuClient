@@ -8,15 +8,9 @@
 </style>
 <style lang="scss">
     .primary-line-btn {
-        /*        background: #FFFFFF;
-                color: #333333;
-                border-color: rgba(45, 156, 255, 0.45);*/
     }
 
     .error-line-btn {
-        /*        background: #FFFFFF;
-                color: #333333;
-                border-color: rgba(255, 66, 20, 0.45);*/
     }
 </style>
 <template>

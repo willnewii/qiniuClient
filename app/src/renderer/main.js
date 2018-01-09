@@ -36,9 +36,8 @@ axios.interceptors.response.use((response) => {
 }, (error) => {
     if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
-    } else {
-        return Promise.reject(error);
     }
+    return Promise.reject(error);
 });
 
 window.ondragover = function (e) {

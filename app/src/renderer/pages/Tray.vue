@@ -53,12 +53,13 @@
 </template>
 
 <script>
-    import {mapGetters, mapActions} from 'vuex'
-    import * as types from '../vuex/mutation-types'
-    import * as util from '../util/util'
-    import * as cloudStorage from '../service/cloudStorage'
-    import storage from 'electron-json-storage'
-    import api from '../api/API'
+    import {mapGetters, mapActions} from 'vuex';
+    import * as types from '../vuex/mutation-types';
+    import * as util from '../util/util';
+    import * as Constants from '../service/constants';
+    import * as cloudStorage from '../service/cloudStorage';
+    import storage from 'electron-json-storage';
+    import api from '../api/API';
 
     let API, ipc;
 
@@ -71,7 +72,7 @@
                 logs: [],
                 current: 1,
                 config: {}
-            }
+            };
         },
         computed: {
             ...mapGetters({
@@ -94,7 +95,7 @@
                     if (data.access_key && data.secret_key) {
                         cloudStorage.init({access_key: data.access_key, secret_key: data.secret_key});
 
-                        API.get(API.method.getDomains, {tbl: this.bucket_name}).then((response) => {
+                        API.get(Constants.method.getDomains, {tbl: this.bucket_name}).then((response) => {
                             that.domains = response.data;
                         });
                     } else {
@@ -107,13 +108,13 @@
 
                 storage.get('app_setup', (error, app) => {
 
-                    if(!app.bucket_name || !app.bucket_dir){
+                    if (!app.bucket_name || !app.bucket_dir) {
                         ipc.send('show-Notifier', {
                             title: 'qiniu-client',
                             message: '请先设置上传空间',
                         });
                         this.updateStatus('');
-                        return ;
+                        return;
                     }
 
                     if (!error) {
@@ -125,7 +126,7 @@
 
             ipc.on('log', (event, log) => {
                 console.log(log);
-            })
+            });
         },
         methods: {
             ...mapActions([
@@ -202,6 +203,6 @@
                 return new RegExp(/\.(png|jpe?g|gif|svg)(\?.*)?$/).test(file);
             }
         }
-    }
+    };
 </script>
 

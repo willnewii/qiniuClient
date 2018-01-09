@@ -73,7 +73,7 @@
         },
         mixins: [mixin_base],
         props: {
-            bucketname: {
+            bucketName: {
                 type: String,
                 default: ''
             }
@@ -94,16 +94,16 @@
             })
         },
         watch: {
-            bucketname: function (val, oldVal) {
+            bucketName: function (val, oldVal) {
                 if (val && oldVal !== val) {
                     this.initBucket(val);
                 }
             }
         },
         mounted() {
-            if (this.$route.query && this.$route.query.bucketname) {
-                if (!this.bucket || this.$route.query.bucketname !== this.bucket.name) {
-                    this.initBucket(this.$route.query.bucketname);
+            if (this.$route.query && this.$route.query.bucketName) {
+                if (!this.bucket || this.$route.query.bucketName !== this.bucket.name) {
+                    this.initBucket(this.$route.query.bucketName);
                 } else {
                     console.log('mounted: error');
                 }
@@ -113,8 +113,8 @@
             /**
              * 初始化空间信息
              */
-            initBucket(bucketname) {
-                this.bucket = new Bucket(bucketname);
+            initBucket(bucketName) {
+                this.bucket = new Bucket(bucketName);
                 this.bucket.checkPrivate(this.privatebucket);
 
                 this.getDomains();

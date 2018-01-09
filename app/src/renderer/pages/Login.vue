@@ -14,10 +14,10 @@
         <h3 class="title">设置七牛云密钥</h3>
         <Form :model="formItem" ref="formItem" :rules="ruleItem" :label-width="150">
             <Form-item label="ACCESS_KEY" prop="access_key">
-                <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"></Input>
+                <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
             </Form-item>
             <Form-item label="SECRET_KEY" prop="secret_key">
-                <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"></Input>
+                <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
             </Form-item>
             <Form-item>
                 <Button type="primary" @click="handleSubmit('formItem')">设置</Button>
@@ -30,6 +30,7 @@
 </template>
 <script>
     import * as cloudStorage from '../service/cloudStorage'
+    import * as Constants from '../service/constants'
 
     const storage = require('electron-json-storage');
 
@@ -69,19 +70,16 @@
             },
             validateToken(access_key, secret_key) {
                 cloudStorage.init({access_key: access_key, secret_key: secret_key});
-
-                API.get(API.method.getBuckets).then((response) => {
+                API.get(Constants.method.getBuckets).then((response) => {
                     storage.set('qiniu_key', {
                         access_key: access_key,
                         secret_key: secret_key
                     }, (error) => {
-                        console.log(error);
                         if (!error) {
                             this.$router.push({path: '/'});
                         }
                     });
                 }).catch((error) => {
-                    console.log(error);
                     this.$Notice.error({
                         title: '抱歉',
                         desc: '七牛key设置失败.请检查你输入的key.' + error.toString()
@@ -89,7 +87,7 @@
                 });
             },
             openBrowser() {
-                this.$electron.shell.openExternal('https://portal.qiniu.com/signin');
+                this.$electron.shell.openExternal('https://portal.qiniu.com/user/key');
             }
         }
     }
