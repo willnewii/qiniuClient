@@ -40,7 +40,8 @@
                     v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
-            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0"  placeholder="请填入空间域名" />
+            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0"
+                   placeholder="请填入空间域名"/>
         </div>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
@@ -59,7 +60,8 @@
             </i-button>
         </div>
 
-        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)" v-if="bucket.name"/>
+        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
+               v-if="bucket.name"/>
 
         <Modal v-model="uploadModal.isShow" title="上传对话框" @on-ok="preUploadFile"
                @on-cancel="initModal">
@@ -77,13 +79,14 @@
             </div>
 
             <div class="modal-filekey" v-for="_path of filePaths">
-                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByPath}}
+                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path |
+                getfileNameByPath}}
             </div>
         </Modal>
     </div>
 </template>
 <script>
-    import {util, cloudStorage, Constants} from '../../service/index';
+    import {util, Constants} from '../../service/index';
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../../vuex/mutation-types';
 
@@ -199,7 +202,12 @@
                     case 1://抓取文件
                         this.filePaths = [];
 
-                        this.uploadModal.path = this.$electron.clipboard.readText();
+                        if (this.$electron.clipboard.readText()) {
+                            this.uploadModal.path = this.$electron.clipboard.readText();
+                            this.filePaths[0] = this.uploadModal.path;
+                        } else {
+                            this.uploadModal.path = '';
+                        }
                         this.uploadModal.type = 'fetch';
                         this.uploadModal.isShow = true;
                         break;
@@ -238,19 +246,14 @@
                 });
 
                 let param = {
-                    bucket: this.bucket.name,
-                    key: key,
                     path: filePath,
+                    key: key,
                     progressCallback: (progress) => {
                         this.$Loading.update(progress);
                     }
                 };
 
-                if (this.uploadModal.type === 'fetch') {
-                    cloudStorage.fetch(param, this.handleResult);
-                } else {
-                    cloudStorage.upload(param, this.handleResult);
-                }
+                this.bucket.createFile(param, this.uploadModal.type, this.handleResult);
             },
             handleResult(err, ret) {
                 if (!err) {

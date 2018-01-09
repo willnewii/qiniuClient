@@ -1,7 +1,6 @@
 import {mapGetters} from 'vuex';
 import * as types from '../vuex/mutation-types';
 import * as util from '../util/util';
-import {cloudStorage} from '../service/index';
 
 export default {
     computed: {
@@ -31,15 +30,7 @@ export default {
          * 获取资源链接
          */
         getResoureUrl(index, key) {
-            let fileName = key ? key : this.bucket.files[index].key;
-
-            let url;
-            if (this.bucket.isprivate) {
-                url = cloudStorage.getPrivateUrl(this.bucket.domain, fileName, this.setup_deadline);
-            } else {
-                url = util.getQiniuUrl(this.bucket.domain, fileName);
-            }
-            return url;
+            return this.bucket.getResoureUrl(index, key, this.setup_deadline);
         },
         show(index) {
             this.$electron.shell.openExternal(this.getResoureUrl(index));
@@ -92,13 +83,10 @@ export default {
             }
         },
         doRemove(callback) {
-            cloudStorage.remove({
-                bucket: this.bucket.name,
+            this.bucket.removeFile({
                 key: this.deleteKey
             }, (ret) => {
-                if (callback) {
-                    callback(ret);
-                }
+                callback && callback(ret);
             });
         },
     }

@@ -4,7 +4,7 @@
 
 import axios from 'axios';
 import config from './config';
-import * as cloudStorage from '../service/cloudStorage';
+import * as CloudStorage from '../bean/CloudStorage';
 
 import Qs from 'qs';
 
@@ -39,7 +39,7 @@ class API {
 
         let regStr = /^http.*(qiniu.com|qbox.me)/g;
         if (regStr.test(url)) {
-            config.headers.Authorization = cloudStorage.httpAuthorization(url);
+            config.headers.Authorization = CloudStorage.getHttpAuthorization(url);
         } else {
             delete config.headers.Authorization;
         }

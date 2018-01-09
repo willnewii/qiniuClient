@@ -99,7 +99,7 @@
 </template>
 <script>
     import {mapGetters, mapActions} from 'vuex';
-    import * as cloudStorage from '../service/cloudStorage';
+    import * as CloudStorage from '../bean/CloudStorage';
     import * as types from '../vuex/mutation-types';
     import storage from 'electron-json-storage';
     import pkg from '../../../package.json';
@@ -182,16 +182,12 @@
                 });
             },
             initKEY(callback) {
-                storage.get(types.APP.qiniu_key, (error, data) => {
-                    if (!error) {
-                        if (data.access_key && data.secret_key) {
-                            if (callback) {
-                                cloudStorage.init({access_key: data.access_key, secret_key: data.secret_key});
-                                callback(data);
-                            }
-                        } else {
-                            this.$router.push({path: Constants.PageName.login});
-                        }
+                CloudStorage.getKey((data) => {
+                    if (data) {
+                        CloudStorage.initStorage(data);
+                        callback && callback();
+                    } else {
+                        this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },

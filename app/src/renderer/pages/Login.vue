@@ -29,12 +29,12 @@
     </div>
 </template>
 <script>
-    import * as cloudStorage from '../service/cloudStorage'
-    import * as Constants from '../service/constants'
+    import * as CloudStorage from '../bean/CloudStorage';
+    import * as Constants from '../service/constants';
 
     const storage = require('electron-json-storage');
 
-    import api from '../api/API'
+    import api from '../api/API';
 
     let API;
 
@@ -49,7 +49,7 @@
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
                 }
-            }
+            };
         },
         computed: {},
         created: function () {
@@ -59,17 +59,17 @@
             handleSubmit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.validateToken(this.formItem.access_key, this.formItem.secret_key)
+                        this.validateToken(this.formItem.access_key, this.formItem.secret_key);
                     } else {
                         console.log('表单不能提交');
                     }
-                })
+                });
             },
             handleReset(name) {
                 this.$refs[name].resetFields();
             },
             validateToken(access_key, secret_key) {
-                cloudStorage.init({access_key: access_key, secret_key: secret_key});
+                CloudStorage.initStorage({access_key: access_key, secret_key: secret_key});
                 API.get(Constants.method.getBuckets).then((response) => {
                     storage.set('qiniu_key', {
                         access_key: access_key,
@@ -90,5 +90,5 @@
                 this.$electron.shell.openExternal('https://portal.qiniu.com/user/key');
             }
         }
-    }
+    };
 </script>

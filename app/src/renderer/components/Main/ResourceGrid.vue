@@ -93,8 +93,6 @@
     import * as types from '../../vuex/mutation-types'
     import mixin_resource from '../../mixins/mixin-resource'
 
-    import {cloudStorage} from '../../service/index'
-
     export default {
         name: 'ResourceGrid',
         mixins: [mixin_resource],

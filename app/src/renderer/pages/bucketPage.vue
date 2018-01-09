@@ -17,7 +17,7 @@
         <ClientHeader :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></ClientHeader>
 
         <div class="dir-layout">
-            <DirTag :bucket="bucket" @on-click="doDirTag"></DirTag>
+            <DirTag :bucket="bucket" @on-click="changeDir"></DirTag>
 
             <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
                     style="margin-right: 10px;background: #FFFFFF;"
@@ -115,49 +115,27 @@
              */
             initBucket(bucketName) {
                 this.bucket = new Bucket(bucketName);
-                this.bucket.checkPrivate(this.privatebucket);
-
-                this.getDomains();
-                this.getDir();
-                this.getResources();
-            },
-            getDomains() {
-                this.bucket.getDomains(this);
-            },
-            /**
-             * 获取该bucket下的目录
-             * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
-             */
-            getDir(marker) {//获取目录
-                this.bucket.getDirs(this);
+                this.bucket.init(this);
             },
             /**
              * 获取指定前缀文件列表
              */
             getResources(keyword) {
-                this.bucket.getResources(this, keyword);
+                this.bucket.getResources(keyword);
             },
             /**
              *  dir：目录
              *  search：关键字
              */
             doSearch: function (dir, search) {
-                this.bucket.marker = '';
-                this.getResources(search ? dir + search : dir);
+                this.bucket.search(dir, search);
             },
             /**
-             * Dir 组件 搜索
-             * @param search
+             * 切换目录
+             * @param dir
              */
-            doDirTag: function (search) {
-                this.bucket.currentDir = search;
-                this.bucket.marker = '';
-
-                if (search === Constants.Key.withoutDelimiter) {
-                    this.bucket.files = this.bucket.withoutDelimiterFiles;
-                } else {
-                    this.doSearch(this.bucket.currentDir);
-                }
+            changeDir: function (dir) {
+                this.bucket.setCurrentDir(dir);
             },
             removes() {
                 if (this.setup_deleteNoAsk) {
@@ -186,12 +164,13 @@
              * @param action 触发的动作,upload/remove
              */
             onTableUpdate(ret, action) {
-                let keyword = '';
+                let dir = '';
                 if (ret && ret.key) {
-                    keyword = util.getPrefix(ret.key);
-                    this.bucket.currentDir = keyword;
+                    dir = util.getPrefix(ret.key);
+                    this.bucket.setCurrentDir(dir)
+                }else{
+                    this.getResources();
                 }
-                this.getResources(keyword);
             }
         }
 

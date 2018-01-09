@@ -1,6 +1,7 @@
 import {Constants} from '../service/index';
+import * as cloudStorage from '../service/cloudStorage';
 
-const delimiter = '/';
+const DELIMITER = '/';
 
 class Bucket {
 
@@ -37,11 +38,28 @@ class Bucket {
     }
 
     /**
-     * 检测是否是私密空间
-     * @param privatebuckets
+     * 根据privateBuckets判断是否是私有空间
+     * 获取域名
+     * 获取目录
+     * 获取默认资源列表
+     * @param vm
      */
-    checkPrivate(privatebuckets) {
-        this.isprivate = (privatebuckets && privatebuckets.length > 0 && privatebuckets.indexOf(this.name) !== -1);
+    init(vm) {
+        this.vm = vm;
+
+        this.checkPrivate(vm.privatebucket);
+
+        this.getDomains();
+        this.getDirs();
+        this.getResources();
+    }
+
+    /**
+     * 检测是否是私密空间
+     * @param privateBuckets
+     */
+    checkPrivate(privateBuckets) {
+        this.isprivate = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1);
     }
 
     /**
@@ -65,12 +83,12 @@ class Bucket {
         }
     }
 
-    getDomains(vm) {
-        vm.doRequsetGet(Constants.method.getDomains, {tbl: this.name}, (response) => {
+    getDomains() {
+        this.vm.doRequsetGet(Constants.method.getDomains, {tbl: this.name}, (response) => {
             if (!response)
                 return;
 
-            this.setDomains(response.data, vm.customeDomains);
+            this.setDomains(response.data, this.vm.customeDomains);
         });
     }
 
@@ -89,26 +107,26 @@ class Bucket {
     }
 
     /**
-     * 获取dirs
-     * @param marker
+     * 获取该bucket下的目录
+     * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
      */
-    getDirs(vm, marker) {//获取目录
+    getDirs(marker) {//获取目录
         let data = {
             bucket: this.name,
-            delimiter: '/',
+            delimiter: DELIMITER,
             limit: 1000
         };
         if (marker) {
             data.marker = marker;
         }
 
-        vm.doRequset(Constants.method.getResources, data, (response) => {
+        this.vm.doRequset(Constants.method.getResources, data, (response) => {
             if (!response)
                 return;
 
             this.setDirs(response.data);
 
-            response.data.marker && this.getDirs(vm, response.data.marker);
+            response.data.marker && this.getDirs(response.data.marker);
         });
     }
 
@@ -121,7 +139,7 @@ class Bucket {
         this.marker = data.marker ? data.marker : '';
     }
 
-    getResources(vm, keyword) {
+    getResources(keyword) {
         //重置多选数组
         this.selection = [];
 
@@ -138,14 +156,90 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        vm.doRequset(Constants.method.getResources, param, (response) => {
+        this.vm.doRequset(Constants.method.getResources, param, (response) => {
             if (!response)
                 return;
 
             this.setResources(response.data);
-            vm.isLoaded = true;
+            this.vm.isLoaded = true;
         });
     }
+
+    /**
+     * 搜索操作
+     *  dir：目录
+     *  search：关键字
+     */
+    search(dir, search) {
+        this.marker = '';
+        this.getResources(search ? dir + search : dir);
+    }
+
+    /**
+     * 设置当前目录
+     * @param dir
+     */
+    setCurrentDir(dir) {
+        this.currentDir = dir;
+        this.marker = '';
+
+        if (dir === Constants.Key.withoutDelimiter) {
+            this.files = this.withoutDelimiterFiles;
+        } else {
+            this.search(this.currentDir);
+        }
+    }
+
+    createFile(_param, type, callback) {
+        let param = {
+            bucket: this.name
+        };
+        Object.assign(param, _param);
+
+        if (type === 'fetch') {
+            cloudStorage.fetch(param, callback);
+        } else {
+            cloudStorage.upload(param, callback);
+        }
+    }
+
+    removeFile(_param, callback) {
+        let param = {
+            bucket: this.name
+        };
+        Object.assign(param, _param);
+
+        cloudStorage.remove(param, (ret) => {
+            callback && callback(ret);
+        });
+    }
+
+    /**
+     * 返回资源真实链接
+     * @param index
+     * @param key
+     * @param deadline  私有模式,文件有效期
+     * @returns {*}
+     */
+    getResoureUrl(index, key, deadline) {
+        let fileName = key ? key : this.files[index].key;
+
+        let url;
+        if (this.isprivate) {
+            url = cloudStorage.getPrivateUrl(this.domain, fileName, deadline);
+        } else {
+            url = getQiniuUrl(this.domain, fileName);
+        }
+        return url;
+    }
+}
+
+function getQiniuUrl(domain, key) {
+    return Constants.protocol + domain + '/' + encodeURI(key);
+}
+
+function initBucket(){
+    console.log('aaaa');
 }
 
 export default Bucket;
