@@ -30,6 +30,7 @@ export const URL = {
 
 export const Event = {
     removes: 'removes',
+    remove: 'remove',
     download: 'download'
 };
 

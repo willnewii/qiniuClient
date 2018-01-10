@@ -24,6 +24,11 @@ export default {
         };
     },
     created: function () {
+        EventBus.$off(Constants.Event.remove);
+        EventBus.$on(Constants.Event.remove, () => {
+            this.remove();
+        });
+
         EventBus.$off(Constants.Event.removes);
         EventBus.$on(Constants.Event.removes, () => {
             this.removes();
@@ -74,41 +79,41 @@ export default {
                 this.$Message.info('文件下载完成');
             }
         },
-        notifiRemove(item) {
+        removeMsg(item) {
             this.$Message.info('移除成功');
 
             this.$emit('on-update', null, 'remove');
         },
+        resourceRemove(index) {
+            this.deleteItem = this.bucket.files[index];
+            this.$parent.remove(this.deleteItem.key);
+        },
         /**
          * 删除单个文件
-         * @param index
          */
-        remove(index) {
-            this.deleteItem = this.bucket.files[index];
-            this.$parent.removes();
+        remove() {
+            if (this.deleteItem) {
+                let item = this.deleteItem;
+                this.deleteItem = null;
+                this.doRemove(item, () => {
+                    this.removeMsg(item);
+                });
+            }
         },
         /**
          * 批量删除
          */
         removes() {
-            if (this.deleteItem) {
-                let item = this.deleteItem;
-                this.deleteItem = null;
-                this.doRemove(item, () => {
-                    this.notifiRemove(item);
-                });
-            } else {
-                let item = this.bucket.selection[0];
+            let item = this.bucket.selection[0];
 
-                this.doRemove(item, () => {
-                    this.bucket.selection.shift();
-                    if (this.bucket.selection.length > 0) {
-                        this.removes();
-                    } else {
-                        this.notifiRemove(item);
-                    }
-                });
-            }
+            this.doRemove(item, () => {
+                this.bucket.selection.shift();
+                if (this.bucket.selection.length > 0) {
+                    this.removes();
+                } else {
+                    this.removeMsg(item);
+                }
+            });
         },
         /**
          * 删除操作

@@ -100,7 +100,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.remove(item.index);
+                                            this.resourceRemove(item.index);
                                         }
                                     }
                                 }, '删除')

@@ -73,7 +73,7 @@
                         <Button type="ghost" shape="circle" size="small" icon="clipboard"
                                 @click.stop="copy(index,$event)" style="background: #FFFFFF"></Button>
                         <Button type="error" shape="circle" size="small" icon="trash-b"
-                                @click.stop="remove(index,$event)"></Button>
+                                @click.stop="resourceRemove(index,$event)"></Button>
                     </div>
                     <span class="name">{{file.key | getfileNameByPath}}</span>
                 </div>

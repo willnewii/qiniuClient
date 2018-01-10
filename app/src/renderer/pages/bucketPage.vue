@@ -43,11 +43,20 @@
                         @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="isLoaded && bucket.showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
+        <!-- 多选-->
         <Modal
                 v-model="Model_DeleteAsk"
                 title="确认删除文件？"
-                @on-ok="doRemove">
+                @on-ok="doRemoves">
             <p v-for="file in bucket.selection">{{file.key}}</p>
+        </Modal>
+        <!-- 单选-->
+        <Modal
+                v-model="Model_DeleteAsk2"
+                title="确认删除文件？"
+                @on-ok="doRemove"
+                @on-cancel="cancelModal">
+            <p>{{Model_DeleteAskKey}}</p>
         </Modal>
     </div>
 </template>
@@ -83,7 +92,9 @@
                 bucket: null,
                 //控制显示时机,不然resource-table/grid 组件在初始化时会出现高度计算错误.
                 isLoaded: false,
-                Model_DeleteAsk: false
+                Model_DeleteAsk: false,
+                Model_DeleteAsk2: false,
+                Model_DeleteAskKey: ''
             };
         },
         computed: {
@@ -139,13 +150,28 @@
             },
             removes() {
                 if (this.setup_deleteNoAsk) {
-                    this.doRemove();
+                    this.doRemoves();
                 } else {
                     this.Model_DeleteAsk = true;
                 }
             },
-            doRemove() {
+            doRemoves() {
                 EventBus.$emit(Constants.Event.removes);
+            },
+            remove(key) {
+                if (this.setup_deleteNoAsk) {
+                    this.doRemove();
+                } else {
+                    this.Model_DeleteAskKey = key;
+                    this.Model_DeleteAsk2 = true;
+                }
+            },
+            doRemove() {
+                this.Model_DeleteAskKey = '';
+                EventBus.$emit(Constants.Event.remove);
+            },
+            cancelModal() {
+                this.Model_DeleteAskKey = '';
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);
