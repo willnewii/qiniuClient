@@ -164,12 +164,16 @@
              * @param action 触发的动作,upload/remove
              */
             onTableUpdate(ret, action) {
-                let dir = '';
-                if (ret && ret.key) {
-                    dir = util.getPrefix(ret.key);
-                    this.bucket.setCurrentDir(dir)
-                }else{
-                    this.getResources();
+                if (action === 'remove') {//如果是删除操作,直接更新当前目录
+                    this.getResources(this.bucket.currentDir);
+                } else {
+                    let dir = '';
+                    if (ret && ret.key) {
+                        dir = util.getPrefix(ret.key);
+                        this.bucket.setCurrentDir(dir);
+                    } else {
+                        this.getResources();
+                    }
                 }
             }
         }

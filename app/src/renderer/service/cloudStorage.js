@@ -86,7 +86,7 @@ function remove(params, callback) {
     bucketManager.delete(params.bucket, params.key, function (err, respBody, respInfo) {
         console.log(respBody, respInfo);
         if (!err) {
-            callback(respBody);
+            callback(respInfo);
         } else {
             console.log(err);
         }

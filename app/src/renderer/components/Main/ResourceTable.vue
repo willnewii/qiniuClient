@@ -18,12 +18,6 @@
         <Table ref="table" border :columns="columns" :context="self"
                :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"
                @on-selection-change="onSelectionChange"></Table>
-        <Modal
-                v-model="deleteNoAskModel"
-                title="确认删除文件？"
-                @on-ok="doRemove">
-            <p>{{deleteKey}}</p>
-        </Modal>
     </div>
 </template>
 <script>
@@ -116,24 +110,6 @@
             };
         },
         created() {
-            EventBus.$off(Constants.Event.removes);
-            EventBus.$on(Constants.Event.removes, () => {
-                this.removes();
-            });
-
-            EventBus.$off(Constants.Event.download);
-            EventBus.$on(Constants.Event.download, () => {
-                this.downloadFiles();
-            });
-
-            this.$electron.ipcRenderer.removeAllListeners('updateDownloadProgress');
-            this.$electron.ipcRenderer.on('updateDownloadProgress', (event, num) => {
-                this.$Loading.update(num * 100);
-                if (num === 1) {
-                    this.$Loading.finish();
-                    this.downloadFiles();
-                }
-            });
         },
         mounted() {
             this.setTableSize();

@@ -1,4 +1,5 @@
 import {mapGetters} from 'vuex';
+import {Constants, EventBus} from '../service/index';
 import * as types from '../vuex/mutation-types';
 import * as util from '../util/util';
 
@@ -19,11 +20,28 @@ export default {
     },
     data() {
         return {
-            deleteKey: '',
-            deleteNoAskModel: false
+            deleteItem: null
         };
     },
     created: function () {
+        EventBus.$off(Constants.Event.removes);
+        EventBus.$on(Constants.Event.removes, () => {
+            this.removes();
+        });
+
+        EventBus.$off(Constants.Event.download);
+        EventBus.$on(Constants.Event.download, () => {
+            this.downloadFiles();
+        });
+
+        this.$electron.ipcRenderer.removeAllListeners('updateDownloadProgress');
+        this.$electron.ipcRenderer.on('updateDownloadProgress', (event, num) => {
+            this.$Loading.update(num * 100);
+            if (num === 1) {
+                this.$Loading.finish();
+                this.downloadFiles();
+            }
+        });
     },
     methods: {
         /**
@@ -56,38 +74,51 @@ export default {
                 this.$Message.info('文件下载完成');
             }
         },
-        removes() {
-            this.deleteKey = this.bucket.selection[0].key;
+        notifiRemove(item) {
+            this.$Message.info('移除成功');
 
-            this.doRemove(() => {
-                this.bucket.selection.shift();
-                if (this.bucket.selection.length > 0) {
-                    this.removes();
-                } else {
-                    this.$Message.info('移除成功');
-                    if (!ret) {
-                        ret = {
-                            key: this.deleteKey
-                        };
-                    }
-                    this.$emit('on-update', ret, 'remove', event);
-                }
-            });
+            this.$emit('on-update', null, 'remove');
         },
-        remove(index, event) {
-            this.deleteKey = this.bucket.files[index].key;
-            if (this.setup_deleteNoAsk) {
-                this.doRemove();
+        /**
+         * 删除单个文件
+         * @param index
+         */
+        remove(index) {
+            this.deleteItem = this.bucket.files[index];
+            this.$parent.removes();
+        },
+        /**
+         * 批量删除
+         */
+        removes() {
+            if (this.deleteItem) {
+                let item = this.deleteItem;
+                this.deleteItem = null;
+                this.doRemove(item, () => {
+                    this.notifiRemove(item);
+                });
             } else {
-                this.deleteNoAskModel = true;
+                let item = this.bucket.selection[0];
+
+                this.doRemove(item, () => {
+                    this.bucket.selection.shift();
+                    if (this.bucket.selection.length > 0) {
+                        this.removes();
+                    } else {
+                        this.notifiRemove(item);
+                    }
+                });
             }
         },
-        doRemove(callback) {
-            this.bucket.removeFile({
-                key: this.deleteKey
-            }, (ret) => {
+        /**
+         * 删除操作
+         * @param item
+         * @param callback
+         */
+        doRemove(item, callback) {
+            this.bucket.removeFile({key: item.key}, (ret) => {
                 callback && callback(ret);
             });
-        },
+        }
     }
 };

@@ -1,5 +1,5 @@
 import {Constants} from '../service/index';
-import * as cloudStorage from '../service/cloudStorage';
+import * as qiniu from '../service/cloudStorage';
 
 const DELIMITER = '/';
 
@@ -197,9 +197,9 @@ class Bucket {
         Object.assign(param, _param);
 
         if (type === 'fetch') {
-            cloudStorage.fetch(param, callback);
+            qiniu.fetch(param, callback);
         } else {
-            cloudStorage.upload(param, callback);
+            qiniu.upload(param, callback);
         }
     }
 
@@ -209,7 +209,7 @@ class Bucket {
         };
         Object.assign(param, _param);
 
-        cloudStorage.remove(param, (ret) => {
+        qiniu.remove(param, (ret) => {
             callback && callback(ret);
         });
     }
@@ -226,7 +226,7 @@ class Bucket {
 
         let url;
         if (this.isprivate) {
-            url = cloudStorage.getPrivateUrl(this.domain, fileName, deadline);
+            url = qiniu.getPrivateUrl(this.domain, fileName, deadline);
         } else {
             url = getQiniuUrl(this.domain, fileName);
         }

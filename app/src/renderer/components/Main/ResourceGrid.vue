@@ -69,23 +69,16 @@
                     <span v-else class="image">其他类型</span>
                     <div class="btn">
                         <Button type="ghost" shape="circle" size="small" icon="ios-download"
-                                @click="handleDownload(index,$event)" style="background: #FFFFFF"></Button>
+                                @click.stop="handleDownload(index,$event)" style="background: #FFFFFF"></Button>
                         <Button type="ghost" shape="circle" size="small" icon="clipboard"
-                                @click="copy(index,$event)" style="background: #FFFFFF"></Button>
+                                @click.stop="copy(index,$event)" style="background: #FFFFFF"></Button>
                         <Button type="error" shape="circle" size="small" icon="trash-b"
-                                @click="remove(index,$event)"></Button>
+                                @click.stop="remove(index,$event)"></Button>
                     </div>
                     <span class="name">{{file.key | getfileNameByPath}}</span>
                 </div>
             </Card>
         </div>
-
-        <Modal
-                v-model="deleteNoAskModel"
-                title="确认删除文件？"
-                @on-ok="doRemove">
-            <p>{{deleteKey}}</p>
-        </Modal>
     </div>
 </template>
 <script>
