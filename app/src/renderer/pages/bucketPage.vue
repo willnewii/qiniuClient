@@ -72,7 +72,7 @@
     import mixin_base from "../mixins/mixin-base";
     import {Constants, util, EventBus} from '../service/index';
 
-    import Bucket from "../bean/Bucket";
+    import * as CloudStorage from "../bean/CloudStorage";
 
     export default {
         name: 'bucketPage',
@@ -125,7 +125,7 @@
              * 初始化空间信息
              */
             initBucket(bucketName) {
-                this.bucket = new Bucket(bucketName);
+                this.bucket = CloudStorage.generateBucket(bucketName);
                 this.bucket.init(this);
             },
             /**

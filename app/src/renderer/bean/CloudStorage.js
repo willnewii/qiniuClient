@@ -1,4 +1,5 @@
 import * as qiniu from '../service/cloudStorage';
+import QiniuBucket from './QiniuBucket';
 
 const storage = require('electron-json-storage');
 
@@ -45,4 +46,13 @@ export function getHttpAuthorization(url) {
     if (Storage.name === Qiniu) {
         return qiniu.httpAuthorization(url);
     }
+}
+
+export function generateBucket(name) {
+    if (Storage.name === Qiniu) {
+        return new QiniuBucket(name);
+    }
+}
+
+export function test(){
 }

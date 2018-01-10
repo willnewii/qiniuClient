@@ -121,7 +121,7 @@ export default {
          * @param callback
          */
         doRemove(item, callback) {
-            this.bucket.removeFile({key: item.key}, (ret) => {
+            this.bucket.removeFile(item, (ret) => {
                 callback && callback(ret);
             });
         }
