@@ -3,6 +3,15 @@ import * as qiniu from '../service/cloudStorage';
 
 const DELIMITER = '/';
 
+const method = {
+    //列举一个账号的所有空间
+    getBuckets: 'https://rs.qbox.me/buckets',
+    //获取一个空间绑定的域名列表
+    getDomains: 'https://api.qiniu.com/v6/domain/list',
+    //获取目录(是通过公共前缀模拟出的效果)
+    getResources: 'https://rsf.qbox.me/list',
+};
+
 class Bucket {
 
     constructor(name) {
@@ -84,7 +93,7 @@ class Bucket {
     }
 
     getDomains() {
-        this.vm.doRequsetGet(Constants.method.getDomains, {tbl: this.name}, (response) => {
+        this.vm.doRequsetGet(method.getDomains, {tbl: this.name}, (response) => {
             if (!response)
                 return;
 
@@ -120,7 +129,7 @@ class Bucket {
             data.marker = marker;
         }
 
-        this.vm.doRequset(Constants.method.getResources, data, (response) => {
+        this.vm.doRequset(method.getResources, data, (response) => {
             if (!response)
                 return;
 
@@ -156,7 +165,7 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        this.vm.doRequset(Constants.method.getResources, param, (response) => {
+        this.vm.doRequset(method.getResources, param, (response) => {
             if (!response)
                 return;
 

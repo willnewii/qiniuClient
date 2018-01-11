@@ -1,4 +1,4 @@
-# qiniuClien v0.0.9
+# qiniuClien v0.1.0
 ![](http://ou62js7ck.bkt.clouddn.com/niu_128.png)
 > 七牛存储文件管理客户端.跟官网相比,增加了按目录显示,托盘上传,URL上传,文件排序 .我觉得还不错 😂
 
@@ -62,20 +62,23 @@ npm i  //electron 需要的文件下载巨慢,经常卡死,耐心,不行就翻�
 npm run dev
 
 # build electron app for production
-npm run package-mac
-npm run package-win32
+npm run pack:mac
+npm run pack:win
 ```
 
 More information can be found [electron-vue](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
 ## issue
-- 上传进度不灵敏.七牛上传文件块设置的是4M.调小以后,进度条反应比较正常,但是会提示上传失败 😂,所以会感觉明明上传了,但是半天没响应.
+- 上传进度不灵敏.七牛上传文件块设置的是4M 😂 ,所以会感觉明明上传了,但是半天没响应.
 
 ## dev tips
 ### npm 安装git分支
 ```shell
 npm i --save git://github.com/willnewii/nodejs-sdk.git#patch-1
 ```
+
+### -webkit-app-region
+鼠标拖拽
 
 ## 参考资料
 - [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)

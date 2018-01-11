@@ -1,7 +1,7 @@
 {
   "name": "qiniuClient",
   "cnname": "七牛云管理客户端",
-  "version": "0.0.9",
+  "version": "0.1",
   "description": "一个七牛云文件管理客户端",
   "scripts": {
     "dev": "node tasks/runner.js",
