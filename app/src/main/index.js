@@ -1,10 +1,10 @@
-'use strict'
+'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog} from 'electron'
+import {app, BrowserWindow, Menu, ipcMain, dialog} from 'electron';
 
 const {download} = require('electron-dl');
 
-import * as util from './util'
+import * as util from './util';
 import * as trayUtil from './trayUtil';
 
 let mainWindow;
@@ -38,19 +38,19 @@ function createMainWindow() {
     mainWindow.loadURL(util.winURL);
 
     mainWindow.on('closed', () => {
-        mainWindow = null
+        mainWindow = null;
     });
 }
 
 app.on('window-all-closed', () => {
     if (!util.isMac()) {
-        app.quit()
+        app.quit();
     }
 });
 
 app.on('activate', () => {
     if (mainWindow === null) {
-        createMainWindow()
+        createMainWindow();
     }
 });
 
@@ -58,20 +58,25 @@ app.on('activate', () => {
  * 注册IPC事件
  */
 const registerIPC = function () {
+
+    ipcMain.on('miniWindow', function (event, option) {
+        mainWindow.setContentSize(option.width, option.height, true);
+    });
+
     //选择文件
     ipcMain.on('open-file-dialog', function (event, option) {
         dialog.showOpenDialog({
             properties: ['openFile', 'multiSelections']
         }, function (files) {
-            if (files) event.sender.send('selected-directory', files)
-        })
+            if (files) event.sender.send('selected-directory', files);
+        });
     });
 
     //选择目录
     ipcMain.on('choiceFolder', function (event, option) {
         dialog.showOpenDialog(option, function (files) {
-            if (files) event.sender.send('choiceFolder', files)
-        })
+            if (files) event.sender.send('choiceFolder', files);
+        });
     });
 
     //下载文件
@@ -154,13 +159,13 @@ const getMenuData = function () {
                 {
                     label: '关于项目',
                     click() {
-                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient')
+                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient');
                     }
                 },
                 {
                     label: '提交异常或需求',
                     click() {
-                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient/issues')
+                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
                     }
                 }
             ]
@@ -181,7 +186,7 @@ const getMenuData = function () {
                 {type: 'separator'},
                 {role: 'quit'}
             ]
-        })
+        });
 
         /*        // Edit menu
                 template[1].submenu.push(
@@ -202,7 +207,7 @@ const getMenuData = function () {
             {role: 'zoom'},
             {type: 'separator'},
             {role: 'front'}
-        ]
+        ];
     }
     return template;
 };

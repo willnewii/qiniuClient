@@ -64,6 +64,26 @@ class Bucket {
     }
 
     /**
+     * 获取当前目录
+     * @returns {*}
+     */
+    getCurrentDirStr() {
+        if (this.currentDir === Constants.Key.withoutDelimiter) {
+            return '';
+        } else {
+            return this.currentDir;
+        }
+    }
+
+    /**
+     * 返回目录数组,忽略前两个手动添加的'全部'，'其它'
+     * @returns {T[]}
+     */
+    getDirArray() {
+        return this.dirs.slice(2);
+    }
+
+    /**
      * 检测是否是私密空间
      * @param privateBuckets
      */
