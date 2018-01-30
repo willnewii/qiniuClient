@@ -1,4 +1,5 @@
-import * as Constants from '../service/constants'
+import * as Constants from '../service/constants';
+import moment from 'moment';
 
 /**
  * Created by zhangweiwei on 2017/4/13.
@@ -31,7 +32,7 @@ export function isEmptyObject(e) {
     let t;
     for (t in e)
         return !1;
-    return !0
+    return !0;
 }
 
 export function getQiniuUrl(domain, key) {
@@ -63,4 +64,42 @@ export function getPostfix(path) {
     } else {
         return path;
     }
+}
+
+export function quickSort(arr, key) {
+    function getValue(item, key) {
+        return key ? item[key] : item;
+    }
+
+    if (arr.length <= 1) {
+        return arr;
+    }
+    let pivotIndex = Math.floor(arr.length / 2);
+    let pivotItem = arr.splice(pivotIndex, 1)[0];
+    let pivot = getValue(pivotItem, key);
+    let left = [];
+    let right = [];
+    for (let i = 0; i < arr.length; i++) {
+        let temp = getValue(arr[i], key);
+        if (temp < pivot) {
+            left.push(arr[i]);
+        } else {
+            right.push(arr[i]);
+        }
+    }
+    return quickSort(left, key).concat(pivotItem, quickSort(right, key));
+}
+
+export function formatFileSize(size) {
+    if (size >= 1024 * 1024) {
+        return (size / 1024 / 1024).toFixed(2) + ' MB';
+    } else if (size >= 1024 && size < 1024 * 1024) {
+        return (size / 1024).toFixed(2) + ' KB';
+    } else {
+        return (size).toFixed(2) + ' B';
+    }
+}
+
+export function formatDate(time) {
+    return moment(time / 10000).format('YYYY-MM-DD HH:mm:ss');
 }

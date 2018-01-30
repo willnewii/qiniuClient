@@ -17,8 +17,6 @@
             margin: 8px 0;
         }
     }
-
-
 </style>
 <template>
     <div class="layout-header">

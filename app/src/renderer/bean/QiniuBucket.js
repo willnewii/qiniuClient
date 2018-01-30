@@ -51,7 +51,7 @@ class Bucket {
      * 获取域名
      * 获取目录
      * 获取默认资源列表
-     * @param vm
+     * @param vm => page
      */
     init(vm) {
         this.vm = vm;
@@ -174,7 +174,7 @@ class Bucket {
 
         let param = {
             bucket: this.name,
-            limit: 30
+            limit: 100
         };
 
         if (keyword) {
@@ -264,10 +264,6 @@ class Bucket {
 
 function getQiniuUrl(domain, key) {
     return Constants.protocol + domain + '/' + encodeURI(key);
-}
-
-function initBucket() {
-    console.log('aaaa');
 }
 
 export default Bucket;

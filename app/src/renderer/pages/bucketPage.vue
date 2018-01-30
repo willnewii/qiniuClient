@@ -18,6 +18,9 @@
 
         <div class="dir-layout">
             <DirTag :bucket="bucket" @on-click="changeDir"></DirTag>
+            <Button type="ghost" size="small" @click="query()" icon="funnel"
+                    style="margin-right: 10px;background: #FFFFFF;">
+            </Button>
 
             <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
                     style="margin-right: 10px;background: #FFFFFF;"
@@ -43,20 +46,31 @@
                         @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="isLoaded && bucket.showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
-        <!-- 多选-->
+        <!-- 删除文件-多选-->
         <Modal
                 v-model="Model_DeleteAsk"
                 title="确认删除文件？"
                 @on-ok="doRemoves">
             <p v-for="file in bucket.selection">{{file.key}}</p>
         </Modal>
-        <!-- 单选-->
+        <!-- 删除文件-单选-->
         <Modal
                 v-model="Model_DeleteAsk2"
                 title="确认删除文件？"
                 @on-ok="doRemove"
                 @on-cancel="cancelModal">
             <p>{{Model_DeleteAskKey}}</p>
+        </Modal>
+        <!-- 筛选文件-->
+        <Modal
+                v-model="Model_Query.model"
+                title="请选择你要筛选的范围">
+            <span>按文件大小查找</span>
+            <Slider v-model="Model_Query.fileSize" range :min="Model_Query.fileSize[0]"
+                    :max="Model_Query.fileSize[1]" :tip-format="tipFormatSize"></Slider>
+            <span>按文件日期查找</span>
+            <Slider v-model="Model_Query.fileDate" range :min="Model_Query.fileDate[0]"
+                    :max="Model_Query.fileDate[1]" :tip-format="tipFormatDate"></Slider>
         </Modal>
     </div>
 </template>
@@ -94,7 +108,14 @@
                 isLoaded: false,
                 Model_DeleteAsk: false,
                 Model_DeleteAsk2: false,
-                Model_DeleteAskKey: ''
+                Model_DeleteAskKey: '',
+                Model_Query: {
+                    model: false,
+                    fileSize: [0, 0],
+                    sizeArray: [],
+                    fileDate: [0, 0],
+                    dateArray: []
+                }
             };
         },
         computed: {
@@ -172,6 +193,21 @@
             },
             cancelModal() {
                 this.Model_DeleteAskKey = '';
+            },
+            query() {
+                this.Model_Query.model = true;
+
+                this.Model_Query.sizeArray = util.quickSort(this.bucket.files, 'fsize');
+                this.Model_Query.dateArray = util.quickSort(this.bucket.files, 'putTime');
+
+                this.Model_Query.fileSize = [0, this.bucket.files.length];
+                this.Model_Query.fileDate = [0, this.bucket.files.length];
+            },
+            tipFormatSize(value) {
+                return util.formatFileSize(this.Model_Query.sizeArray[value].fsize);
+            },
+            tipFormatDate(value) {
+                return util.formatDate(this.Model_Query.dateArray[value].putTime);
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);

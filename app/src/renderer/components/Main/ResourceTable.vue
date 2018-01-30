@@ -22,10 +22,9 @@
 </template>
 <script>
     import {mapGetters} from 'vuex';
-    import {Constants, EventBus} from '../../service/index';
+    import {Constants, EventBus, util} from '../../service/index';
     import * as types from '../../vuex/mutation-types';
     import mixin_resource from '../../mixins/mixin-resource';
-    import moment from 'moment';
 
     export default {
         name: 'ResourceTable',
@@ -46,20 +45,14 @@
                         title: '大小', key: 'fsize', sortable: true, width: 100,
                         render(h, item) {
                             let row = item.row;
-                            if (row.fsize >= 1024 * 1024) {
-                                return (row.fsize / 1024 / 1024).toFixed(2) + ' MB';
-                            } else if (row.fsize >= 1024 && row.fsize < 1024 * 1024) {
-                                return (row.fsize / 1024).toFixed(2) + ' KB';
-                            } else {
-                                return (row.fsize).toFixed(2) + ' B';
-                            }
+                            return util.formatFileSize(row.fsize);
                         }
                     },
                     {title: '类型', key: 'mimeType', width: 100},
                     {
                         title: '上传日期', key: 'putTime', sortable: true, sortType: 'desc', width: 150,
                         render(h, item) {
-                            return moment(item.row.putTime / 10000).format('YYYY-MM-DD HH:mm:ss');
+                            return util.formatDate(item.row.putTime);
                         }
                     },
                     {
