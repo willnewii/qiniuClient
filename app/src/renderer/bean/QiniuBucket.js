@@ -38,7 +38,7 @@ class Bucket {
 
         //已选的文件列表
         this.selection = [];
-        //全部文件列表
+        //当前显示文件列表
         this.files = [];
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];

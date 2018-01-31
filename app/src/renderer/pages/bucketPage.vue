@@ -63,14 +63,17 @@
         </Modal>
         <!-- 筛选文件-->
         <Modal
-                v-model="Model_Query.model"
-                title="请选择你要筛选的范围">
-            <span>按文件大小查找</span>
-            <Slider v-model="Model_Query.fileSize" range :min="Model_Query.fileSize[0]"
-                    :max="Model_Query.fileSize[1]" :tip-format="tipFormatSize"></Slider>
-            <span>按文件日期查找</span>
-            <Slider v-model="Model_Query.fileDate" range :min="Model_Query.fileDate[0]"
-                    :max="Model_Query.fileDate[1]" :tip-format="tipFormatDate"></Slider>
+                v-model="Model_Query.show"
+                title="请选择你要筛选的范围"
+                @on-ok="filter">
+            <span>按文件大小：</span>
+            {{tipFormatSize(Model_Query.fileSize[0])}} ~ {{tipFormatSize(Model_Query.fileSize[1])}}
+            <Slider v-model="Model_Query.fileSize" range :min='0' :max="Model_Query.sizeArray.length -1"
+                    show-tip="never"></Slider>
+            <span>按文件日期：</span>
+            {{tipFormatDate(Model_Query.fileDate[0])}} ~ {{tipFormatDate(Model_Query.fileDate[1])}}
+            <Slider v-model="Model_Query.fileDate" range :min="0" :max="Model_Query.dateArray.length -1"
+                    show-tip="never"></Slider>
         </Modal>
     </div>
 </template>
@@ -109,8 +112,9 @@
                 Model_DeleteAsk: false,
                 Model_DeleteAsk2: false,
                 Model_DeleteAskKey: '',
+                Model_QueryShow: false,
                 Model_Query: {
-                    model: false,
+                    show: false,
                     fileSize: [0, 0],
                     sizeArray: [],
                     fileDate: [0, 0],
@@ -195,19 +199,47 @@
                 this.Model_DeleteAskKey = '';
             },
             query() {
-                this.Model_Query.model = true;
+                this.Model_Query.show = true;
 
-                this.Model_Query.sizeArray = util.quickSort(this.bucket.files, 'fsize');
-                this.Model_Query.dateArray = util.quickSort(this.bucket.files, 'putTime');
+                this.Model_Query.sizeArray = [].concat(this.bucket.files);
+                this.Model_Query.dateArray = [].concat(this.bucket.files);
 
-                this.Model_Query.fileSize = [0, this.bucket.files.length];
-                this.Model_Query.fileDate = [0, this.bucket.files.length];
+                this.Model_Query.sizeArray = util.quickSort(this.Model_Query.sizeArray, 'fsize');
+                this.Model_Query.dateArray = util.quickSort(this.Model_Query.dateArray, 'putTime');
+
+                this.Model_Query.fileSize = [0, this.bucket.files.length - 1];
+                this.Model_Query.fileDate = [0, this.bucket.files.length - 1];
+            },
+            filter() {
+                let result = [];
+
+                let sizeMin = this.Model_Query.sizeArray[this.Model_Query.fileSize[0]].fsize;
+                let sizeMax = this.Model_Query.sizeArray[this.Model_Query.fileSize[1]].fsize;
+
+                let dateMin = this.Model_Query.dateArray[this.Model_Query.fileDate[0]].putTime;
+                let dateMax = this.Model_Query.dateArray[this.Model_Query.fileDate[1]].putTime;
+
+                this.Model_Query.sizeArray.forEach((item) => {
+                    if (item.fsize >= sizeMin && item.fsize <= sizeMax && item.putTime >= dateMin && item.putTime <= dateMax) {
+                        result.push(item);
+                    }
+                });
+
+                this.bucket.files = result ;
             },
             tipFormatSize(value) {
-                return util.formatFileSize(this.Model_Query.sizeArray[value].fsize);
+                if (this.Model_Query.sizeArray && this.Model_Query.sizeArray.length > 0) {
+                    return util.formatFileSize(this.Model_Query.sizeArray[value].fsize);
+                } else {
+                    return '';
+                }
             },
             tipFormatDate(value) {
-                return util.formatDate(this.Model_Query.dateArray[value].putTime);
+                if (this.Model_Query.dateArray && this.Model_Query.dateArray.length > 0) {
+                    return util.formatDate(this.Model_Query.dateArray[value].putTime);
+                } else {
+                    return '';
+                }
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);

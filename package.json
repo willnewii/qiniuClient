@@ -66,6 +66,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "electron-dl": "^1.10.0",
     "electron-winstaller": "^2.6.3",
+    "iview": "^2.9.1",
     "node-notifier": "^5.1.2",
     "vue-lazyload": "^1.0.6"
   },
