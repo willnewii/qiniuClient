@@ -225,7 +225,8 @@
                     }
                 });
 
-                this.bucket.files = result ;
+                this.bucket.currentDir = '__filter__';
+                this.bucket.files = result;
             },
             tipFormatSize(value) {
                 if (this.Model_Query.sizeArray && this.Model_Query.sizeArray.length > 0) {

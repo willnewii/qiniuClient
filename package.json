@@ -12,16 +12,6 @@
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config webpack.renderer.config.js",
     "postinstall": "cd app && npm install"
   },
-  "a": {
-    "build:linux": "cross-env PLATFORM_TARGET=linux node tasks/release.js",
-    "build:mas": "cross-env PLATFORM_TARGET=mas node tasks/release.js",
-    "build:clean": "cross-env PLATFORM_TARGET=clean node tasks/release.js",
-    "build:darwin": "cross-env PLATFORM_TARGET=darwin node tasks/release.js",
-    "build:pack_main_darwin": "cross-env PLATFORM_TARGET=darwin PACK=main node tasks/release.js",
-    "build:no_pack_darwin": "cross-env PLATFORM_TARGET=darwin PACK=no node tasks/release.js",
-    "build:win32": "cross-env PLATFORM_TARGET=win32 node tasks/release.js",
-    "build:exe": "npm run build:win32 && node tasks/buildexe.js"
-  },
   "author": "诗人的咸鱼 <willnewii@163.com>",
   "license": "MIT",
   "devDependencies": {
@@ -38,10 +28,10 @@
     "css-loader": "^0.26.1",
     "del": "^2.2.1",
     "devtron": "^1.1.0",
-    "electron": "^1.7.8",
+    "electron": "^1.8.2-beta.4",
     "electron-builder": "^19.47.1",
     "electron-debug": "^1.1.0",
-    "electron-devtools-installer": "^2.0.1",
+    "electron-devtools-installer": "^2.2.3",
     "electron-rebuild": "^1.1.3",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
@@ -65,7 +55,6 @@
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "electron-dl": "^1.10.0",
-    "electron-winstaller": "^2.6.3",
     "iview": "^2.9.1",
     "node-notifier": "^5.1.2",
     "vue-lazyload": "^1.0.6"
