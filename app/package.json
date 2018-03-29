@@ -17,8 +17,8 @@
     "vuex": "^2.1.1"
   },
   "build": {
-    "productName": "qiniu client",
     "appId": "com.github.willnewii.qiniuClient",
+    "productName": "qiniu client",
     "compression": "maximum",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "win": {

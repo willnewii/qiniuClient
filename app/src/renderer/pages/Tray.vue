@@ -107,7 +107,6 @@
                 this.files = files;
 
                 storage.get('app_setup', (error, app) => {
-
                     if (!app.bucket_name || !app.bucket_dir) {
                         ipc.send('show-Notifier', {
                             title: 'qiniu-client',

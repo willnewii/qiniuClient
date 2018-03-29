@@ -63,7 +63,7 @@
     <div class="layout">
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
-                <i-button type="text" @click="toggleMenu" class="navicon_btn">
+                <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon type="navicon" size="32"></Icon>
                 </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"

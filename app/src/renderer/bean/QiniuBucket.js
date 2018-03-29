@@ -38,7 +38,7 @@ class Bucket {
 
         //已选的文件列表
         this.selection = [];
-        //全部文件列表
+        //当前显示文件列表
         this.files = [];
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
@@ -51,7 +51,7 @@ class Bucket {
      * 获取域名
      * 获取目录
      * 获取默认资源列表
-     * @param vm
+     * @param vm => page
      */
     init(vm) {
         this.vm = vm;
@@ -61,6 +61,26 @@ class Bucket {
         this.getDomains();
         this.getDirs();
         this.getResources();
+    }
+
+    /**
+     * 获取当前目录
+     * @returns {*}
+     */
+    getCurrentDirStr() {
+        if (this.currentDir === Constants.Key.withoutDelimiter) {
+            return '';
+        } else {
+            return this.currentDir;
+        }
+    }
+
+    /**
+     * 返回目录数组,忽略前两个手动添加的'全部'，'其它'
+     * @returns {T[]}
+     */
+    getDirArray() {
+        return this.dirs.slice(2);
     }
 
     /**
@@ -154,7 +174,7 @@ class Bucket {
 
         let param = {
             bucket: this.name,
-            limit: 30
+            limit: 100
         };
 
         if (keyword) {
@@ -244,10 +264,6 @@ class Bucket {
 
 function getQiniuUrl(domain, key) {
     return Constants.protocol + domain + '/' + encodeURI(key);
-}
-
-function initBucket() {
-    console.log('aaaa');
 }
 
 export default Bucket;
