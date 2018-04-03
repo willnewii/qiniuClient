@@ -1,4 +1,4 @@
-# qiniuClien v0.1.0
+# qiniuClient v0.1.0
 ![](http://ou62js7ck.bkt.clouddn.com/niu_128.png)
 > 七牛存储文件管理客户端.跟官网相比,增加了按目录显示,托盘上传,URL上传,文件排序 .我觉得还不错 😂
 
