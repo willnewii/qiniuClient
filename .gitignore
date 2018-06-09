@@ -2,7 +2,7 @@
 app/dist/*
 builds/*
 
-
+!.vscode/
 !app/node_modules/vue/package.json
 !app/node_modules/sync-request/package.json
 node_modules/
