@@ -44,15 +44,14 @@
                     {
                         title: '大小', key: 'fsize', sortable: true, width: 100,
                         render(h, item) {
-                            let row = item.row;
-                            return util.formatFileSize(row.fsize);
+                            return h('span', {}, util.formatFileSize(item.row.fsize));
                         }
                     },
                     {title: '类型', key: 'mimeType', width: 100},
                     {
                         title: '上传日期', key: 'putTime', sortable: true, sortType: 'desc', width: 150,
                         render(h, item) {
-                            return util.formatDate(item.row.putTime);
+                            return h('span', {}, util.formatDate(item.row.putTime));
                         }
                     },
                     {

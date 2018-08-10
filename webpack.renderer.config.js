@@ -1,15 +1,14 @@
-'use strict'
+'use strict';
 
-process.env.BABEL_ENV = 'renderer'
+process.env.BABEL_ENV = 'renderer';
 
-const path = require('path')
-const pkg = require('./app/package.json')
-const settings = require('./config.js')
-const webpack = require('webpack')
+const path = require('path');
+const pkg = require('./app/package.json');
+const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 let rendererConfig = {
     devtool: '#eval-source-map',
@@ -106,13 +105,13 @@ let rendererConfig = {
         extensions: ['.js', '.vue', '.json', '.css', '.node']
     },
     target: 'electron-renderer'
-}
+};
 
 /**
  * Adjust rendererConfig for production settings
  */
 if (process.env.NODE_ENV === 'production') {
-    rendererConfig.devtool = ''
+    rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
         new BabiliWebpackPlugin({
@@ -132,7 +131,7 @@ if (process.env.NODE_ENV === 'production') {
                 drop_console: true
             },
         })
-    )
+    );
 }
 
-module.exports = rendererConfig
+module.exports = rendererConfig;

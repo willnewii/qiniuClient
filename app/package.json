@@ -1,24 +1,27 @@
 {
-  "name": "qiniuClient",
+  "name": "qiniu-client",
   "version": "0.1.0",
   "description": "一个七牛云文件管理客户端",
   "main": "./dist/main.js",
   "dependencies": {
-    "animate.css": "^3.5.2",
+    "animate.css": "^3.7.0",
     "axios": "^0.16.1",
-    "electron-json-storage": "^3.0.6",
-    "iview": "^2.2.0",
-    "moment": "^2.18.1",
-    "qiniu": "^7.0.8",
-    "qs": "^6.4.0",
-    "vue": "^2.4.1",
+    "electron-json-storage": "^3.2.0",
+    "iview": "^2.14.3",
+    "moment": "^2.22.2",
+    "qiniu": "^7.2.1",
+    "qs": "^6.5.2",
+    "vue": "^2.5.17",
     "vue-electron": "^1.0.6",
-    "vue-router": "^2.1.2",
-    "vuex": "^2.1.1"
+    "vue-lazyload": "^1.2.6",
+    "vue-router": "^2.8.1",
+    "vuex": "^2.5.0"
   },
+  "devDependencies": {},
+  "author": "诗人的咸鱼 <willnewii@163.com>",
   "build": {
+    "productName": "qiniuClient",
     "appId": "com.github.willnewii.qiniuClient",
-    "productName": "qiniu client",
     "compression": "maximum",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "win": {
@@ -49,7 +52,7 @@
         "rpm",
         "AppImage"
       ],
-      "icon": "./icons"
+      "icon": "./app/icons"
     },
     "nsis": {
       "oneClick": false,
@@ -57,9 +60,7 @@
       "allowToChangeInstallationDirectory": true
     },
     "directories": {
-      "output": "../release"
+      "output": "./release"
     }
-  },
-  "devDependencies": {},
-  "author": "诗人的咸鱼 <willnewii@163.com>"
+  }
 }

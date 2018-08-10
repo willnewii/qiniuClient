@@ -1,12 +1,10 @@
-'use strict'
+'use strict';
 
-process.env.BABEL_ENV = 'main'
+process.env.BABEL_ENV = 'main';
 
-const path = require('path')
-const pkg = require('./app/package.json')
-const settings = require('./config.js')
-const webpack = require('webpack')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const path = require('path');
+const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 let mainConfig = {
     entry: {
@@ -18,7 +16,7 @@ let mainConfig = {
             {
                 test: /\.js$/,
                 loader: 'babel-loader',
-                include: [path.join(__dirname, 'node_modules/electron-dl'), path.join(__dirname, 'node_modules/ext-name'), path.join(__dirname, 'node_modules/pupa'),path.join(__dirname, 'node_modules/unused-filename')],
+                include: [path.join(__dirname, 'node_modules/electron-dl'), path.join(__dirname, 'node_modules/ext-name'), path.join(__dirname, 'node_modules/pupa'), path.join(__dirname, 'node_modules/unused-filename')],
             },
             {
                 test: /\.js$/,
@@ -52,11 +50,11 @@ let mainConfig = {
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),
-/*        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        })*/
+        /*        new webpack.optimize.UglifyJsPlugin({
+                    compress: {
+                        warnings: false
+                    }
+                })*/
     ],
     resolve: {
         extensions: ['.js', '.json', '.node'],
@@ -65,6 +63,6 @@ let mainConfig = {
         ]
     },
     target: 'electron-main'
-}
+};
 
-module.exports = mainConfig
+module.exports = mainConfig;
