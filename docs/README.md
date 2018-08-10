@@ -20,3 +20,6 @@
 ### todo
 - sync folder
 - mini模式
+
+###
+- [electron.build cli](https://www.electron.build/cli)
