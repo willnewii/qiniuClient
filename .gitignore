@@ -3,15 +3,10 @@ app/dist/*
 builds/*
 
 !.vscode/
-!app/node_modules/vue/package.json
-!app/node_modules/sync-request/package.json
+dist/electron/*
+dist/web/*
+build/*
+!build/icons
 node_modules/
-npm-debug.log
-npm-debug.log.*
-thumbs.db
 !.gitkeep
 .idea
-
-builds/
-
-release
