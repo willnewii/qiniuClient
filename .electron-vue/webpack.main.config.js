@@ -13,9 +13,9 @@ let mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js')
     },
-/*    externals: [
+    externals: [
         ...Object.keys(dependencies || {})
-    ],*/
+    ],
     module: {
         rules: [
             {
@@ -71,6 +71,10 @@ if (process.env.NODE_ENV === 'production') {
             'process.env.NODE_ENV': '"production"'
         })
     );
+}
+
+if (process.env.NODE_ENV !== 'production') {
+    mainConfig.externals = mainConfig.externals.concat(['electron-debug', 'babel-core', 'babel-register']);
 }
 
 module.exports = mainConfig;
