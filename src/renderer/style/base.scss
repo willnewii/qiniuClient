@@ -1,0 +1,58 @@
+// 样式调整
+
+.ivu-menu-item-group-title {
+  font-size: 12px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+  padding-left: 24px !important;
+}
+
+.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
+  border-right-width: 5px;
+}
+
+.ivu-loading-bar {
+  top: 22px;
+}
+
+.ivu-loading-bar-win {
+  top: 0;
+}
+
+.layout-menu-left {
+  background: #495060 !important;
+  border-radius: 5px;
+  //box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+
+//表格 多选 图标边距修改
+.ivu-table-cell {
+  .ivu-checkbox-wrapper {
+    margin-right: 0;
+  }
+}
+
+
+/* 自定义scrollbar 效果不好
+::-webkit-scrollbar
+{
+  width: 4px;
+  height: 4px;
+  background-color: #F5F5F5;
+}
+
+!*定义滚动条轨道 内阴影+圆角*!
+::-webkit-scrollbar-track
+{
+  border-radius: 3px;
+  //-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #F5F5F5;
+}
+
+!*定义滑块 内阴影+圆角*!
+::-webkit-scrollbar-thumb
+{
+  border-radius: 3px;
+  //-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+  background-color: #A9A5A5;
+}*/
