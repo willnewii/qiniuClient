@@ -7,24 +7,24 @@ export default [
         components: require('pages/Main.vue'),
         children: [
             {
-                path: 'bucketPage',
+                path: Constants.PageName.bucketPage,
                 name: Constants.PageName.bucketPage,
                 components: require('pages/bucketPage.vue')
             },
             {
-                path: 'setup',
+                path: Constants.PageName.setup,
                 name: Constants.PageName.setup,
                 components: require('pages/Setup.vue')
             }
         ]
     },
     {
-        path: '/login',
+        path: '/' + Constants.PageName.login,
         name: Constants.PageName.login,
         components: require('pages/Login.vue')
     },
     {
-        path: '/tray',
+        path: '/' + Constants.PageName.tray,
         name: Constants.PageName.tray,
         components: require('pages/Tray.vue')
     }

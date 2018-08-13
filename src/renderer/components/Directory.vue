@@ -9,6 +9,12 @@
             border: 1px solid #39f !important;
         }
     }
+
+    ::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+        color: transparent;
+    }
 </style>
 <template>
     <div class="layout-tag">
