@@ -1,10 +1,9 @@
 /**
  * Created by zhangweiwei on 2017/04/10.
  */
-
+import Vue from 'vue';
 import axios from 'axios';
 import config from './config';
-import * as CloudStorage from '../bean/CloudStorage';
 
 import Qs from 'qs';
 
@@ -39,7 +38,7 @@ class API {
 
         let regStr = /^http.*(qiniu.com|qbox.me)/g;
         if (regStr.test(url)) {
-            config.headers.Authorization = CloudStorage.getHttpAuthorization(url);
+            config.headers.Authorization = this.view.$storage.cos.httpAuthorization(url);
         } else {
             delete config.headers.Authorization;
         }

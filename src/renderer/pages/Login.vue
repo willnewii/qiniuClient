@@ -29,11 +29,6 @@
     </div>
 </template>
 <script>
-    import * as CloudStorage from '../bean/CloudStorage';
-    import * as Constants from '../service/constants';
-
-    const storage = require('electron-json-storage');
-
     import api from '../api/API';
 
     let API;
@@ -42,8 +37,8 @@
         data() {
             return {
                 formItem: {
-                    access_key: '',
-                    secret_key: ''
+                    access_key: 'slIJj1p7f9-A0Wt3uvuiD_rzf-HpOlkvTOkwq1gN',
+                    secret_key: 'eZrtrSf0WecIWt2vfzUT7-9Gl4PPpHZxJXVP3Owb'
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
@@ -69,15 +64,14 @@
                 this.$refs[name].resetFields();
             },
             validateToken(access_key, secret_key) {
-                CloudStorage.initStorage({access_key: access_key, secret_key: secret_key});
-                API.get(Constants.method.getBuckets).then((response) => {
-                    storage.set('qiniu_key', {
+                this.$storage.setname('qiniu');
+                this.$storage.init({access_key: access_key, secret_key: secret_key});
+                API.get(this.$storage.cos.methods.buckets).then((response) => {
+                    this.$storage.saveKey({
                         access_key: access_key,
                         secret_key: secret_key
-                    }, (error) => {
-                        if (!error) {
-                            this.$router.push({path: '/'});
-                        }
+                    }, () => {
+                        this.$router.push({path: '/'});
                     });
                 }).catch((error) => {
                     this.$Notice.error({

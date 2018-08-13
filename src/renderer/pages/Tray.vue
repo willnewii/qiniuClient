@@ -57,7 +57,7 @@
     import * as types from '../vuex/mutation-types';
     import * as util from '../util/util';
     import * as Constants from '../service/constants';
-    import * as cloudStorage from '../service/cloudStorage';
+    import * as cloudStorage from '../cos/qiniu';
     import storage from 'electron-json-storage';
     import api from '../api/API';
 

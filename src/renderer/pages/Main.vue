@@ -67,7 +67,7 @@
                     <Icon type="navicon" size="32"></Icon>
                 </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
-                      @on-select="selectBuckets" :active-name="bucketName">
+                      @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
                             <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
@@ -99,9 +99,7 @@
 </template>
 <script>
     import {mapGetters, mapActions} from 'vuex';
-    import * as CloudStorage from '../bean/CloudStorage';
     import * as types from '../vuex/mutation-types';
-    import storage from 'electron-json-storage';
     import pkg from '../../../package.json';
 
     import mixin_base from "../mixins/mixin-base";
@@ -155,7 +153,7 @@
          * 检查是否有新版本
          */
         created: function () {
-            this.initKEY(() => {
+            this.initKEY('qiniu', () => {
                 this.getBuckets();
             });
 
@@ -181,10 +179,11 @@
                     }
                 });
             },
-            initKEY(callback) {
-                CloudStorage.getKey((data) => {
+            initKEY(cosname, callback) {
+                this.$storage.setname(cosname);
+                this.$storage.getKey((data) => {
                     if (data) {
-                        CloudStorage.initStorage(data);
+                        this.$storage.cos.init(data);
                         callback && callback();
                     } else {
                         this.$router.push({path: Constants.PageName.login});
@@ -192,47 +191,51 @@
                 });
             },
             getBuckets() {
-                this.doRequset(Constants.method.getBuckets, null, (response) => {
+                this.doRequset(this.$storage.cos.methods.buckets, null, (response) => {
                     if (response.data) {
                         this[types.APP.app_a_buckets](response.data);
-                        this.selectBuckets(this.buckets[0]);
+                        this.onMenuSelect(this.buckets[0]);
                     } else {
                         this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
                         this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
-            selectBuckets(name) {
+            onMenuSelect(name) {
                 this.bucketName = name;
-                if (name === Constants.Key.app_logout) {
-                    this.$Modal.confirm({
-                        title: '登出该账号?',
-                        render: (h) => {
-                            return h('div', {
-                                style: {
-                                    'padding-top': '10px'
-                                }
-                            }, [
-                                '如果有不满意的地方,记得提个',
-                                h('a', {
-                                    on: {
-                                        click: () => {
-                                            this.openBrowser(Constants.URL.issue);
-                                        }
+                switch (this.bucketName) {
+                    case Constants.Key.app_logout:
+                        this.$Modal.confirm({
+                            title: '登出该账号?',
+                            render: (h) => {
+                                return h('div', {
+                                    style: {
+                                        'padding-top': '10px'
                                     }
-                                }, ' issues')
-                            ]);
-                        },
-                        onOk: () => {
-                            storage.clear(() => {
-                                this.$router.push({path: Constants.PageName.login});
-                            });
-                        }
-                    });
-                } else if (name === Constants.Key.app_setup) {
-                    this.$router.push({name: Constants.PageName.setup});
-                } else {
-                    this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                                }, [
+                                    '如果有不满意的地方,记得提个',
+                                    h('a', {
+                                        on: {
+                                            click: () => {
+                                                this.openBrowser(Constants.URL.issue);
+                                            }
+                                        }
+                                    }, ' issues')
+                                ]);
+                            },
+                            onOk: () => {
+                                this.$storage.logout(() => {
+                                    this.$router.push({path: Constants.PageName.login});
+                                });
+                            }
+                        });
+                        break;
+                    case Constants.Key.app_setup:
+                        this.$router.push({name: Constants.PageName.setup});
+                        break;
+                    default:
+                        this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        break;
                 }
             },
         }

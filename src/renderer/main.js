@@ -13,6 +13,8 @@ Vue.use(Router);
 Vue.use(iView);
 Vue.use(VueLazyload);
 
+Vue.prototype.$storage = new CloudObjectStorage();
+
 Vue.config.debug = false;
 
 import routes from './routes';
@@ -46,6 +48,7 @@ window.ondragover = function (e) {
 };
 
 import App from './App';
+import {CloudObjectStorage} from "@/cos/CloudObjectStorage";
 
 new Vue({
     router,

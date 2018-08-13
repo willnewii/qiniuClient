@@ -1,16 +1,7 @@
 import {Constants} from '../service/index';
-import * as qiniu from '../service/cloudStorage';
+import * as qiniu from '../cos/qiniu';
 
 const DELIMITER = '/';
-
-const method = {
-    //列举一个账号的所有空间
-    getBuckets: 'https://rs.qbox.me/buckets',
-    //获取一个空间绑定的域名列表
-    getDomains: 'https://api.qiniu.com/v6/domain/list',
-    //获取目录(是通过公共前缀模拟出的效果)
-    getResources: 'https://rsf.qbox.me/list',
-};
 
 class Bucket {
 
@@ -113,7 +104,7 @@ class Bucket {
     }
 
     getDomains() {
-        this.vm.doRequsetGet(method.getDomains, {tbl: this.name}, (response) => {
+        this.vm.doRequsetGet(qiniu.methods.getDomains, {tbl: this.name}, (response) => {
             if (!response)
                 return;
 
@@ -149,7 +140,7 @@ class Bucket {
             data.marker = marker;
         }
 
-        this.vm.doRequset(method.getResources, data, (response) => {
+        this.vm.doRequset(qiniu.methods.getResources, data, (response) => {
             if (!response)
                 return;
 
@@ -185,7 +176,7 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        this.vm.doRequset(method.getResources, param, (response) => {
+        this.vm.doRequset(qiniu.methods.getResources, param, (response) => {
             if (!response)
                 return;
 
@@ -256,14 +247,11 @@ class Bucket {
         if (this.isprivate) {
             url = qiniu.getPrivateUrl(this.domain, fileName, deadline);
         } else {
-            url = getQiniuUrl(this.domain, fileName);
+            url = qiniu.getQiniuUrl(this.domain, fileName);
         }
         return url;
     }
 }
 
-function getQiniuUrl(domain, key) {
-    return Constants.protocol + domain + '/' + encodeURI(key);
-}
 
 export default Bucket;
