@@ -21,5 +21,10 @@
 - sync folder
 - mini模式
 
-###
+### 通过npmrc配置electron,node-sass下载路径
+
+### electron.build 配置
 - [electron.build cli](https://www.electron.build/cli)
+
+### issue
+- [Critical dependency: the request of a dependency is an expression](https://github.com/SimulatedGREG/electron-vue/issues/498)

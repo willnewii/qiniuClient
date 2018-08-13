@@ -83,8 +83,8 @@
 </template>
 <script>
     import {mapGetters} from 'vuex'
-    import * as types from '../../vuex/mutation-types'
-    import mixin_resource from '../../mixins/mixin-resource'
+    import * as types from '../vuex/mutation-types'
+    import mixin_resource from '../mixins/mixin-resource'
 
     export default {
         name: 'ResourceGrid',

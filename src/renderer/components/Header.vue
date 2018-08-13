@@ -52,14 +52,14 @@
     </div>
 </template>
 <script>
-    import {util, Constants} from '../../service/index';
+    import {util, Constants} from '../service/index';
     import {mapGetters, mapActions} from 'vuex';
-    import * as types from '../../vuex/mutation-types';
-    import UploadModal from "../UploadModal";
+    import * as types from '../vuex/mutation-types';
+    import UploadModal from "./UploadModal";
 
     export default {
         components: {UploadModal},
-        name: 'ClientHeader',
+        name: 'Header',
         data() {
             return {
                 search: '',

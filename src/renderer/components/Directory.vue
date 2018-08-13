@@ -18,10 +18,10 @@
     </div>
 </template>
 <script>
-    import {Constants} from '../../service/index';
+    import {Constants} from '../service/index';
 
     export default {
-        name: 'DirTag',
+        name: 'Directory',
         props: {
             bucket: {
                 type: Object

@@ -22,9 +22,9 @@
 </template>
 <script>
     import {mapGetters} from 'vuex';
-    import {Constants, EventBus, util} from '../../service/index';
-    import * as types from '../../vuex/mutation-types';
-    import mixin_resource from '../../mixins/mixin-resource';
+    import {Constants, EventBus, util} from '../service/index';
+    import * as types from '../vuex/mutation-types';
+    import mixin_resource from '../mixins/mixin-resource';
 
     export default {
         name: 'ResourceTable',

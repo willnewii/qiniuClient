@@ -14,10 +14,10 @@
 </style>
 <template>
     <div class="layout" v-if="bucket">
-        <ClientHeader :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></ClientHeader>
+        <Header :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <DirTag :bucket="bucket" @on-click="changeDir"></DirTag>
+            <Directory :bucket="bucket" @on-click="changeDir"></Directory>
             <Button type="ghost" size="small" @click="query()" icon="funnel"
                     style="margin-right: 10px;background: #FFFFFF;">
             </Button>
@@ -78,10 +78,10 @@
     </div>
 </template>
 <script>
-    import DirTag from '../components/Main/DirTag.vue';
-    import ClientHeader from '../components/Main/ClientHeader.vue';
-    import ResourceTable from '../components/Main/ResourceTable.vue';
-    import ResourceGrid from "../components/Main/ResourceGrid.vue";
+    import Directory from '../components/Directory';
+    import Header from '../components/Header';
+    import ResourceTable from '../components/ResourceTable.vue';
+    import ResourceGrid from "../components/ResourceGrid.vue";
 
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
@@ -95,7 +95,7 @@
         name: 'bucketPage',
         components: {
             ResourceGrid,
-            DirTag, ClientHeader, ResourceTable
+            Directory, Header, ResourceTable
         },
         mixins: [mixin_base],
         props: {

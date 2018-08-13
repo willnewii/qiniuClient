@@ -29,14 +29,14 @@
             默认托盘上传位置：<br>
             <Row class="row-line">
                 <Col span="10">
-                <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
-                    <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
-                </Select>
-                /
-                <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>
+                    <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
+                        <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
+                    </Select>
+                    /
+                    <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>
                 </Col>
                 <Col span="10" offset="1">
-                <Button @click="saveDir" type="ghost" size="small" class="save-btn">保存</Button>
+                    <Button @click="saveDir" type="ghost" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
             <div v-if="setup_bucket_name">提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/ 目录下</div>
@@ -46,12 +46,12 @@
             下载目录：<br>
             <Row class="row-line">
                 <Col span="10">
-                <Input v-model="downloaddir" size="small" placeholder="默认下载目录" style="width: 100%;"
-                       disabled/>
+                    <Input v-model="downloaddir" size="small" placeholder="默认下载目录" style="width: 100%;"
+                           disabled/>
                 </Col>
                 <Col span="12" offset="1">
-                <Button @click="choiceDownloadolder" type="ghost" size="small" class="save-btn"
-                        icon="ios-folder-outline"/>
+                    <Button @click="choiceDownloadolder" type="ghost" size="small" class="save-btn"
+                            icon="ios-folder-outline"/>
                 </Col>
             </Row>
 
@@ -61,11 +61,11 @@
             预览图片样式：<br>
             <Row class="row-line">
                 <Col span="10">
-                <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
+                    <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
                 </Col>
                 <Col span="12" offset="1">
-                <Button @click="saveImagestyle" type="ghost" size="small" class="save-btn">保存</Button>
-                <Button @click="openBrowser(0)" size="small">什么是图片样式</Button>
+                    <Button @click="saveImagestyle" type="ghost" size="small" class="save-btn">保存</Button>
+                    <Button @click="openBrowser(0)" size="small">什么是图片样式</Button>
                 </Col>
             </Row>
         </div>
@@ -81,10 +81,11 @@
             </CheckboxGroup>
             <Row class="row-line">
                 <Col span="10" style="display: flex;align-items: center;">
-                <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟" style="width: 20%; margin-right: 10px"/>分钟
+                    <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
+                           style="width: 20%; margin-right: 10px"/>分钟
                 </Col>
                 <Col span="12" offset="1">
-                <Button @click="saveDeadline" type="ghost" size="small" class="save-btn">保存</Button>
+                    <Button @click="saveDeadline" type="ghost" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
         </div>
@@ -92,9 +93,8 @@
 </template>
 
 <script>
-    import ClientHeader from '../components/Main/ClientHeader.vue'
-    import {mapGetters, mapActions} from 'vuex'
-    import * as types from '../vuex/mutation-types'
+    import {mapGetters, mapActions} from 'vuex';
+    import * as types from '../vuex/mutation-types';
 
     let ipc;
 
@@ -108,7 +108,7 @@
                 downloaddir: '',
                 deadline: 0,
                 privates: []
-            }
+            };
         },
         computed: {
             ...mapGetters({
@@ -123,7 +123,7 @@
                 setup_deadline: types.APP.setup_deadline
             })
         },
-        components: {ClientHeader},
+        components: {},
         created: function () {
             this.bucketname = this.setup_bucket_name;
             this.bucketdir = this.setup_bucket_dir;
@@ -192,6 +192,6 @@
                 this.$electron.shell.openExternal(url);
             }
         }
-    }
+    };
 </script>
 
