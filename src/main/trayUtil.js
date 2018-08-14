@@ -1,9 +1,10 @@
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
-import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron'
-import notifier from 'node-notifier'
-import * as util from './util'
+import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron';
+import notifier from 'node-notifier';
+import * as util from './util';
+import * as Constants from '../renderer/service/constants';
 
 const icon_tray = util.isWin() ? 'win_tray.png' : 'tray.png';
 const icon_upload = util.isWin() ? 'win_upload.png' : 'upload.png';
@@ -19,28 +20,28 @@ export const createTray = function (_mainWindowId) {
     mTrayWindow = createTrayWindow();
 
     mTray.on('click', () => {
-        toggleTrayWindow()
+        toggleTrayWindow();
     });
 
     mTray.on('drop-files', (event, files) => {
         setTrayIcon(icon_upload);
-        mTrayWindow.webContents.send('upload-Files', files);
+        mTrayWindow.webContents.send(Constants.Listener.uploadFile, files);
     });
 
-    ipcMain.on('upload-tray-title', function (event, title) {
+    ipcMain.on(Constants.Listener.updateTrayTitle, function (event, title) {
         if (title.length === 0) {
             setTrayIcon(icon_tray);
         }
-        setTrayTitle(title)
+        setTrayTitle(title);
     });
 
-    ipcMain.on('show-Notifier', function (event, option) {
+    ipcMain.on(Constants.Listener.showNotifier, function (event, option) {
         if (option.icon) {
             option.icon = util.getIconPath(option.icon);
         }
 
         notifier.notify(option, (err, response) => {
-            event.sender.send('log', err)
+            event.sender.send('log', err);
         });
     });
 
@@ -69,7 +70,7 @@ const createTrayWindow = () => {
     // Hide the window when it loses focus
     trayWindow.on('blur', () => {
         if (!trayWindow.webContents.isDevToolsOpened()) {
-            trayWindow.hide()
+            trayWindow.hide();
         }
     });
 
@@ -84,7 +85,7 @@ const toggleTrayWindow = () => {
             BrowserWindow.fromId(mainWindowId).focus();
         }
     } else {
-        showTrayWindow()
+        showTrayWindow();
     }
 };
 
@@ -102,13 +103,13 @@ const getTrayWindowPosition = () => {
     let x, y;
     if (util.isMac()) {
         x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2));
-        y = Math.round(trayBounds.y + trayBounds.height + 4)
+        y = Math.round(trayBounds.y + trayBounds.height + 4);
     } else {
         x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2));
-        y = Math.round(trayBounds.y - (windowBounds.height))
+        y = Math.round(trayBounds.y - (windowBounds.height));
     }
 
-    return {x: x, y: y}
+    return {x: x, y: y};
 };
 
 export const setTrayTitle = function (title) {
@@ -118,6 +119,6 @@ export const setTrayTitle = function (title) {
 };
 
 export const setTrayIcon = function (image) {
-    mTray.setImage(util.getIconPath(image))
+    mTray.setImage(util.getIconPath(image));
 };
 

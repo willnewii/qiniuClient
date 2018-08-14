@@ -79,7 +79,7 @@
                 switch (index) {
                     case 0://调用文件选取对话框
                         this.filePaths = [];
-                        this.$electron.ipcRenderer.send('open-file-dialog', {properties: ['openFile', 'multiSelections']});
+                        this.$electron.ipcRenderer.send(Constants.Listener.openFileDialog, {properties: ['openFile', 'multiSelections']});
                         break;
                     case 1://抓取文件
                         this.filePaths = [];

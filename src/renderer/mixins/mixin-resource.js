@@ -70,7 +70,7 @@ export default {
                     option.directory = this.setup_downloaddir;
                 }
 
-                this.$electron.ipcRenderer.send('downloadFile', this.getResoureUrl(this.bucket.selection[0].key), option);
+                this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0].key), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);

@@ -94,6 +94,7 @@
 
 <script>
     import {mapGetters, mapActions} from 'vuex';
+    import {Constants} from '../service';
     import * as types from '../vuex/mutation-types';
 
     let ipc;
@@ -133,7 +134,7 @@
             this.deadline = this.setup_deadline / 60;
 
             ipc = this.$electron.ipcRenderer;
-            ipc.on('choiceFolder', (event, path) => {
+            ipc.on(Con, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
             });
@@ -174,7 +175,7 @@
                 }
             },
             choiceDownloadolder() {
-                ipc.send('choiceFolder', {properties: ['openDirectory']});
+                ipc.send(Constants.Listener.choiceDownloadFolder, {properties: ['openDirectory']});
             },
             saveDownloadolder() {
                 this[types.APP.setup_a_downloaddir](this.downloaddir);

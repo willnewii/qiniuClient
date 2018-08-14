@@ -99,15 +99,15 @@
             });
 
             ipc = this.$electron.ipcRenderer;
-            ipc.removeAllListeners(Constants.Listener.UploadFile);
-            ipc.on(Constants.Listener.UploadFile, (event, files) => {
+            ipc.removeAllListeners(Constants.Listener.uploadFile);
+            ipc.on(Constants.Listener.uploadFile, (event, files) => {
                 this.files = files;
                 storage.get('app_setup', (error, app) => {
                     if (app && app.bucket_name) {
                         this.config = app;
                         this.doUploadFile();
                     } else {
-                        ipc.send('show-Notifier', {
+                        ipc.send(Constants.Listener.showNotifier, {
                             title: 'qiniu-client',
                             message: '请先设置上传空间',
                         });
@@ -122,10 +122,10 @@
             ]),
             updateStatus(title) {
                 console.log('title:', title);
-                ipc.send('upload-tray-title', title);
+                ipc.send(Constants.Listener.updateTrayTitle, title);
             },
             sendNotify() {
-                ipc.send('show-Notifier', {
+                ipc.send(Constants.Listener.showNotifier, {
                     title: '上传完成',
                     message: '上传完成  (＾－＾)V',
                     icon: 'notify-success.png'

@@ -41,5 +41,10 @@ export const CopyType = {
 };
 
 export const Listener = {
-    'UploadFile':'upload-Files'
+    uploadFile: 'upload-Files',
+    downloadFile: 'downloadFile',
+    showNotifier: 'show-Notifier',
+    updateTrayTitle: 'update-TrayTitle',
+    choiceDownloadFolder: 'choiceDownloadFolder',
+    openFileDialog: 'open-file-dialog'
 };
