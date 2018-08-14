@@ -52,7 +52,6 @@
     </div>
 </template>
 <script>
-    import {util, Constants} from '../service/index';
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import UploadModal from "./UploadModal";
@@ -66,9 +65,6 @@
             };
         },
         computed: {
-            icon() {
-                return this.bucket.name ? 'ios-at' : 'ios-cog';
-            },
             placeholder() {
                 if (this.bucket.getCurrentDirStr()) {
                     return '搜索' + this.bucket.getCurrentDirStr() + '目录下文件';
@@ -79,7 +75,7 @@
         },
         watch: {
             'bucket.domain': function (val) {//在domains为空时,保存 bucket.domain
-                if (this.bucket && this.bucket.domains.length === 0) {
+                if (this.bucket && this.bucket.domains.length === 0 && val) {
                     let obj = {};
                     obj[this.bucket.name] = val;
                     this[types.APP.setup_a_customedomain](obj);
@@ -115,8 +111,6 @@
             actionBtn(index) {
                 switch (index) {
                     case 0://调用文件选取对话框
-                        this.$refs['uploadModal'].uploadAction(index);
-                        break;
                     case 1://抓取文件
                         this.$refs['uploadModal'].uploadAction(index);
                         break;

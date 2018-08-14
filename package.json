@@ -75,7 +75,7 @@
         "productName": "qiniuClient",
         "appId": "com.github.willnewii.qiniuClient",
         "asar": false,
-        "compression": "maximum",
+        "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
         "electronDownload": {
         },

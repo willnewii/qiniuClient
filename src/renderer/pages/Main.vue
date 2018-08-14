@@ -201,8 +201,7 @@
                 });
             },
             onMenuSelect(name) {
-                this.bucketName = name;
-                switch (this.bucketName) {
+                switch (name) {
                     case Constants.Key.app_logout:
                         this.$Modal.confirm({
                             title: '登出该账号?',
@@ -233,6 +232,7 @@
                         this.$router.push({name: Constants.PageName.setup});
                         break;
                     default:
+                        this.bucketName = name;
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                 }

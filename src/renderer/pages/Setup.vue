@@ -39,7 +39,10 @@
                     <Button @click="saveDir" type="ghost" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-            <div v-if="setup_bucket_name">提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/ 目录下</div>
+            <div v-if="setup_bucket_name && setup_bucket_dir">提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/
+                目录下
+            </div>
+            <div v-else-if="setup_bucket_name">提示：默认文件将会被上传到 {{setup_bucket_name}}/ 目录下</div>
         </div>
 
         <div class="item">
@@ -134,7 +137,7 @@
             this.deadline = this.setup_deadline / 60;
 
             ipc = this.$electron.ipcRenderer;
-            ipc.on(Con, (event, path) => {
+            ipc.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
             });
