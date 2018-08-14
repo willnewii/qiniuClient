@@ -1,128 +1,127 @@
 {
-  "name": "qiniu-client",
-  "cnname": "七牛云文件管理",
-  "version": "0.1.0",
-  "description": "一个七牛云文件管理客户端",
-  "author": "诗人的咸鱼 <willnewii@163.com>",
-  "license": "MIT",
-  "main": "./dist/electron/main.js",
-  "scripts": {
-    "build": "node .electron-vue/build.js && electron-builder",
-    "build:mac": "cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' electron-builder --mac",
-    "build:win32": "cross-env ELECTRON_MIRROR='https://npm.taobao.org/mirrors/electron/' electron-builder --win --ia32",
-    "build:dir": "node .electron-vue/build.js && electron-builder --dir",
-    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
-    "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
-    "dev": "node .electron-vue/dev-runner.js",
-    "pack": "npm run pack:main && npm run pack:renderer",
-    "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
-    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
-    "postinstall": ""
-  },
-  "dependencies": {
-    "node-notifier": "^5.2.1"
-  },
-  "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-loader": "^7.1.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.24.1",
-    "babili-webpack-plugin": "^0.1.2",
-    "cfonts": "^1.1.3",
-    "chalk": "^2.1.0",
-    "copy-webpack-plugin": "^4.5.2",
-    "cross-env": "^5.0.5",
-    "css-loader": "^0.28.4",
-    "del": "^3.0.0",
-    "devtron": "^1.4.0",
-    "electron": "^2.0.7",
-    "electron-builder": "^19.56.2",
-    "electron-debug": "^1.4.0",
-    "electron-devtools-installer": "^2.2.0",
-    "extract-text-webpack-plugin": "^3.0.0",
-    "file-loader": "^0.11.2",
-    "html-webpack-plugin": "^2.30.1",
-    "multispinner": "^0.2.1",
-    "node-loader": "^0.6.0",
-    "node-sass": "^4.9.3",
-    "sass-loader": "^7.1.0",
-    "style-loader": "^0.18.2",
-    "url-loader": "^0.5.9",
-    "vue-html-loader": "^1.2.4",
-    "vue-loader": "^13.0.5",
-    "vue-style-loader": "^3.0.1",
-    "vue-template-compiler": "^2.4.2",
-    "webpack": "^3.5.2",
-    "webpack-dev-server": "^2.7.1",
-    "webpack-hot-middleware": "^2.18.2",
-    "iview": "^2.14.3",
-    "vue": "^2.3.3",
-    "vue-electron": "^1.0.6",
-    "vue-lazyload": "^1.2.6",
-    "vue-router": "^2.5.3",
-    "vuex": "^2.3.1",
-    "qiniu": "^7.2.1",
-    "qs": "^6.5.2",
-    "axios": "^0.16.2",
-    "animate.css": "^3.7.0",
-    "moment": "^2.22.2",
-    "electron-dl": "^1.12.0",
-    "electron-json-storage": "^4.1.1"
-  },
-  "build": {
-    "productName": "qiniuClient",
-    "appId": "com.github.willnewii.qiniuClient",
-    "asar": false,
-    "compression": "maximum",
-    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "electronDownload": {
-      "cache": "/Users/zhangweiwei/.electron"
+    "name": "qiniu-client",
+    "cnname": "七牛云文件管理",
+    "version": "0.1.0",
+    "description": "一个七牛云文件管理客户端",
+    "author": "诗人的咸鱼 <willnewii@163.com>",
+    "license": "MIT",
+    "main": "./dist/electron/main.js",
+    "scripts": {
+        "build": "node .electron-vue/build.js && electron-builder",
+        "build:mac": "electron-builder --mac",
+        "build:win32": "electron-builder --win --ia32",
+        "build:dir": "node .electron-vue/build.js && electron-builder --dir",
+        "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
+        "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
+        "dev": "node .electron-vue/dev-runner.js",
+        "pack": "npm run pack:main && npm run pack:renderer",
+        "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
+        "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+        "postinstall": ""
     },
-    "files": [
-      "dist/electron",
-      "node_modules/",
-      "package.json"
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "./build/icon.ico"
+    "dependencies": {
+        "node-notifier": "^5.2.1"
     },
-    "dmg": {
-      "contents": [
-        {
-          "x": 130,
-          "y": 220,
-          "type": "file"
+    "devDependencies": {
+        "babel-core": "^6.25.0",
+        "babel-loader": "^7.1.1",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "babel-preset-env": "^1.6.0",
+        "babel-preset-stage-0": "^6.24.1",
+        "babel-register": "^6.24.1",
+        "babili-webpack-plugin": "^0.1.2",
+        "cfonts": "^1.1.3",
+        "chalk": "^2.1.0",
+        "copy-webpack-plugin": "^4.5.2",
+        "cross-env": "^5.0.5",
+        "css-loader": "^0.28.4",
+        "del": "^3.0.0",
+        "devtron": "^1.4.0",
+        "electron": "^2.0.7",
+        "electron-builder": "^19.56.2",
+        "electron-debug": "^1.4.0",
+        "electron-devtools-installer": "^2.2.0",
+        "extract-text-webpack-plugin": "^3.0.0",
+        "file-loader": "^0.11.2",
+        "html-webpack-plugin": "^2.30.1",
+        "multispinner": "^0.2.1",
+        "node-loader": "^0.6.0",
+        "node-sass": "^4.9.3",
+        "sass-loader": "^7.1.0",
+        "style-loader": "^0.18.2",
+        "url-loader": "^0.5.9",
+        "vue-html-loader": "^1.2.4",
+        "vue-loader": "^13.0.5",
+        "vue-style-loader": "^3.0.1",
+        "vue-template-compiler": "^2.4.2",
+        "webpack": "^3.5.2",
+        "webpack-dev-server": "^2.7.1",
+        "webpack-hot-middleware": "^2.18.2",
+        "iview": "^2.14.3",
+        "vue": "^2.3.3",
+        "vue-electron": "^1.0.6",
+        "vue-lazyload": "^1.2.6",
+        "vue-router": "^2.5.3",
+        "vuex": "^2.3.1",
+        "qiniu": "^7.2.1",
+        "qs": "^6.5.2",
+        "axios": "^0.16.2",
+        "animate.css": "^3.7.0",
+        "moment": "^2.22.2",
+        "electron-dl": "^1.12.0",
+        "electron-json-storage": "^4.1.1"
+    },
+    "build": {
+        "productName": "qiniuClient",
+        "appId": "com.github.willnewii.qiniuClient",
+        "asar": false,
+        "compression": "maximum",
+        "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+        "electronDownload": {
         },
-        {
-          "x": 410,
-          "y": 220,
-          "type": "link",
-          "path": "/Applications"
+        "files": [
+            "dist/electron",
+            "node_modules/",
+            "package.json"
+        ],
+        "win": {
+            "target": "nsis",
+            "icon": "./build/icon.ico"
+        },
+        "dmg": {
+            "contents": [
+                {
+                    "x": 130,
+                    "y": 220,
+                    "type": "file"
+                },
+                {
+                    "x": 410,
+                    "y": 220,
+                    "type": "link",
+                    "path": "/Applications"
+                }
+            ],
+            "title": "qiniu client ${version}"
+        },
+        "mac": {
+            "icon": "./build/icons/icon.icns"
+        },
+        "linux": {
+            "target": [
+                "deb",
+                "rpm",
+                "AppImage"
+            ],
+            "icon": "./build/icons"
+        },
+        "nsis": {
+            "oneClick": false,
+            "perMachine": true,
+            "allowToChangeInstallationDirectory": true
+        },
+        "directories": {
+            "output": "./build"
         }
-      ],
-      "title": "qiniu client ${version}"
-    },
-    "mac": {
-      "icon": "./build/icons/icon.icns"
-    },
-    "linux": {
-      "target": [
-        "deb",
-        "rpm",
-        "AppImage"
-      ],
-      "icon": "./build/icons"
-    },
-    "nsis": {
-      "oneClick": false,
-      "perMachine": true,
-      "allowToChangeInstallationDirectory": true
-    },
-    "directories": {
-      "output": "./build"
     }
-  }
 }
