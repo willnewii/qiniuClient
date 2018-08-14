@@ -1,7 +1,6 @@
 import {mapGetters} from 'vuex';
-import {Constants, EventBus} from '../service/index';
+import {Constants, EventBus, util} from '../service/index';
 import * as types from '../vuex/mutation-types';
-import * as util from '../util/util';
 
 export default {
     computed: {
@@ -52,14 +51,14 @@ export default {
         /**
          * 获取资源链接
          */
-        getResoureUrl(index, key) {
-            return this.bucket.getResoureUrl(index, key, this.setup_deadline);
+        getResoureUrl(key) {
+            return this.bucket.generateUrl(key, this.setup_deadline);
         },
         show(index) {
-            this.$electron.shell.openExternal(this.getResoureUrl(index));
+            this.$electron.shell.openExternal(this.getResoureUrl(this.bucket.files[index]));
         },
         copy(index) {
-            util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(index));
+            util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(this.bucket.files[index]));
 
             this.$Message.info('文件路径以复制到剪贴板');
         },
@@ -71,7 +70,7 @@ export default {
                     option.directory = this.setup_downloaddir;
                 }
 
-                this.$electron.ipcRenderer.send('downloadFile', this.getResoureUrl(null, this.bucket.selection[0].key), option);
+                this.$electron.ipcRenderer.send('downloadFile', this.getResoureUrl(this.bucket.selection[0].key), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);

@@ -240,16 +240,10 @@ class Bucket {
      * @param deadline  私有模式,文件有效期
      * @returns {*}
      */
-    getResoureUrl(index, key, deadline) {
-        let fileName = key ? key : this.files[index].key;
+    generateUrl(key, deadline) {
+        //let fileName = key ? key : this.files[index].key;
 
-        let url;
-        if (this.isprivate) {
-            url = qiniu.getPrivateUrl(this.domain, fileName, deadline);
-        } else {
-            url = qiniu.getQiniuUrl(this.domain, fileName);
-        }
-        return url;
+        return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
     }
 }
 

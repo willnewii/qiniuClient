@@ -1,6 +1,11 @@
 import qiniu from 'qiniu';
-import * as Constants from '../service/constants';
 import QiniuBucket from "@/cos/qiniuBucket";
+
+qiniu.conf.ACCESS_KEY = '';
+qiniu.conf.SECRET_KEY = '';
+
+//独立于个COS的配置
+const PROTOCOL = 'http://';
 
 const methods = {
     //列举账号的所有空间
@@ -17,8 +22,13 @@ function init(param) {
     qiniu.conf.RPC_TIMEOUT = 180000;
 }
 
+let token = null;
+
 function getToken() {
-    return new qiniu.auth.digest.Mac(qiniu.conf.ACCESS_KEY, qiniu.conf.SECRET_KEY);
+    if (!token && qiniu.conf.ACCESS_KEY && qiniu.conf.SECRET_KEY) {
+        token = new qiniu.auth.digest.Mac(qiniu.conf.ACCESS_KEY, qiniu.conf.SECRET_KEY);
+    }
+    return token;
 }
 
 /**
@@ -30,17 +40,22 @@ function httpAuthorization(url) {
     return qiniu.util.generateAccessToken(getToken(), url, null);
 }
 
-function getQiniuUrl(domain, key) {
-    return Constants.protocol + domain + '/' + encodeURI(key);
-}
-
-function getPrivateUrl(domain, key, deadline) {
-    let config = new qiniu.conf.Config();
-    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
-
-    deadline = parseInt(Date.now() / 1000) + deadline;
-
-    return bucketManager.privateDownloadUrl(Constants.protocol + domain, key, deadline);
+/**
+ * 根据 deadline 判断是否成成privateDownloadUrl
+ * @param domain
+ * @param key
+ * @param deadline
+ * @returns {string}
+ */
+function generateUrl(domain, key, deadline) {
+    if (deadline) {
+        let config = new qiniu.conf.Config();
+        let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
+        deadline = parseInt(Date.now() / 1000) + deadline;
+        return bucketManager.privateDownloadUrl(PROTOCOL + domain, key, deadline);
+    } else {
+        return PROTOCOL + domain + '/' + encodeURI(key);
+    }
 }
 
 /**
@@ -110,4 +125,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, httpAuthorization, getQiniuUrl, getPrivateUrl, remove, upload, fetch, methods, generateBucket,};
+export {init, httpAuthorization, generateUrl, remove, upload, fetch, methods, generateBucket,};

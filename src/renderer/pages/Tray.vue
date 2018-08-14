@@ -55,7 +55,7 @@
 <script>
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
-    import * as util from '../util/util';
+    import {util, Constants} from '../service';
     import storage from 'electron-json-storage';
     import api from '../api/API';
 
@@ -74,52 +74,46 @@
         },
         computed: {
             ...mapGetters({
-                bucket_name: types.APP.setup_bucket_name,
-                bucket_dir: types.APP.setup_bucket_dir,
-                setup_copyType: types.APP.setup_copyType,
+                bucket_name: types.APP.setup_bucket_name
             })
         },
         created() {
             document.getElementById('title') && document.getElementById('title').remove();
 
-            this[types.APP.app_a_setup_init](() => {
-                this.$storage.setname('qiniu');
-                this.$storage.initCOS((result) => {
-                    if (result) {
-                        API = new api(this);
-                        API.get(this.$storage.cos.methods.domains, {tbl: this.bucket_name}).then((response) => {
-                            console.log(this.response);
-                            this.domains = response.data;
-                        });
-                    } else {
-                        console.log('key 注册失败');
-                    }
-                });
+            storage.get('app_setup', (error, app) => {
+                if (app && app.bucket_name) {
+                    this.$storage.setname('qiniu');
+                    this.$storage.initCOS((result) => {
+                        if (result) {
+                            API = new api(this);
+                            API.get(this.$storage.cos.methods.domains, {tbl: app.bucket_name}).then((response) => {
+                                this.domains = response.data;
+                            });
+                        } else {
+                            console.log('key 注册失败');
+                        }
+                    });
+                } else {
+                    //如果未设置bucket_name时的处理
+                }
             });
 
-            let ipc = this.$electron.ipcRenderer;
-            ipc.on('upload-Files', (event, files) => {
+            ipc = this.$electron.ipcRenderer;
+            ipc.removeAllListeners(Constants.Listener.UploadFile);
+            ipc.on(Constants.Listener.UploadFile, (event, files) => {
                 this.files = files;
-
                 storage.get('app_setup', (error, app) => {
-                    if (!app.bucket_name || !app.bucket_dir) {
+                    if (app && app.bucket_name) {
+                        this.config = app;
+                        this.doUploadFile();
+                    } else {
                         ipc.send('show-Notifier', {
                             title: 'qiniu-client',
                             message: '请先设置上传空间',
                         });
                         this.updateStatus('');
-                        return;
-                    }
-
-                    if (!error) {
-                        this.config = app;
-                        this.doUploadFile();
                     }
                 });
-            });
-
-            ipc.on('log', (event, log) => {
-                console.log(log);
             });
         },
         methods: {
@@ -147,7 +141,7 @@
                 }
             },
             uploadFile(filePath) {
-                let key = this.config.bucket_dir + '/' + util.getName(filePath);
+                let key = (this.config.bucket_dir ? this.config.bucket_dir + '/' : '') + util.getName(filePath);
 
                 let log = {
                     path: filePath,
@@ -183,11 +177,11 @@
                 this.doUploadFile();
             },
             show(key) {
-                let url = util.getQiniuUrl(this.domains[0], key);
+                let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 this.$electron.shell.openExternal(url);
             },
             copy(key) {
-                let url = util.getQiniuUrl(this.domains[0], key);
+                let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 util.setClipboardText(this, this.config.copyType, url);
             },
             openInFolder(path) {

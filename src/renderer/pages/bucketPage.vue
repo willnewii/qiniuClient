@@ -48,14 +48,14 @@
                        @on-update="onTableUpdate"></resource-grid>
         <!-- 删除文件-多选-->
         <Modal
-                v-model="Model_DeleteAsk"
+                v-model="Model_DeleteAsk_Multiple"
                 title="确认删除文件？"
                 @on-ok="doRemoves">
             <p v-for="file in bucket.selection">{{file.key}}</p>
         </Modal>
         <!-- 删除文件-单选-->
         <Modal
-                v-model="Model_DeleteAsk2"
+                v-model="Model_DeleteAsk"
                 title="确认删除文件？"
                 @on-ok="doRemove"
                 @on-cancel="cancelModal">
@@ -92,8 +92,8 @@
     export default {
         name: 'bucketPage',
         components: {
-            ResourceGrid,
-            Directory, Header, ResourceTable
+            Header, Directory,
+            ResourceGrid, ResourceTable
         },
         mixins: [mixin_base],
         props: {
@@ -107,8 +107,8 @@
                 bucket: null,
                 //控制显示时机,不然resource-table/grid 组件在初始化时会出现高度计算错误.
                 isLoaded: false,
+                Model_DeleteAsk_Multiple: false,
                 Model_DeleteAsk: false,
-                Model_DeleteAsk2: false,
                 Model_DeleteAskKey: '',
                 Model_QueryShow: false,
                 Model_Query: {
@@ -175,7 +175,7 @@
                 if (this.setup_deleteNoAsk) {
                     this.doRemoves();
                 } else {
-                    this.Model_DeleteAsk = true;
+                    this.Model_DeleteAsk_Multiple = true;
                 }
             },
             doRemoves() {
@@ -186,7 +186,7 @@
                     this.doRemove();
                 } else {
                     this.Model_DeleteAskKey = key;
-                    this.Model_DeleteAsk2 = true;
+                    this.Model_DeleteAsk = true;
                 }
             },
             doRemove() {

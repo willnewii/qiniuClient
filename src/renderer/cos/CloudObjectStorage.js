@@ -8,7 +8,6 @@ const NAMES = {
 
 class CloudObjectStorage {
     constructor() {
-        console.log(storage.getDataPath());
     }
 
     setname(name) {

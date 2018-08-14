@@ -28,7 +28,7 @@ export const createTray = function (_mainWindowId) {
     });
 
     ipcMain.on('upload-tray-title', function (event, title) {
-        if (title.length == 0) {
+        if (title.length === 0) {
             setTrayIcon(icon_tray);
         }
         setTrayTitle(title)

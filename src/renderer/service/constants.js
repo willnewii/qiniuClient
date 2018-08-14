@@ -39,3 +39,7 @@ export const CopyType = {
     URL: 'url',
     MARKDOWN: 'markdown'
 };
+
+export const Listener = {
+    'UploadFile':'upload-Files'
+};

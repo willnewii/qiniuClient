@@ -8,6 +8,9 @@ import axios from 'axios';
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 
+import {util} from './service';
+import {CloudObjectStorage} from "@/cos/CloudObjectStorage";
+
 Vue.use(Electron);
 Vue.use(Router);
 Vue.use(iView);
@@ -24,9 +27,6 @@ const router = new Router({
     scrollBehavior: () => ({y: 0}),
     routes
 });
-
-
-import * as util from './util/util';
 
 Vue.filter('getfileNameByPath', function (value) {
     return util.getPostfix(value);
@@ -48,8 +48,6 @@ window.ondragover = function (e) {
 };
 
 import App from './App';
-import {CloudObjectStorage} from "@/cos/CloudObjectStorage";
-
 new Vue({
     router,
     store,

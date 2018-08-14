@@ -78,8 +78,7 @@
             },
         },
         watch: {
-            'bucket.domain': function (val, oldVal) {
-                //在domains为空时,保存 bucket.domain
+            'bucket.domain': function (val) {//在domains为空时,保存 bucket.domain
                 if (this.bucket && this.bucket.domains.length === 0) {
                     let obj = {};
                     obj[this.bucket.name] = val;

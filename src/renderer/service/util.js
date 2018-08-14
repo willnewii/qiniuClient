@@ -35,10 +35,6 @@ export function isEmptyObject(e) {
     return !0;
 }
 
-export function getQiniuUrl(domain, key) {
-    return Constants.protocol + domain + '/' + encodeURI(key);
-}
-
 export function setClipboardText(that, type, url) {
     switch (type) {
         case Constants.CopyType.URL:

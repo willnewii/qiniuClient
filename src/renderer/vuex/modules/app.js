@@ -3,14 +3,13 @@
  */
 import * as types from '../mutation-types';
 
-import * as util from '../../util/util';
+import {util} from '../../service';
 
 const storage = require('electron-json-storage');
 
 function setAppSetup(app) {
     storage.set('app_setup', app);
 }
-
 
 export default {
     state: {

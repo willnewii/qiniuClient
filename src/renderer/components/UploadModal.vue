@@ -1,5 +1,5 @@
 <template>
-    <Modal v-model="uploadModal.isShow" title="上传对话框" @on-ok="preUploadFile"
+    <Modal v-model="uploadModal.isShow" title="上传文件" @on-ok="preUploadFile"
            @on-cancel="initModal">
 
         <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
@@ -42,8 +42,7 @@
                 messageFlag: false
             };
         },
-        computed: {
-        },
+        computed: {},
         created() {
             this.$electron.ipcRenderer.on('selected-directory', (event, path) => {
                 this.handleFile(path);

@@ -65,7 +65,7 @@
             },
             validateToken(access_key, secret_key) {
                 this.$storage.setname('qiniu');
-                this.$storage.init({access_key: access_key, secret_key: secret_key});
+                this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
                 API.get(this.$storage.cos.methods.buckets).then((response) => {
                     this.$storage.saveKey({
                         access_key: access_key,
