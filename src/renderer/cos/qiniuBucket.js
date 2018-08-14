@@ -104,7 +104,7 @@ class Bucket {
     }
 
     getDomains() {
-        this.vm.doRequsetGet(qiniu.methods.getDomains, {tbl: this.name}, (response) => {
+        this.vm.doRequsetGet(qiniu.methods.domains, {tbl: this.name}, (response) => {
             if (!response)
                 return;
 

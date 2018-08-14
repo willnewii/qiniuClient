@@ -7,14 +7,6 @@ import * as util from '../../util/util';
 
 const storage = require('electron-json-storage');
 
-/*function setAppSetup(key, value) {
- storage.get('app_setup', (error, app) => {
- if (!error) {
- app[key] = value;
- storage.set('app_setup', app);
- }
- })
- }*/
 function setAppSetup(app) {
     storage.set('app_setup', app);
 }
@@ -23,32 +15,32 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
-            deleteNoAsk: false,
+            deleteNoAsk: false,//文件删除前是否弹出对话框
             copyType: 'markdown',
             bucket_name: '',
             bucket_dir: '',
-            imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',
-            downloaddir: '',
-            privatebucket: [],
             customedomain: {},
+            imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
+            downloaddir: '',//设置文件的下载路径
+            privatebucket: [],//七牛私有空间不能通过api获取,只能用户手动标记
             privatedeadline: 3600//默认1小时
         },
         app_buckets: [],
     },
     mutations: {
-        [types.APP.setup_s_privatebucket](state, value) {
+        [types.APP.setup_privatebucket](state, value) {
             state.setup.privatebucket = value;
             setAppSetup(state.setup);
         },
-        [types.APP.setup_s_deadline](state, value) {
+        [types.APP.setup_deadline](state, value) {
             state.setup.privatedeadline = value;
             setAppSetup(state.setup);
         },
-        [types.APP.setup_s_downloaddir](state, value) {
+        [types.APP.setup_downloaddir](state, value) {
             state.setup.downloaddir = value;
             setAppSetup(state.setup);
         },
-        [types.APP.setup_s_deleteNoAsk](state, value) {
+        [types.APP.setup_deleteNoAsk](state, value) {
             state.setup.deleteNoAsk = value;
             setAppSetup(state.setup);
         },
@@ -56,7 +48,7 @@ export default {
             state.setup.copyType = value;
             setAppSetup(state.setup);
         },
-        [types.APP.setup_s_customedomain](state, value) {
+        [types.APP.setup_customedomain](state, value) {
             if (!state.setup.customedomain) {
                 state.setup.customedomain = {};
             }
@@ -82,19 +74,19 @@ export default {
     },
     actions: {
         [types.APP.setup_a_deadline](context, value) {
-            context.commit(types.APP.setup_s_deadline, value);
+            context.commit(types.APP.setup_deadline, value);
         },
         [types.APP.setup_a_privatebucket](context, value) {
-            context.commit(types.APP.setup_s_privatebucket, value);
+            context.commit(types.APP.setup_privatebucket, value);
         },
         [types.APP.setup_a_imagestyle](context, value) {
             context.commit(types.APP.setup_imagestyle, value);
         },
         [types.APP.setup_a_deleteNoAsk](context, json) {
-            context.commit(types.APP.setup_s_deleteNoAsk, json);
+            context.commit(types.APP.setup_deleteNoAsk, json);
         },
         [types.APP.setup_a_downloaddir](context, json) {
-            context.commit(types.APP.setup_s_downloaddir, json);
+            context.commit(types.APP.setup_downloaddir, json);
         },
         [types.APP.setup_a_copyType](context, json) {
             context.commit(types.APP.setup_copyType, json);
@@ -103,16 +95,17 @@ export default {
             context.commit(types.APP.setup_savedir, value);
         },
         [types.APP.setup_a_customedomain](context, value) {
-            context.commit(types.APP.setup_s_customedomain, value);
+            context.commit(types.APP.setup_customedomain, value);
         },
         [types.APP.app_a_buckets](context, value) {
             context.commit(types.APP.app_buckets, value);
         },
-        [types.APP.app_a_setup_init](context) {
+        [types.APP.app_a_setup_init](context, callback) {
             storage.get('app_setup', (error, app) => {
                 if (!error) {
                     if (!util.isEmptyObject(app)) {
                         context.commit(types.APP.app_setup_init, app);
+                        callback && callback();
                     }
                 }
             });

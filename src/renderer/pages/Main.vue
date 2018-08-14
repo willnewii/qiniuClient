@@ -181,9 +181,8 @@
             },
             initKEY(cosname, callback) {
                 this.$storage.setname(cosname);
-                this.$storage.getKey((data) => {
-                    if (data) {
-                        this.$storage.cos.init(data);
+                this.$storage.initCOS((result) => {
+                    if (result) {
                         callback && callback();
                     } else {
                         this.$router.push({path: Constants.PageName.login});

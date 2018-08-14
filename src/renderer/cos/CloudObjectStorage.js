@@ -7,7 +7,8 @@ const NAMES = {
 };
 
 class CloudObjectStorage {
-    constructor(name) {
+    constructor() {
+        console.log(storage.getDataPath());
     }
 
     setname(name) {
@@ -19,8 +20,17 @@ class CloudObjectStorage {
         }
     }
 
-    init(param) {
-        this.cos.init({access_key: param.access_key, secret_key: param.secret_key});
+    initCOS(callback) {
+        storage.get(this.name + '_key', (error, data) => {
+            if (!error) {
+                if (data.access_key && data.secret_key) {
+                    this.cos.init({access_key: data.access_key, secret_key: data.secret_key});
+                    callback && callback(true);
+                } else {
+                    callback && callback(false);
+                }
+            }
+        });
     }
 
     saveKey(param, callback) {
@@ -31,18 +41,6 @@ class CloudObjectStorage {
             console.log(error);
             if (!error) {
                 callback && callback();
-            }
-        });
-    }
-
-    getKey(callback) {
-        storage.get(this.name + '_key', (error, data) => {
-            if (!error) {
-                if (data.access_key && data.secret_key) {
-                    callback && callback(data);
-                } else {
-                    callback && callback();
-                }
             }
         });
     }

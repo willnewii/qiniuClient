@@ -56,8 +56,6 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import * as util from '../util/util';
-    import * as Constants from '../service/constants';
-    import * as cloudStorage from '../cos/qiniu';
     import storage from 'electron-json-storage';
     import api from '../api/API';
 
@@ -82,27 +80,24 @@
             })
         },
         created() {
-            document.getElementById('title').remove();
+            document.getElementById('title') && document.getElementById('title').remove();
 
-            this[types.APP.app_a_setup_init]();
-            ipc = this.$electron.ipcRenderer;
-
-            API = new api(this);
-
-            let that = this;
-            storage.get(types.APP.qiniu_key, (error, data) => {
-                if (!error) {
-                    if (data.access_key && data.secret_key) {
-                        cloudStorage.init({access_key: data.access_key, secret_key: data.secret_key});
-
-                        API.get(Constants.method.getDomains, {tbl: this.bucket_name}).then((response) => {
-                            that.domains = response.data;
+            this[types.APP.app_a_setup_init](() => {
+                this.$storage.setname('qiniu');
+                this.$storage.initCOS((result) => {
+                    if (result) {
+                        API = new api(this);
+                        API.get(this.$storage.cos.methods.domains, {tbl: this.bucket_name}).then((response) => {
+                            console.log(this.response);
+                            this.domains = response.data;
                         });
                     } else {
+                        console.log('key 注册失败');
                     }
-                }
+                });
             });
 
+            let ipc = this.$electron.ipcRenderer;
             ipc.on('upload-Files', (event, files) => {
                 this.files = files;
 
@@ -159,7 +154,7 @@
                     key: key
                 };
                 try {
-                    cloudStorage.upload({
+                    this.$storage.cos.upload({
                         bucket: this.config.bucket_name,
                         key: key,
                         path: filePath,

@@ -1,7 +1,6 @@
 /**
  * Created by zhangweiwei on 2017/04/10.
  */
-import Vue from 'vue';
 import axios from 'axios';
 import config from './config';
 
