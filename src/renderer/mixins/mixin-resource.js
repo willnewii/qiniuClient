@@ -5,11 +5,11 @@ import * as types from '../vuex/mutation-types';
 export default {
     computed: {
         ...mapGetters({
-            setup_copyType: types.APP.setup_copyType,
-            setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-            setup_imagestyle: types.APP.setup_imagestyle,
-            setup_downloaddir: types.APP.setup_downloaddir,
-            setup_deadline: types.APP.setup_deadline,
+            setup_copyType: types.setup.setup_copyType,
+            setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+            setup_imagestyle: types.setup.setup_imagestyle,
+            setup_downloaddir: types.setup.setup_downloaddir,
+            setup_deadline: types.setup.setup_deadline,
         })
     },
     props: {

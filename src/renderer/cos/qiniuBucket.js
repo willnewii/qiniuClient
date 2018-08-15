@@ -241,8 +241,6 @@ class Bucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        //let fileName = key ? key : this.files[index].key;
-
         return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
     }
 }

@@ -55,14 +55,14 @@
 <script>
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
-    import {util, Constants} from '../service';
+    import {util, Constants, storagePromise, mixins} from '../service';
     import storage from 'electron-json-storage';
-    import api from '../api/API';
 
-    let API, ipc;
+    let ipc;
 
     export default {
         name: 'tray-page',
+        mixins: [mixins.base],
         data() {
             return {
                 domains: [],
@@ -74,35 +74,33 @@
         },
         computed: {
             ...mapGetters({
-                bucket_name: types.APP.setup_bucket_name
+                bucket_name: types.setup.setup_bucket_name
             })
         },
-        created() {
+        async created() {
             document.getElementById('title') && document.getElementById('title').remove();
 
-            storage.get('app_setup', (error, app) => {
-                if (app && app.bucket_name) {
-                    this.$storage.setname('qiniu');
-                    this.$storage.initCOS((result) => {
-                        if (result) {
-                            API = new api(this);
-                            API.get(this.$storage.cos.methods.domains, {tbl: app.bucket_name}).then((response) => {
-                                this.domains = response.data;
-                            });
-                        } else {
-                            console.log('key 注册失败');
-                        }
-                    });
-                } else {
-                    //如果未设置bucket_name时的处理
-                }
-            });
+            let app = await storagePromise.get(Constants.Key.configuration);
+            if (app && app.bucket_name) {
+                this.$storage.setName('qiniu');
+                this.$storage.initCOS((result) => {
+                    if (result) {
+                        this.doRequsetGet(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
+                            this.domains = response.data;
+                        });
+                    } else {
+                        console.log('key 注册失败');
+                    }
+                });
+            } else {
+                console.error('未设置bucket_name');
+            }
 
             ipc = this.$electron.ipcRenderer;
             ipc.removeAllListeners(Constants.Listener.uploadFile);
             ipc.on(Constants.Listener.uploadFile, (event, files) => {
                 this.files = files;
-                storage.get('app_setup', (error, app) => {
+                storage.get(Constants.Key.configuration, (error, app) => {
                     if (app && app.bucket_name) {
                         this.config = app;
                         this.doUploadFile();
@@ -118,7 +116,7 @@
         },
         methods: {
             ...mapActions([
-                types.APP.app_a_setup_init,
+                types.setup.setup_init,
             ]),
             updateStatus(title) {
                 console.log('title:', title);

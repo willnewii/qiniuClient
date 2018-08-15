@@ -78,7 +78,7 @@
                 if (this.bucket && this.bucket.domains.length === 0 && val) {
                     let obj = {};
                     obj[this.bucket.name] = val;
-                    this[types.APP.setup_a_customedomain](obj);
+                    this[types.setup.setup_a_customedomain](obj);
                 }
             },
         },
@@ -91,7 +91,7 @@
         },
         methods: {
             ...mapActions([
-                types.APP.setup_a_customedomain,
+                types.setup.setup_a_customedomain,
             ]),
             toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];

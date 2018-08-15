@@ -9,7 +9,7 @@ import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 
 import {util} from './service';
-import {CloudObjectStorage} from "@/cos/CloudObjectStorage";
+import CloudObjectStorage from "@/cos/CloudObjectStorage";
 
 Vue.use(Electron);
 Vue.use(Router);
@@ -18,7 +18,7 @@ Vue.use(VueLazyload);
 
 Vue.prototype.$storage = new CloudObjectStorage();
 
-Vue.config.debug = false;
+// Vue.config.debug = false;
 
 import routes from './routes';
 import store from './vuex/store';

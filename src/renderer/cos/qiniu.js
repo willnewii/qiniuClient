@@ -4,13 +4,13 @@ import QiniuBucket from "@/cos/qiniuBucket";
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
-//独立于个COS的配置
+//独立于各COS的配置
 const PROTOCOL = 'http://';
 
 const methods = {
-    //列举账号的所有空间
+    //空间列表
     buckets: 'https://rs.qbox.me/buckets',
-    //获取一个空间绑定的域名列表
+    //空间对应的域名列表(授权空间域名返回为空)
     domains: 'https://api.qiniu.com/v6/domain/list',
     //获取目录(是通过公共前缀模拟出的效果)
     getResources: 'https://rsf.qbox.me/list',

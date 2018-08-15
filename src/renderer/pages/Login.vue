@@ -29,11 +29,10 @@
     </div>
 </template>
 <script>
-    import api from '../api/API';
-
-    let API;
+    import {Constants, mixins} from '../service';
 
     export default {
+        mixins: [mixins.base],
         data() {
             return {
                 formItem: {
@@ -48,13 +47,12 @@
         },
         computed: {},
         created: function () {
-            API = new api(this);
         },
         methods: {
             handleSubmit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.validateToken(this.formItem.access_key, this.formItem.secret_key);
+                        this.validateKey(this.formItem.access_key, this.formItem.secret_key);
                     } else {
                         console.log('表单不能提交');
                     }
@@ -63,20 +61,20 @@
             handleReset(name) {
                 this.$refs[name].resetFields();
             },
-            validateToken(access_key, secret_key) {
-                this.$storage.setname('qiniu');
+            validateKey(access_key, secret_key) {
+                this.$storage.setName('qiniu');
                 this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
-                API.get(this.$storage.cos.methods.buckets).then((response) => {
-                    this.$storage.saveKey({
+                this.doRequsetGet(this.$storage.cos.methods.buckets, null, () => {
+                    this.$storage.saveCosKey({
                         access_key: access_key,
                         secret_key: secret_key
                     }, () => {
-                        this.$router.push({path: '/'});
+                        this.$router.push({name: Constants.PageName.main});
                     });
-                }).catch((error) => {
+                }, (error) => {
                     this.$Notice.error({
                         title: '抱歉',
-                        desc: '七牛key设置失败.请检查你输入的key.' + error.toString()
+                        desc: 'COS key设置失败.请检查你输入的key是否正确.' + error.toString()
                     });
                 });
             },

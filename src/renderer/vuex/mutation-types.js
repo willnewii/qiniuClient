@@ -1,5 +1,5 @@
-export const APP = {
-    qiniu_key: 'qiniu_Key',
+export const setup = {
+    setup_init: 'setup_init',
 
     setup_deadline: 'setup_deadline',
     setup_a_deadline: 'setup_a_deadline',
@@ -27,13 +27,12 @@ export const APP = {
 
     setup_customedomain: 'setup_customedomain',
     setup_a_customedomain: 'setup_a_customedomain',
+};
 
-    menu_state: 'menu_state',
-    menu_a_state: 'menu_a_state',
+export const app = {
+    name: 'name',
+    a_name: 'name',
 
-    app_buckets: 'app_buckets',
-    app_a_buckets: 'app_a_buckets',
-
-    app_setup_init: 'app_setup_init',
-    app_a_setup_init: 'app_a_setup_init',
+    buckets: 'buckets',
+    a_buckets: 'action_buckets',
 };

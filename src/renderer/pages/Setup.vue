@@ -116,15 +116,15 @@
         },
         computed: {
             ...mapGetters({
-                buckets: types.APP.app_buckets,
-                setup_copyType: types.APP.setup_copyType,
-                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-                setup_bucket_name: types.APP.setup_bucket_name,
-                setup_bucket_dir: types.APP.setup_bucket_dir,
-                setup_imagestyle: types.APP.setup_imagestyle,
-                setup_downloaddir: types.APP.setup_downloaddir,
-                setup_privatebucket: types.APP.setup_privatebucket,
-                setup_deadline: types.APP.setup_deadline
+                buckets: types.app.buckets,
+                setup_copyType: types.setup.setup_copyType,
+                setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                setup_bucket_name: types.setup.setup_bucket_name,
+                setup_bucket_dir: types.setup.setup_bucket_dir,
+                setup_imagestyle: types.setup.setup_imagestyle,
+                setup_downloaddir: types.setup.setup_downloaddir,
+                setup_privatebucket: types.setup.setup_privatebucket,
+                setup_deadline: types.setup.setup_deadline
             })
         },
         components: {},
@@ -144,36 +144,36 @@
         },
         methods: {
             ...mapActions([
-                types.APP.setup_a_copyType,
-                types.APP.setup_a_deleteNoAsk,
-                types.APP.setup_a_savedir,
-                types.APP.setup_a_imagestyle,
-                types.APP.setup_a_downloaddir,
-                types.APP.setup_a_privatebucket,
-                types.APP.setup_a_deadline,
+                types.setup.setup_a_copyType,
+                types.setup.setup_a_deleteNoAsk,
+                types.setup.setup_a_savedir,
+                types.setup.setup_a_imagestyle,
+                types.setup.setup_a_downloaddir,
+                types.setup.setup_a_privatebucket,
+                types.setup.setup_a_deadline,
             ]),
             deleteNoAskChange: function (state) {
-                this[types.APP.setup_a_deleteNoAsk](state);
+                this[types.setup.setup_a_deleteNoAsk](state);
             },
             copyTypeChange: function (model) {
-                this[types.APP.setup_a_copyType](model);
+                this[types.setup.setup_a_copyType](model);
             },
             privatesChange: function (privatebucket) {
-                this[types.APP.setup_a_privatebucket](privatebucket);
+                this[types.setup.setup_a_privatebucket](privatebucket);
             },
             saveDir: function () {
-                this[types.APP.setup_a_savedir]([this.bucketname, this.bucketdir]);
+                this[types.setup.setup_a_savedir]([this.bucketname, this.bucketdir]);
                 this.$Message.success('默认托盘路径修改成功');
             },
             saveImagestyle: function () {
-                this[types.APP.setup_a_imagestyle]([this.imagestyle]);
+                this[types.setup.setup_a_imagestyle]([this.imagestyle]);
                 this.$Message.success('图片样式修改成功');
             },
             saveDeadline: function () {
                 if (isNaN(this.deadline)) {
                     this.$Message.error('请检查过期时间值格式是否正确');
                 } else {
-                    this[types.APP.setup_a_deadline](this.deadline * 60);
+                    this[types.setup.setup_a_deadline](this.deadline * 60);
                     this.$Message.success('私有空间过期时间已修改为' + this.deadline + '分钟');
                 }
             },
@@ -181,7 +181,7 @@
                 ipc.send(Constants.Listener.choiceDownloadFolder, {properties: ['openDirectory']});
             },
             saveDownloadolder() {
-                this[types.APP.setup_a_downloaddir](this.downloaddir);
+                this[types.setup.setup_a_downloaddir](this.downloaddir);
             },
             openBrowser(index) {
                 let url;

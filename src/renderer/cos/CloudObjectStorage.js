@@ -1,65 +1,60 @@
+import * as storagePromise from '../service/storagePromise';
 import * as qiniu from '../cos/qiniu';
+import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
 
-const NAMES = {
-    qiniu: 'qiniu'
-};
 
-class CloudObjectStorage {
+export default class CloudObjectStorage {
     constructor() {
     }
 
-    setname(name) {
+    setName(name) {
         this.name = name;
 
         switch (name) {
-            case NAMES.qiniu:
+            case brand.qiniu:
                 this.cos = qiniu;
         }
     }
 
-    initCOS(callback) {
-        storage.get(this.name + '_key', (error, data) => {
-            if (!error) {
-                if (data.access_key && data.secret_key) {
-                    this.cos.init({access_key: data.access_key, secret_key: data.secret_key});
-                    callback && callback(true);
-                } else {
-                    callback && callback(false);
-                }
-            }
-        });
+    /**
+     * 初始化当前cos ,只做了非空验证
+     * @param callback
+     */
+    async initCOS(callback) {
+        let data = await storagePromise.get(this.name + '_key');
+        if (data && data.access_key && data.secret_key) {
+            this.cos.init({access_key: data.access_key, secret_key: data.secret_key});
+            callback && callback(true);
+        } else {
+            callback && callback(false);
+        }
     }
 
-    saveKey(param, callback) {
-        storage.set(this.name + '_key', {
+    /**
+     * 保存当前cos key信息
+     * @param param
+     * @param callback
+     */
+    async saveCosKey(param, callback) {
+        let params = {
             access_key: param.access_key,
             secret_key: param.secret_key
-        }, (error) => {
-            console.log(error);
-            if (!error) {
-                callback && callback();
-            }
-        });
+        };
+        await storagePromise.set(this.name + '_key', params);
+        callback && callback();
     }
 
-    logout(callback) {
+    /**
+     * 删除当前cos key信息
+     * @param callback
+     */
+    cleanCosKey(callback) {
         storage.clear(this.name + '_key', (error, data) => {
             if (!error) {
                 callback && callback();
             }
         });
     }
-
-    /**
-     * 根据url,生成鉴权信息
-     * @param url
-     * @returns {*}
-     */
-    getHttpAuthorization(url) {
-        return this.cos.httpAuthorization(url);
-    }
 }
-
-export {CloudObjectStorage, NAMES};

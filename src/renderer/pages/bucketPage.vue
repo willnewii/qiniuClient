@@ -86,8 +86,7 @@
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
-    import mixin_base from "../mixins/mixin-base";
-    import {Constants, util, EventBus} from '../service/index';
+    import {Constants, util, EventBus, mixins} from '../service/index';
 
     export default {
         name: 'bucketPage',
@@ -95,7 +94,7 @@
             Header, Directory,
             ResourceGrid, ResourceTable
         },
-        mixins: [mixin_base],
+        mixins: [mixins.base],
         props: {
             bucketName: {
                 type: String,
@@ -122,9 +121,9 @@
         },
         computed: {
             ...mapGetters({
-                privatebucket: types.APP.setup_privatebucket,
-                setup_deleteNoAsk: types.APP.setup_deleteNoAsk,
-                customeDomains: types.APP.setup_customedomain
+                privatebucket: types.setup.setup_privatebucket,
+                setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                customeDomains: types.setup.setup_customedomain
             })
         },
         watch: {

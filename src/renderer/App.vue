@@ -15,7 +15,7 @@
             }
         },
         data() {
-            return {}
+            return {};
         },
         created: function () {
             if (process.platform !== 'darwin') {
@@ -24,5 +24,9 @@
         },
         mounted() {
         }
-    }
+    };
 </script>
+<style lang="scss">
+    @import './style/animate';
+    @import './style/base';
+</style>

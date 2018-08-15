@@ -8,22 +8,18 @@ export default {
         api = new API(this);
     },
     methods: {
-        doRequset(url, param, success) {
-            api.post(url, param).then((response) => {
-                success(response);
-            });
+        doRequset(url, param, success, fail) {
+            this._request('post', ...arguments);
         },
-        doRequsetGet(url, param, success) {
-            api.get(url, param).then((response) => {
+        doRequsetGet(url, param, success, fail) {
+            this._request('get', ...arguments);
+        },
+        _request(method, url, param, success, fail) {
+            api[method](url, param).then((response) => {
                 count = 0;
                 success(response);
             }).catch((error) => {
-                if (error.response.status === 503 && count < 3) {
-                    count++;
-                    this.doRequsetGet(url, param, success);
-                } else {
-                    count = 0;
-                }
+                fail && fail(error);
             });
         },
         openBrowser(url) {

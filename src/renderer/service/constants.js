@@ -14,10 +14,12 @@ export const Key = {
     filter: '__filter__',
     app_setup: '__app__setup__',
     app_logout: '__app__logout__',
+    configuration:'configuration',
 };
 
 export const PageName = {
     login: 'login',
+    main: 'main',
     tray: 'tray',
     bucketPage: 'bucketPage',
     setup: 'setup',
