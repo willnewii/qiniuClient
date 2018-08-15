@@ -168,8 +168,7 @@ class Bucket {
      */
     search(dir, search = '') {
         this.marker = '';
-        //TODO: 设置search默认值
-        this.getResources(search ? dir + search : dir);
+        this.getResources(dir + search);
     }
 
     /**
