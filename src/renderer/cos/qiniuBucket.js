@@ -86,44 +86,26 @@ class Bucket {
      * 设置domains
      * 如果正常读取domains,默认匹配最后一个(目前clouddn.com域名在最前,正好最后可以匹配自定义域名)
      * 如果domains为空,查询customeDomains
-     * @param domains
-     * @param customeDomains
      */
-    setDomains(domains, customeDomains) {
-        if (domains && domains.length > 0) {
-            this.domains = domains;
-            //默认选择最后一个域名
-            this.domain = this.domains[this.domains.length - 1];
-        } else {
-            if (customeDomains && customeDomains[this.name]) {
-                this.domain = customeDomains[this.name];
-            } else {
-                this.domain = '';
-            }
-        }
-    }
-
     getDomains() {
-        this.vm.doRequsetGet(qiniu.methods.domains, {tbl: this.name}, (response) => {
+        this.vm.doRequset(qiniu.methods.domains, {tbl: this.name}, (response) => {
             if (!response)
                 return;
 
-            this.setDomains(response.data, this.vm.customeDomains);
+            let domains = response.data ;
+            let customeDomains = this.vm.customeDomains ;
+            if (domains && domains.length > 0) {
+                this.domains = domains;
+                //默认选择最后一个域名
+                this.domain = this.domains[this.domains.length - 1];
+            } else {
+                if (customeDomains && customeDomains[this.name]) {
+                    this.domain = customeDomains[this.name];
+                } else {
+                    this.domain = '';
+                }
+            }
         });
-    }
-
-    /**
-     * 添加dirs
-     * @param data
-     */
-    setDirs(data) {
-        if (data.commonPrefixes) {
-            this.dirs = this.dirs.concat(data.commonPrefixes);
-        }
-
-        if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
-            this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
-        }
     }
 
     /**
@@ -144,20 +126,19 @@ class Bucket {
             if (!response)
                 return;
 
-            this.setDirs(response.data);
+            let data = response.data;
+            if (data.commonPrefixes) {
+                this.dirs = this.dirs.concat(data.commonPrefixes);
+            }
+
+            if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
+                this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
+            }
 
             response.data.marker && this.getDirs(response.data.marker);
         });
     }
 
-    /**
-     * 添加files
-     * @param data
-     */
-    setResources(data) {
-        this.files = this.marker ? this.files.concat(data.items) : data.items;
-        this.marker = data.marker ? data.marker : '';
-    }
 
     getResources(keyword) {
         //重置多选数组
@@ -180,7 +161,10 @@ class Bucket {
             if (!response)
                 return;
 
-            this.setResources(response.data);
+            let data = response.data;
+            this.files = this.marker ? this.files.concat(data.items) : data.items;
+            this.marker = data.marker ? data.marker : '';
+
             this.vm.isLoaded = true;
         });
     }

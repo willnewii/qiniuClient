@@ -1,17 +1,10 @@
 <style lang="scss" scoped>
     .layout-content {
         margin: 15px;
-        //overflow: scroll;
+        flex-grow: 1;
         background: #fff;
     }
 
-</style>
-<style lang="scss">
-    .primary-line-btn {
-    }
-
-    .error-line-btn {
-    }
 </style>
 <template>
     <div class="layout-content">
@@ -31,7 +24,6 @@
             return {
                 self: this,
                 tableHeight: 100,
-                tableWidth: 100,
                 columns: [
                     {
                         type: 'selection',
@@ -102,22 +94,17 @@
         created() {
         },
         mounted() {
-            this.setTableSize();
+            this.updateTableSize();
             window.onresize = () => {
-                this.setTableSize();
+                this.updateTableSize();
             };
         },
         methods: {
             onSelectionChange(selection) {
                 this.bucket.selection = selection;
             },
-            setTableSize() {
-                if (this.$parent) {
-                    let layout = this.$parent.$el;
-
-                    let style = window.getComputedStyle(layout.children[2]);
-                    this.tableHeight = layout.clientHeight - layout.children[0].clientHeight - layout.children[1].clientHeight - parseInt(style.marginTop) - parseInt(style.marginBottom);
-                }
+            updateTableSize() {
+                this.tableHeight = this.$el.clientHeight;
             },
         }
     };

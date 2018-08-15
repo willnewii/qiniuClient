@@ -13,23 +13,14 @@ class API {
     }
 
     post(url, param) {
-        //config.data = param;
-        // return axios.post("", null, config);
-        let _url = url;
-        if (param)
-            _url = _url + '?' + Qs.stringify(param);
-        return this._request(_url, 'post');
+        return this._request(url, 'post', param);
     }
 
     get(url, param) {
-        // config.params = param;
-        //return axios.get("", config);
-
-        let _url = url;
         if (param)
-            _url = _url + '?' + Qs.stringify(param);
+            url = url + '?' + Qs.stringify(param);
 
-        return this._request(_url, 'get');
+        return this._request(url, 'get');
     }
 
     _request(url, type, param) {
@@ -48,7 +39,7 @@ class API {
         if (type === 'get') {
             request = axios.get(url, config);
         } else {
-            request = axios[type](url, null, config);
+            request = axios[type](url, param, config);
         }
 
         request.then((response) => {

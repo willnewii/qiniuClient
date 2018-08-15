@@ -123,7 +123,7 @@
                 });
             },
             checkVersion() {
-                this.doRequsetGet(Constants.URL.releases, null, (response) => {
+                this.doRequset(Constants.URL.releases, null, (response) => {
                     let result = response.data;
                     if (result.tag_name > pkg.version) {
                         this.version.url = result.html_url;
@@ -182,7 +182,8 @@
         position: relative;
         border-radius: 4px;
         overflow: hidden;
-
+        display: flex;
+        flex-direction: column;
         .ivu-row-flex {
             height: 100%;
         }

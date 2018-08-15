@@ -64,7 +64,7 @@
             validateKey(access_key, secret_key) {
                 this.$storage.setName('qiniu');
                 this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
-                this.doRequsetGet(this.$storage.cos.methods.buckets, null, () => {
+                this.doRequset(this.$storage.cos.methods.buckets, null, () => {
                     this.$storage.saveCosKey({
                         access_key: access_key,
                         secret_key: secret_key

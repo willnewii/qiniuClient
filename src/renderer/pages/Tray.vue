@@ -85,7 +85,7 @@
                 this.$storage.setName('qiniu');
                 this.$storage.initCOS((result) => {
                     if (result) {
-                        this.doRequsetGet(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
+                        this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
                             this.domains = response.data;
                         });
                     } else {

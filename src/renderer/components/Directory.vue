@@ -1,7 +1,7 @@
 <template>
     <div class="layout-tag">
         <Tag type="border" v-for="item of bucket.dirs" :key="item"
-             :class="{'blue-tag':bucket.currentDir}">
+             :class="{'blue-tag':bucket.currentDir === item}">
             <p v-on:click="doSearch(item)">{{getText(item)}}</p>
         </Tag>
     </div>
@@ -17,9 +17,7 @@
             }
         },
         data() {
-            return {
-                withoutDelimiter: Constants.Key.withoutDelimiter
-            };
+            return {};
         },
         methods: {
             getText(name) {
