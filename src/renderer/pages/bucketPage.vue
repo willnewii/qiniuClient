@@ -32,9 +32,9 @@
             </Button>
 
             <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
-                <Button :type="bucket.showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
+                <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
                         icon="navicon-round"></Button>
-                <Button :type="bucket.showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
+                <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
             </Button-group>
 
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
@@ -42,9 +42,9 @@
             </Button-group>
         </div>
 
-        <resource-table v-if="isLoaded && bucket.showType === 0" :bucket="bucket"
+        <resource-table v-if="showType === 0" :bucket="bucket"
                         @on-update="onTableUpdate"></resource-table>
-        <resource-grid v-else-if="isLoaded && bucket.showType === 1" :bucket="bucket"
+        <resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
         <!-- 删除文件-多选-->
         <Modal
@@ -104,8 +104,7 @@
         data() {
             return {
                 bucket: null,
-                //控制显示时机,不然resource-table/grid 组件在初始化时会出现高度计算错误.
-                isLoaded: false,
+                showType: 0, //0:列表 1:grid
                 Model_DeleteAsk_Multiple: false,
                 Model_DeleteAsk: false,
                 Model_DeleteAskKey: '',
@@ -148,7 +147,7 @@
              */
             initBucket(bucketName) {
                 this.bucket = this.$storage.cos.generateBucket(bucketName);
-                this.bucket.init(this);
+                this.bucket.bindPage(this);
             },
             /**
              * 获取指定前缀文件列表
@@ -248,7 +247,7 @@
              */
             showType(type) {
                 this.bucket.selection = [];
-                this.bucket.showType = type;
+                this.showType = type;
             },
             /**
              * table数据项更新回调

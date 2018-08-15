@@ -51,7 +51,7 @@
             window.ondrop = (e) => {
                 e.preventDefault();
                 if (e.dataTransfer.files.length > 0) {
-                    this.uploadModal.prepend = this.bucket.getCurrentDirStr();
+                    this.uploadModal.prepend = this.bucket.getCurrentDir();
 
                     let paths = [];
                     Array.from(e.dataTransfer.files).forEach((item) => {
@@ -75,7 +75,7 @@
         },
         methods: {
             uploadAction(index) {
-                this.uploadModal.prepend = this.bucket.getCurrentDirStr();
+                this.uploadModal.prepend = this.bucket.getCurrentDir();
                 switch (index) {
                     case 0://调用文件选取对话框
                         this.filePaths = [];

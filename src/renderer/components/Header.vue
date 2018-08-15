@@ -66,8 +66,8 @@
         },
         computed: {
             placeholder() {
-                if (this.bucket.getCurrentDirStr()) {
-                    return '搜索' + this.bucket.getCurrentDirStr() + '目录下文件';
+                if (this.bucket.getCurrentDir()) {
+                    return '搜索' + this.bucket.getCurrentDir() + '目录下文件';
                 } else {
                     return '搜索';
                 }
@@ -115,7 +115,7 @@
                         this.$refs['uploadModal'].uploadAction(index);
                         break;
                     case 2://搜索事件
-                        this.$emit('on-search', this.bucket.getCurrentDirStr(), this.search, event);
+                        this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);
                         break;
                 }
             }

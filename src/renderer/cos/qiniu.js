@@ -13,7 +13,7 @@ const methods = {
     //空间对应的域名列表(授权空间域名返回为空)
     domains: 'https://api.qiniu.com/v6/domain/list',
     //获取目录(是通过公共前缀模拟出的效果)
-    getResources: 'https://rsf.qbox.me/list',
+    resources: 'https://rsf.qbox.me/list',
 };
 
 function init(param) {

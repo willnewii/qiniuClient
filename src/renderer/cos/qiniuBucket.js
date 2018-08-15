@@ -33,8 +33,6 @@ class Bucket {
         this.files = [];
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
-        //显示类型 0: table  1: grid
-        this.showType = 0;
     }
 
     /**
@@ -44,10 +42,10 @@ class Bucket {
      * 获取默认资源列表
      * @param vm => page
      */
-    init(vm) {
+    bindPage(vm) {
         this.vm = vm;
 
-        this.checkPrivate(vm.privatebucket);
+        this.checkPrivate();
 
         this.getDomains();
         this.getDirs();
@@ -55,15 +53,11 @@ class Bucket {
     }
 
     /**
-     * 获取当前目录
+     * 返回当前目录，[全部,其他]都返回''
      * @returns {*}
      */
-    getCurrentDirStr() {
-        if (this.currentDir === Constants.Key.withoutDelimiter) {
-            return '';
-        } else {
-            return this.currentDir;
-        }
+    getCurrentDir() {
+        return this.currentDir === Constants.Key.withoutDelimiter ? '' : this.currentDir;
     }
 
     /**
@@ -75,10 +69,10 @@ class Bucket {
     }
 
     /**
-     * 检测是否是私密空间
-     * @param privateBuckets
+     * 检测是否属于私密空间
      */
-    checkPrivate(privateBuckets) {
+    checkPrivate() {
+        let privateBuckets = this.vm.privatebucket;
         this.isprivate = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1);
     }
 
@@ -92,8 +86,8 @@ class Bucket {
             if (!response)
                 return;
 
-            let domains = response.data ;
-            let customeDomains = this.vm.customeDomains ;
+            let domains = response.data;
+            let customeDomains = this.vm.customeDomains;
             if (domains && domains.length > 0) {
                 this.domains = domains;
                 //默认选择最后一个域名
@@ -122,7 +116,7 @@ class Bucket {
             data.marker = marker;
         }
 
-        this.vm.doRequset(qiniu.methods.getResources, data, (response) => {
+        this.vm.doRequset(qiniu.methods.resources, data, (response) => {
             if (!response)
                 return;
 
@@ -157,15 +151,13 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        this.vm.doRequset(qiniu.methods.getResources, param, (response) => {
+        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
             if (!response)
                 return;
 
             let data = response.data;
             this.files = this.marker ? this.files.concat(data.items) : data.items;
             this.marker = data.marker ? data.marker : '';
-
-            this.vm.isLoaded = true;
         });
     }
 
@@ -174,8 +166,9 @@ class Bucket {
      *  dir：目录
      *  search：关键字
      */
-    search(dir, search) {
+    search(dir, search = '') {
         this.marker = '';
+        //TODO: 设置search默认值
         this.getResources(search ? dir + search : dir);
     }
 
