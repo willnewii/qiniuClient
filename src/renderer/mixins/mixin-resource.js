@@ -85,7 +85,7 @@ export default {
         },
         resourceRemove(index) {
             this.deleteItem = this.bucket.files[index];
-            this.$parent.remove(this.deleteItem.key);
+            this.$parent.askRemove(this.deleteItem.key);
         },
         /**
          * 删除单个文件

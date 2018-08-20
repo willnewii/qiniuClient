@@ -27,7 +27,7 @@
                     v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
             </Button>
 
-            <Button type="error" size="small" @click="removes()" icon="trash-b" style="margin-right: 10px;"
+            <Button type="error" size="small" @click="askRemove()" icon="trash-b" style="margin-right: 10px;"
                     v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
             </Button>
 
@@ -46,20 +46,15 @@
                         @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
-        <!-- 删除文件-多选-->
-        <Modal
-                v-model="model_DeleteAsk_Multiple"
-                title="确认删除文件？"
-                @on-ok="doRemoves">
-            <p v-for="file in bucket.selection">{{file.key}}</p>
-        </Modal>
-        <!-- 删除文件-单选-->
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
-                @on-ok="doRemove"
+                @on-ok="callRemove"
                 @on-cancel="cancelModal">
-            <p>{{model_DeleteAskKey}}</p>
+            <p v-if="model_DeleteAskKey">{{model_DeleteAskKey}}</p>
+            <template v-else>
+                <p v-for="file in bucket.selection">{{file.key}}</p>
+            </template>
         </Modal>
         <!-- 筛选文件-->
         <Modal
@@ -168,27 +163,21 @@
             changeDir: function (dir) {
                 this.bucket.setCurrentDir(dir);
             },
-            removes() {
+            askRemove(key) {
+                this.model_DeleteAskKey = key;
                 if (this.setup_deleteNoAsk) {
-                    this.doRemoves();
+                    this.callRemove();
                 } else {
-                    this.model_DeleteAsk_Multiple = true;
-                }
-            },
-            doRemoves() {
-                EventBus.$emit(Constants.Event.removes);
-            },
-            remove(key) {
-                if (this.setup_deleteNoAsk) {
-                    this.doRemove();
-                } else {
-                    this.model_DeleteAskKey = key;
                     this.model_DeleteAsk = true;
                 }
             },
-            doRemove() {
-                this.model_DeleteAskKey = '';
-                EventBus.$emit(Constants.Event.remove);
+            callRemove() {
+                if (this.model_DeleteAskKey) {
+                    this.model_DeleteAskKey = '';
+                    EventBus.$emit(Constants.Event.remove);
+                } else {
+                    EventBus.$emit(Constants.Event.removes);
+                }
             },
             cancelModal() {
                 this.model_DeleteAskKey = '';
