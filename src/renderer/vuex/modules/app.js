@@ -8,6 +8,7 @@ export default {
         app: {
             name: '', //cos name
             buckets: [],
+            buckets_info: [],
         }
 
     },
@@ -15,11 +16,17 @@ export default {
         [types.app.buckets](state, value) {
             state.app.buckets = value;
         },
+        [types.app.buckets_info](state, value) {
+            state.app.buckets_info = value;
+        },
         [types.app.name](state, value) {
             state.app.name = value;
         },
     },
     actions: {
+        [types.app.a_buckets_info](context, value) {
+            context.commit(types.app.buckets_info, value);
+        },
         [types.app.a_buckets](context, value) {
             context.commit(types.app.buckets, value);
         },
@@ -28,6 +35,9 @@ export default {
         },
     },
     getters: {
+        [types.app.buckets_info](state) {
+            return state.app.buckets_info;
+        },
         [types.app.buckets](state) {
             return state.app.buckets;
         },

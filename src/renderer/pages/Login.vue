@@ -30,14 +30,17 @@
 </template>
 <script>
     import {Constants, mixins} from '../service';
+    import brand from '../cos/brand';
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
                 formItem: {
-                    access_key: 'slIJj1p7f9-A0Wt3uvuiD_rzf-HpOlkvTOkwq1gN',
-                    secret_key: 'eZrtrSf0WecIWt2vfzUT7-9Gl4PPpHZxJXVP3Owb'
+                    /*access_key: 'slIJj1p7f9-A0Wt3uvuiD_rzf-HpOlkvTOkwq1gN',
+                    secret_key: 'eZrtrSf0WecIWt2vfzUT7-9Gl4PPpHZxJXVP3Owb',*/
+                    access_key: 'AKIDX2MTQBZFVedUAeo2RjqmpjU4TgrrAGiz',
+                    secret_key: 'EJCyYv65tWxBE6lEWcVCgy4xe9TaWGqD'
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
@@ -62,20 +65,23 @@
                 this.$refs[name].resetFields();
             },
             validateKey(access_key, secret_key) {
-                this.$storage.setName('qiniu');
+                this.$storage.setName(brand.qiniu);
                 this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
-                this.doRequset(this.$storage.cos.methods.buckets, null, () => {
-                    this.$storage.saveCosKey({
-                        access_key: access_key,
-                        secret_key: secret_key
-                    }, () => {
-                        this.$router.push({name: Constants.PageName.main});
-                    });
-                }, (error) => {
-                    this.$Notice.error({
-                        title: '抱歉',
-                        desc: 'COS key设置失败.请检查你输入的key是否正确.' + error.toString()
-                    });
+                this.$storage.getBuckets((error, result) => {
+                    if (error) {
+                        this.$Notice.error({
+                            title: '啊哦~',
+                            desc: error.message
+                        });
+                    } else {
+                        this.$storage.saveCosKey({
+                            access_key: access_key,
+                            secret_key: secret_key
+                        }, () => {
+                            this.$router.push({name: Constants.PageName.main});
+                        });
+                    }
+                    console.log(error, result);
                 });
             },
             openBrowser() {

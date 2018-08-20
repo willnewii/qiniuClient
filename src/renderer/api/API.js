@@ -23,14 +23,16 @@ class API {
         return this._request(url, 'get');
     }
 
+    setAuthorization(authorization) {
+        config.headers.Authorization = authorization;
+    }
+
     _request(url, type, param) {
-        this.view.$Loading.start();
+        this.view && this.view.$Loading.start();
 
         let regStr = /^http.*(qiniu.com|qbox.me)/g;
-        if (regStr.test(url)) {
+        if (regStr.test(url) && this.view) {
             config.headers.Authorization = this.view.$storage.cos.httpAuthorization(url);
-        } else {
-            delete config.headers.Authorization;
         }
 
         config.method = type;
@@ -43,9 +45,9 @@ class API {
         }
 
         request.then((response) => {
-            this.view.$Loading.finish();
+            this.view && this.view.$Loading.finish();
         }).catch((error) => {
-            this.view.$Loading.error();
+            this.view && this.view.$Loading.error();
         });
         return request;
     }

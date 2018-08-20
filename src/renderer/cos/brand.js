@@ -1,3 +1,4 @@
 export default {
-    qiniu: 'qiniu'
+    qiniu: 'qiniu',
+    tencent: 'tencent'
 };

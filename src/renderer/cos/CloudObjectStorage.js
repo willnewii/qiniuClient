@@ -1,5 +1,6 @@
 import * as storagePromise from '../service/storagePromise';
 import * as qiniu from '../cos/qiniu';
+import * as tencent from '../cos/tencent';
 import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
@@ -11,11 +12,18 @@ export default class CloudObjectStorage {
 
     setName(name) {
         this.name = name;
-
         switch (name) {
             case brand.qiniu:
                 this.cos = qiniu;
+                break;
+            case brand.tencent:
+                this.cos = tencent;
+                break;
         }
+    }
+
+    getBuckets(callback) {
+        this.cos.getBuckets(callback);
     }
 
     /**

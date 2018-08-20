@@ -42,6 +42,7 @@
     import pkg from '../../../package.json';
 
     import {Constants, mixins} from '../service/index';
+    import brand from "@/cos/brand";
 
     export default {
         mixins: [mixins.base],
@@ -88,9 +89,7 @@
          * 检查是否有新版本
          */
         created: function () {
-            this.initCOS('qiniu', () => {
-                this.getBuckets();
-            });
+            this.initCOS();
 
             this[types.setup.setup_init]();
 
@@ -99,26 +98,41 @@
         methods: {
             ...mapActions([
                 types.app.a_buckets,
+                types.app.a_buckets_info,
                 types.setup.setup_init,
             ]),
-            initCOS(cosName, callback) {
-                this.$storage.setName(cosName);
+            initCOS() {
+                this.$storage.setName(brand.tencent);
                 this.$storage.initCOS((result) => {
                     if (result) {
-                        callback && callback();
+                        this.getBuckets();
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
             getBuckets() {
-                this.doRequset(this.$storage.cos.methods.buckets, null, (response) => {
-                    if (response.data) {
-                        this[types.app.a_buckets](response.data);
-                        this.onMenuSelect(this.buckets[0]);
-                    } else {
+                this.$storage.getBuckets((error, data) => {
+                    if (error) {
                         this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
                         this.$router.push({path: Constants.PageName.login});
+                    } else {
+                        switch (this.$storage.name) {
+                            case brand.qiniu:
+                                this[types.app.a_buckets](data);
+                                break;
+                            case brand.tencent:
+                                let buckets = [];
+                                data.forEach((value) => {
+                                    buckets.push(value.Name);
+                                });
+
+                                this[types.app.a_buckets](buckets);
+                                this[types.app.a_buckets_info](data);
+                                break;
+                        }
+
+                        this.onMenuSelect(this.buckets[0]);
                     }
                 });
             },
@@ -137,6 +151,10 @@
             },
             onMenuSelect(name) {
                 switch (name) {
+                    default:
+                        this.bucketName = name;
+                        this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        break;
                     case Constants.Key.app_logout:
                         this.$Modal.confirm({
                             title: '登出该账号?',
@@ -165,10 +183,6 @@
                         break;
                     case Constants.Key.app_setup:
                         this.$router.push({name: Constants.PageName.setup});
-                        break;
-                    default:
-                        this.bucketName = name;
-                        this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                 }
             },

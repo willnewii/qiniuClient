@@ -20,6 +20,7 @@
         "postinstall": ""
     },
     "dependencies": {
+        "cos-nodejs-sdk-v5": "^2.4.9",
         "node-notifier": "^5.2.1"
     },
     "devDependencies": {

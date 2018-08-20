@@ -1,17 +1,12 @@
-import qiniu from 'qiniu';
-import QiniuBucket from "@/cos/qiniuBucket";
+import tencent from 'cos-nodejs-sdk-v5';
+import TencentBucket from "@/cos/tencentBucket";
 
-import Request from '../api/API';
-
-qiniu.conf.ACCESS_KEY = '';
-qiniu.conf.SECRET_KEY = '';
+let cos = null;
 
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
 const methods = {
-    //空间列表
-    buckets: 'https://rs.qbox.me/buckets',
     //空间对应的域名列表(授权空间域名返回为空)
     domains: 'https://api.qiniu.com/v6/domain/list',
     //获取目录(是通过公共前缀模拟出的效果)
@@ -19,34 +14,22 @@ const methods = {
 };
 
 function init(param) {
-    qiniu.conf.ACCESS_KEY = param.access_key;
-    qiniu.conf.SECRET_KEY = param.secret_key;
-    qiniu.conf.RPC_TIMEOUT = 180000;
-}
-
-function getBuckets(callback) {
-    let error = null;
-    let request = new Request();
-    request.setAuthorization(httpAuthorization(methods.buckets));
-    request.get(methods.buckets).then((result) => {
-        callback(null, result.data);
-    }).catch((error) => {
-        callback(error);
+    cos = new tencent({
+        SecretId: param.access_key,
+        SecretKey: param.secret_key,
     });
 }
 
+function getBuckets(callback) {
+    cos.getService(function (err, data) {
+        let error = null;
+        if (err) {
+            error = {};
+            error.message = err.error.Message;
+        }
 
-function getToken() {
-    return new qiniu.auth.digest.Mac(qiniu.conf.ACCESS_KEY, qiniu.conf.SECRET_KEY);
-}
-
-/**
- * http请求鉴权
- * @param url
- * @returns {*}
- */
-function httpAuthorization(url) {
-    return qiniu.util.generateAccessToken(getToken(), url, null);
+        callback(error, data.Buckets);
+    });
 }
 
 /**
@@ -131,7 +114,7 @@ function remove(params, callback) {
 }
 
 function generateBucket(name) {
-    return new QiniuBucket(name);
+    return new TencentBucket(name);
 }
 
-export {init, getBuckets, httpAuthorization, generateUrl, remove, upload, fetch, methods, generateBucket,};
+export {init, getBuckets, generateUrl, remove, upload, fetch, methods, generateBucket,};
