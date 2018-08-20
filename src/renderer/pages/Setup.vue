@@ -49,7 +49,7 @@
             下载目录：<br>
             <Row class="row-line">
                 <Col span="10">
-                    <Input v-model="downloaddir" size="small" placeholder="默认下载目录" style="width: 100%;"
+                    <Input v-model="downloaddir" size="small" placeholder="默认download目录" style="width: 100%;"
                            disabled/>
                 </Col>
                 <Col span="12" offset="1">
@@ -100,8 +100,6 @@
     import {Constants} from '../service';
     import * as types from '../vuex/mutation-types';
 
-    let ipc;
-
     export default {
         name: 'setup-page',
         data() {
@@ -136,8 +134,7 @@
             this.privates = this.setup_privatebucket;
             this.deadline = this.setup_deadline / 60;
 
-            ipc = this.$electron.ipcRenderer;
-            ipc.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
+            this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
             });
@@ -178,10 +175,11 @@
                 }
             },
             choiceDownloadolder() {
-                ipc.send(Constants.Listener.choiceDownloadFolder, {properties: ['openDirectory']});
+                this.$electron.ipcRenderer.send(Constants.Listener.choiceDownloadFolder, {properties: ['openDirectory']});
             },
             saveDownloadolder() {
                 this[types.setup.setup_a_downloaddir](this.downloaddir);
+                this.$Message.success('下载路径修改成功');
             },
             openBrowser(index) {
                 let url;

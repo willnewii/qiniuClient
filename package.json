@@ -77,8 +77,7 @@
         "asar": false,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-        "electronDownload": {
-        },
+        "electronDownload": {},
         "files": [
             "dist/electron",
             "node_modules/",

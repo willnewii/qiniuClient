@@ -32,9 +32,9 @@
             </Button>
 
             <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
-                <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="showType(0)"
+                <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
                         icon="navicon-round"></Button>
-                <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="showType(1)" icon="images"></Button>
+                <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>
             </Button-group>
 
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
@@ -48,31 +48,31 @@
                        @on-update="onTableUpdate"></resource-grid>
         <!-- 删除文件-多选-->
         <Modal
-                v-model="Model_DeleteAsk_Multiple"
+                v-model="model_DeleteAsk_Multiple"
                 title="确认删除文件？"
                 @on-ok="doRemoves">
             <p v-for="file in bucket.selection">{{file.key}}</p>
         </Modal>
         <!-- 删除文件-单选-->
         <Modal
-                v-model="Model_DeleteAsk"
+                v-model="model_DeleteAsk"
                 title="确认删除文件？"
                 @on-ok="doRemove"
                 @on-cancel="cancelModal">
-            <p>{{Model_DeleteAskKey}}</p>
+            <p>{{model_DeleteAskKey}}</p>
         </Modal>
         <!-- 筛选文件-->
         <Modal
-                v-model="Model_Query.show"
+                v-model="model_Query.show"
                 title="请选择你要筛选的范围"
                 @on-ok="filter">
             <span>按文件大小：</span>
-            {{tipFormatSize(Model_Query.fileSize[0])}} ~ {{tipFormatSize(Model_Query.fileSize[1])}}
-            <Slider v-model="Model_Query.fileSize" range :min='0' :max="Model_Query.sizeArray.length -1"
+            {{tipFormatSize(model_Query.fileSize[0])}} ~ {{tipFormatSize(model_Query.fileSize[1])}}
+            <Slider v-model="model_Query.fileSize" range :min='0' :max="model_Query.sizeArray.length -1"
                     show-tip="never"></Slider>
             <span>按文件日期：</span>
-            {{tipFormatDate(Model_Query.fileDate[0])}} ~ {{tipFormatDate(Model_Query.fileDate[1])}}
-            <Slider v-model="Model_Query.fileDate" range :min="0" :max="Model_Query.dateArray.length -1"
+            {{tipFormatDate(model_Query.fileDate[0])}} ~ {{tipFormatDate(model_Query.fileDate[1])}}
+            <Slider v-model="model_Query.fileDate" range :min="0" :max="model_Query.dateArray.length -1"
                     show-tip="never"></Slider>
         </Modal>
     </div>
@@ -105,11 +105,10 @@
             return {
                 bucket: null,
                 showType: 0, //0:列表 1:grid
-                Model_DeleteAsk_Multiple: false,
-                Model_DeleteAsk: false,
-                Model_DeleteAskKey: '',
-                Model_QueryShow: false,
-                Model_Query: {
+                model_DeleteAsk_Multiple: false,
+                model_DeleteAsk: false,
+                model_DeleteAskKey: '',
+                model_Query: {
                     show: false,
                     fileSize: [0, 0],
                     sizeArray: [],
@@ -173,7 +172,7 @@
                 if (this.setup_deleteNoAsk) {
                     this.doRemoves();
                 } else {
-                    this.Model_DeleteAsk_Multiple = true;
+                    this.model_DeleteAsk_Multiple = true;
                 }
             },
             doRemoves() {
@@ -183,39 +182,39 @@
                 if (this.setup_deleteNoAsk) {
                     this.doRemove();
                 } else {
-                    this.Model_DeleteAskKey = key;
-                    this.Model_DeleteAsk = true;
+                    this.model_DeleteAskKey = key;
+                    this.model_DeleteAsk = true;
                 }
             },
             doRemove() {
-                this.Model_DeleteAskKey = '';
+                this.model_DeleteAskKey = '';
                 EventBus.$emit(Constants.Event.remove);
             },
             cancelModal() {
-                this.Model_DeleteAskKey = '';
+                this.model_DeleteAskKey = '';
             },
             query() {
-                this.Model_Query.show = true;
+                this.model_Query.show = true;
 
-                this.Model_Query.sizeArray = [].concat(this.bucket.files);
-                this.Model_Query.dateArray = [].concat(this.bucket.files);
+                this.model_Query.sizeArray = [].concat(this.bucket.files);
+                this.model_Query.dateArray = [].concat(this.bucket.files);
 
-                this.Model_Query.sizeArray = util.quickSort(this.Model_Query.sizeArray, 'fsize');
-                this.Model_Query.dateArray = util.quickSort(this.Model_Query.dateArray, 'putTime');
+                this.model_Query.sizeArray = util.quickSort(this.model_Query.sizeArray, 'fsize');
+                this.model_Query.dateArray = util.quickSort(this.model_Query.dateArray, 'putTime');
 
-                this.Model_Query.fileSize = [0, this.bucket.files.length - 1];
-                this.Model_Query.fileDate = [0, this.bucket.files.length - 1];
+                this.model_Query.fileSize = [0, this.bucket.files.length - 1];
+                this.model_Query.fileDate = [0, this.bucket.files.length - 1];
             },
             filter() {
                 let result = [];
 
-                let sizeMin = this.Model_Query.sizeArray[this.Model_Query.fileSize[0]].fsize;
-                let sizeMax = this.Model_Query.sizeArray[this.Model_Query.fileSize[1]].fsize;
+                let sizeMin = this.model_Query.sizeArray[this.model_Query.fileSize[0]].fsize;
+                let sizeMax = this.model_Query.sizeArray[this.model_Query.fileSize[1]].fsize;
 
-                let dateMin = this.Model_Query.dateArray[this.Model_Query.fileDate[0]].putTime;
-                let dateMax = this.Model_Query.dateArray[this.Model_Query.fileDate[1]].putTime;
+                let dateMin = this.model_Query.dateArray[this.model_Query.fileDate[0]].putTime;
+                let dateMax = this.model_Query.dateArray[this.model_Query.fileDate[1]].putTime;
 
-                this.Model_Query.sizeArray.forEach((item) => {
+                this.model_Query.sizeArray.forEach((item) => {
                     if (item.fsize >= sizeMin && item.fsize <= sizeMax && item.putTime >= dateMin && item.putTime <= dateMax) {
                         result.push(item);
                     }
@@ -225,15 +224,15 @@
                 this.bucket.files = result;
             },
             tipFormatSize(value) {
-                if (this.Model_Query.sizeArray && this.Model_Query.sizeArray.length > 0) {
-                    return util.formatFileSize(this.Model_Query.sizeArray[value].fsize);
+                if (this.model_Query.sizeArray && this.model_Query.sizeArray.length > 0) {
+                    return util.formatFileSize(this.model_Query.sizeArray[value].fsize);
                 } else {
                     return '';
                 }
             },
             tipFormatDate(value) {
-                if (this.Model_Query.dateArray && this.Model_Query.dateArray.length > 0) {
-                    return util.formatDate(this.Model_Query.dateArray[value].putTime);
+                if (this.model_Query.dateArray && this.model_Query.dateArray.length > 0) {
+                    return util.formatDate(this.model_Query.dateArray[value].putTime);
                 } else {
                     return '';
                 }
@@ -245,7 +244,7 @@
              * 表单模式/图片模式
              * @param type
              */
-            showType(type) {
+            changeShowType(type) {
                 this.bucket.selection = [];
                 this.showType = type;
             },
