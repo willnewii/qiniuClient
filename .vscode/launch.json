@@ -10,8 +10,9 @@
             "windows": {
                 "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
             },
-            "program": "${workspaceRoot}/app/src/main/index.dev.js",
+            "sourceMaps": true,
+            "program": "${workspaceRoot}/src/main/index.dev.js",
             "protocol": "inspector"
-        },
+        }
     ]
 }

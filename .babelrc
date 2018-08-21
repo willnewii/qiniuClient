@@ -1,5 +1,7 @@
 {
   "comments": false,
+  "sourceMaps": true,
+  "retainLines": true,
   "env": {
     "main": {
       "presets": ["env"]
