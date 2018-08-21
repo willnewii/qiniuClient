@@ -102,7 +102,6 @@
                 types.setup.setup_init,
             ]),
             initCOS() {
-                this.$storage.setName(brand.tencent);
                 this.$storage.initCOS((result) => {
                     if (result) {
                         this.getBuckets();

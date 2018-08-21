@@ -48,6 +48,10 @@
                 this.handleFile(path);
             });
 
+            window.ondragover = function (e) {
+                return false;
+            };
+
             window.ondrop = (e) => {
                 e.preventDefault();
                 if (e.dataTransfer.files.length > 0) {

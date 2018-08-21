@@ -10,6 +10,7 @@ import 'iview/dist/styles/iview.css';
 
 import {util} from './service';
 import CloudObjectStorage from "@/cos/CloudObjectStorage";
+import brand from "@/cos/brand";
 
 Vue.use(Electron);
 Vue.use(Router);
@@ -17,7 +18,7 @@ Vue.use(iView);
 Vue.use(VueLazyload);
 
 Vue.prototype.$storage = new CloudObjectStorage();
-
+Vue.prototype.$storage.setName(brand.qiniu);
 // Vue.config.debug = false;
 
 import routes from './routes';
@@ -41,11 +42,6 @@ axios.interceptors.response.use((response) => {
     }
     return Promise.reject(error);
 });
-
-window.ondragover = function (e) {
-    e.preventDefault();
-    return false;
-};
 
 import App from './App';
 new Vue({
