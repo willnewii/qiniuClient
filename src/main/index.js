@@ -69,7 +69,7 @@ const registerIPC = function () {
         dialog.showOpenDialog({
             properties: ['openFile', 'multiSelections']
         }, function (files) {
-            if (files) event.sender.send('selected-directory', files);
+            if (files) event.sender.send(Constants.Listener.selectedDirectory, files);
         });
     });
 
@@ -84,18 +84,18 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.downloadFile, function (event, file, option) {
         option.onProgress = function (num) {
             if (num !== 1) {
-                event.sender.send('updateDownloadProgress', num);
+                event.sender.send(Constants.Listener.updateDownloadProgress, num);
             }
         };
 
         download(BrowserWindow.getFocusedWindow(), file, option)
         .then(dl => {
             console.log('getSavePath:' + dl.getSavePath());
-            event.sender.send('updateDownloadProgress', 1);
+            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         })
         .catch(error => {
             console.error(error);
-            event.sender.send('updateDownloadProgress', 1);
+            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });
 

@@ -191,9 +191,9 @@ class Bucket {
             bucket: this.name
         };
         Object.assign(param, _param);
-        if (type === 'fetch') {
+        if (type === Constants.UploadType.FETCH) {
             qiniu.fetch(param, callback);
-        } else {
+        } else if (type === Constants.UploadType.UPLOAD) {
             qiniu.upload(param, callback);
         }
     }

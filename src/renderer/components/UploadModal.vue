@@ -44,11 +44,11 @@
         },
         computed: {},
         created() {
-            this.$electron.ipcRenderer.on('selected-directory', (event, path) => {
+            this.$electron.ipcRenderer.on(Constants.Listener.selectedDirectory, (event, path) => {
                 this.handleFile(path);
             });
 
-            window.ondragover = function (e) {
+            window.ondragover = function () {
                 return false;
             };
 
@@ -94,7 +94,7 @@
                         } else {
                             this.uploadModal.path = '';
                         }
-                        this.uploadModal.type = 'fetch';
+                        this.uploadModal.type = Constants.UploadType.FETCH;
                         this.uploadModal.isShow = true;
                         break;
                 }
@@ -106,11 +106,10 @@
             handleURLPath() {//处理URL上传的路径
                 this.filePaths[0] = this.uploadModal.path;
             },
-            handleFile(paths) {
-                //多文件上传
+            handleFile(paths) {//通过文件对话框选择的文件
                 this.filePaths = paths;
 
-                this.uploadModal.type = 'upload';
+                this.uploadModal.type = Constants.UploadType.UPLOAD;
                 this.uploadModal.isShow = true;
             },
             preUploadFile() {

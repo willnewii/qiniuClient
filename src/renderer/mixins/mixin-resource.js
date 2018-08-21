@@ -38,8 +38,8 @@ export default {
             this.downloadFiles();
         });
 
-        this.$electron.ipcRenderer.removeAllListeners('updateDownloadProgress');
-        this.$electron.ipcRenderer.on('updateDownloadProgress', (event, num) => {
+        this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.updateDownloadProgress);
+        this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
             this.$Loading.update(num * 100);
             if (num === 1) {
                 this.$Loading.finish();
@@ -51,15 +51,15 @@ export default {
         /**
          * 获取资源链接
          */
-        getResoureUrl(key) {
-            return this.bucket.generateUrl(key, this.setup_deadline);
+        getResoureUrl(file) {
+            return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
         show(index) {
             this.$electron.shell.openExternal(this.getResoureUrl(this.bucket.files[index]));
         },
         copy(index) {
-            util.setClipboardText(this, this.setup_copyType, this.getResoureUrl(this.bucket.files[index]));
-
+            let url = util.getClipboardText(this.setup_copyType, this.getResoureUrl(this.bucket.files[index]));
+            this.$electron.clipboard.writeText(url);
             this.$Message.info('文件路径以复制到剪贴板');
         },
         downloadFiles() {
@@ -70,7 +70,7 @@ export default {
                     option.directory = this.setup_downloaddir;
                 }
 
-                this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0].key), option);
+                this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0]), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);

@@ -42,11 +42,18 @@ export const CopyType = {
     MARKDOWN: 'markdown'
 };
 
+export const UploadType = {
+    UPLOAD: 'upload',
+    FETCH: 'fetch'
+};
+
 export const Listener = {
     uploadFile: 'upload-Files',
     downloadFile: 'downloadFile',
     showNotifier: 'show-Notifier',
     updateTrayTitle: 'update-TrayTitle',
     choiceDownloadFolder: 'choiceDownloadFolder',
-    openFileDialog: 'open-file-dialog'
+    updateDownloadProgress: 'updateDownloadProgress',
+    openFileDialog: 'open-file-dialog',
+    selectedDirectory: 'selected-directory',
 };

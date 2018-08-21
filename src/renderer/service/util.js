@@ -1,5 +1,5 @@
 import * as Constants from '../service/constants';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 /**
  * Created by zhangweiwei on 2017/4/13.
@@ -35,14 +35,14 @@ export function isEmptyObject(e) {
     return !0;
 }
 
-export function setClipboardText(that, type, url) {
+export function getClipboardText(type, url) {
     switch (type) {
         case Constants.CopyType.URL:
-            that.$electron.clipboard.writeText(url);
-            break;
+            return url;
         case Constants.CopyType.MARKDOWN:
-            that.$electron.clipboard.writeText('![' + getName(url) + '](' + url + ')');
-            break;
+            return `![${getName(url)}](${url})`;
+        default:
+            return url;
     }
 }
 
@@ -97,5 +97,5 @@ export function formatFileSize(size) {
 }
 
 export function formatDate(time) {
-    return moment(time / 10000).format('YYYY-MM-DD HH:mm:ss');
+    return dayjs(time / 10000).format('YYYY-MM-DD HH:mm:ss');
 }
