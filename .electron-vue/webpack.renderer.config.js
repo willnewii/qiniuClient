@@ -6,7 +6,8 @@ const path = require('path');
 const {dependencies} = require('../package.json');
 const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const MinifyPlugin = require("babel-minify-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -147,7 +148,7 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
-        new BabiliWebpackPlugin(),
+        new MinifyPlugin(),
         new CopyWebpackPlugin([
             {
                 from: path.join(__dirname, '../static'),
@@ -162,6 +163,12 @@ if (process.env.NODE_ENV === 'production') {
             minimize: true
         })
     );
+
+    if (process.env.ANALYZER === 'true') {
+        rendererConfig.plugins.push(
+            new BundleAnalyzerPlugin(),
+        );
+    }
 }
 
 module.exports = rendererConfig;
