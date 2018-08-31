@@ -5,7 +5,6 @@ import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
 
-
 export default class CloudObjectStorage {
     constructor() {
     }

@@ -114,7 +114,7 @@ function remove(params, callback) {
 }
 
 function generateBucket(name) {
-    return new TencentBucket(name);
+    return new TencentBucket(name, cos);
 }
 
 export {init, getBuckets, generateUrl, remove, upload, fetch, methods, generateBucket,};

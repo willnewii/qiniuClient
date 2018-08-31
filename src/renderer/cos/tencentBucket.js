@@ -1,18 +1,19 @@
 import {Constants} from '../service/index';
-import * as qiniu from '../cos/qiniu';
 
 const DELIMITER = '/';
 
 class Bucket {
 
-    constructor(name) {
+    constructor(name, cos) {
         this.reset();
 
         name && (this.name = name);
+        this.cos = cos;
     }
 
     reset() {
         this.name = '';
+        this.location = '';//腾讯COS字段
         this.domains = [];
         this.isprivate = false;
 
@@ -45,13 +46,20 @@ class Bucket {
     bindPage(vm) {
         this.vm = vm;
 
-        console.log(this.vm.buckets_info);
-        //Location
+        this.vm.buckets_info.forEach((item) => {
+            if (item.Name === this.name) {
+                this.location = item.Location
+            }
+        });
+
+        if (this.location) {
+            this.getResources();//获取文件列表
+        }
         /*this.checkPrivate();
 
         this.getDomains();
         this.getDirs();
-        this.getResources();*/
+        */
     }
 
     /**
@@ -137,29 +145,31 @@ class Bucket {
 
 
     getResources(keyword) {
-        //重置多选数组
-        this.selection = [];
-
-        let param = {
-            bucket: this.name,
-            limit: 100
+        let params = {
+            Bucket: this.name,
+            Region: this.location
         };
 
-        if (keyword) {
-            param.prefix = keyword;
-        }
-
-        if (this.marker) {
-            param.marker = this.marker;
-        }
-
-        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
-            if (!response)
-                return;
-
-            let data = response.data;
-            this.files = this.marker ? this.files.concat(data.items) : data.items;
-            this.marker = data.marker ? data.marker : '';
+        //key fsize mimeType putTime
+        this.cos.getBucket(params, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(data);
+                data.Contents.forEach((item) => {
+                    if (item.Key.indexOf('/') === item.Key.length - 1) {
+                        //目录
+                        this.dirs.push(item.Key.substring(0, item.Key.length - 1));
+                    } else {
+                        this.files.push({
+                            key: item.Key,
+                            fsize: item.Size,
+                            putTime: new Date(item.LastModified).getTime(),
+                            mimeType: ''
+                        });
+                    }
+                })
+            }
         });
     }
 
@@ -219,7 +229,20 @@ class Bucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+            Key: key
+        };
+
+        this.cos.getObjectUrl(params, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log(data);
+            }
+        });
+        return '';
     }
 }
 
