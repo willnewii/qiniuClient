@@ -33,24 +33,6 @@ function getBuckets(callback) {
 }
 
 /**
- * 根据 deadline 判断是否成成privateDownloadUrl
- * @param domain
- * @param key
- * @param deadline
- * @returns {string}
- */
-function generateUrl(domain, key, deadline) {
-    if (deadline) {
-        let config = new qiniu.conf.Config();
-        let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
-        deadline = parseInt(Date.now() / 1000) + deadline;
-        return bucketManager.privateDownloadUrl(PROTOCOL + domain, key, deadline);
-    } else {
-        return PROTOCOL + domain + '/' + encodeURI(key);
-    }
-}
-
-/**
  * 通过url抓取文件
  */
 function fetch(params, callback) {
@@ -96,25 +78,8 @@ function upload(params, callback) {
     });
 }
 
-/**
- * 删除文件操作
- */
-function remove(params, callback) {
-    let config = new qiniu.conf.Config();
-    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
-
-    bucketManager.delete(params.bucket, params.key, function (err, respBody, respInfo) {
-        console.log(respBody, respInfo);
-        if (!err) {
-            callback(respInfo);
-        } else {
-            console.log(err);
-        }
-    });
-}
-
 function generateBucket(name) {
     return new TencentBucket(name, cos);
 }
 
-export {init, getBuckets, generateUrl, remove, upload, fetch, methods, generateBucket,};
+export {init, getBuckets, generateBucket, upload, fetch, methods,};

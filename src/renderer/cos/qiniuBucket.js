@@ -156,6 +156,9 @@ class Bucket {
                 return;
 
             let data = response.data;
+            data.items.forEach((item, index) => {
+                data.items[index].putTime = item.putTime / 10000;
+            });
             this.files = this.marker ? this.files.concat(data.items) : data.items;
             this.marker = data.marker ? data.marker : '';
         });

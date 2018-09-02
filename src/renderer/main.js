@@ -44,6 +44,7 @@ axios.interceptors.response.use((response) => {
 });
 
 import App from './App';
+
 new Vue({
     router,
     store,

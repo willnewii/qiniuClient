@@ -27,7 +27,7 @@ function init(param) {
 function getBuckets(callback) {
     let error = null;
     let request = new Request();
-    request.setAuthorization(httpAuthorization(methods.buckets));
+    request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
         callback(null, result.data);
     }).catch((error) => {
@@ -45,7 +45,7 @@ function getToken() {
  * @param url
  * @returns {*}
  */
-function httpAuthorization(url) {
+function _httpAuthorization(url) {
     return qiniu.util.generateAccessToken(getToken(), url, null);
 }
 
@@ -134,4 +134,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, httpAuthorization, generateUrl, remove, upload, fetch, methods, generateBucket,};
+export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, remove, upload, fetch, methods,};

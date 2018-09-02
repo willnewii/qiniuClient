@@ -32,7 +32,7 @@ class API {
 
         let regStr = /^http.*(qiniu.com|qbox.me)/g;
         if (regStr.test(url) && this.view) {
-            config.headers.Authorization = this.view.$storage.cos.httpAuthorization(url);
+            config.headers.Authorization = this.view.$storage.cos._httpAuthorization(url);
         }
 
         config.method = type;

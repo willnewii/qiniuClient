@@ -1,3 +1,4 @@
+const fs = require('fs');
 import {Constants} from '../service/index';
 
 const DELIMITER = '/';
@@ -48,7 +49,7 @@ class Bucket {
 
         this.vm.buckets_info.forEach((item) => {
             if (item.Name === this.name) {
-                this.location = item.Location
+                this.location = item.Location;
             }
         });
 
@@ -158,8 +159,10 @@ class Bucket {
                 console.log(data);
                 data.Contents.forEach((item) => {
                     if (item.Key.indexOf('/') === item.Key.length - 1) {
-                        //目录
-                        this.dirs.push(item.Key.substring(0, item.Key.length - 1));
+                        let dir = item.Key.substring(0, item.Key.length - 1);
+                        if (this.dirs.indexOf(dir) === -1) {
+                            this.dirs.push(dir);
+                        }
                     } else {
                         this.files.push({
                             key: item.Key,
@@ -168,7 +171,7 @@ class Bucket {
                             mimeType: ''
                         });
                     }
-                })
+                });
             }
         });
     }
@@ -199,25 +202,42 @@ class Bucket {
     }
 
     createFile(_param, type, callback) {
+
+        console.log(fs.readFileSync(_param.path));
+
         let param = {
-            bucket: this.name
+            Bucket: this.name,
+            Region: this.location,
+            Key: _param.key,
+            Body:fs.createReadStream(_param.path),
+            ContentLength: fs.statSync(_param.path).size,
+            onProgress: function (progressData) {
+                console.log(JSON.stringify(progressData));
+            }
         };
-        Object.assign(param, _param);
+
+        console.log(param);
+        this.cos.putObject(param, (err, data) => {
+            console.log(err || data);
+            //fs.unlinkSync(_param.path);
+        });
+
+        /*Object.assign(param, _param);
         if (type === 'fetch') {
             qiniu.fetch(param, callback);
         } else {
             qiniu.upload(param, callback);
-        }
+        }*/
     }
 
     removeFile(item, callback) {
-        let param = {
-            key: item.key,
-            bucket: this.name
-        };
-
-        qiniu.remove(param, (ret) => {
-            callback && callback(ret);
+        this.cos.deleteObject({
+            Bucket: this.name, // Bucket 格式：test-1250000000
+            Region: this.location,
+            Key: item.key,
+        }, function (err, data) {
+            console.log(err || data);
+            callback && callback(data);
         });
     }
 
@@ -235,14 +255,9 @@ class Bucket {
             Key: key
         };
 
-        this.cos.getObjectUrl(params, (err, data) => {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log(data);
-            }
+        return this.cos.getObjectUrl(params, (err, data) => {
+            //console.log(err || data);
         });
-        return '';
     }
 }
 

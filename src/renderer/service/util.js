@@ -97,5 +97,5 @@ export function formatFileSize(size) {
 }
 
 export function formatDate(time) {
-    return dayjs(time / 10000).format('YYYY-MM-DD HH:mm:ss');
+    return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
