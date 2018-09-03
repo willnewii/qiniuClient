@@ -25,6 +25,21 @@ export default class CloudObjectStorage {
         this.cos.getBuckets(callback);
     }
 
+    async getCOS(callback) {
+        let cos = [brand.qiniu, brand.tencent];
+        let _cos = [];
+
+        for (let i = 0; i < cos.length; i++) {
+            let data = await storagePromise.get(cos[i] + '_key');
+            console.log(data);
+            if (data && data.access_key && data.secret_key) {
+                _cos.push(cos[i]);
+            }
+        }
+
+        callback(_cos);
+    }
+
     /**
      * 初始化当前cos ,只做了非空验证
      * @param callback

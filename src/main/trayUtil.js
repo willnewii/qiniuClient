@@ -6,7 +6,8 @@ import notifier from 'node-notifier';
 import * as util from './util';
 import * as Constants from '../renderer/service/constants';
 
-const icon_tray = util.isWin() ? 'win_tray.png' : 'tray.png';
+let icon_brand = 'tray.png';
+const icon_tray = util.isWin() ? 'win_tray.png' : icon_brand;
 const icon_upload = util.isWin() ? 'win_upload.png' : 'upload.png';
 
 let mTray, mTrayWindow;

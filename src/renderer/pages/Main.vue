@@ -34,6 +34,12 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
+        <Modal v-model="cosChoiceModel" class-name="vertical-center-modal" :closable="false">
+            <div v-for="item in cos">
+                <Icon type="android-sad"></Icon>
+            </div>
+            <div slot="footer"></div>
+        </Modal>
     </div>
 </template>
 <script>
@@ -48,6 +54,8 @@
         mixins: [mixins.base],
         data() {
             return {
+                cos: [],
+                cosChoiceModel: true,
                 bucketName: '',
                 menuState: true,
                 iconStyle: {
@@ -102,13 +110,19 @@
                 types.setup.setup_init,
             ]),
             initCOS() {
-                this.$storage.initCOS((result) => {
+                //TODO: 选择COS 服务商
+                this.$storage.getCOS((cos) => {
+                    this.cos = cos;
+                    console.log(cos);
+                });
+
+                /*this.$storage.initCOS((result) => {
                     if (result) {
                         this.getBuckets();
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
-                });
+                });*/
             },
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
@@ -244,5 +258,19 @@
             }
         }
     }
+</style>
+<style lang="scss">
+    .vertical-center-modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
+        .ivu-modal {
+            top: 0;
+        }
+
+        .ivu-modal-footer {
+            border-top: 0;
+        }
+    }
 </style>

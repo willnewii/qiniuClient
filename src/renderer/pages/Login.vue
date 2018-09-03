@@ -36,8 +36,8 @@
         data() {
             return {
                 formItem: {
-                    access_key: '',
-                    secret_key: '',
+                    access_key: 'AKIDX2MTQBZFVedUAeo2RjqmpjU4TgrrAGiz',
+                    secret_key: 'EJCyYv65tWxBE6lEWcVCgy4xe9TaWGqD',
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],

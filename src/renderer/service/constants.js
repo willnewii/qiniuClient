@@ -14,7 +14,7 @@ export const Key = {
     filter: '__filter__',
     app_setup: '__app__setup__',
     app_logout: '__app__logout__',
-    configuration:'configuration',
+    configuration: 'configuration',
 };
 
 export const PageName = {
@@ -56,4 +56,5 @@ export const Listener = {
     updateDownloadProgress: 'updateDownloadProgress',
     openFileDialog: 'open-file-dialog',
     selectedDirectory: 'selected-directory',
+    setBrand: 'setBrand',
 };

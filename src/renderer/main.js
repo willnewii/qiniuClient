@@ -19,6 +19,7 @@ Vue.use(VueLazyload);
 
 Vue.prototype.$storage = new CloudObjectStorage();
 Vue.prototype.$storage.setName(brand.tencent);
+// Vue.prototype.$storage.setName(brand.qiniu);
 // Vue.config.debug = false;
 
 import routes from './routes';

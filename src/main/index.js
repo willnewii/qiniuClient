@@ -89,14 +89,20 @@ const registerIPC = function () {
         };
 
         download(BrowserWindow.getFocusedWindow(), file, option)
-        .then(dl => {
-            console.log('getSavePath:' + dl.getSavePath());
-            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-        })
-        .catch(error => {
-            console.error(error);
-            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-        });
+            .then(dl => {
+                console.log('getSavePath:' + dl.getSavePath());
+                event.sender.send(Constants.Listener.updateDownloadProgress, 1);
+            })
+            .catch(error => {
+                console.error(error);
+                event.sender.send(Constants.Listener.updateDownloadProgress, 1);
+            });
+    });
+
+
+    ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
+        console.log(arg);
+        // trayUtil.setTrayIcon();
     });
 
     /*    ipcMain.on('previewFile', function (event, filePath) {
