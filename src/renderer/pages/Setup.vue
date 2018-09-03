@@ -16,11 +16,11 @@
     <div>
         <div class="item">
             直接删除,不需要确认：
-            <i-switch v-model="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
+            <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
         <div class="item">
             复制到粘贴板格式：
-            <Radio-group v-model="setup_copyType" @on-change="copyTypeChange">
+            <Radio-group :value="setup_copyType" @on-change="copyTypeChange">
                 <Radio label="url"></Radio>
                 <Radio label="markdown"></Radio>
             </Radio-group>

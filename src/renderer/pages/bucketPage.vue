@@ -38,7 +38,7 @@
             </Button-group>
 
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
-                <Button type="ghost" @click="getResources" icon="chevron-right"></Button>
+                <Button type="ghost" @click="getResources()" icon="chevron-right"></Button>
             </Button-group>
         </div>
 

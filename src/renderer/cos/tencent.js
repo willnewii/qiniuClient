@@ -1,4 +1,9 @@
+import cosUtil from 'cos-nodejs-sdk-v5/sdk/util';
+cosUtil.isBrowser = false;
+
+
 import tencent from 'cos-nodejs-sdk-v5';
+
 import TencentBucket from "@/cos/tencentBucket";
 
 let cos = null;

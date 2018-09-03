@@ -92,10 +92,20 @@ export function formatFileSize(size) {
     } else if (size >= 1024 && size < 1024 * 1024) {
         return (size / 1024).toFixed(2) + ' KB';
     } else {
-        return (size).toFixed(2) + ' B';
+        return (size) + ' B';
     }
 }
 
 export function formatDate(time) {
     return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
+}
+
+
+export function wrapperFile(item, type) {
+    return {
+        key: item.Key,
+        fsize: item.Size,
+        putTime: new Date(item.LastModified).getTime(),
+        mimeType: ''
+    }
 }
