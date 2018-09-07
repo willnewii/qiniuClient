@@ -3,7 +3,7 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon type="navicon" size="32"></Icon>
+                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>
                 </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
@@ -34,9 +34,15 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
-        <Modal v-model="cosChoiceModel" class-name="vertical-center-modal" :closable="false">
-            <div v-for="item in cos">
-                <Icon type="android-sad"></Icon>
+        <Modal v-model="cosChoiceModel" class-name="vertical-center-modal" :closable="false" :mask-closable="false">
+            <div class="choice-cos">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos">
+                    <div class="choice-view" @click="selectCOS(item)">
+                        <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
+                        <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
+                        <span class="name">{{item.name}}</span>
+                    </div>
+                </Card>
             </div>
             <div slot="footer"></div>
         </Modal>
@@ -55,7 +61,8 @@
         data() {
             return {
                 cos: [],
-                cosChoiceModel: true,
+                cos_key: '',
+                cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
                 iconStyle: {
@@ -69,6 +76,10 @@
                     info: ''
                 },
                 menus: [{
+                    name: Constants.Key.app_switch,
+                    icon: 'arrow-swap',
+                    title: '切换'
+                }, {
                     name: Constants.Key.app_setup,
                     icon: 'ios-gear',
                     title: '设置'
@@ -110,19 +121,29 @@
                 types.setup.setup_init,
             ]),
             initCOS() {
-                //TODO: 选择COS 服务商
                 this.$storage.getCOS((cos) => {
-                    this.cos = cos;
-                    console.log(cos);
+                    if (cos.length === 0) {
+                        this.$router.push({path: Constants.PageName.login});
+                    } else if (cos.length === 1) {
+                        this.selectCOS(cos[0]);
+                    } else {
+                        this.cos = cos;
+                        this.cosChoiceModel = true;
+                    }
                 });
-
-                /*this.$storage.initCOS((result) => {
+            },
+            selectCOS(item) {
+                document.getElementById("title").innerText = item.name + "COS客户端";
+                this.cos_key = item.key;
+                this.$storage.setName(item.key);
+                this.$storage.initCOS((result) => {
+                    this.cosChoiceModel = false;
                     if (result) {
                         this.getBuckets();
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
-                });*/
+                });
             },
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
@@ -167,6 +188,23 @@
                     default:
                         this.bucketName = name;
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        break;
+                    case Constants.Key.app_switch:
+                        this.$Modal.confirm({
+                            title: '切换账号',
+                            render: (h) => {
+                                return h('div', {
+                                    style: {
+                                        'padding-top': '10px'
+                                    }
+                                }, [
+                                    '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
+                                ]);
+                            },
+                            onOk: () => {
+                                this.$router.push({path: Constants.PageName.login});
+                            }
+                        });
                         break;
                     case Constants.Key.app_logout:
                         this.$Modal.confirm({
@@ -258,6 +296,21 @@
             }
         }
     }
+
+    .choice-cos {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        .choice-view {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            .name {
+                font-size: 13px;
+                margin-top: 5px;
+            }
+        }
+    }
 </style>
 <style lang="scss">
     .vertical-center-modal {
@@ -271,6 +324,7 @@
 
         .ivu-modal-footer {
             border-top: 0;
+            padding: 0;
         }
     }
 </style>

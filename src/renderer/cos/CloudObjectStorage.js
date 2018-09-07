@@ -26,12 +26,11 @@ export default class CloudObjectStorage {
     }
 
     async getCOS(callback) {
-        let cos = [brand.qiniu, brand.tencent];
+        let cos = [{key: brand.qiniu, name: "七牛云"}, {key: brand.tencent, name: "腾讯云"}];
         let _cos = [];
 
         for (let i = 0; i < cos.length; i++) {
-            let data = await storagePromise.get(cos[i] + '_key');
-            console.log(data);
+            let data = await storagePromise.get(cos[i].key + '_key');
             if (data && data.access_key && data.secret_key) {
                 _cos.push(cos[i]);
             }

@@ -13,6 +13,7 @@ export const Key = {
     withoutDelimiter: '__withoutDelimiter__',
     filter: '__filter__',
     app_setup: '__app__setup__',
+    app_switch: '__app__switch__',
     app_logout: '__app__logout__',
     configuration: 'configuration',
 };
