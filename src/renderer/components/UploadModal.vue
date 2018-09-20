@@ -20,6 +20,8 @@
     </Modal>
 </template>
 <script>
+    import {mapGetters} from 'vuex';
+    import * as types from '../vuex/mutation-types';
     import {Constants, util} from '../service/index';
 
     export default {
@@ -42,14 +44,29 @@
                 messageFlag: false
             };
         },
-        computed: {},
+        computed: {
+            ...mapGetters({
+                setup_isOverwrite: types.setup.setup_isOverwrite,
+            })
+        },
         created() {
             this.$electron.ipcRenderer.on(Constants.Listener.selectedDirectory, (event, path) => {
                 this.handleFile(path);
             });
 
-            window.ondragover = function () {
-                return false;
+            window.ondragover = (e) => {
+                e.preventDefault();
+            };
+
+            window.ondragenter = (e) => {
+                e.preventDefault();
+                if (!this.messageFlag) {
+                    this.messageFlag = true;
+                    this.$Message.info('我已经感受到你传来的文件啦 😎');
+                    setTimeout(() => {
+                        this.messageFlag = false;
+                    }, 2000);
+                }
             };
 
             window.ondrop = (e) => {
@@ -64,17 +81,6 @@
                     this.handleFile(paths);
                 }
                 return false;
-            };
-
-            window.ondragenter = (e) => {
-                e.preventDefault();
-                if (!this.messageFlag) {
-                    this.messageFlag = true;
-                    this.$Message.info('我已经感受到你传来的文件啦 😎');
-                    setTimeout(() => {
-                        this.messageFlag = false;
-                    }, 2000);
-                }
             };
         },
         methods: {
@@ -130,6 +136,7 @@
                 let param = {
                     path: filePath,
                     key: key,
+                    isOverwrite: this.setup_isOverwrite,
                     progressCallback: (progress) => {
                         this.$Loading.update(progress);
                     }

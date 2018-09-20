@@ -35,6 +35,7 @@
                 <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
                         icon="navicon-round"></Button>
                 <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>
+                <Button :type="showType === 2 ? 'primary' : 'ghost'" @click="changeShowType(2)" icon="folder"></Button>
             </Button-group>
 
             <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
@@ -46,6 +47,8 @@
                         @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
+        <resource-file-grid v-else-if="showType === 2" :bucket="bucket"
+                            @on-update="onTableUpdate"></resource-file-grid>
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
@@ -77,6 +80,7 @@
     import Header from '../components/Header';
     import ResourceTable from '../components/ResourceTable.vue';
     import ResourceGrid from "../components/ResourceGrid.vue";
+    import ResourceFileGrid from "../components/ResourceFileGrid";
 
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
@@ -87,7 +91,7 @@
         name: 'bucketPage',
         components: {
             Header, Directory,
-            ResourceGrid, ResourceTable
+            ResourceGrid, ResourceTable, ResourceFileGrid
         },
         mixins: [mixins.base],
         props: {

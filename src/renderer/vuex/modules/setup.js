@@ -11,7 +11,8 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
-            deleteNoAsk: false,//文件删除前是否弹出对话框
+            deleteNoAsk: false,                                     //文件删除前是否弹出对话框
+            isOverwrite: false,                                     //上传时是否直接覆盖文件
             copyType: 'markdown',
             bucket_name: '',
             bucket_dir: '',
@@ -25,6 +26,10 @@ export default {
     mutations: {
         [types.setup.setup_privatebucket](state, value) {
             state.setup.privatebucket = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.setup_isOverwrite](state, value) {
+            state.setup.isOverwrite = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_deadline](state, value) {
@@ -65,6 +70,9 @@ export default {
         },
     },
     actions: {
+        [types.setup.setup_a_isOverwrite](context, value) {
+            context.commit(types.setup.setup_isOverwrite, value);
+        },
         [types.setup.setup_a_deadline](context, value) {
             context.commit(types.setup.setup_deadline, value);
         },
@@ -98,6 +106,9 @@ export default {
         },
     },
     getters: {
+        [types.setup.setup_isOverwrite](state) {
+            return ('isOverwrite' in state.setup) ? state.setup.isOverwrite : false;
+        },
         [types.setup.setup_deadline](state) {
             return ('privatedeadline' in state.setup) ? state.setup.privatedeadline : 3600;
         },

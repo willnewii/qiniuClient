@@ -1,7 +1,7 @@
 import {Constants} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 
-const DELIMITER = '/';
+
 
 class Bucket {
 
@@ -107,16 +107,16 @@ class Bucket {
      * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
      */
     getDirs(marker) {//获取目录
-        let data = {
+        let param = {
             bucket: this.name,
-            delimiter: DELIMITER,
+            delimiter: qiniu.DELIMITER,
             limit: 1000
         };
         if (marker) {
             data.marker = marker;
         }
 
-        this.vm.doRequset(qiniu.methods.resources, data, (response) => {
+        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
             if (!response)
                 return;
 
@@ -132,7 +132,6 @@ class Bucket {
             response.data.marker && this.getDirs(response.data.marker);
         });
     }
-
 
     getResources(keyword) {
         //重置多选数组

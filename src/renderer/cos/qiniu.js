@@ -6,6 +6,8 @@ import Request from '../api/API';
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
+//默认文件的分隔符
+const DELIMITER = '/';
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
@@ -89,7 +91,7 @@ function fetch(params, callback) {
  */
 function upload(params, callback) {
     let options = {
-        scope: params.bucket,
+        scope: params.isOverwrite ? params.bucket : `${params.bucket}:${params.key}`,
     };
     let putPolicy = new qiniu.rs.PutPolicy(options);
     let uploadToken = putPolicy.uploadToken(getToken());
@@ -134,4 +136,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, remove, upload, fetch, methods,};
+export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, remove, upload, fetch, methods, DELIMITER};

@@ -4,6 +4,9 @@ export const setup = {
     setup_deadline: 'setup_deadline',
     setup_a_deadline: 'setup_a_deadline',
 
+    setup_isOverwrite: 'setup_isOverwrite',
+    setup_a_isOverwrite: 'setup_a_isOverwrite',
+
     setup_privatebucket: 'setup_privatebucket',
     setup_a_privatebucket: 'setup_a_privatebucket',
 

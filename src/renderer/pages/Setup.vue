@@ -19,6 +19,10 @@
             <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
         <div class="item">
+            如果文件已存在,是否覆盖上传：
+            <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
+        </div>
+        <div class="item">
             复制到粘贴板格式：
             <Radio-group :value="setup_copyType" @on-change="copyTypeChange">
                 <Radio label="url"></Radio>
@@ -117,6 +121,7 @@
                 buckets: types.app.buckets,
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                setup_isOverwrite: types.setup.setup_isOverwrite,
                 setup_bucket_name: types.setup.setup_bucket_name,
                 setup_bucket_dir: types.setup.setup_bucket_dir,
                 setup_imagestyle: types.setup.setup_imagestyle,
@@ -148,9 +153,13 @@
                 types.setup.setup_a_downloaddir,
                 types.setup.setup_a_privatebucket,
                 types.setup.setup_a_deadline,
+                types.setup.setup_a_isOverwrite,
             ]),
             deleteNoAskChange: function (state) {
                 this[types.setup.setup_a_deleteNoAsk](state);
+            },
+            isOverwriteChange: function (state) {
+                this[types.setup.setup_a_isOverwrite](state);
             },
             copyTypeChange: function (model) {
                 this[types.setup.setup_a_copyType](model);
