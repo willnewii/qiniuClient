@@ -56,7 +56,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(item.index);
+                                            this.show(item.row);
                                         }
                                     }
                                 }, '查看'),
@@ -69,7 +69,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.copy(item.index);
+                                            this.copy(item.row);
                                         }
                                     }
                                 }, '复制'),
@@ -82,7 +82,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.resourceRemove(item.index);
+                                            this.resourceRemove(item.row);
                                         }
                                     }
                                 }, '删除')

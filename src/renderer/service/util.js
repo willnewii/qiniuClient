@@ -100,6 +100,26 @@ export function formatDate(time) {
     return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
 
+/**
+ * 文件排序
+ * @param file1
+ * @param file2
+ * @returns {*}
+ */
+export function sequence(file1, file2) {
+    if (file1._directory && file2._directory) {
+        return file1.key > file2.key;
+    } else if (file1._directory && !file2._directory) {
+        return -1;
+    } else if (!file1._directory && file2._directory) {
+        return 1;
+    } else if (!file1._directory && !file2._directory) {
+        return file1.key > file2.key;
+    } else {
+        return 0;
+    }
+}
+
 
 export function wrapperFile(item, type) {
     return {
@@ -107,5 +127,5 @@ export function wrapperFile(item, type) {
         fsize: item.Size,
         putTime: new Date(item.LastModified).getTime(),
         mimeType: ''
-    }
+    };
 }

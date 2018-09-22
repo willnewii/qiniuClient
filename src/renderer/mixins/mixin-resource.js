@@ -54,11 +54,11 @@ export default {
         getResoureUrl(file) {
             return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
-        show(index) {
-            this.$electron.shell.openExternal(this.getResoureUrl(this.bucket.files[index]));
+        show(file) {
+            this.$electron.shell.openExternal(this.getResoureUrl(file));
         },
-        copy(index) {
-            let url = util.getClipboardText(this.setup_copyType, this.getResoureUrl(this.bucket.files[index]));
+        copy(file) {
+            let url = util.getClipboardText(this.setup_copyType, this.getResoureUrl(file));
             this.$electron.clipboard.writeText(url);
             this.$Message.info('文件路径以复制到剪贴板');
         },
@@ -83,8 +83,8 @@ export default {
 
             this.$emit('on-update', null, 'remove');
         },
-        resourceRemove(index) {
-            this.deleteItem = this.bucket.files[index];
+        resourceRemove(file) {
+            this.deleteItem = file;
             this.$parent.askRemove(this.deleteItem.key);
         },
         /**

@@ -2,23 +2,22 @@
     <div class="layout-content">
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
             <Card v-for="file,index in bucket.files" :key="index" class="card" :padding="10" :bordered="false">
-                <div class="view" @click="show(index)">
-                    <img v-if="file.mimeType.indexOf('image')===0" class="image"
+                <div class="view" @click="show(file)">
+                    <img v-if="/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())" class="image"
                          v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
-                    <div v-else-if="file.mimeType.indexOf('audio')===0" class="audio">
-                        <Icon type="music-note" size="32"></Icon>
+                    <div v-else-if="file.mimeType.indexOf('audio')===0" class="other">
+                        <Icon type="music-note" size="50"></Icon>
                     </div>
-                    <div v-else class="audio">
-                        <Icon type="help-circled" size="32"></Icon>
+                    <div v-else class="other">
+                        <Icon type="document-text" size="50"></Icon>
                     </div>
-                    <span v-else class="image">其他类型</span>
                     <div class="btn">
                         <Button type="ghost" shape="circle" size="small" icon="ios-download"
-                                @click.stop="handleDownload(index,$event)" style="background: #FFFFFF"></Button>
+                                @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
                         <Button type="ghost" shape="circle" size="small" icon="clipboard"
-                                @click.stop="copy(index,$event)" style="background: #FFFFFF"></Button>
+                                @click.stop="copy(file)" style="background: #FFFFFF"></Button>
                         <Button type="error" shape="circle" size="small" icon="trash-b"
-                                @click.stop="resourceRemove(index,$event)"></Button>
+                                @click.stop="resourceRemove(file)"></Button>
                     </div>
                     <span class="name">{{file.key | getfileNameByPath}}</span>
                 </div>
@@ -27,7 +26,7 @@
     </div>
 </template>
 <script>
-    import mixin_resource from '../mixins/mixin-resource'
+    import mixin_resource from '../mixins/mixin-resource';
 
     export default {
         name: 'ResourceGrid',
@@ -42,19 +41,20 @@
         data() {
             return {
                 self: this,
-            }
+            };
         },
         methods: {
-            handleDownload(index) {
-                let item = this.bucket.files[index];
-
-                this.bucket.selection = [item];
+            handleDownload(file) {
+                this.bucket.selection = [file];
                 this.downloadFiles();
             }
         }
     };
 </script>
 <style lang="scss" scoped>
+
+    $size: 80px;
+
     .layout-content {
         margin: 15px;
         overflow: scroll;
@@ -64,22 +64,26 @@
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            justify-content: space-between;
+            justify-content: flex-start;
+            align-content: flex-start;
+            padding: 10px;
             .card {
-                margin-bottom: 10px;
-                max-height: 150px;
+                height: 120px;
+                width: 103.5px;
+                margin: 10px;
                 .view {
                     display: flex;
                     flex-direction: column;
+                    align-items: center;
                     .image {
-                        height: 100px;
-                        width: 100px;
-                        min-height: 100px;
-                        min-width: 100px;
+                        height: $size;
+                        width: $size;
+                        min-height: $size;
+                        min-width: $size;
                     }
-                    .audio {
-                        height: 100px;
-                        width: 100px;
+                    .other {
+                        height: $size;
+                        width: $size;
                         display: flex;
                         justify-content: center;
                         align-items: center;
@@ -96,8 +100,7 @@
                     .btn {
                         display: none;
                         position: absolute;
-                        right: 15px;
-                        top: 80px;
+                        top: 70px;
                     }
                 }
                 .view:hover {
