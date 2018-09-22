@@ -47,8 +47,8 @@
                         @on-update="onTableUpdate"></resource-table>
         <resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
-        <resource-file-grid v-else-if="showType === 2" :bucket="bucket"
-                            @on-update="onTableUpdate"></resource-file-grid>
+        <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
+                       @on-update="onTableUpdate"></resource-grid>
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
@@ -80,7 +80,6 @@
     import Header from '../components/Header';
     import ResourceTable from '../components/ResourceTable.vue';
     import ResourceGrid from "../components/ResourceGrid.vue";
-    import ResourceFileGrid from "../components/ResourceFileGrid";
 
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
@@ -91,7 +90,7 @@
         name: 'bucketPage',
         components: {
             Header, Directory,
-            ResourceGrid, ResourceTable, ResourceFileGrid
+            ResourceGrid, ResourceTable
         },
         mixins: [mixins.base],
         props: {
