@@ -17,7 +17,23 @@
         <Header :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <Directory :bucket="bucket" @on-click="changeDir"></Directory>
+            <div style="flex-grow: 1">
+                <Breadcrumb v-if="showType === 2">
+                    <span @click="changeFolderPath(-1)">
+                        <BreadcrumbItem>
+                            <Icon type="android-home"></Icon>
+                        </BreadcrumbItem>
+                    </span>
+                    <template v-if="folderPath">
+                         <span v-for="(item,index) in folderPath.split('/')" @click="changeFolderPath(index)">
+                        <BreadcrumbItem>
+                            {{item}}
+                        </BreadcrumbItem>
+                    </span>
+                    </template>
+                </Breadcrumb>
+                <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
+            </div>
             <Button type="ghost" size="small" @click="query()" icon="funnel"
                     style="margin-right: 10px;background: #FFFFFF;">
             </Button>
@@ -48,7 +64,8 @@
         <resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onTableUpdate"></resource-grid>
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
-                       @on-update="onTableUpdate"></resource-grid>
+                       @on-update="onTableUpdate" @onPathUpdate="onPathUpdate"
+                       :_folderPath="folderPath"></resource-grid>
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
@@ -60,10 +77,7 @@
             </template>
         </Modal>
         <!-- 筛选文件-->
-        <Modal
-                v-model="model_Query.show"
-                title="请选择你要筛选的范围"
-                @on-ok="filter">
+        <Modal v-model="model_Query.show" title="请选择你要筛选的范围" @on-ok="filter">
             <span>按文件大小：</span>
             {{tipFormatSize(model_Query.fileSize[0])}} ~ {{tipFormatSize(model_Query.fileSize[1])}}
             <Slider v-model="model_Query.fileSize" range :min='0' :max="model_Query.sizeArray.length -1"
@@ -102,7 +116,8 @@
         data() {
             return {
                 bucket: null,
-                showType: 0, //0:列表 1:grid
+                showType: 0, //0:列表 1:grid 2:folder
+                folderPath: null,
                 model_DeleteAsk_Multiple: false,
                 model_DeleteAsk: false,
                 model_DeleteAskKey: '',
@@ -240,6 +255,10 @@
             changeShowType(type) {
                 this.bucket.selection = [];
                 this.showType = type;
+
+                if (type === 2) {
+                    this.changeDir('');
+                }
             },
             /**
              * table数据项更新回调
@@ -258,7 +277,24 @@
                         this.getResources();
                     }
                 }
-            }
+            },
+            /**
+             * 文件夹模式下路径变更的处理
+             * @param path
+             */
+            onPathUpdate(path) {
+                this.folderPath = path;
+            },
+            changeFolderPath(index) {
+
+                if (index === -1) {
+                    this.folderPath = undefined;
+                    return;
+                }
+
+                let arrays = this.folderPath.split('/');
+                this.folderPath = arrays.slice(0, index + 1).join('/');
+            },
         }
 
     };

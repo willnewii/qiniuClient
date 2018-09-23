@@ -52,6 +52,7 @@
 - [electron-vue](https://github.com/SimulatedGREG/electron-vue)
 - [vue2.0 + axios + router + vuex](https://github.com/vuejs/vue)
 - [iview 2.0](https://github.com/iview/iview)
+- [v-contextmenu](https://github.com/snokier/v-contextmenu)
 
 ## Build Setup
 

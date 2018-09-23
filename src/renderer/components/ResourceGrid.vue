@@ -1,20 +1,33 @@
 <template>
     <div class="layout-content">
+        <v-contextmenu ref="contextmenu" @contextmenu="handleContextMenu">
+            <v-contextmenu-item @click="handleContextMenuClick(0)"><span style="color: red;width: 300px">删除</span>
+            </v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleContextMenuClick(1)">详情</v-contextmenu-item>
+        </v-contextmenu>
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
-            <Card v-for="(file,index) in files" :key="index" class="card" :padding="10" :bordered="false">
-                <div class="view" @click="showDirectory(file)" v-if="file._directory">
-                    <div class="other">
+            <Card v-for="(file,index) in files" class="card" :padding="0" :bordered="false">
+                <div v-if="file._directory && file._icon === 'folder'" class="view" @click="showDirectory(file)"
+                     v-contextmenu:contextmenu :index="index">
+                    <div class="file">
                         <Icon :type="file._icon" size="50"></Icon>
                     </div>
                     <span class="name">{{file._name}}</span>
                 </div>
-                <div class="view" @click="show(file)" v-else>
+                <div v-else-if="file._directory && file._icon !== 'folder'" class="view" @click="showDirectory(file)">
+                    <div class="file">
+                        <Icon :type="file._icon" size="50"></Icon>
+                    </div>
+                    <span class="name">{{file._name}}</span>
+                </div>
+                <div v-else class="view" @click="show(file)">
                     <img v-if="/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())" class="image"
                          v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
-                    <div v-else-if="file.mimeType.indexOf('audio')===0" class="other">
+                    <div v-else-if="file.mimeType.indexOf('audio')===0" class="file">
                         <Icon type="music-note" size="50"></Icon>
                     </div>
-                    <div v-else class="other">
+                    <div v-else class="file">
                         <Icon type="document-text" size="50"></Icon>
                     </div>
                     <div class="btn">
@@ -51,37 +64,76 @@
             type: {
                 type: Number,
                 default: 0 // 0:grid 1:file
-            }
+            },
+            _folderPath: {
+                type: String,
+                default: undefined
+            },
         },
         data() {
             return {
                 self: this,
+                contextMenuIndex: -1,
                 files: [],
-                path: []//当前路径 a/b=> [a,b]
+                folderPath: undefined
             };
         },
         watch: {
             'bucket.files': function () {
-                this.fileFilter();
+                this.folderPath = undefined;
+                this.fileFilter(this.folderPath);
+            },
+            '_folderPath': function (newValue) {
+                console.log(newValue !== this.folderPath);
+                if (newValue !== this.folderPath) {
+                    this.folderPath = newValue;
+                    this.fileFilter(this.folderPath);
+                }
             },
         },
         mounted() {
-            this.fileFilter();
+            this.fileFilter(this.folderPath);
         },
         methods: {
-            handleDownload(file) {
-                this.bucket.selection = [file];
-                this.downloadFiles();
+            handleContextMenu(ref) {
+                this.contextMenuIndex = ref.data.attrs.index;
+            },
+            handleContextMenuClick(action) {
+                switch (action) {
+                    case 0://删除操作
+                        break;
+                }
+            },
+            /**
+             * 根据前缀获取当前目录下的所有文件
+             * @param prefix
+             */
+            getFilebyPath(prefix) {
+                let files = [];
+                this.bucket.files.forEach((file) => {
+                    let temp_key = file.key;
+                    if (temp_key.indexOf(prefix + qiniu.DELIMITER) === 0) {
+                        console.log(temp_key);
+                        files.push(file);
+                    }
+                });
             },
             showDirectory(file) {
                 this.fileFilter(file._path);
             },
-            // TODO:构建树状结构
+            /**
+             * 根据前缀获取当前目录结构(文件夹/文件)
+             * @param prefix
+             */
             fileFilter(prefix) {
                 if (this.type === 0) {
                     this.files = this.bucket.files;
                     return;
                 }
+
+                this.folderPath = prefix;
+                //文件夹模式下,路径修改的回调
+                this.$emit('onPathUpdate', this.folderPath);
 
                 let _dirs = [];
                 let files = [];
@@ -110,7 +162,6 @@
                 files = files.sort(util.sequence);
                 if (prefix !== undefined) {
                     let lastIndex = prefix.lastIndexOf('/');
-                    console.log(prefix, prefix.substring(0, prefix.lastIndexOf('/')));
                     files.unshift({
                         _name: '返回上级',
                         _path: lastIndex !== -1 ? prefix.substring(0, lastIndex) : undefined,
@@ -119,14 +170,27 @@
                     });
                 }
 
-                this.files = files;
+                //清除view绑定的右键事件
+                this.$refs['contextmenu'].references.forEach((ref) => {
+                    ref.el.removeEventListener(this.$refs['contextmenu'].eventType, this.$refs['contextmenu'].handleReferenceContextmenu);
+                });
+                this.$refs['contextmenu'].references = [];
+                this.files = [];
+
+                this.$nextTick(function () {
+                    this.files = files;
+                });
+            },
+            handleDownload(file) {
+                this.bucket.selection = [file];
+                this.downloadFiles();
             },
         }
     };
 </script>
 <style lang="scss" scoped>
 
-    $size: 80px;
+    $imageWidth: 80px;
 
     .layout-content {
         margin: 15px;
@@ -141,29 +205,30 @@
             align-content: flex-start;
             padding: 10px;
             .card {
-                height: 120px;
-                width: 103px;
-                margin: 10px;
+                height: 113px;
+                width: 113px;
+                margin: 5px;
                 .view {
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     .image {
-                        height: $size;
-                        width: $size;
-                        min-height: $size;
-                        min-width: $size;
+                        height: $imageWidth;
+                        width: $imageWidth;
+                        min-height: $imageWidth;
+                        min-width: $imageWidth;
+                        margin-top: 5px;
                     }
-                    .other {
-                        height: $size;
-                        width: $size;
+                    .file {
+                        height: $imageWidth;
+                        width: $imageWidth;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                     }
                     .name {
                         font-size: 12px;
-                        max-width: 100px;
+                        max-width: $imageWidth;
                         white-space: nowrap;
                         text-overflow: ellipsis;
                         overflow: hidden;
@@ -171,14 +236,21 @@
                         text-align: center;
                     }
                     .btn {
-                        display: none;
+                        opacity: 0;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-around;
+                        align-items: center;
                         position: absolute;
-                        top: 70px;
+                        width: 100%;
+                        height: 100%;
+                        transition: all .2s;
                     }
-                }
-                .view:hover {
-                    .btn {
-                        display: inline;
+                    &:hover {
+                        .btn {
+                            opacity: 1;
+                            background: rgba(28, 36, 56, 0.22);
+                        }
                     }
                 }
             }

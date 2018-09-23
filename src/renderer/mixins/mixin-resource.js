@@ -19,6 +19,7 @@ export default {
     },
     data() {
         return {
+            //如果出现确认操作框,会中断操作,用作缓存
             deleteItem: null
         };
     },
@@ -103,7 +104,7 @@ export default {
          * 批量删除
          */
         removes() {
-            let item = this.bucket.selection[0];
+            /*let item = this.bucket.selection[0];
 
             this.doRemove(item, () => {
                 this.bucket.selection.shift();
@@ -112,7 +113,13 @@ export default {
                 } else {
                     this.removeMsg(item);
                 }
+            });*/
+
+            this.bucket.removeFile(this.bucket.selection, (ret) => {
+                this.removeMsg();
+                this.bucket.selection = [];
             });
+
         },
         /**
          * 删除操作

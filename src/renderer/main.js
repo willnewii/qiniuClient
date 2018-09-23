@@ -4,20 +4,25 @@ import Router from 'vue-router';
 import Electron from 'vue-electron';
 import VueLazyload from 'vue-lazyload';
 import axios from 'axios';
+import contentmenu from 'v-contextmenu/src/index';
+import 'v-contextmenu/dist/index.css';
 
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
 
 import {util} from './service';
 import CloudObjectStorage from "@/cos/CloudObjectStorage";
-import brand from "@/cos/brand";
+
 
 Vue.use(Electron);
 Vue.use(Router);
 Vue.use(iView);
 Vue.use(VueLazyload);
+Vue.use(contentmenu);
 
 Vue.prototype.$storage = new CloudObjectStorage();
+
+//import brand from "@/cos/brand";
 // Vue.prototype.$storage.setName(brand.qiniu);
 // Vue.config.debug = false;
 

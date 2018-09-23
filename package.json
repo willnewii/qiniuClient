@@ -19,7 +19,8 @@
         "postinstall": ""
     },
     "dependencies": {
-        "node-notifier": "^5.2.1"
+        "node-notifier": "^5.2.1",
+        "v-contextmenu": "^2.8.0"
     },
     "devDependencies": {
         "animate.css": "^3.7.0",

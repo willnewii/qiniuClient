@@ -2,7 +2,6 @@ import {Constants} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 
 
-
 class Bucket {
 
     constructor(name) {
@@ -200,13 +199,8 @@ class Bucket {
         }
     }
 
-    removeFile(item, callback) {
-        let param = {
-            key: item.key,
-            bucket: this.name
-        };
-
-        qiniu.remove(param, (ret) => {
+    removeFile(items, callback) {
+        qiniu.remove(this.name, items, (ret) => {
             callback && callback(ret);
         });
     }

@@ -116,20 +116,50 @@ function upload(params, callback) {
 }
 
 /**
- * 删除文件操作
+ * 批量删除文件
+ * @param bucket    名称
+ * @param items     需要处理的文件
+ * @param callback
  */
-function remove(params, callback) {
+function remove(bucket, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+
+    //批量删除
+    let deleteOperations = [];
+    items.forEach((item) => {
+        deleteOperations.push(qiniu.rs.deleteOp(bucket, item.key));
+    });
+
+    _batch(deleteOperations, callback);
+}
+
+//https://github.com/qiniu/nodejs-sdk/blob/master/examples/rs_batch_delete.js
+function _batch(operations, callback) {
     let config = new qiniu.conf.Config();
     let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
 
-    bucketManager.delete(params.bucket, params.key, function (err, respBody, respInfo) {
-        console.log(respBody, respInfo);
-        if (!err) {
-            callback(respInfo);
-        } else {
+    bucketManager.batch(operations, function (err, respBody, respInfo) {
+        if (err) {
             console.log(err);
+        } else {
+            // 200 is success, 298 is part success
+            if (parseInt(respInfo.statusCode / 100) === 2) {
+                respBody.forEach(function (item) {
+                    if (item.code === 200) {
+                        console.log(item.code + "\tsuccess");
+                    } else {
+                        console.log(item.code + "\t" + item.data.error);
+                    }
+                });
+                callback(respInfo);
+            } else {
+                console.log(respInfo, respBody);
+            }
         }
     });
+
 }
 
 function generateBucket(name) {
