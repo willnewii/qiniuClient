@@ -179,33 +179,35 @@ const getMenuData = function () {
         }
     ];
 
+    let aboutMenu = {
+        label: '关于',
+        click() {
+            if (aboutWindow) {
+                aboutWindow.show();
+            } else {
+                aboutWindow = new BrowserWindow({
+                    width: 300,
+                    height: 300,
+                    resizable: false,
+                    title: '关于',
+                    webPreferences: {
+                        webSecurity: false,
+                        backgroundThrottling: false
+                    }
+                });
+                aboutWindow.loadURL(util.winURL + '#/about');
+                aboutWindow.on('closed', () => {
+                    aboutWindow = null;
+                });
+            }
+        }
+    };
+
     if (process.platform === 'darwin') {
         template.unshift({
             label: app.getName(),
             submenu: [
-                {
-                    label: '关于',
-                    click() {
-                        if (aboutWindow) {
-                            aboutWindow.show();
-                        } else {
-                            aboutWindow = new BrowserWindow({
-                                width: 300,
-                                height: 300,
-                                resizable: false,
-                                title: '关于',
-                                webPreferences: {
-                                    webSecurity: false,
-                                    backgroundThrottling: false
-                                }
-                            });
-                            aboutWindow.loadURL(util.winURL + '#/about');
-                            aboutWindow.on('closed', () => {
-                                aboutWindow = null;
-                            });
-                        }
-                    }
-                },
+                aboutMenu,
                 {type: 'separator'},
                 {role: 'services', submenu: []},
                 {type: 'separator'},
@@ -225,6 +227,8 @@ const getMenuData = function () {
             /*{type: 'separator'},
             {role: 'front'}*/
         ];
+    } else {
+        template[template.length - 1].submenu.unshift(aboutMenu);
     }
     return template;
 };
