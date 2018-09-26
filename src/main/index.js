@@ -165,15 +165,9 @@ const getMenuData = function () {
             label: '帮助',
             submenu: [
                 {
-                    label: 'github',
-                    click() {
-                        shell.openExternal('https://github.com/willnewii/qiniuClient');
-                    }
-                },
-                {
                     label: '提交异常或需求',
                     click() {
-                        shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
+                        shell.openExternal('mailto:support@paocdn.com');
                     }
                 }
             ]

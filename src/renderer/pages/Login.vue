@@ -11,42 +11,19 @@
 </style>
 <template>
     <div class="layout">
-        <Tabs type="card" @on-click="onTabClick">
-            <TabPane name="qiniu" label="七牛云">
-                <h3 class="title">设置七牛云密钥</h3>
-                <Form :model="formItem" ref="formItem1" :rules="ruleItem" :label-width="150">
-                    <Form-item label="ACCESS_KEY" prop="access_key">
-                        <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
-                    </Form-item>
-                    <Form-item label="SECRET_KEY" prop="secret_key">
-                        <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
-                    </Form-item>
-                    <Form-item>
-                        <Button type="primary" @click="handleSubmit('formItem1')">设置</Button>
-                        <Button type="ghost" @click="handleReset('formItem1')" style="margin-left: 8px">重置</Button>
-                    </Form-item>
-                    <div style="margin-left: 150px">＊如何获取密钥信息:登录<a @click="openBrowser('https://portal.qiniu.com/user/key')">七牛云</a>->个人面板->密钥管理</div>
-                </Form>
-            </TabPane>
-            <TabPane name="tencent" label="腾讯云">
-                <h3 class="title">设置腾讯云密钥</h3>
-                <Form :model="formItem" ref="formItem2" :rules="ruleItem" :label-width="150">
-                    <Form-item label="ACCESS_KEY" prop="access_key">
-                        <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
-                    </Form-item>
-                    <Form-item label="SECRET_KEY" prop="secret_key">
-                        <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
-                    </Form-item>
-                    <Form-item>
-                        <Button type="primary" @click="handleSubmit('formItem2')">设置</Button>
-                        <Button type="ghost" @click="handleReset('formItem2')" style="margin-left: 8px">重置</Button>
-                    </Form-item>
-                    <div style="margin-left: 150px">＊如何获取密钥信息:登录<a
-                            @click="openBrowser('https://console.cloud.tencent.com/cos5')">腾讯云</a>->密钥管理
-                    </div>
-                </Form>
-            </TabPane>
-        </Tabs>
+        <h3 class="title">设置云存储密钥</h3>
+        <Form :model="formItem" ref="formItem1" :rules="ruleItem" :label-width="150">
+            <Form-item label="ACCESS_KEY" prop="access_key">
+                <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
+            </Form-item>
+            <Form-item label="SECRET_KEY" prop="secret_key">
+                <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
+            </Form-item>
+            <Form-item>
+                <Button type="primary" @click="handleSubmit('formItem1')">设置</Button>
+                <Button type="ghost" @click="handleReset('formItem1')" style="margin-left: 8px">重置</Button>
+            </Form-item>
+        </Form>
     </div>
 </template>
 <script>

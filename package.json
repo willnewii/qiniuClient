@@ -1,6 +1,6 @@
 {
     "name": "qiniu-client",
-    "cnname": "七牛云文件管理",
+    "cnname": "速网云存储客户端",
     "version": "0.1.1",
     "description": "一个七牛云文件管理客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
@@ -74,8 +74,8 @@
         "webpack-hot-middleware": "^2.18.2"
     },
     "build": {
-        "productName": "qiniuClient",
-        "appId": "com.github.willnewii.qiniuClient",
+        "productName": "速网云存储客户端",
+        "appId": "com.github.willnewii.fastcache-client",
         "asar": false,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
