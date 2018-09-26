@@ -22,6 +22,7 @@ export const PageName = {
     login: 'login',
     main: 'main',
     tray: 'tray',
+    about: 'about',
     bucketPage: 'bucketPage',
     setup: 'setup',
 };

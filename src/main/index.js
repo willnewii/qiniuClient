@@ -1,16 +1,28 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
 
 const {download} = require('electron-dl');
 
 import * as util from './util';
-import * as Constants from '../renderer/service/constants';
 import * as trayUtil from './trayUtil';
+import * as Constants from '../renderer/service/constants';
 
-let mainWindow;
+let mainWindow, aboutWindow;
 
 app.on('ready', initApp);
+
+app.on('window-all-closed', () => {
+    if (!util.isMac()) {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (mainWindow === null) {
+        createMainWindow();
+    }
+});
 
 function initApp() {
     //注册菜单
@@ -42,18 +54,6 @@ function createMainWindow() {
         mainWindow = null;
     });
 }
-
-app.on('window-all-closed', () => {
-    if (!util.isMac()) {
-        app.quit();
-    }
-});
-
-app.on('activate', () => {
-    if (mainWindow === null) {
-        createMainWindow();
-    }
-});
 
 /**
  * 注册IPC事件
@@ -89,14 +89,14 @@ const registerIPC = function () {
         };
 
         download(BrowserWindow.getFocusedWindow(), file, option)
-            .then(dl => {
-                console.log('getSavePath:' + dl.getSavePath());
-                event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-            })
-            .catch(error => {
-                console.error(error);
-                event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-            });
+        .then(dl => {
+            console.log('getSavePath:' + dl.getSavePath());
+            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
+        })
+        .catch(error => {
+            console.error(error);
+            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
+        });
     });
 
 
@@ -121,15 +121,15 @@ const getMenuData = function () {
         {
             label: '修改',
             submenu: [
-                {role: 'undo'},
-                {role: 'redo'},
+                {role: 'undo', label: '撤销'},
+                {role: 'redo', label: '重做'},
                 {type: 'separator'},
-                {role: 'cut'},
-                {role: 'copy'},
-                {role: 'paste'},
-                {role: 'pasteandmatchstyle'},
-                {role: 'delete'},
-                {role: 'selectall'}
+                {role: 'cut', label: '剪切'},
+                {role: 'copy', label: '复制'},
+                {role: 'paste', label: '粘贴'},
+                {role: 'pasteandmatchstyle', label: '粘贴并匹配样式'},
+                {role: 'delete', label: '删除'},
+                {role: 'selectall', label: '全选'}
             ]
         },
         {
@@ -144,13 +144,13 @@ const getMenuData = function () {
                     }
                 },
                 {role: 'forcereload'},
-                {role: 'toggledevtools'},
-                {type: 'separator'},
+                {role: 'toggledevtools', label: '开发者工具'},
+                /*{type: 'separator'},
                 {role: 'resetzoom'},
                 {role: 'zoomin'},
                 {role: 'zoomout'},
                 {type: 'separator'},
-                {role: 'togglefullscreen'}
+                {role: 'togglefullscreen'}*/
             ]
         },
         {
@@ -164,15 +164,15 @@ const getMenuData = function () {
             label: '帮助',
             submenu: [
                 {
-                    label: '关于项目',
+                    label: 'github',
                     click() {
-                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient');
+                        shell.openExternal('https://github.com/willnewii/qiniuClient');
                     }
                 },
                 {
                     label: '提交异常或需求',
                     click() {
-                        require('electron').shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
+                        shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
                     }
                 }
             ]
@@ -183,37 +183,47 @@ const getMenuData = function () {
         template.unshift({
             label: app.getName(),
             submenu: [
-                {role: 'about'},
+                {
+                    label: '关于',
+                    click() {
+                        if (aboutWindow) {
+                            aboutWindow.show();
+                        } else {
+                            aboutWindow = new BrowserWindow({
+                                width: 300,
+                                height: 300,
+                                resizable: false,
+                                title: '关于',
+                                webPreferences: {
+                                    webSecurity: false,
+                                    backgroundThrottling: false
+                                }
+                            });
+                            aboutWindow.loadURL(util.winURL + '#/about');
+                            aboutWindow.on('closed', () => {
+                                aboutWindow = null;
+                            });
+                        }
+                    }
+                },
                 {type: 'separator'},
                 {role: 'services', submenu: []},
                 {type: 'separator'},
-                {role: 'hide'},
-                {role: 'hideothers'},
-                {role: 'unhide'},
+                {role: 'hide', label: '隐藏'},
+                {role: 'hideothers', label: '隐藏其他'},
+                {role: 'unhide', label: '显示全部'},
                 {type: 'separator'},
-                {role: 'quit'}
+                {role: 'quit', label: '关闭'}
             ]
         });
-
-        /*        // Edit menu
-                template[1].submenu.push(
-                    {type: 'separator'},
-                    {
-                        label: 'Speech',
-                        submenu: [
-                            {role: 'startspeaking'},
-                            {role: 'stopspeaking'}
-                        ]
-                    }
-                )*/
 
         // Window menu
         template[3].submenu = [
             {role: 'close'},
-            {role: 'minimize'},
-            {role: 'zoom'},
-            {type: 'separator'},
-            {role: 'front'}
+            {role: 'minimize', label: '最小化'},
+            {role: 'zoom', label: '缩放'},
+            /*{type: 'separator'},
+            {role: 'front'}*/
         ];
     }
     return template;

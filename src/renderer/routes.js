@@ -27,5 +27,10 @@ export default [
         path: '/' + Constants.PageName.tray,
         name: Constants.PageName.tray,
         components: require('@/pages/Tray.vue')
+    },
+    {
+        path: '/' + Constants.PageName.about,
+        name: Constants.PageName.about,
+        components: require('@/pages/About')
     }
 ];
