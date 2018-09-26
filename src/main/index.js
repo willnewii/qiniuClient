@@ -4,6 +4,7 @@ import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
 
 const {download} = require('electron-dl');
 
+import pkg from '../../package';
 import * as util from './util';
 import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
@@ -41,6 +42,7 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         height: 750,
         width: 1000,
+        title: pkg.cnname,
         // frame: false,
         titleBarStyle: 'hidden',
         webPreferences: {
@@ -189,6 +191,7 @@ const getMenuData = function () {
                     width: 300,
                     height: 300,
                     resizable: false,
+                    autoHideMenuBar: true,
                     title: '关于',
                     webPreferences: {
                         webSecurity: false,

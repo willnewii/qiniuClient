@@ -26,11 +26,13 @@ export default [
     {
         path: '/' + Constants.PageName.tray,
         name: Constants.PageName.tray,
-        components: require('@/pages/Tray.vue')
+        components: require('@/pages/Tray.vue'),l
+        meta: {hideTitle: true}
     },
     {
         path: '/' + Constants.PageName.about,
         name: Constants.PageName.about,
-        components: require('@/pages/About')
+        components: require('@/pages/About'),
+        meta: {hideTitle: true}
     }
 ];

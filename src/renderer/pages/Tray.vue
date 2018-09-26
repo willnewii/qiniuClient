@@ -78,8 +78,6 @@
             })
         },
         async created() {
-            document.getElementById('title') && document.getElementById('title').remove();
-
             let app = await storagePromise.get(Constants.Key.configuration);
             if (app && app.bucket_name) {
                 this.$storage.setName('qiniu');

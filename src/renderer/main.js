@@ -34,6 +34,12 @@ const router = new Router({
     routes
 });
 
+router.afterEach((to, from) => {
+    if (to.meta && to.meta.hideTitle) {
+        document.getElementById('title') && document.getElementById('title').remove();
+    }
+});
+
 Vue.filter('getfileNameByPath', function (value) {
     return util.getPostfix(value);
 });

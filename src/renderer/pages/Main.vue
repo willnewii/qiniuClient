@@ -133,7 +133,7 @@
                 });
             },
             selectCOS(item) {
-                document.getElementById("title").innerText = item.name + "COS客户端";
+                document.getElementById("title") && (document.getElementById("title").innerText = item.name + "COS客户端");
                 this.cos_key = item.key;
                 this.$storage.setName(item.key);
                 this.$storage.initCOS((result) => {
