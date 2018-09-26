@@ -25,9 +25,7 @@
                         <Button type="primary" @click="handleSubmit('formItem1')">设置</Button>
                         <Button type="ghost" @click="handleReset('formItem1')" style="margin-left: 8px">重置</Button>
                     </Form-item>
-                    <div style="margin-left: 150px">＊如何获取密钥信息:登录<a
-                            @click="openBrowser('https://portal.qiniu.com/user/key')">七牛云</a>->个人面板->密钥管理
-                    </div>
+                    <div style="margin-left: 150px">＊如何获取密钥信息:登录<a @click="openBrowser('https://portal.qiniu.com/user/key')">七牛云</a>->个人面板->密钥管理</div>
                 </Form>
             </TabPane>
             <TabPane name="tencent" label="腾讯云">

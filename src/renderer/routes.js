@@ -26,7 +26,7 @@ export default [
     {
         path: '/' + Constants.PageName.tray,
         name: Constants.PageName.tray,
-        components: require('@/pages/Tray.vue'),l
+        components: require('@/pages/Tray.vue'),
         meta: {hideTitle: true}
     },
     {

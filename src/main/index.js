@@ -43,7 +43,6 @@ function createMainWindow() {
         height: 750,
         width: 1000,
         title: pkg.cnname,
-        // frame: false,
         titleBarStyle: 'hidden',
         webPreferences: {
             webSecurity: false
