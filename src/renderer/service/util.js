@@ -5,24 +5,6 @@ import dayjs from 'dayjs';
  * Created by zhangweiwei on 2017/4/13.
  */
 
-let separator = '/';
-if (process.platform !== 'darwin') {
-    separator = '\\';
-}
-
-/**
- * 获取图片名
- * @param path
- * @returns {*}
- */
-export function getName(path) {
-    path = decodeURIComponent(path);
-    if (path.lastIndexOf(separator) !== -1) {
-        path = path.substring(path.lastIndexOf(separator) + 1, path.length);
-    }
-    return path;
-}
-
 /**
  * 是否为空对象
  * @param e
@@ -40,7 +22,7 @@ export function getClipboardText(type, url) {
         case Constants.CopyType.URL:
             return url;
         case Constants.CopyType.MARKDOWN:
-            return `![${getName(url)}](${url})`;
+            return `![${getPostfix(url)}](${url})`;
         default:
             return url;
     }
@@ -54,12 +36,31 @@ export function getPrefix(key) {
     }
 }
 
+/**
+ * 获取链接后缀
+ * @param path
+ * @returns {*}
+ */
 export function getPostfix(path) {
-    if (path.lastIndexOf(separator) !== -1) {
-        return path.substring(path.lastIndexOf(separator) + 1, path.length);
+    if (path.lastIndexOf('/') !== -1) {
+        return path.substring(path.lastIndexOf('/') + 1, path.length);
     } else {
         return path;
     }
+}
+
+/**
+ * 根据路径获取文件名
+ * @param path
+ * @returns {*}
+ */
+export function getFileName(path) {
+    let separator = process.platform === 'darwin' ? '/' : '\\';
+    path = decodeURIComponent(path);
+    if (path.lastIndexOf(separator) !== -1) {
+        path = path.substring(path.lastIndexOf(separator) + 1, path.length);
+    }
+    return path;
 }
 
 export function quickSort(arr, key) {

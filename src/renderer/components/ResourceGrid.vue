@@ -38,7 +38,7 @@
                         <Button type="error" shape="circle" size="small" icon="trash-b"
                                 @click.stop="resourceRemove(file)"></Button>
                     </div>
-                    <span class="name">{{file.key | getfileNameByPath}}</span>
+                    <span class="name">{{file.key | getfileNameByUrl}}</span>
                 </div>
             </Card>
             <div style="flex-grow: 1"></div>

@@ -40,8 +40,12 @@ router.afterEach((to, from) => {
     }
 });
 
-Vue.filter('getfileNameByPath', function (value) {
+Vue.filter('getfileNameByUrl', function (value) {
     return util.getPostfix(value);
+});
+
+Vue.filter('getfileNameByPath', function (value) {
+    return util.getFileName(value);
 });
 
 //拦截器
