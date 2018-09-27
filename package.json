@@ -1,8 +1,8 @@
 {
-    "name": "qiniu-client",
+    "name": "fastcache",
     "cnname": "速网云存储客户端",
     "version": "0.1.1",
-    "description": "一个七牛云文件管理客户端",
+    "description": "速网云存储客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
     "main": "./dist/electron/main.js",
@@ -75,7 +75,7 @@
     },
     "build": {
         "productName": "速网云存储客户端",
-        "appId": "com.github.willnewii.fastcache-client",
+        "appId": "com.github.willnewii.fastcache",
         "asar": false,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
@@ -103,7 +103,7 @@
                     "path": "/Applications"
                 }
             ],
-            "title": "qiniu client ${version}"
+            "title": "fastcache ${version}"
         },
         "mac": {
             "icon": "./build/icons/icon.icns"
