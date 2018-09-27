@@ -37,28 +37,21 @@ export function getPrefix(key) {
 }
 
 /**
- * 获取链接后缀
+ * 获取文件路径和链接的后缀
  * @param path
  * @returns {*}
  */
 export function getPostfix(path) {
-    if (path.lastIndexOf('/') !== -1) {
-        return path.substring(path.lastIndexOf('/') + 1, path.length);
-    } else {
-        return path;
-    }
-}
-
-/**
- * 根据路径获取文件名
- * @param path
- * @returns {*}
- */
-export function getFileName(path) {
-    let separator = process.platform === 'darwin' ? '/' : '\\';
-    path = decodeURIComponent(path);
-    if (path.lastIndexOf(separator) !== -1) {
-        path = path.substring(path.lastIndexOf(separator) + 1, path.length);
+    if (path.indexOf('http') === 0) {//链接处理
+        if (path.lastIndexOf('/') !== -1) {
+            return path.substring(path.lastIndexOf('/') + 1, path.length);
+        }
+    } else {//文件路径
+        let separator = process.platform === 'darwin' ? '/' : '\\';
+        path = decodeURIComponent(path);
+        if (path.lastIndexOf(separator) !== -1) {
+            return path.substring(path.lastIndexOf(separator) + 1, path.length);
+        }
     }
     return path;
 }

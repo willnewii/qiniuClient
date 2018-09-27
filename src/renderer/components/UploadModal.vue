@@ -15,14 +15,7 @@
         </div>
 
         <div class="modal-filekey" v-for="_path of filePaths">
-            <template v-if="uploadModal.type === 'upload'">
-                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path |
-                getfileNameByPath}}
-            </template>
-            <template v-else-if="uploadModal.type === 'fetch'">
-                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path |
-                getfileNameByUrl}}
-            </template>
+            文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByUrl}}
         </div>
     </Modal>
 </template>
@@ -134,7 +127,7 @@
             },
             uploadFile() {
                 let filePath = this.filePaths[0];
-                let key = this.uploadModal.prepend + this.uploadModal.input + util.getFileName(filePath);
+                let key = this.uploadModal.prepend + this.uploadModal.input + util.getPostfix(filePath);
 
                 this.$Notice.info({
                     title: '文件上传中...',
