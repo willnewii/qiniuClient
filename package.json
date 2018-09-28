@@ -90,6 +90,7 @@
             "icon": "./build/icons/icon.ico"
         },
         "dmg": {
+            "title": "qiniu client ${version}",
             "contents": [
                 {
                     "x": 130,
@@ -102,8 +103,7 @@
                     "type": "link",
                     "path": "/Applications"
                 }
-            ],
-            "title": "qiniu client ${version}"
+            ]
         },
         "mac": {
             "icon": "./build/icons/icon.icns"
