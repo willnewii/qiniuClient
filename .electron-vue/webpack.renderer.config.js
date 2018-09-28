@@ -4,6 +4,7 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const {dependencies} = require('../package.json');
+const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
 const MinifyPlugin = require("babel-minify-webpack-plugin");
@@ -56,12 +57,9 @@ let rendererConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
-                        extractCSS: process.env.NODE_ENV === 'production',
-                        loaders: {
-                            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-                            scss: 'vue-style-loader!css-loader!sass-loader'
-                        }
+                        loaders: utils.cssLoaders({extract: process.env.NODE_ENV === 'production'})
                     }
+
                 }
             },
             {
