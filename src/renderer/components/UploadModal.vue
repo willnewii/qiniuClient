@@ -15,7 +15,7 @@
         </div>
 
         <div class="modal-filekey" v-for="_path of filePaths">
-            文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByPath}}
+            文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByUrl}}
         </div>
     </Modal>
 </template>
@@ -39,6 +39,7 @@
                     input: '',
                     path: '',
                     fileName: '',
+                    type: ''
                 },
                 filePaths: [],
                 messageFlag: false

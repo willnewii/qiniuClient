@@ -40,7 +40,7 @@ router.afterEach((to, from) => {
     }
 });
 
-Vue.filter('getfileNameByPath', function (value) {
+Vue.filter('getfileNameByUrl', function (value) {
     return util.getPostfix(value);
 });
 
