@@ -130,8 +130,7 @@
                     (this.uploadModal.prepend ? this.uploadModal.prepend : '') +
                     (this.uploadModal.input ? this.uploadModal.input + '/' : '') +
                     util.getPostfix(filePath);
-                console.log(key);
-                return;
+                
                 this.$Notice.info({
                     title: '文件上传中...',
                     desc: filePath,
