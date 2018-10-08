@@ -325,6 +325,6 @@
 
     .ivu-modal-footer {
         border-top: 0;
-        padding: 0;
+        /*padding: 0;*/
     }
 </style>

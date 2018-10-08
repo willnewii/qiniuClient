@@ -1,10 +1,10 @@
 <template>
     <div class="layout-content">
         <v-contextmenu ref="contextmenu" @contextmenu="handleContextMenu">
+            <v-contextmenu-item @click="handleContextMenuClick(1)">详情</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleContextMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
-            <v-contextmenu-item divider></v-contextmenu-item>
-            <v-contextmenu-item @click="handleContextMenuClick(1)">详情</v-contextmenu-item>
         </v-contextmenu>
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
             <Card v-for="(file,index) in files" class="card" :padding="0" :bordered="false">
@@ -95,7 +95,6 @@
         },
         watch: {
             'bucket.files': function () {
-                console.log(this.cacheName, this.bucket.name);
                 if (this.cacheName !== this.bucket.name) {
                     this.cacheName = this.bucket.name;
                     this.folderPath = undefined;
