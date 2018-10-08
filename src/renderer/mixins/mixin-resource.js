@@ -85,6 +85,7 @@ export default {
             this.$emit('on-update', null, 'remove');
         },
         resourceRemove(file) {
+            //this.bucket.selection = [file];
             this.deleteItem = file;
             this.$parent.askRemove(this.deleteItem.key);
         },
@@ -94,8 +95,8 @@ export default {
         remove() {
             if (this.deleteItem) {
                 let item = this.deleteItem;
-                this.deleteItem = null;
-                this.doRemove(item, () => {
+                this.bucket.removeFile(item, (ret) => {
+                    this.deleteItem = null;
                     this.removeMsg(item);
                 });
             }
@@ -104,32 +105,11 @@ export default {
          * 批量删除
          */
         removes() {
-            /*let item = this.bucket.selection[0];
-
-            this.doRemove(item, () => {
-                this.bucket.selection.shift();
-                if (this.bucket.selection.length > 0) {
-                    this.removes();
-                } else {
-                    this.removeMsg(item);
-                }
-            });*/
-
             this.bucket.removeFile(this.bucket.selection, (ret) => {
                 this.removeMsg();
                 this.bucket.selection = [];
             });
 
         },
-        /**
-         * 删除操作
-         * @param item
-         * @param callback
-         */
-        doRemove(item, callback) {
-            this.bucket.removeFile(item, (ret) => {
-                callback && callback(ret);
-            });
-        }
     }
 };

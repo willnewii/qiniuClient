@@ -182,6 +182,9 @@
             changeDir: function (dir) {
                 this.bucket.setCurrentDir(dir);
             },
+            /**
+             * 根据配置,是否弹出确认框
+             */
             askRemove(key) {
                 this.model_DeleteAskKey = key;
                 if (this.setup_deleteNoAsk) {

@@ -66,7 +66,7 @@ const createTrayWindow = () => {
         }
     });
 
-    trayWindow.loadURL(util.winURL + '#/tray');
+    trayWindow.loadURL(util.mainURL + '#/tray');
 
     // Hide the window when it loses focus
     trayWindow.on('blur', () => {

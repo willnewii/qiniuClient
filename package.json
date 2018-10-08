@@ -19,8 +19,7 @@
         "postinstall": ""
     },
     "dependencies": {
-        "node-notifier": "^5.2.1",
-        "v-contextmenu": "^2.8.0"
+        "node-notifier": "^5.2.1"
     },
     "devDependencies": {
         "animate.css": "^3.7.0",
@@ -67,6 +66,7 @@
         "vue-router": "^2.5.3",
         "vue-style-loader": "^3.0.1",
         "vue-template-compiler": "^2.4.2",
+        "v-contextmenu": "^2.8.0",
         "vuex": "^2.3.1",
         "webpack": "^3.5.2",
         "webpack-bundle-analyzer": "^2.13.1",
@@ -75,7 +75,7 @@
     },
     "build": {
         "productName": "COS管理客户端",
-        "appId": "com.github.willnewii.qiniuclient",
+        "appId": "com.willnewii.${name}",
         "asar": false,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",

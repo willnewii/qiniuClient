@@ -3,14 +3,12 @@
  */
 const path = require('path');
 
-export const winURL = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:9080/'
-    : `file://${__dirname}/index.html`;
+export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
 const iconPath = path.join(__dirname, 'assets/');
 
 export const getIconPath = function (filename) {
-    return path.join(iconPath, (process.platform === 'win32' ? filename : filename));
+    return path.join(iconPath, filename);
 };
 
 export const isMac = function () {

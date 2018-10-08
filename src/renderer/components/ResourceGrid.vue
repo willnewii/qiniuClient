@@ -65,7 +65,7 @@
                 type: Number,
                 default: 0 // 0:grid 1:file
             },
-            _folderPath: {
+            _folderPath: {//base 路径
                 type: String,
                 default: undefined
             },
@@ -84,7 +84,6 @@
                 this.fileFilter(this.folderPath);
             },
             '_folderPath': function (newValue) {
-                console.log(newValue !== this.folderPath);
                 if (newValue !== this.folderPath) {
                     this.folderPath = newValue;
                     this.fileFilter(this.folderPath);
@@ -101,6 +100,8 @@
             handleContextMenuClick(action) {
                 switch (action) {
                     case 0://删除操作
+                        let file = this.files[this.contextMenuIndex];
+                        console.log(this.getFilebyPath(file._path));
                         break;
                 }
             },
@@ -117,6 +118,7 @@
                         files.push(file);
                     }
                 });
+                return files;
             },
             showDirectory(file) {
                 this.fileFilter(file._path);
