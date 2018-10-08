@@ -1,6 +1,7 @@
 'use strict';
 
 import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
+import EAU from 'electron-asar-hot-updater';
 
 const {download} = require('electron-dl');
 
@@ -35,10 +36,10 @@ function initApp() {
     //托盘处理
     util.isMac() && trayUtil.createTray(mainWindow.id);
 
-    //TODO:动态加载asar
-    dialog.showMessageBox(null, {message: __dirname});
-
     registerIPC();
+
+
+    //updateAsar();
 }
 
 function createMainWindow() {
@@ -115,6 +116,45 @@ const registerIPC = function () {
             }
         });*/
 };
+
+/**
+ * 检测更新asar
+ */
+function updateAsar() {
+
+    if (!app.getAppPath().toLowerCase().endsWith('asar')) {
+        console.log('未使用asar,跳过更新');
+        return;
+    }
+
+    EAU.init({
+        'api': 'http://ou62js7ck.bkt.clouddn.com/test/last-version.json?t=' + new Date().getTime(), // The API EAU will talk to
+        'server': false // Where to check. true: server side, false: client side, default: true.
+    });
+
+    EAU.check(function (error, last, body) {
+        console.log(error, last, body);
+        if (error) {
+            if (error === 'no_update_available') {
+                return false;
+            }
+            dialog.showErrorBox('info', error);
+            return false;
+        }
+
+        /*EAU.progress(function (state) {
+            console.log(state);
+        });
+
+        EAU.download(function (error) {
+            if (error) {
+                dialog.showErrorBox('info', error);
+                return false;
+            }
+            dialog.showErrorBox('info', 'App updated successfully! Restart it please.');
+        });*/
+    });
+}
 
 /**
  * 注册菜单
