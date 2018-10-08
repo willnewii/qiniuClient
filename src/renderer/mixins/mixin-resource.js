@@ -18,10 +18,7 @@ export default {
         }
     },
     data() {
-        return {
-            //如果出现确认操作框,会中断操作,用作缓存
-            deleteItem: null
-        };
+        return {};
     },
     created: function () {
         EventBus.$off(Constants.Event.remove);
@@ -84,52 +81,23 @@ export default {
 
             this.$emit('on-update', null, 'remove');
         },
-        resourceRemove(file) {
-            this.deleteItem = file;
-            this.$parent.askRemove(this.deleteItem.key);
-        },
         /**
-         * 删除单个文件
+         * item 删除按钮操作
+         * @param file
          */
-        remove() {
-            if (this.deleteItem) {
-                let item = this.deleteItem;
-                this.deleteItem = null;
-                this.doRemove(item, () => {
-                    this.removeMsg(item);
-                });
-            }
+        resourceRemove(file) {
+            this.bucket.selection = [file];
+            this.$parent.askRemove();
         },
         /**
-         * 批量删除
+         * 删除文件
          */
         removes() {
-            /*let item = this.bucket.selection[0];
-
-            this.doRemove(item, () => {
-                this.bucket.selection.shift();
-                if (this.bucket.selection.length > 0) {
-                    this.removes();
-                } else {
-                    this.removeMsg(item);
-                }
-            });*/
-
             this.bucket.removeFile(this.bucket.selection, (ret) => {
                 this.removeMsg();
                 this.bucket.selection = [];
             });
 
         },
-        /**
-         * 删除操作
-         * @param item
-         * @param callback
-         */
-        doRemove(item, callback) {
-            this.bucket.removeFile(item, (ret) => {
-                callback && callback(ret);
-            });
-        }
     }
 };

@@ -35,6 +35,9 @@ function initApp() {
     //托盘处理
     util.isMac() && trayUtil.createTray(mainWindow.id);
 
+    //TODO:动态加载asar
+    dialog.showMessageBox(null, {message: __dirname});
+
     registerIPC();
 }
 
@@ -49,7 +52,7 @@ function createMainWindow() {
         }
     });
 
-    mainWindow.loadURL(util.winURL);
+    mainWindow.loadURL(util.mainURL);
 
     mainWindow.on('closed', () => {
         mainWindow = null;
@@ -140,7 +143,7 @@ const getMenuData = function () {
                     label: '重新加载',
                     click() {
                         if (mainWindow) {
-                            mainWindow.loadURL(util.winURL);
+                            mainWindow.loadURL(util.mainURL);
                         }
                     }
                 },
@@ -191,7 +194,7 @@ const getMenuData = function () {
                         backgroundThrottling: false
                     }
                 });
-                aboutWindow.loadURL(util.winURL + '#/about');
+                aboutWindow.loadURL(util.mainURL + '#/about');
                 aboutWindow.on('closed', () => {
                     aboutWindow = null;
                 });

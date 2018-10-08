@@ -321,10 +321,10 @@
         .ivu-modal {
             top: 0;
         }
+    }
 
-        .ivu-modal-footer {
-            border-top: 0;
-            padding: 0;
-        }
+    .ivu-modal-footer {
+        border-top: 0;
+        padding: 0;
     }
 </style>
