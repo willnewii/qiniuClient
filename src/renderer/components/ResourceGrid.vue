@@ -43,6 +43,14 @@
             </Card>
             <div style="flex-grow: 1"></div>
         </div>
+        <Modal
+                v-model="folderInfoDialog.show"
+                :title="folderInfoDialog.title"
+                @on-ok="">
+            {{folderInfoDialog.info}}
+            <div slot="footer">
+            </div>
+        </Modal>
     </div>
 </template>
 <script>
@@ -75,12 +83,23 @@
                 self: this,
                 contextMenuIndex: -1,
                 files: [],
-                folderPath: undefined
+                folderInfoDialog: {
+                    show: false,
+                    title: '',
+                    info: ''
+                },
+                folderPath: undefined,
+                cacheName: '',
+
             };
         },
         watch: {
             'bucket.files': function () {
-                this.folderPath = undefined;
+                console.log(this.cacheName, this.bucket.name);
+                if (this.cacheName !== this.bucket.name) {
+                    this.cacheName = this.bucket.name;
+                    this.folderPath = undefined;
+                }
                 this.fileFilter(this.folderPath);
             },
             '_folderPath': function (newValue) {
@@ -98,10 +117,23 @@
                 this.contextMenuIndex = ref.data.attrs.index;
             },
             handleContextMenuClick(action) {
+                let path = this.files[this.contextMenuIndex]._path;
+
                 switch (action) {
                     case 0://删除操作
-                        let file = this.files[this.contextMenuIndex];
-                        console.log(this.getFilebyPath(file._path));
+                        this.bucket.selection = this.getFilebyPath(path);
+                        this.$parent.askRemove();
+                        break;
+                    case 1://目录详情
+                        let files = this.getFilebyPath(path);
+                        let size = 0;
+                        files.forEach((item) => {
+                            size += item.fsize;
+                        });
+                        this.folderInfoDialog.show = true;
+                        this.folderInfoDialog.title = `${path}简介`;
+                        this.folderInfoDialog.info = `共${files.length}个文件,大小:${util.formatFileSize(size)}`;
+                        console.log();
                         break;
                 }
             },
@@ -114,7 +146,6 @@
                 this.bucket.files.forEach((file) => {
                     let temp_key = file.key;
                     if (temp_key.indexOf(prefix + qiniu.DELIMITER) === 0) {
-                        console.log(temp_key);
                         files.push(file);
                     }
                 });

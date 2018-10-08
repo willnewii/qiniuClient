@@ -18,10 +18,7 @@ export default {
         }
     },
     data() {
-        return {
-            //如果出现确认操作框,会中断操作,用作缓存
-            deleteItem: null
-        };
+        return {};
     },
     created: function () {
         EventBus.$off(Constants.Event.remove);
@@ -84,25 +81,16 @@ export default {
 
             this.$emit('on-update', null, 'remove');
         },
-        resourceRemove(file) {
-            //this.bucket.selection = [file];
-            this.deleteItem = file;
-            this.$parent.askRemove(this.deleteItem.key);
-        },
         /**
-         * 删除单个文件
+         * item 删除按钮操作
+         * @param file
          */
-        remove() {
-            if (this.deleteItem) {
-                let item = this.deleteItem;
-                this.bucket.removeFile(item, (ret) => {
-                    this.deleteItem = null;
-                    this.removeMsg(item);
-                });
-            }
+        resourceRemove(file) {
+            this.bucket.selection = [file];
+            this.$parent.askRemove();
         },
         /**
-         * 批量删除
+         * 删除文件
          */
         removes() {
             this.bucket.removeFile(this.bucket.selection, (ret) => {

@@ -14,7 +14,7 @@
 </style>
 <template>
     <div class="layout" v-if="bucket">
-        <Header :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></Header>
+        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
             <div style="flex-grow: 1">
@@ -60,19 +60,18 @@
         </div>
 
         <resource-table v-if="showType === 0" :bucket="bucket"
-                        @on-update="onTableUpdate"></resource-table>
+                        @on-update="onFilesUpdate"></resource-table>
         <resource-grid v-else-if="showType === 1" :bucket="bucket"
-                       @on-update="onTableUpdate"></resource-grid>
+                       @on-update="onFilesUpdate"></resource-grid>
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
-                       @on-update="onTableUpdate" @onPathUpdate="onPathUpdate"
+                       @on-update="onGridFilesUpdate" @onPathUpdate="onPathUpdate"
                        :_folderPath="folderPath"></resource-grid>
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
                 @on-ok="callRemove"
                 @on-cancel="cancelModal">
-            <p v-if="model_DeleteAskKey">{{model_DeleteAskKey}}</p>
-            <template v-else>
+            <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>
         </Modal>
@@ -118,9 +117,7 @@
                 bucket: null,
                 showType: 0, //0:列表 1:grid 2:folder
                 folderPath: null,
-                model_DeleteAsk_Multiple: false,
                 model_DeleteAsk: false,
-                model_DeleteAskKey: '',
                 model_Query: {
                     show: false,
                     fileSize: [0, 0],
@@ -185,8 +182,7 @@
             /**
              * 根据配置,是否弹出确认框
              */
-            askRemove(key) {
-                this.model_DeleteAskKey = key;
+            askRemove() {
                 if (this.setup_deleteNoAsk) {
                     this.callRemove();
                 } else {
@@ -194,15 +190,10 @@
                 }
             },
             callRemove() {
-                if (this.model_DeleteAskKey) {
-                    this.model_DeleteAskKey = '';
-                    EventBus.$emit(Constants.Event.remove);
-                } else {
-                    EventBus.$emit(Constants.Event.removes);
-                }
+                EventBus.$emit(Constants.Event.removes);
             },
             cancelModal() {
-                this.model_DeleteAskKey = '';
+                this.bucket.selection = [];
             },
             query() {
                 this.model_Query.show = true;
@@ -268,7 +259,7 @@
              * @param ret 变更的资源
              * @param action 触发的动作,upload/remove
              */
-            onTableUpdate(ret, action) {
+            onFilesUpdate(ret, action) {
                 if (action === 'remove') {//如果是删除操作,直接更新当前目录
                     this.getResources(this.bucket.currentDir);
                 } else {
@@ -281,6 +272,9 @@
                     }
                 }
             },
+            onGridFilesUpdate() {
+                this.getResources();
+            },
             /**
              * 文件夹模式下路径变更的处理
              * @param path
@@ -289,12 +283,10 @@
                 this.folderPath = path;
             },
             changeFolderPath(index) {
-
                 if (index === -1) {
                     this.folderPath = undefined;
                     return;
                 }
-
                 let arrays = this.folderPath.split('/');
                 this.folderPath = arrays.slice(0, index + 1).join('/');
             },
