@@ -90,7 +90,6 @@
                 },
                 folderPath: undefined,
                 cacheName: '',
-
             };
         },
         watch: {
@@ -132,7 +131,6 @@
                         this.folderInfoDialog.show = true;
                         this.folderInfoDialog.title = `${path}简介`;
                         this.folderInfoDialog.info = `共${files.length}个文件,大小:${util.formatFileSize(size)}`;
-                        console.log();
                         break;
                 }
             },

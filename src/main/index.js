@@ -104,6 +104,13 @@ const registerIPC = function () {
         });
     });
 
+    ipcMain.on(Constants.Listener.readDirectory, function (event, arg) {
+        let files = [];
+        arg.files.forEach((item) => {
+            files = files.concat(util.readDir(item));
+        });
+        event.sender.send(Constants.Listener.readDirectory, files);
+    });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);

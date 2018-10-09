@@ -1,6 +1,6 @@
 <template>
     <Modal v-model="uploadModal.isShow" title="上传文件" @on-ok="preUploadFile"
-           @on-cancel="initModal">
+           @on-cancel="initModal" class-name="upload-modal">
 
         <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
                placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"
@@ -14,15 +14,21 @@
             <Input v-model="uploadModal.input"/>
         </div>
 
-        <div class="modal-filekey" v-for="_path of filePaths">
-            文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path | getfileNameByUrl}}
+        <div class="file-list">
+            <div class="modal-filekey" v-for="_path of filePaths">
+                文件名:{{uploadModal.prepend}}{{uploadModal.input ? uploadModal.input + '/' : ''}}{{_path |
+                getfileNameByUrl}}
+            </div>
         </div>
+
     </Modal>
 </template>
 <script>
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import {Constants, util} from '../service/index';
+
+    const path = require('path');
 
     export default {
         name: 'UploadModal',
@@ -55,6 +61,11 @@
                 this.handleFile(path);
             });
 
+            this.$electron.ipcRenderer.on(Constants.Listener.readDirectory, (event, files) => {
+                this.uploadModal.prepend = this.bucket.getCurrentDir();
+                this.handleFile(files);
+            });
+
             window.ondragover = (e) => {
                 e.preventDefault();
             };
@@ -73,13 +84,12 @@
             window.ondrop = (e) => {
                 e.preventDefault();
                 if (e.dataTransfer.files.length > 0) {
-                    this.uploadModal.prepend = this.bucket.getCurrentDir();
-
-                    let paths = [];
-                    Array.from(e.dataTransfer.files).forEach((item) => {
-                        paths.push(item.path);
+                    let path = [];
+                    Array.from(e.dataTransfer.files).forEach((file) => {
+                        path.push(file.path);
                     });
-                    this.handleFile(paths);
+
+                    this.$electron.ipcRenderer.send(Constants.Listener.readDirectory, {files: path});
                 }
                 return false;
             };
@@ -130,7 +140,7 @@
                     (this.uploadModal.prepend ? this.uploadModal.prepend : '') +
                     (this.uploadModal.input ? this.uploadModal.input + '/' : '') +
                     util.getPostfix(filePath);
-                
+
                 this.$Notice.info({
                     title: '文件上传中...',
                     desc: filePath,
@@ -180,6 +190,12 @@
         flex-direction: row;
     }
 
+    .file-list {
+        padding-top: 10px;
+        overflow: scroll;
+        max-height: 300px;
+    }
+
     .modal-filekey {
         padding: 5px 0 0 0;
         line-height: 1;
@@ -189,4 +205,12 @@
     .modal-url {
         margin: 0 0 20px 0;
     }
+</style>
+<style lang="scss">
+    .upload-modal {
+        .ivu-modal-body {
+            padding-bottom: 0;
+        }
+    }
+
 </style>
