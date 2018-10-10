@@ -21,26 +21,32 @@ export const isWin = function () {
 };
 
 /**
+ * 是否是目录类型
+ * @param path
+ * @returns {Stats | boolean}
+ */
+export const isDirectory = function (path) {
+    let stat = fs.statSync(path);
+    return stat && stat.isDirectory();
+};
+
+
+/**
  * 遍历目录
  * @param dir
  */
 export const readDir = function (dir) {
     let children = [];
 
-    let _stat = fs.statSync(dir);
-    if (_stat && !_stat.isDirectory()) {
-        children.push(dir);
-    } else {
-        fs.readdirSync(dir).forEach(function (filename) {
-            let path = dir + "/" + filename;
-            let stat = fs.statSync(path);
-            if (stat && stat.isDirectory()) {
-                children = children.concat(readDir(path));
-            } else {
-                children.push(path);
-            }
-        });
-    }
+    fs.readdirSync(dir).forEach(function (filename) {
+        let path = dir + "/" + filename;
+        let stat = fs.statSync(path);
+        if (stat && stat.isDirectory()) {
+            children = children.concat(readDir(path));
+        } else {
+            children.push(path);
+        }
+    });
 
     return children;
 };

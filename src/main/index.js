@@ -69,15 +69,6 @@ const registerIPC = function () {
         mainWindow.setContentSize(option.width, option.height, true);
     });
 
-    //选择文件
-    ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
-        dialog.showOpenDialog({
-            properties: ['openFile', 'multiSelections']
-        }, function (files) {
-            if (files) event.sender.send(Constants.Listener.selectedDirectory, files);
-        });
-    });
-
     //选择下载目录
     ipcMain.on(Constants.Listener.choiceDownloadFolder, function (event, option) {
         dialog.showOpenDialog(option, function (files) {
@@ -93,23 +84,28 @@ const registerIPC = function () {
             }
         };
 
-        download(BrowserWindow.getFocusedWindow(), file, option)
-        .then(dl => {
+        download(BrowserWindow.getFocusedWindow(), file, option).then(dl => {
             console.log('getSavePath:' + dl.getSavePath());
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-        })
-        .catch(error => {
+        }).catch(error => {
             console.error(error);
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });
 
-    ipcMain.on(Constants.Listener.readDirectory, function (event, arg) {
-        let files = [];
-        arg.files.forEach((item) => {
-            files = files.concat(util.readDir(item));
+    //选择文件
+    ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
+        dialog.showOpenDialog({
+            properties: option.properties
+        }, function (_files) {
+            if (_files) {
+                event.sender.send(Constants.Listener.readDirectory, wrapperFiles(_files));
+            }
         });
-        event.sender.send(Constants.Listener.readDirectory, files);
+    });
+
+    ipcMain.on(Constants.Listener.readDirectory, function (event, arg) {
+        event.sender.send(Constants.Listener.readDirectory, wrapperFiles(arg.files));
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
@@ -123,6 +119,20 @@ const registerIPC = function () {
             }
         });*/
 };
+
+function wrapperFiles(_files) {
+    let files = [];
+    _files.forEach((item) => {
+        if (util.isDirectory(item)) {
+            util.readDir(item).forEach((path) => {
+                files.push({path, dir: item});
+            });
+        } else {
+            files.push({path: item});
+        }
+    });
+    return files;
+}
 
 /**
  * 检测更新asar

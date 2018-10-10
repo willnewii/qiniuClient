@@ -125,6 +125,9 @@ class Bucket {
             }
 
             if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
+                data.items.forEach((item, index) => {
+                    data.items[index].putTime = item.putTime / 10000;
+                });
                 this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
             }
 

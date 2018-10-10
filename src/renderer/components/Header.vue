@@ -46,7 +46,7 @@
         </div>
 
         <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
-               v-if="bucket.name"/>
+               v-show="bucket.name && showSearch"/>
 
         <upload-modal :bucket="bucket" ref="uploadModal"></upload-modal>
     </div>
@@ -85,6 +85,9 @@
         props: {
             bucket: {
                 type: Object
+            },
+            showSearch: {
+                type: Boolean
             }
         },
         created() {

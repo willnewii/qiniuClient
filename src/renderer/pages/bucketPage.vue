@@ -14,7 +14,7 @@
 </style>
 <template>
     <div class="layout" v-if="bucket">
-        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
+        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch" :showSearch="showType === 0"></Header>
 
         <div class="dir-layout">
             <div style="flex-grow: 1">
@@ -50,7 +50,7 @@
             <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
                 <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
                         icon="navicon-round"></Button>
-                <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>
+                <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
                 <Button :type="showType === 2 ? 'primary' : 'ghost'" @click="changeShowType(2)" icon="folder"></Button>
             </Button-group>
 
@@ -61,10 +61,10 @@
 
         <resource-table v-if="showType === 0" :bucket="bucket"
                         @on-update="onFilesUpdate"></resource-table>
-        <resource-grid v-else-if="showType === 1" :bucket="bucket"
-                       @on-update="onFilesUpdate"></resource-grid>
+        <!--<resource-grid v-else-if="showType === 1" :bucket="bucket"
+                       @on-update="onFilesUpdate"></resource-grid>-->
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
-                       @on-update="onGridFilesUpdate" @onPathUpdate="onPathUpdate"
+                       @on-update="onFilesUpdate" @onPathUpdate="onPathUpdate"
                        :_folderPath="folderPath"></resource-grid>
         <Modal
                 v-model="model_DeleteAsk"
@@ -163,6 +163,7 @@
              * 获取指定前缀文件列表
              */
             getResources(keyword) {
+                console.log(keyword);
                 this.bucket.getResources(keyword);
             },
             /**
@@ -260,20 +261,23 @@
              * @param action 触发的动作,upload/remove
              */
             onFilesUpdate(ret, action) {
-                if (action === 'remove') {//如果是删除操作,直接更新当前目录
-                    this.getResources(this.bucket.currentDir);
+
+                if (this.showType === 2) {
+                    this.getResources();
                 } else {
-                    let dir = '';
-                    if (ret && ret.key) {
-                        dir = util.getPrefix(ret.key);
-                        this.bucket.setCurrentDir(dir);
+                    if (action === 'remove') {//如果是删除操作,直接更新当前目录
+                        this.getResources(this.bucket.currentDir);
                     } else {
-                        this.getResources();
+                        if (ret && ret.key) {
+                            //更新文件所在的路径
+                            this.bucket.setCurrentDir(util.getPrefix(ret.key));
+                        } else {
+                            this.getResources();
+                        }
                     }
                 }
-            },
-            onGridFilesUpdate() {
-                this.getResources();
+
+
             },
             /**
              * 文件夹模式下路径变更的处理
