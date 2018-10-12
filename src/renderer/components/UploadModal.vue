@@ -74,6 +74,7 @@
         },
         created() {
             this.$electron.ipcRenderer.on(Constants.Listener.readDirectory, (event, files) => {
+                this.$Spin.hide();
                 if (files && files.length > 0) {
                     files.forEach((item, index) => {
                         if (item.dir) {
@@ -113,6 +114,21 @@
                         path.push(file.path);
                     });
 
+                    //提示框
+                    this.$Spin.show({
+                        render: (h) => {
+                            return h('div', [
+                                h('Icon', {
+                                    'class': 'demo-spin-icon-load',
+                                    props: {
+                                        type: 'load-c',
+                                        size: 18
+                                    }
+                                }),
+                                h('div', '文件读取中')
+                            ]);
+                        }
+                    });
                     this.$electron.ipcRenderer.send(Constants.Listener.readDirectory, {files: path});
                 }
                 return false;

@@ -14,7 +14,7 @@
 </style>
 <template>
     <div class="layout" v-if="bucket">
-        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch" :showSearch="showType === 0"></Header>
+        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
             <div style="flex-grow: 1">
@@ -163,7 +163,6 @@
              * 获取指定前缀文件列表
              */
             getResources(keyword) {
-                console.log(keyword);
                 this.bucket.getResources(keyword);
             },
             /**
@@ -171,7 +170,12 @@
              *  search：关键字
              */
             doSearch: function (dir, search) {
-                this.bucket.search(dir, search);
+                if (this.showType === 2) {
+                    this.folderPath = (this.folderPath ? this.folderPath : '') + search;
+                    // console.log(this.folderPath, dir, search);
+                } else {
+                    this.bucket.search(dir, search);
+                }
             },
             /**
              * 切换目录
@@ -261,7 +265,6 @@
              * @param action 触发的动作,upload/remove
              */
             onFilesUpdate(ret, action) {
-
                 if (this.showType === 2) {
                     this.getResources();
                 } else {
@@ -276,8 +279,6 @@
                         }
                     }
                 }
-
-
             },
             /**
              * 文件夹模式下路径变更的处理

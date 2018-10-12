@@ -35,18 +35,33 @@ export const isDirectory = function (path) {
  * 遍历目录
  * @param dir
  */
-export const readDir = function (dir) {
+export const readDir = async function (dir) {
     let children = [];
 
-    fs.readdirSync(dir).forEach(function (filename) {
-        let path = dir + "/" + filename;
-        let stat = fs.statSync(path);
-        if (stat && stat.isDirectory()) {
-            children = children.concat(readDir(path));
-        } else {
-            children.push(path);
+    let root = await _readdir(dir);
+    for (const filename of root) {
+        if (!/\.(DS_Store)$/.test(filename)) {
+            let path = dir + "/" + filename;
+            let stat = fs.statSync(path);
+            if (stat && stat.isDirectory()) {
+                let temp = await readDir(path);
+                children = children.concat(temp);
+            } else {
+                children.push(path);
+            }
         }
-    });
-
+    }
     return children;
 };
+
+function _readdir(dir) {
+    return new Promise((resolve, reject) => {
+        fs.readdir(dir, 'utf-8', (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}

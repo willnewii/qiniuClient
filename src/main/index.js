@@ -104,8 +104,8 @@ const registerIPC = function () {
         });
     });
 
-    ipcMain.on(Constants.Listener.readDirectory, function (event, arg) {
-        event.sender.send(Constants.Listener.readDirectory, wrapperFiles(arg.files));
+    ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
+        event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(arg.files));
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
@@ -120,17 +120,15 @@ const registerIPC = function () {
         });*/
 };
 
-function wrapperFiles(_files) {
+async function wrapperFiles(_files) {
     let files = [];
-    _files.forEach((item) => {
-        if (util.isDirectory(item)) {
-            util.readDir(item).forEach((path) => {
-                files.push({path, dir: item});
-            });
-        } else {
-            files.push({path: item});
-        }
-    });
+    for (const item of _files) {
+        let temp = await util.readDir(item);
+        temp.forEach((path) => {
+            files.push({path, dir: item});
+        });
+    }
+
     return files;
 }
 

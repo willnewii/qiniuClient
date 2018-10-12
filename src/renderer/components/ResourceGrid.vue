@@ -88,6 +88,7 @@
                     title: '',
                     info: ''
                 },
+                //当前路径
                 folderPath: undefined,
                 cacheName: '',
             };
@@ -279,7 +280,7 @@
                     &:hover {
                         .btn {
                             opacity: 1;
-                            background: rgba(28, 36, 56, 0.22);
+                            background: rgba(28, 36, 56, 0.20);
                         }
                     }
                 }
