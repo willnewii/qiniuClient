@@ -58,5 +58,6 @@ export const Listener = {
     updateDownloadProgress: 'updateDownloadProgress',
     openFileDialog: 'open-file-dialog',
     selectedDirectory: 'selected-directory',
+    readDirectory: 'read-directory',
     setBrand: 'setBrand',
 };

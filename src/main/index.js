@@ -1,6 +1,7 @@
 'use strict';
 
 import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
+import EAU from 'electron-asar-hot-updater';
 
 const {download} = require('electron-dl');
 
@@ -35,10 +36,10 @@ function initApp() {
     //托盘处理
     util.isMac() && trayUtil.createTray(mainWindow.id);
 
-    //TODO:动态加载asar
-    dialog.showMessageBox(null, {message: __dirname});
-
     registerIPC();
+
+
+    //updateAsar();
 }
 
 function createMainWindow() {
@@ -68,15 +69,6 @@ const registerIPC = function () {
         mainWindow.setContentSize(option.width, option.height, true);
     });
 
-    //选择文件
-    ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
-        dialog.showOpenDialog({
-            properties: ['openFile', 'multiSelections']
-        }, function (files) {
-            if (files) event.sender.send(Constants.Listener.selectedDirectory, files);
-        });
-    });
-
     //选择下载目录
     ipcMain.on(Constants.Listener.choiceDownloadFolder, function (event, option) {
         dialog.showOpenDialog(option, function (files) {
@@ -92,17 +84,29 @@ const registerIPC = function () {
             }
         };
 
-        download(BrowserWindow.getFocusedWindow(), file, option)
-        .then(dl => {
+        download(BrowserWindow.getFocusedWindow(), file, option).then(dl => {
             console.log('getSavePath:' + dl.getSavePath());
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
-        })
-        .catch(error => {
+        }).catch(error => {
             console.error(error);
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });
 
+    //选择文件
+    ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
+        dialog.showOpenDialog({
+            properties: option.properties
+        }, async function (_files) {
+            if (_files) {
+                event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(_files));
+            }
+        });
+    });
+
+    ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
+        event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(arg.files));
+    });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);
@@ -115,6 +119,61 @@ const registerIPC = function () {
             }
         });*/
 };
+
+async function wrapperFiles(_files) {
+    let files = [];
+    for (const item of _files) {
+        if (util.isDirectory(item)) {
+            let temp = await util.readDir(item);
+            temp.forEach((path) => {
+                files.push({path, dir: item});
+            });
+        } else {
+            files.push({path: item});
+        }
+    }
+
+    return files;
+}
+
+/**
+ * 检测更新asar
+ */
+function updateAsar() {
+
+    if (!app.getAppPath().toLowerCase().endsWith('asar')) {
+        console.log('未使用asar,跳过更新');
+        return;
+    }
+
+    EAU.init({
+        'api': 'http://ou62js7ck.bkt.clouddn.com/test/last-version.json?t=' + new Date().getTime(), // The API EAU will talk to
+        'server': false // Where to check. true: server side, false: client side, default: true.
+    });
+
+    EAU.check(function (error, last, body) {
+        console.log(error, last, body);
+        if (error) {
+            if (error === 'no_update_available') {
+                return false;
+            }
+            dialog.showErrorBox('info', error);
+            return false;
+        }
+
+        /*EAU.progress(function (state) {
+            console.log(state);
+        });
+
+        EAU.download(function (error) {
+            if (error) {
+                dialog.showErrorBox('info', error);
+                return false;
+            }
+            dialog.showErrorBox('info', 'App updated successfully! Restart it please.');
+        });*/
+    });
+}
 
 /**
  * 注册菜单
