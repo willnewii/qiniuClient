@@ -55,8 +55,8 @@ export default {
         show(file) {
             this.$electron.shell.openExternal(this.getResoureUrl(file));
         },
-        copy(file) {
-            let url = util.getClipboardText(this.setup_copyType, this.getResoureUrl(file));
+        copy(file, copyType) {
+            let url = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file));
             this.$electron.clipboard.writeText(url);
             this.$Message.info('文件路径以复制到剪贴板');
         },

@@ -45,7 +45,8 @@
             </i-button>
         </div>
 
-        <Input class="input-search" v-model="search" :placeholder="placeholder" @on-enter="actionBtn(2)"
+        <Input class="input-search" v-model="search" :placeholder="placeholder" icon="ios-close-outline"
+               @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
 
         <upload-modal :bucket="bucket" ref="uploadModal"></upload-modal>
@@ -93,6 +94,10 @@
             ...mapActions([
                 types.setup.setup_a_customedomain,
             ]),
+            clearSearch() {
+                this.search = '';
+                this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);
+            },
             toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
                 let className = target.className;

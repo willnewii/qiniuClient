@@ -10,6 +10,17 @@
         flex-direction: row;
         align-items: center;
         padding: 15px 15px 0 15px;
+        .header-dir-view {
+            flex-grow: 1;
+            flex-shrink: 1;
+            overflow: scroll;
+            margin-right: 10px;
+        }
+        .header-button-view {
+            display: flex;
+            flex-direction: row;
+            flex-shrink: 0;
+        }
     }
 </style>
 <template>
@@ -17,15 +28,15 @@
         <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <div style="flex-grow: 1">
+            <div class="header-dir-view">
                 <Breadcrumb v-if="showType === 2">
                     <span @click="changeFolderPath(-1)">
                         <BreadcrumbItem>
                             <Icon type="android-home"></Icon>
                         </BreadcrumbItem>
                     </span>
-                    <template v-if="folderPath">
-                         <span v-for="(item,index) in folderPath.split('/')" @click="changeFolderPath(index)">
+                    <template v-if="bucket.folderPath">
+                         <span v-for="(item,index) in bucket.folderPath.split('/')" @click="changeFolderPath(index)">
                         <BreadcrumbItem>
                             {{item}}
                         </BreadcrumbItem>
@@ -34,29 +45,33 @@
                 </Breadcrumb>
                 <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
             </div>
-            <Button type="ghost" size="small" @click="query()" icon="funnel"
-                    style="margin-right: 10px;background: #FFFFFF;">
-            </Button>
 
-            <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
-                    style="margin-right: 10px;background: #FFFFFF;"
-                    v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
-            </Button>
+            <div class="header-button-view">
+                <Button type="ghost" size="small" @click="query()" icon="funnel"
+                        style="margin-right: 10px;background: #FFFFFF;">
+                </Button>
 
-            <Button type="error" size="small" @click="askRemove()" icon="trash-b" style="margin-right: 10px;"
-                    v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
-            </Button>
+                <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
+                        style="margin-right: 10px;background: #FFFFFF;"
+                        v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
+                </Button>
 
-            <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
-                <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
-                        icon="navicon-round"></Button>
-                <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
-                <Button :type="showType === 2 ? 'primary' : 'ghost'" @click="changeShowType(2)" icon="folder"></Button>
-            </Button-group>
+                <Button type="error" size="small" @click="askRemove()" icon="trash-b" style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
+                </Button>
 
-            <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
-                <Button type="ghost" @click="getResources()" icon="chevron-right"></Button>
-            </Button-group>
+                <Button-group size="small" style="background: #FFF;display: flex;">
+                    <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
+                            icon="navicon-round"></Button>
+                    <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
+                    <Button :type="showType === 2 ? 'primary' : 'ghost'" @click="changeShowType(2)"
+                            icon="folder"></Button>
+                </Button-group>
+
+                <Button-group size="small" style="background: #FFF;margin-left: 10px;" v-if="bucket.marker">
+                    <Button type="ghost" @click="getResources()" icon="chevron-right"></Button>
+                </Button-group>
+            </div>
         </div>
 
         <resource-table v-if="showType === 0" :bucket="bucket"
@@ -64,8 +79,7 @@
         <!--<resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onFilesUpdate"></resource-grid>-->
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
-                       @on-update="onFilesUpdate" @onPathUpdate="onPathUpdate"
-                       :_folderPath="folderPath"></resource-grid>
+                       @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
         <Modal
                 v-model="model_DeleteAsk"
                 title="确认删除文件？"
@@ -117,6 +131,7 @@
                 bucket: null,
                 showType: 0, //0:列表 1:grid 2:folder
                 folderPath: null,
+                folderKeyWord: null,
                 model_DeleteAsk: false,
                 model_Query: {
                     show: false,
@@ -171,8 +186,7 @@
              */
             doSearch: function (dir, search) {
                 if (this.showType === 2) {
-                    this.folderPath = (this.folderPath ? this.folderPath : '') + search;
-                    // console.log(this.folderPath, dir, search);
+                    this.folderKeyWord = search;
                 } else {
                     this.bucket.search(dir, search);
                 }
@@ -280,20 +294,13 @@
                     }
                 }
             },
-            /**
-             * 文件夹模式下路径变更的处理
-             * @param path
-             */
-            onPathUpdate(path) {
-                this.folderPath = path;
-            },
             changeFolderPath(index) {
                 if (index === -1) {
-                    this.folderPath = undefined;
+                    this.bucket.folderPath = '';
                     return;
                 }
-                let arrays = this.folderPath.split('/');
-                this.folderPath = arrays.slice(0, index + 1).join('/');
+                let arrays = this.bucket.folderPath.split('/');
+                this.bucket.folderPath = arrays.slice(0, index + 1).join('/');
             },
         }
 

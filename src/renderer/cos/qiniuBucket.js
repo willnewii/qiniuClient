@@ -15,21 +15,24 @@ class Bucket {
         this.domains = [];
         this.isprivate = false;
 
-        this.dirs = [];
-        this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
-
-        //当前选择dir
-        this.currentDir = '';
         //当前选择domain
         this.domain = '';
         //当前dir加载返回的marker
         this.marker = '';
 
-        //已选的文件列表
-        this.selection = [];
-        //当前显示文件列表
+        //当前bucket源数据
         this.files = [];
+        //已选的文件列表,批处理时使用
+        this.selection = [];
+        //当前路径
+        this.folderPath = '';
+
+        //旧设计,Table 中使用
+        this.dirs = [];
+        this.dirs.push('');//全部
+        this.dirs.push(Constants.Key.withoutDelimiter);//其它
+        //当前选择dir
+        this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
     }
@@ -141,7 +144,7 @@ class Bucket {
 
         let param = {
             bucket: this.name,
-            limit: 100
+            limit: 1000
         };
 
         if (keyword) {

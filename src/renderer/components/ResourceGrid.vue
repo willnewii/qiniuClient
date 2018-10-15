@@ -1,15 +1,25 @@
 <template>
     <div class="layout-content">
-        <v-contextmenu ref="contextmenu" @contextmenu="handleContextMenu">
-            <v-contextmenu-item @click="handleContextMenuClick(1)">详情</v-contextmenu-item>
+        <v-contextmenu ref="folderMenu" @contextmenu="handleFolderMenu">
+            <v-contextmenu-item @click="handleFolderMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
-            <v-contextmenu-item @click="handleContextMenuClick(0)"><span style="color: red;width: 300px">删除</span>
+            <v-contextmenu-item @click="handleFolderMenuClick(0)"><span style="color: red;width: 300px">删除</span>
+            </v-contextmenu-item>
+        </v-contextmenu>
+        <v-contextmenu ref="fileMenu" @contextmenu="handleFileMenu">
+            <v-contextmenu-item @click="handleFileMenuClick(1)">详情</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(2)">复制链接</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(3)">复制链接(Markdown)</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
         <div class="gallery" :style="{height: tableHeight+ 'px'}">
             <Card v-for="(file,index) in files" class="card" :padding="0" :bordered="false">
                 <div v-if="file._directory && file._icon === 'folder'" class="view" @click="showDirectory(file)"
-                     v-contextmenu:contextmenu :index="index">
+                     v-contextmenu:folderMenu :index="index">
                     <div class="file">
                         <Icon :type="file._icon" size="50"></Icon>
                     </div>
@@ -21,7 +31,7 @@
                     </div>
                     <span class="name">{{file._name}}</span>
                 </div>
-                <div v-else class="view" @click="show(file)">
+                <div v-else class="view" @click="show(file)" v-contextmenu:fileMenu :index="index">
                     <img v-if="/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())" class="image"
                          v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
                     <div v-else-if="file.mimeType.indexOf('audio')===0" class="file">
@@ -43,11 +53,10 @@
             </Card>
             <div style="flex-grow: 1"></div>
         </div>
-        <Modal
-                v-model="folderInfoDialog.show"
-                :title="folderInfoDialog.title"
-                @on-ok="">
-            {{folderInfoDialog.info}}
+        <Modal v-model="folderInfoDialog.show" :title="folderInfoDialog.title" @on-ok="">
+            <div style="white-space: pre-line">
+                {{folderInfoDialog.info}}
+            </div>
             <div slot="footer">
             </div>
         </Modal>
@@ -56,6 +65,7 @@
 <script>
     import mixin_resource from '../mixins/mixin-resource';
     import * as util from '../service/util';
+    import * as constants from '../service/constants';
     import * as qiniu from '../cos/qiniu';
 
     export default {
@@ -77,11 +87,16 @@
                 type: String,
                 default: undefined
             },
+            keyWord: {//搜索关键字
+                type: String,
+                default: ''
+            },
         },
         data() {
             return {
                 self: this,
-                contextMenuIndex: -1,
+                contextFolderMenuIndex: -1,
+                contextFileMenuIndex: -1,
                 files: [],
                 folderInfoDialog: {
                     show: false,
@@ -89,7 +104,6 @@
                     info: ''
                 },
                 //当前路径
-                folderPath: undefined,
                 cacheName: '',
             };
         },
@@ -97,31 +111,29 @@
             'bucket.files': function () {
                 if (this.cacheName !== this.bucket.name) {
                     this.cacheName = this.bucket.name;
-                    this.folderPath = undefined;
                 }
-                this.fileFilter(this.folderPath);
+                this.fileFilter();
             },
-            '_folderPath': function (newValue) {
-                if (newValue !== this.folderPath) {
-                    this.folderPath = newValue;
-                    this.fileFilter(this.folderPath);
-                }
+            'bucket.folderPath': function (newValue) {
+                this.fileFilter();
+            },
+            'keyWord': function (newValue) {
+                this.fileFilter();
             },
         },
         mounted() {
-            this.fileFilter(this.folderPath);
+            this.fileFilter();
         },
         methods: {
-            handleContextMenu(ref) {
-                this.contextMenuIndex = ref.data.attrs.index;
+            handleFolderMenu(ref) {
+                this.contextFolderMenuIndex = ref.data.attrs.index;
             },
-            handleContextMenuClick(action) {
-                let path = this.files[this.contextMenuIndex]._path;
+            handleFolderMenuClick(action) {
+                let path = this.files[this.contextFolderMenuIndex]._path;
 
                 switch (action) {
                     case 0://删除操作
-                        this.bucket.selection = this.getFilebyPath(path);
-                        this.$parent.askRemove();
+                        this.resourceRemove(this.getFilebyPath(path));
                         break;
                     case 1://目录详情
                         let files = this.getFilebyPath(path);
@@ -131,7 +143,30 @@
                         });
                         this.folderInfoDialog.show = true;
                         this.folderInfoDialog.title = `${path}简介`;
-                        this.folderInfoDialog.info = `共${files.length}个文件,大小:${util.formatFileSize(size)}`;
+                        this.folderInfoDialog.info = `共${files.length}个文件\n大小：${util.formatFileSize(size)}`;
+                        break;
+                }
+            },
+            handleFileMenu(ref) {
+                this.contextFileMenuIndex = ref.data.attrs.index;
+            },
+            handleFileMenuClick(action) {
+                let file = this.files[this.contextFileMenuIndex];
+
+                switch (action) {
+                    case 0://删除操作
+                        this.resourceRemove(file);
+                        break;
+                    case 1:
+                        this.folderInfoDialog.show = true;
+                        this.folderInfoDialog.title = `${file.key}简介`;
+                        this.folderInfoDialog.info = `上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}`;
+                        break;
+                    case 2:
+                        this.copy(file, constants.CopyType.URL);
+                        break;
+                    case 3:
+                        this.copy(file, constants.CopyType.MARKDOWN);
                         break;
                 }
             },
@@ -150,38 +185,44 @@
                 return files;
             },
             showDirectory(file) {
-                this.fileFilter(file._path);
+                this.bucket.folderPath = file._path;
+                this.fileFilter();
             },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
-             * @param prefix
+             * @param prefix 完整的目录前缀
+             * @param word  关键字
              */
-            fileFilter(prefix) {
+            fileFilter() {
                 if (this.type === 0) {
                     this.files = this.bucket.files;
                     return;
                 }
 
-                this.folderPath = prefix;
-                //文件夹模式下,路径修改的回调
-                this.$emit('onPathUpdate', this.folderPath);
-
+                let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
+
                 this.bucket.files.forEach((file) => {
                     let temp_key = file.key;
-                    if (prefix === undefined || temp_key.indexOf(prefix + qiniu.DELIMITER) === 0) {
+                    if (folderPath === '' || temp_key.indexOf(folderPath) === 0) {
+                        if (this.keyWord && temp_key.indexOf(this.keyWord) === -1) {
+                            return;
+                        }
                         //去除前缀然后再split
-                        temp_key = temp_key.replace(prefix + qiniu.DELIMITER, '');
+                        if (folderPath.length > 0) {
+                            temp_key = temp_key.replace(folderPath + qiniu.DELIMITER, '');
+                        }
                         let temps = temp_key.split(qiniu.DELIMITER);
-                        if (temps.length === 1) {//当前prefix下文件
+                        //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
+                        if (temps.length === 1) {
                             files.push(file);
-                        } else {//当前prefix下目录
+                        } else {
                             if (_dirs.indexOf(temps[0]) === -1) {
                                 _dirs.push(temps[0]);
                                 files.push({
                                     _name: temps[0],
-                                    _path: prefix ? prefix + qiniu.DELIMITER + temps[0] : temps[0],
+                                    _path: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
                                     _directory: true,
                                     _icon: 'folder'
                                 });
@@ -191,21 +232,24 @@
                 });
 
                 files = files.sort(util.sequence);
-                if (prefix !== undefined) {
-                    let lastIndex = prefix.lastIndexOf('/');
+                if (folderPath !== '') {
+                    let lastIndex = folderPath.lastIndexOf('/');
                     files.unshift({
                         _name: '返回上级',
-                        _path: lastIndex !== -1 ? prefix.substring(0, lastIndex) : undefined,
+                        _path: lastIndex !== -1 ? folderPath.substring(0, lastIndex) : '',
                         _directory: true,
                         _icon: 'arrow-return-left'
                     });
                 }
 
-                //清除view绑定的右键事件
-                this.$refs['contextmenu'].references.forEach((ref) => {
-                    ref.el.removeEventListener(this.$refs['contextmenu'].eventType, this.$refs['contextmenu'].handleReferenceContextmenu);
+                //清除view绑定的ContentMenu事件
+                ['folderMenu', 'fileMenu'].forEach((item) => {
+                    this.$refs[item].references.forEach((ref) => {
+                        ref.el.removeEventListener(this.$refs[item].eventType, this.$refs[item].handleReferenceContextmenu);
+                    });
+                    this.$refs[item].references = [];
                 });
-                this.$refs['contextmenu'].references = [];
+
                 this.files = [];
 
                 this.$nextTick(function () {

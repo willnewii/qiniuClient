@@ -97,9 +97,9 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
         dialog.showOpenDialog({
             properties: option.properties
-        }, function (_files) {
+        }, async function (_files) {
             if (_files) {
-                event.sender.send(Constants.Listener.readDirectory, wrapperFiles(_files));
+                event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(_files));
             }
         });
     });
@@ -123,10 +123,14 @@ const registerIPC = function () {
 async function wrapperFiles(_files) {
     let files = [];
     for (const item of _files) {
-        let temp = await util.readDir(item);
-        temp.forEach((path) => {
-            files.push({path, dir: item});
-        });
+        if (util.isDirectory(item)) {
+            let temp = await util.readDir(item);
+            temp.forEach((path) => {
+                files.push({path, dir: item});
+            });
+        } else {
+            files.push({path: item});
+        }
     }
 
     return files;
