@@ -75,7 +75,6 @@ export default {
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);
-                //打开下载目录
                 this.$Message.info('文件下载完成');
             }
         },
