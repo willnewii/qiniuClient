@@ -3,6 +3,7 @@
 import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
 import EAU from 'electron-asar-hot-updater';
 
+const path = require('path');
 const {download} = require('electron-dl');
 
 import pkg from '../../package';
@@ -37,7 +38,6 @@ function initApp() {
     util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
-
 
     //updateAsar();
 }
@@ -83,9 +83,19 @@ const registerIPC = function () {
                 event.sender.send(Constants.Listener.updateDownloadProgress, num);
             }
         };
+        if (!option.directory) {
+            option.directory = path.join(app.getPath('downloads'), pkg.name);
+        }
+        if (option.folder) {
+            option.directory = path.join(option.directory, option.folder);
+        }
 
         download(BrowserWindow.getFocusedWindow(), file, option).then(dl => {
             console.log('getSavePath:' + dl.getSavePath());
+
+            if (option.count === 1) {
+                shell.showItemInFolder(dl.getSavePath());
+            }
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         }).catch(error => {
             console.error(error);

@@ -67,12 +67,15 @@ export default {
                 if (this.setup_downloaddir) {
                     option.directory = this.setup_downloaddir;
                 }
+                option.count = this.bucket.selection.length;
+                //文件自带的虚拟路径
+                option.folder = '/' + util.getFakeFolder(this.bucket.selection[0].key);
 
                 this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0]), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);
-
+                //打开下载目录
                 this.$Message.info('文件下载完成');
             }
         },

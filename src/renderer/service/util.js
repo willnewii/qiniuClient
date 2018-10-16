@@ -28,9 +28,27 @@ export function getClipboardText(type, url) {
     }
 }
 
+/**
+ * a/b/c/d/a.png => a/
+ * @param key
+ * @returns {string}
+ */
 export function getPrefix(key) {
     if (key.indexOf('/') !== -1) {
         return key.substring(0, key.indexOf('/') + 1);
+    } else {
+        return '';
+    }
+}
+
+/**
+ * a/b/c/d/a.png => a//b/c/d/
+ * @param key
+ * @returns {string}
+ */
+export function getFakeFolder(key) {
+    if (key.lastIndexOf('/') !== -1) {
+        return key.substring(0, key.lastIndexOf('/') + 1);
     } else {
         return '';
     }
