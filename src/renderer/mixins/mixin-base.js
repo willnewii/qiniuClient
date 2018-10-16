@@ -7,6 +7,9 @@ export default {
         api = new API(this);
     },
     methods: {
+        showMessage(option) {
+            this.$Message.info(option.message);
+        },
         doRequset(url, param, success, fail) {
             this._request('get', ...arguments);
         },

@@ -70,6 +70,22 @@ function generateUrl(domain, key, deadline) {
 }
 
 /**
+ * 返回当前bucket文件列表
+ */
+function list(params, callback) {
+    let config = new qiniu.conf.Config();
+    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
+
+    bucketManager.listPrefix(params.bucket, params, function (respErr, respBody, respInfo) {
+        if (respBody.error) {
+            respErr = {"error": respBody.error, 'status': respBody.status};
+        }
+        callback(respErr, respBody, respInfo);
+    });
+
+}
+
+/**
  * 通过url抓取文件
  */
 function fetch(params, callback) {
@@ -166,4 +182,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, remove, upload, fetch, methods, DELIMITER};
+export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, upload, fetch, methods, DELIMITER};

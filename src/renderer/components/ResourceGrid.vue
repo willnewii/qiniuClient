@@ -16,7 +16,7 @@
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
-        <div class="gallery" :style="{height: tableHeight+ 'px'}">
+        <div class="gallery">
             <Card v-for="(file,index) in files" class="card" :padding="0" :bordered="false">
                 <div v-if="file._directory && file._icon === 'folder'" class="view" @click="showDirectory(file)"
                      v-contextmenu:folderMenu :index="index">
@@ -63,29 +63,18 @@
     </div>
 </template>
 <script>
-    import mixin_resource from '../mixins/mixin-resource';
+    import {resource, base} from '../mixins/index';
     import * as util from '../service/util';
     import * as constants from '../service/constants';
     import * as qiniu from '../cos/qiniu';
 
     export default {
         name: 'ResourceGrid',
-        mixins: [mixin_resource],
-        computed: {
-            tableHeight() {
-                let layout = this.$parent.$el;
-                let style = window.getComputedStyle(layout.children[2]);
-                return layout.clientHeight - layout.children[0].clientHeight - layout.children[1].clientHeight - parseInt(style.marginTop) - parseInt(style.marginBottom);
-            }
-        },
+        mixins: [resource, base],
         props: {
             type: {
                 type: Number,
                 default: 0 // 0:grid 1:file
-            },
-            _folderPath: {//base 路径
-                type: String,
-                default: undefined
             },
             keyWord: {//搜索关键字
                 type: String,
@@ -117,8 +106,14 @@
             'bucket.folderPath': function (newValue) {
                 this.fileFilter();
             },
-            'keyWord': function (newValue) {
-                this.fileFilter();
+            'keyWord': function () {
+                this.fileFilter((result) => {
+                    if (this.keyWord) {
+                        this.showMessage({
+                            message: `匹配到${result.searchCount}个文件`
+                        });
+                    }
+                });
             },
         },
         mounted() {
@@ -186,14 +181,13 @@
             },
             showDirectory(file) {
                 this.bucket.folderPath = file._path;
-                this.fileFilter();
             },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
              * @param prefix 完整的目录前缀
              * @param word  关键字
              */
-            fileFilter() {
+            fileFilter(callback) {
                 if (this.type === 0) {
                     this.files = this.bucket.files;
                     return;
@@ -202,13 +196,20 @@
                 let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
+                let resultCount = 0;
 
                 this.bucket.files.forEach((file) => {
                     let temp_key = file.key;
                     if (folderPath === '' || temp_key.indexOf(folderPath) === 0) {
-                        if (this.keyWord && temp_key.indexOf(this.keyWord) === -1) {
-                            return;
+
+                        if (this.keyWord) {
+                            if (temp_key.indexOf(this.keyWord) === -1) {
+                                return;
+                            } else {
+                                resultCount++;
+                            }
                         }
+
                         //去除前缀然后再split
                         if (folderPath.length > 0) {
                             temp_key = temp_key.replace(folderPath + qiniu.DELIMITER, '');
@@ -244,16 +245,19 @@
 
                 //清除view绑定的ContentMenu事件
                 ['folderMenu', 'fileMenu'].forEach((item) => {
-                    this.$refs[item].references.forEach((ref) => {
-                        ref.el.removeEventListener(this.$refs[item].eventType, this.$refs[item].handleReferenceContextmenu);
-                    });
-                    this.$refs[item].references = [];
+                    if (this.$refs[item] && this.$refs[item].references) {
+                        this.$refs[item].references.forEach((ref) => {
+                            ref.el.removeEventListener(this.$refs[item].eventType, this.$refs[item].handleReferenceContextmenu);
+                        });
+                        this.$refs[item].references = [];
+                    }
                 });
 
                 this.files = [];
-
+                //TODO:优化显示速度
                 this.$nextTick(function () {
                     this.files = files;
+                    callback && callback({searchCount: resultCount});
                 });
             },
             handleDownload(file) {
@@ -271,6 +275,8 @@
         margin: 15px;
         overflow: scroll;
         background: #fff;
+        flex-grow: 1;
+        border-radius: 4px;
 
         .gallery {
             display: flex;

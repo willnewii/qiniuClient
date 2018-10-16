@@ -2,6 +2,7 @@
     .layout-header {
         background: #fff;
         box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         padding-right: 15px;
@@ -29,10 +30,26 @@
                    placeholder="请填入空间域名"/>
         </div>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+        <div v-if="isMac" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
+                <Tooltip content="文件、文件夹上传(支持多选)" placement="bottom">
+                    <Icon type="upload" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
+        <div v-if="isWin">
+            <i-button type="text" @click="actionBtn(3)" v-if="bucket.name">
                 <Tooltip content="文件上传(支持多选)" placement="bottom">
-                    <Icon type="ios-plus-outline" size="24"/>
+                    <Icon type="document" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
+        <div v-if="isWin">
+            <i-button type="text" @click="actionBtn(4)" v-if="bucket.name">
+                <Tooltip content="文件夹上传(支持多选)" placement="bottom">
+                    <Icon type="folder" size="24"></Icon>
                 </Tooltip>
             </i-button>
         </div>
@@ -40,7 +57,7 @@
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
                 <Tooltip content="通过url直接上传文件" placement="bottom">
-                    <Icon type="ios-cloud-upload-outline" size="24"/>
+                    <Icon type="link" size="24"/>
                 </Tooltip>
             </i-button>
         </div>
@@ -63,6 +80,8 @@
         data() {
             return {
                 search: '',
+                isMac: process.platform === 'darwin',
+                isWin: process.platform === 'win32',
             };
         },
         computed: {
@@ -115,8 +134,10 @@
             },
             actionBtn(index) {
                 switch (index) {
-                    case 0://调用文件选取对话框
+                    case 0://mac 对话框,选取文件和文件夹多选
                     case 1://抓取文件
+                    case 3://win 对话框,选取文件多选
+                    case 4://win 对话框,选取文件夹多选
                         this.$refs['uploadModal'].uploadAction(index);
                         break;
                     case 2://搜索事件

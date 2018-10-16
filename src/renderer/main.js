@@ -40,8 +40,9 @@ router.afterEach((to, from) => {
     }
 });
 
+//组件中直接显示文件名 'XXX/AAA/BBB/a.png => a.png'
 Vue.filter('getfileNameByUrl', function (value) {
-    return util.getPostfix(value);
+    return value.substring(value.lastIndexOf('/') + 1, value.length);
 });
 
 //拦截器

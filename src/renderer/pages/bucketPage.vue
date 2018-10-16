@@ -10,11 +10,29 @@
         flex-direction: row;
         align-items: center;
         padding: 15px 15px 0 15px;
+        flex-shrink: 0;
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
             overflow: scroll;
             margin-right: 10px;
+        }
+        .header-info-view {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-shrink: 0;
+            margin-right: 10px;
+            .icon {
+                font-size: 14px;
+            }
+            .count {
+                margin-right: 5px;
+                padding-left: 5px;
+            }
+            .size {
+                padding-left: 5px;
+            }
         }
         .header-button-view {
             display: flex;
@@ -46,6 +64,12 @@
                 <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
             </div>
 
+            <div class="header-info-view">
+                <span class="icon iconfont icon-wenjian"></span>
+                <span class="count">共{{bucket.files.length}}个 文件</span>
+                <span class="icon iconfont icon-fuwuqi"></span>
+                <span class="size">共{{totalSize}} 存储量</span>
+            </div>
             <div class="header-button-view">
                 <Button type="ghost" size="small" @click="query()" icon="funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
@@ -129,7 +153,7 @@
         data() {
             return {
                 bucket: null,
-                showType: 0, //0:列表 1:grid 2:folder
+                showType: 2, //0:列表 1:grid 2:folder
                 folderPath: null,
                 folderKeyWord: null,
                 model_DeleteAsk: false,
@@ -148,7 +172,16 @@
                 privatebucket: types.setup.setup_privatebucket,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
                 customeDomains: types.setup.setup_customedomain
-            })
+            }),
+            totalSize() {
+                let totalSzie = 0;
+                if (this.bucket && this.bucket.files) {
+                    this.bucket.files.forEach((item) => {
+                        totalSzie += item.fsize;
+                    });
+                }
+                return util.formatFileSize(totalSzie);
+            }
         },
         watch: {
             bucketName: function (val, oldVal) {

@@ -86,7 +86,7 @@ export default {
          * @param file
          */
         resourceRemove(file) {
-            this.bucket.selection = [file];
+            this.bucket.selection = Array.isArray(file) ? file : [file];
             this.$parent.askRemove();
         },
         /**
