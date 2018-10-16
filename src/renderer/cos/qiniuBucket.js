@@ -17,7 +17,7 @@ class Bucket {
 
         //当前选择domain
         this.domain = '';
-        //当前dir加载返回的marker
+        //缓存请求时返回的marker
         this.marker = '';
 
         //当前bucket源数据
@@ -155,16 +155,17 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
-            if (!response)
-                return;
-
-            let data = response.data;
+        qiniu.list(param, (respErr, respBody, respInfo) => {
+            let data = respInfo.data;
             data.items.forEach((item, index) => {
                 data.items[index].putTime = item.putTime / 10000;
             });
             this.files = this.marker ? this.files.concat(data.items) : data.items;
             this.marker = data.marker ? data.marker : '';
+
+            if (this.marker) {
+                this.getResources(keyword);
+            }
         });
     }
 

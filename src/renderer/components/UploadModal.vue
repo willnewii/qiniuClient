@@ -9,7 +9,7 @@
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
                    placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"
-                   icon="trash-b" @on-click="uploadModal.path = ''"/>
+                   icon="trash-b" @on-click="uploadModal.path = '';filePaths=[]"/>
 
             <div class="modal-input">
                 <Select v-model="uploadModal.prepend" style="width: 100px">
@@ -142,15 +142,28 @@
                         this.filePaths = [];
                         this.$electron.ipcRenderer.send(Constants.Listener.openFileDialog, {properties: ['openFile', 'openDirectory', 'multiSelections']});
                         break;
+                    case 3://windows 不支持 openFile 和 openDirectory 同时调用
+                        this.filePaths = [];
+                        this.$electron.ipcRenderer.send(Constants.Listener.openFileDialog, {properties: ['openFile', 'multiSelections']});
+                        break;
+                    case 4:
+                        this.filePaths = [];
+                        this.$electron.ipcRenderer.send(Constants.Listener.openFileDialog, {properties: ['openDirectory', 'multiSelections']});
+                        break;
                     case 1://抓取文件
                         this.filePaths = [];
 
                         if (this.$electron.clipboard.readText()) {
                             this.uploadModal.path = this.$electron.clipboard.readText();
-                            this.filePaths[0] = {
-                                path: this.uploadModal.path,
-                                key: util.getPostfix(this.uploadModal.path)
-                            };
+
+                            let urls = this.uploadModal.path.split('\n');
+
+                            urls.forEach((url) => {
+                                this.filePaths.push({
+                                    path: url,
+                                    key: util.getPostfix(url)
+                                });
+                            });
                         } else {
                             this.uploadModal.path = '';
                         }
@@ -164,10 +177,16 @@
                 this.uploadModal.path = '';
             },
             handleURLPath() {//处理URL上传的路径
-                this.filePaths[0] = {
-                    path: this.uploadModal.path,
-                    key: util.getPostfix(this.uploadModal.path)
-                };
+                this.filePaths = [];
+                //录入input后,换行符会变成空格
+                let urls = this.uploadModal.path.split(' ');
+                console.log(urls);
+                urls.forEach((url) => {
+                    this.filePaths.push({
+                        path: url,
+                        key: util.getPostfix(url)
+                    });
+                });
             },
             handleFile(paths) {//通过文件对话框选择的文件
                 this.filePaths = paths;
