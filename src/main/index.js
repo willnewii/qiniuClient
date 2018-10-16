@@ -91,8 +91,6 @@ const registerIPC = function () {
         }
 
         download(BrowserWindow.getFocusedWindow(), file, option).then(dl => {
-            console.log('getSavePath:' + dl.getSavePath());
-
             if (option.count === 1) {
                 shell.showItemInFolder(dl.getSavePath());
             }
@@ -136,10 +134,11 @@ async function wrapperFiles(_files) {
         if (util.isDirectory(item)) {
             let temp = await util.readDir(item);
             temp.forEach((path) => {
-                files.push({path, dir: item});
+                //path.sep 将window 的路径分割符 \  转换成 /
+                files.push({path: path.replace(/\\/g, '/'), dir: item.replace(/\\/g, '/')});
             });
         } else {
-            files.push({path: item});
+            files.push({path: item.replace(/\\/g, '/')});
         }
     }
 
