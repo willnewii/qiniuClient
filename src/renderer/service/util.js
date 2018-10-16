@@ -60,18 +60,10 @@ export function getFakeFolder(key) {
  * @returns {*}
  */
 export function getPostfix(path) {
-    if (path.indexOf('http') === 0) {//链接处理
-        if (path.lastIndexOf('/') !== -1) {
-            return path.substring(path.lastIndexOf('/') + 1, path.length);
-        }
-    } else {//文件路径
-        let separator = process.platform === 'darwin' ? '/' : '\\';
-        path = decodeURIComponent(path);
-        if (path.lastIndexOf(separator) !== -1) {
-            return path.substring(path.lastIndexOf(separator) + 1, path.length);
-        }
+    if (path.lastIndexOf('/') !== -1) {
+        return path.substring(path.lastIndexOf('/') + 1, path.length);
     }
-    return path;
+    return '';
 }
 
 export function quickSort(arr, key) {
