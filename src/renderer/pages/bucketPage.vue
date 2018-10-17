@@ -1,4 +1,6 @@
 <style lang="scss" scoped>
+    @import '../style/base';
+
     .layout-copy {
         text-align: center;
         padding: 10px 0 20px;
@@ -16,6 +18,17 @@
             flex-shrink: 1;
             overflow-x: scroll;
             margin-right: 10px;
+            .ivu-breadcrumb {
+                display: flex;
+                flex-direction: row;
+                color: $fontColor;
+                .bread-sub {
+                    flex-shrink: 0;
+                    .ivu-breadcrumb-item-separator {
+                        color: $fontColor;
+                    }
+                }
+            }
         }
         .header-info-view {
             display: flex;
@@ -41,24 +54,34 @@
         }
     }
 </style>
+<style lang="scss">
+    @import '../style/base';
+
+    .bread-sub {
+        .ivu-breadcrumb-item-separator {
+            color: $fontColor;
+        }
+    }
+</style>
 <template>
     <div class="layout" v-if="bucket">
         <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
             <div class="header-dir-view">
-                <Breadcrumb v-if="showType === 2">
-                    <span @click="changeFolderPath(-1)">
+                <Breadcrumb v-if="showType === 2" separator=">">
+                    <div class="bread-sub" @click="changeFolderPath(-1)">
                         <BreadcrumbItem>
-                            <Icon type="android-home"></Icon>
+                            <Icon type="android-home" size="14"></Icon>
                         </BreadcrumbItem>
-                    </span>
+                    </div>
                     <template v-if="bucket.folderPath">
-                         <span v-for="(item,index) in bucket.folderPath.split('/')" @click="changeFolderPath(index)">
-                        <BreadcrumbItem>
-                            {{item}}
-                        </BreadcrumbItem>
-                    </span>
+                        <div class="bread-sub" v-for="(item,index) in bucket.folderPath.split('/')"
+                             @click="changeFolderPath(index)">
+                            <BreadcrumbItem>
+                                {{item}}
+                            </BreadcrumbItem>
+                        </div>
                     </template>
                 </Breadcrumb>
                 <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
@@ -70,6 +93,7 @@
                 <span class="icon iconfont icon-fuwuqi"></span>
                 <span class="size">共{{totalSize}} 存储量</span>
             </div>
+
             <div class="header-button-view">
                 <Button type="ghost" size="small" @click="query()" icon="funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
@@ -104,11 +128,10 @@
                        @on-update="onFilesUpdate"></resource-grid>-->
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
-        <Modal
-                v-model="model_DeleteAsk"
-                title="确认删除文件？"
-                @on-ok="callRemove"
-                @on-cancel="cancelModal">
+        <Modal v-model="model_DeleteAsk"
+               title="确认删除文件？"
+               @on-ok="callRemove"
+               @on-cancel="cancelModal">
             <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>

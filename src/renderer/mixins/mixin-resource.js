@@ -78,12 +78,16 @@ export default {
                 this.$Message.info('文件下载完成');
             }
         },
-        removeMsg(item) {
-            this.$Message.info('移除成功');
-
-            this.$emit('on-update', null, 'remove');
+        resourceRename(files) {
+            this.bucket.renameFile(files, () => {
+                this.showMessage({
+                    message: '文件修改成功'
+                });
+                this.$emit('on-update', null, 'change');
+            });
         },
         /**
+         *
          * item 删除按钮操作
          * @param file
          */
@@ -96,7 +100,9 @@ export default {
          */
         removes() {
             this.bucket.removeFile(this.bucket.selection, (ret) => {
-                this.removeMsg();
+                this.$Message.info('移除成功');
+                this.$emit('on-update', null, 'remove');
+
                 this.bucket.selection = [];
             });
 

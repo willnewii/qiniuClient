@@ -62,6 +62,14 @@
             </i-button>
         </div>
 
+        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <i-button type="text" @click="actionBtn(5)" v-if="bucket.name">
+                <Tooltip :content="`刷新bucket：${bucket.name}`" placement="bottom">
+                    <Icon type="refresh" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
         <Input class="input-search" v-model="search" :placeholder="placeholder" icon="ios-close-outline"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
@@ -142,6 +150,9 @@
                         break;
                     case 2://搜索事件
                         this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);
+                        break;
+                    case 5://刷新当前bucket
+                        this.$parent.getResources();
                         break;
                 }
             }

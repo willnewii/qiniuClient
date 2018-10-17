@@ -9,16 +9,20 @@
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
+                            <template v-if="menuState">
+                                <Icon :size="item.size ? item.icon : 25"
+                                      :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"></Icon>
+                                <span class="layout-text">{{item}}</span>
+                            </template>
+                            <template v-else>
+                                <span class="layout-icon">{{item.substring(0,1)}}</span>
+                            </template>
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
                         <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="item.icon"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item.title}}</span>
+                            <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
+                            <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
                     </Menu-group>
                 </Menu>
@@ -65,9 +69,6 @@
                 cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
-                iconStyle: {
-                    width: '25px'
-                },
                 appVersion: pkg.version,
                 version: {
                     github: Constants.URL.github,
@@ -241,6 +242,8 @@
     };
 </script>
 <style lang="scss" scoped>
+    @import "../style/params";
+
     .layout {
         height: 100%;
         background: #f5f7f9;
@@ -275,7 +278,17 @@
                 display: flex;
                 align-items: center;
                 .layout-text {
-                    margin-left: 0px;
+                    margin-left: 0;
+                    line-height: 25px;
+                }
+                .layout-icon {
+                    margin-left: 0;
+                    line-height: 25px;
+                    background: rgba(255, 255, 255, .7);
+                    width: 25px;
+                    color: $fontColor;
+                    text-align: center;
+                    text-transform: capitalize;
                 }
             }
 

@@ -1,7 +1,13 @@
+@import './params';
+
 // 样式调整
 $barPadding: 0;
 @if ($platform == 'darwin') {
   $barPadding: 20px;
+}
+
+body {
+  color: $fontColor;
 }
 
 .ivu-menu-item-group-title {
@@ -30,6 +36,10 @@ $barPadding: 0;
   .ivu-checkbox-wrapper {
     margin-right: 0;
   }
+}
+
+.ivu-btn-text:focus {
+  box-shadow: none;
 }
 
 /* 自定义scrollbar 效果不好

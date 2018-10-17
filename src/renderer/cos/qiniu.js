@@ -132,6 +132,27 @@ function upload(params, callback) {
 }
 
 /**
+ * 批量修改文件名
+ * @param bucket    名称
+ * @param items     需要处理的文件
+ * @param replace   需要处理的文件
+ * @param callback
+ */
+function rename(bucket, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+
+    //批量删除
+    let operations = [];
+    items.forEach((item) => {
+        operations.push(qiniu.rs.moveOp(bucket, item.key, bucket, item._key));
+    });
+
+    _batch(operations, callback);
+}
+
+/**
  * 批量删除文件
  * @param bucket    名称
  * @param items     需要处理的文件
@@ -143,12 +164,12 @@ function remove(bucket, items, callback) {
     }
 
     //批量删除
-    let deleteOperations = [];
+    let operations = [];
     items.forEach((item) => {
-        deleteOperations.push(qiniu.rs.deleteOp(bucket, item.key));
+        operations.push(qiniu.rs.deleteOp(bucket, item.key));
     });
 
-    _batch(deleteOperations, callback);
+    _batch(operations, callback);
 }
 
 //https://github.com/qiniu/nodejs-sdk/blob/master/examples/rs_batch_delete.js
@@ -182,4 +203,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, upload, fetch, methods, DELIMITER};
+export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, rename, upload, fetch, methods, DELIMITER};
