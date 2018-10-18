@@ -345,7 +345,7 @@
                         width: $imageWidth;
                         min-height: $imageWidth;
                         min-width: $imageWidth;
-                        margin-top: 5px;
+                        padding: 10px;
                     }
                     .file {
                         height: $imageWidth;
