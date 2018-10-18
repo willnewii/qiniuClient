@@ -212,6 +212,12 @@ class Bucket {
         });
     }
 
+    renameFile(items, callback) {
+        qiniu.rename(this.name, items, (ret) => {
+            callback && callback(ret);
+        });
+    }
+
     /**
      * 返回资源真实链接
      * @param index

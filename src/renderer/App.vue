@@ -18,9 +18,9 @@
             return {};
         },
         created: function () {
-            if (process.platform !== 'darwin') {
+            /*if (process.platform !== 'darwin') {
                 document.getElementById('title').remove();
-            }
+            }*/
         },
         mounted() {
         }

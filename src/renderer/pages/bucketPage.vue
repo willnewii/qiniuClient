@@ -1,21 +1,35 @@
 <style lang="scss" scoped>
-    .layout-copy {
-        text-align: center;
-        padding: 10px 0 20px;
-        color: #9ea7b4;
+    @import '../style/params';
+
+    .bucketpage {
+        background-color: $bg-bucketpage;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .dir-layout {
         display: flex;
         flex-direction: row;
         align-items: center;
-        padding: 15px 15px 0 15px;
+        padding: 15px;
         flex-shrink: 0;
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
             overflow-x: scroll;
             margin-right: 10px;
+            .ivu-breadcrumb {
+                display: flex;
+                flex-direction: row;
+                color: $fontColor;
+                .bread-sub {
+                    flex-shrink: 0;
+                    .ivu-breadcrumb-item-separator {
+                        color: $fontColor;
+                    }
+                }
+            }
         }
         .header-info-view {
             display: flex;
@@ -41,24 +55,34 @@
         }
     }
 </style>
+<style lang="scss">
+    @import '../style/params';
+
+    .bread-sub {
+        .ivu-breadcrumb-item-separator {
+            color: $fontColor;
+        }
+    }
+</style>
 <template>
-    <div class="layout" v-if="bucket">
+    <div class="bucketpage" v-if="bucket">
         <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
             <div class="header-dir-view">
-                <Breadcrumb v-if="showType === 2">
-                    <span @click="changeFolderPath(-1)">
+                <Breadcrumb v-if="showType === 2" separator=">">
+                    <div class="bread-sub" @click="changeFolderPath(-1)">
                         <BreadcrumbItem>
-                            <Icon type="android-home"></Icon>
+                            <Icon type="md-home" size="14"></Icon>
                         </BreadcrumbItem>
-                    </span>
+                    </div>
                     <template v-if="bucket.folderPath">
-                         <span v-for="(item,index) in bucket.folderPath.split('/')" @click="changeFolderPath(index)">
-                        <BreadcrumbItem>
-                            {{item}}
-                        </BreadcrumbItem>
-                    </span>
+                        <div class="bread-sub" v-for="(item,index) in bucket.folderPath.split('/')"
+                             @click="changeFolderPath(index)">
+                            <BreadcrumbItem>
+                                {{item}}
+                            </BreadcrumbItem>
+                        </div>
                     </template>
                 </Breadcrumb>
                 <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
@@ -70,30 +94,31 @@
                 <span class="icon iconfont icon-fuwuqi"></span>
                 <span class="size">共{{totalSize}} 存储量</span>
             </div>
+
             <div class="header-button-view">
-                <Button type="ghost" size="small" @click="query()" icon="funnel"
+                <Button size="small" @click="query()" icon="md-funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
                 </Button>
 
-                <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
-                        style="margin-right: 10px;background: #FFFFFF;"
+                <Button size="small" @click="downloads()" icon="md-download"
+                        style="margin-right: 10px;"
                         v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
                 </Button>
 
-                <Button type="error" size="small" @click="askRemove()" icon="trash-b" style="margin-right: 10px;"
+                <Button type="error" size="small" @click="askRemove()" icon="md-trash"
+                        style="margin-right: 10px;"
                         v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
                 </Button>
 
                 <Button-group size="small" style="background: #FFF;display: flex;">
-                    <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
-                            icon="navicon-round"></Button>
+                    <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)"
+                            icon="md-list"></Button>
                     <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
-                    <Button :type="showType === 2 ? 'primary' : 'ghost'" @click="changeShowType(2)"
-                            icon="folder"></Button>
+                    <Button :type="showType === 2 ? 'primary' : 'default'" @click="changeShowType(2)"
+                            icon="md-folder"></Button>
                 </Button-group>
-
                 <Button-group size="small" style="background: #FFF;margin-left: 10px;" v-if="bucket.marker">
-                    <Button type="ghost" @click="getResources()" icon="chevron-right"></Button>
+                    <Button @click="getResources()" icon="ios-arrow-forward"></Button>
                 </Button-group>
             </div>
         </div>
@@ -104,11 +129,10 @@
                        @on-update="onFilesUpdate"></resource-grid>-->
         <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
-        <Modal
-                v-model="model_DeleteAsk"
-                title="确认删除文件？"
-                @on-ok="callRemove"
-                @on-cancel="cancelModal">
+        <Modal v-model="model_DeleteAsk"
+               title="确认删除文件？"
+               @on-ok="callRemove"
+               @on-cancel="cancelModal">
             <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>

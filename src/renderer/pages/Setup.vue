@@ -40,7 +40,7 @@
                     <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>
                 </Col>
                 <Col span="10" offset="1">
-                    <Button @click="saveDir" type="ghost" size="small" class="save-btn">保存</Button>
+                    <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
             <div v-if="setup_bucket_name && setup_bucket_dir">提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/
@@ -57,7 +57,7 @@
                            disabled/>
                 </Col>
                 <Col span="12" offset="1">
-                    <Button @click="choiceDownloadolder" type="ghost" size="small" class="save-btn"
+                    <Button @click="choiceDownloadolder" size="small" class="save-btn"
                             icon="ios-folder-outline"/>
                 </Col>
             </Row>
@@ -71,15 +71,15 @@
                     <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
                 </Col>
                 <Col span="12" offset="1">
-                    <Button @click="saveImagestyle" type="ghost" size="small" class="save-btn">保存</Button>
-                    <Button @click="openBrowser(0)" size="small">什么是图片样式</Button>
+                    <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
+                    <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
                 </Col>
             </Row>
         </div>
 
         <div class="item">
             私有空间：
-            <Button @click="openBrowser(1)" size="small">什么是私有空间</Button>
+            <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
             <br>
             <CheckboxGroup v-model="privates" @on-change="privatesChange">
                 <Checkbox v-for="item,index in buckets" :key="index" :label="item">
@@ -92,7 +92,7 @@
                            style="width: 20%; margin-right: 10px"/>分钟
                 </Col>
                 <Col span="12" offset="1">
-                    <Button @click="saveDeadline" type="ghost" size="small" class="save-btn">保存</Button>
+                    <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
         </div>

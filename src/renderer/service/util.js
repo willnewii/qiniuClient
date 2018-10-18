@@ -63,7 +63,7 @@ export function getPostfix(path) {
     if (path.lastIndexOf('/') !== -1) {
         return path.substring(path.lastIndexOf('/') + 1, path.length);
     }
-    return '';
+    return path;
 }
 
 export function quickSort(arr, key) {
@@ -112,13 +112,13 @@ export function formatDate(time) {
  */
 export function sequence(file1, file2) {
     if (file1._directory && file2._directory) {
-        return file1.key > file2.key;
+        return file1._name.localeCompare(file2._name);
     } else if (file1._directory && !file2._directory) {
         return -1;
     } else if (!file1._directory && file2._directory) {
         return 1;
     } else if (!file1._directory && !file2._directory) {
-        return file1.key > file2.key;
+        return file1.key.localeCompare(file2.key);
     } else {
         return 0;
     }

@@ -12,8 +12,8 @@ export default {
     state: {
         setup: {
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
-            isOverwrite: false,                                     //上传时是否直接覆盖文件
-            copyType: 'markdown',
+            isOverwrite: true,                                     //上传时是否直接覆盖文件
+            copyType: 'url',
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
@@ -107,7 +107,7 @@ export default {
     },
     getters: {
         [types.setup.setup_isOverwrite](state) {
-            return ('isOverwrite' in state.setup) ? state.setup.isOverwrite : false;
+            return ('isOverwrite' in state.setup) ? state.setup.isOverwrite : true;
         },
         [types.setup.setup_deadline](state) {
             return ('privatedeadline' in state.setup) ? state.setup.privatedeadline : 3600;

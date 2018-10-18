@@ -3,22 +3,27 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>
+                    <!--<Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>-->
+                    {{menuState ? cos_name : ''}}
                 </i-button>
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
+                            <template v-if="menuState">
+                                <Icon :size="item.size ? item.icon : 25"
+                                      :type="privatebucket.indexOf(item) !==  -1 ? 'md-lock' : 'md-folder'"></Icon>
+                                <span class="layout-text">{{item}}</span>
+                            </template>
+                            <template v-else>
+                                <span class="layout-icon">{{item.substring(0,1)}}</span>
+                            </template>
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
                         <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="item.icon"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item.title}}</span>
+                            <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
+                            <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
                     </Menu-group>
                 </Menu>
@@ -30,7 +35,7 @@
                     </Poptip>
                 </div>
             </i-col>
-            <i-col :span="menuSpace.right">
+            <i-col :span="menuSpace.right" class="layout-menu-right">
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
@@ -62,12 +67,10 @@
             return {
                 cos: [],
                 cos_key: '',
+                cos_name: '',
                 cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
-                iconStyle: {
-                    width: '25px'
-                },
                 appVersion: pkg.version,
                 version: {
                     github: Constants.URL.github,
@@ -77,15 +80,15 @@
                 },
                 menus: [{
                     name: Constants.Key.app_switch,
-                    icon: 'arrow-swap',
+                    icon: 'md-swap',
                     title: '切换'
                 }, {
                     name: Constants.Key.app_setup,
-                    icon: 'ios-gear',
+                    icon: 'md-cog',
                     title: '设置'
                 }, {
                     name: Constants.Key.app_logout,
-                    icon: 'android-exit',
+                    icon: 'md-exit',
                     title: '注销'
                 }]
             };
@@ -133,6 +136,7 @@
                 });
             },
             selectCOS(item) {
+                this.cos_name = pkg.cnname;
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name + "COS客户端");
                 this.cos_key = item.key;
                 this.$storage.setName(item.key);
@@ -241,46 +245,52 @@
     };
 </script>
 <style lang="scss" scoped>
+    @import "../style/params";
+
     .layout {
         height: 100%;
-        background: #f5f7f9;
-        position: relative;
-        border-radius: 4px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
         .ivu-row-flex {
             height: 100%;
         }
 
         .layout-menu-left {
-            background: #464c5b;
+            background: $bg-menu;
             display: flex;
             flex-direction: column;
+            border-radius: 4px;
+            padding-top: 20px;
+            -webkit-app-region: drag;
 
             .navicon_btn {
+                background: $bg-menu;
                 text-align: left;
-                color: #c5c5c5;
+                color: rgba(255, 255, 255, .7);
+                padding-left: 22px;
                 &:hover {
-                    color: #57a3f3;
+                    color: $primary;
                 }
             }
 
             .ivu-menu-vertical {
                 flex-grow: 1;
-            }
-
-            .ivu-menu-item {
-                padding: 8px 24px;
-                display: flex;
-                align-items: center;
-                .layout-text {
-                    margin-left: 0px;
+                .ivu-menu-item {
+                    padding: 8px 24px;
+                    display: flex;
+                    align-items: center;
+                    .layout-text {
+                        margin-left: 0;
+                        line-height: 25px;
+                    }
+                    .layout-icon {
+                        margin-left: 0;
+                        line-height: 25px;
+                        background: rgba(255, 255, 255, .7);
+                        width: 25px;
+                        color: $fontColor;
+                        text-align: center;
+                        text-transform: capitalize;
+                    }
                 }
-            }
-
-            .layout-hide-text {
-                display: none;
             }
 
             .version {
@@ -294,6 +304,10 @@
                     color: #555;
                 }
             }
+        }
+
+        .layout-menu-right {
+            padding-top: 10px;
         }
     }
 
@@ -313,6 +327,8 @@
     }
 </style>
 <style lang="scss">
+    @import "../style/params";
+
     .vertical-center-modal {
         display: flex;
         align-items: center;
@@ -326,5 +342,19 @@
     .ivu-modal-footer {
         border-top: 0;
         /*padding: 0;*/
+    }
+
+    .ivu-menu {
+        background: none !important;
+        .ivu-menu-item-group-title {
+            font-size: 12px !important;
+            height: 30px !important;
+            line-height: 30px !important;
+            padding-left: 24px !important;
+        }
+
+        .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
+            border-right: 5px solid $primary;
+        }
     }
 </style>

@@ -1,35 +1,35 @@
+@import './params';
+
 // 样式调整
 $barPadding: 0;
-@if ($platform == 'darwin') {
+/*@if ($platform == 'darwin') {
   $barPadding: 20px;
-}
+}*/
 
-.ivu-menu-item-group-title {
-  font-size: 12px !important;
-  height: 30px !important;
-  line-height: 30px !important;
-  padding-left: 24px !important;
-}
-
-.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
-  border-right-width: 5px;
+body {
+  background-color: #FFFFFF;
+  color: $fontColor;
 }
 
 .ivu-loading-bar {
   top: $barPadding;
 }
 
-.layout-menu-left {
+/*.layout-menu-left {
   background: #495060 !important;
   border-radius: 5px;
   //box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
-}
+}*/
 
 //表格 多选 图标边距修改
 .ivu-table-cell {
   .ivu-checkbox-wrapper {
     margin-right: 0;
   }
+}
+
+.ivu-btn-text:focus {
+  box-shadow: none;
 }
 
 /* 自定义scrollbar 效果不好
