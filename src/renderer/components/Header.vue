@@ -33,7 +33,7 @@
         <div v-if="isMac" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
                 <Tooltip content="文件、文件夹上传(支持多选)" placement="bottom">
-                    <Icon type="upload" size="24"/>
+                    <Icon type="md-cloud-upload" size="24"/>
                 </Tooltip>
             </i-button>
         </div>
@@ -41,7 +41,7 @@
         <div v-if="isWin">
             <i-button type="text" @click="actionBtn(3)" v-if="bucket.name">
                 <Tooltip content="文件上传(支持多选)" placement="bottom">
-                    <Icon type="document" size="24"/>
+                    <Icon type="md-document" size="24"/>
                 </Tooltip>
             </i-button>
         </div>
@@ -49,7 +49,7 @@
         <div v-if="isWin">
             <i-button type="text" @click="actionBtn(4)" v-if="bucket.name">
                 <Tooltip content="文件夹上传(支持多选)" placement="bottom">
-                    <Icon type="folder" size="24"></Icon>
+                    <Icon type="md-folder" size="24"></Icon>
                 </Tooltip>
             </i-button>
         </div>
@@ -57,7 +57,7 @@
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
                 <Tooltip content="通过url直接上传文件" placement="bottom">
-                    <Icon type="link" size="24"/>
+                    <Icon type="md-link" size="24"/>
                 </Tooltip>
             </i-button>
         </div>
@@ -65,7 +65,7 @@
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button type="text" @click="actionBtn(5)" v-if="bucket.name">
                 <Tooltip :content="`刷新bucket：${bucket.name}`" placement="bottom">
-                    <Icon type="refresh" size="24"/>
+                    <Icon type="md-refresh" size="24"/>
                 </Tooltip>
             </i-button>
         </div>

@@ -21,15 +21,16 @@
             </v-contextmenu-item>
         </v-contextmenu>
         <div class="gallery">
-            <Card v-for="(file,index) in files" class="card" :padding="0" :bordered="false">
-                <div v-if="file._directory && file._icon === 'folder'" class="view" @click="showDirectory(file)"
+            <Card v-for="(file,index) in files" :key="file.key" class="card" :padding="0" :bordered="false">
+                <div v-if="file._directory && file._icon === 'md-folder'" class="view" @click="showDirectory(file)"
                      v-contextmenu:folderMenu :index="index">
                     <div class="file">
                         <Icon :type="file._icon" size="50"></Icon>
                     </div>
                     <span class="name">{{file._name}}</span>
                 </div>
-                <div v-else-if="file._directory && file._icon !== 'folder'" class="view" @click="showDirectory(file)">
+                <div v-else-if="file._directory && file._icon !== 'md-folder'" class="view"
+                     @click="showDirectory(file)">
                     <div class="file">
                         <Icon :type="file._icon" size="50"></Icon>
                     </div>
@@ -39,17 +40,17 @@
                     <img v-if="/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())" class="image"
                          v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
                     <div v-else-if="file.mimeType.indexOf('audio')===0" class="file">
-                        <Icon type="music-note" size="50"></Icon>
+                        <Icon type="md-musical-notes" size="50"></Icon>
                     </div>
                     <div v-else class="file">
-                        <Icon type="document-text" size="50"></Icon>
+                        <Icon type="md-document" size="50"></Icon>
                     </div>
                     <div class="btn">
-                        <Button type="ghost" shape="circle" size="small" icon="ios-download"
+                        <Button shape="circle" size="small" icon="md-download"
                                 @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
-                        <Button type="ghost" shape="circle" size="small" icon="clipboard"
+                        <Button shape="circle" size="small" icon="md-clipboard"
                                 @click.stop="copy(file)" style="background: #FFFFFF"></Button>
-                        <Button type="error" shape="circle" size="small" icon="trash-b"
+                        <Button type="error" shape="circle" size="small" icon="md-trash"
                                 @click.stop="resourceRemove(file)"></Button>
                     </div>
                     <span class="name">{{file.key | getfileNameByUrl}}</span>
@@ -272,7 +273,7 @@
                                     _name: temps[0],
                                     _path: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
                                     _directory: true,
-                                    _icon: 'folder'
+                                    _icon: 'md-folder'
                                 });
                             }
                         }
@@ -286,7 +287,7 @@
                         _name: '返回上级',
                         _path: lastIndex !== -1 ? folderPath.substring(0, lastIndex) : '',
                         _directory: true,
-                        _icon: 'arrow-return-left'
+                        _icon: 'md-return-left'
                     });
                 }
 
@@ -319,7 +320,7 @@
     $imageWidth: 80px;
 
     .layout-content {
-        margin: 15px;
+        margin: 0 15px 15px 15px;
         overflow-y: scroll;
         background: #fff;
         flex-grow: 1;
