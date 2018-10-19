@@ -3,9 +3,10 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>
-                    {{menuState ? cos_name : ''}}
+                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="25"></Icon>
+                    <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
+                <!--light dark-->
                 <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
@@ -51,6 +52,10 @@
             </div>
             <div slot="footer"></div>
         </Modal>
+        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
+            <div>{{status.message}}</div>
+            <div>{{status.path}}</div>
+        </div>
     </div>
 </template>
 <script>
@@ -58,7 +63,7 @@
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
 
-    import {Constants, mixins} from '../service/index';
+    import {Constants, mixins, EventBus} from '../service/index';
     import brand from "@/cos/brand";
 
     export default {
@@ -90,7 +95,12 @@
                     name: Constants.Key.app_logout,
                     icon: 'md-exit',
                     title: '注销'
-                }]
+                }],
+                status: {
+                    show: false,
+                    path: '',
+                    message: '',
+                }
             };
         },
         computed: {
@@ -116,6 +126,10 @@
             this[types.setup.setup_init]();
 
             this.checkVersion();
+
+            EventBus.$on(Constants.Event.statusview, (option) => {
+                this.status = Object.assign(this.status, option);
+            });
         },
         methods: {
             ...mapActions([
@@ -255,19 +269,26 @@
 
         .layout-menu-left {
             background: $bg-menu;
+            color: $color-menu;
             display: flex;
             flex-direction: column;
-            border-radius: 4px;
+            /*border-radius: 4px;*/
+            border-bottom-right-radius: 4px;
             padding-top: 20px;
             -webkit-app-region: drag;
 
             .navicon_btn {
-                background: $bg-menu;
+                font-weight: bold;
                 text-align: left;
-                color: rgba(255, 255, 255, .7);
                 padding-left: 22px;
+                color: $color-menu;
                 &:hover {
                     color: $primary;
+                }
+                & > span {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                 }
             }
 
@@ -295,7 +316,7 @@
 
             .version {
                 padding: 10px 20px;
-                color: #c5c5c5;
+                /*color: #c5c5c5;*/
                 &-new {
                     color: #ff3605;
                     cursor: pointer;
@@ -307,7 +328,6 @@
         }
 
         .layout-menu-right {
-            padding-top: 10px;
         }
     }
 
@@ -325,9 +345,40 @@
             }
         }
     }
+
+    .status-view {
+        opacity: 1;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0.51);
+        color: #FFFFFF;
+        padding: 10px;
+        font-size: 12px;
+        z-index: 901;
+        transition: opacity 1s;
+    }
+
+    .status-view-none {
+        opacity: 0;
+        transition: opacity 2s;
+    }
 </style>
 <style lang="scss">
     @import "../style/params";
+
+    .navicon_btn {
+        & > span {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            & > span {
+                margin-left: 6px;
+            }
+        }
+    }
 
     .vertical-center-modal {
         display: flex;
@@ -346,6 +397,9 @@
 
     .ivu-menu {
         background: none !important;
+        &:after {
+            background: none !important;
+        }
         .ivu-menu-item-group-title {
             font-size: 12px !important;
             height: 30px !important;

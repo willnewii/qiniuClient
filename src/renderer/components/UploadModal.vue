@@ -25,21 +25,16 @@
                 </div>
             </div>
         </Modal>
-        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
-            <div>{{status.message}}</div>
-            <div>{{status.path}}</div>
-        </div>
     </div>
 </template>
 <script>
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
-    import {Constants, util} from '../service/index';
-
-    const path = require('path');
+    import {Constants, util, EventBus, mixins} from '../service/index';
 
     export default {
         name: 'UploadModal',
+        mixins: [mixins.base],
         props: {
             bucket: {
                 type: Object
@@ -53,18 +48,13 @@
                     input: '',
                     path: '',
                     fileName: '',
-                    type: ''
+                    type: '',
                 },
+                status_count: 0,
+                status_total: 0,
                 //文件拖拽提示框标记位
                 messageFlag: false,
                 filePaths: [],
-                status: {
-                    show: false,
-                    path: '',
-                    message: '',
-                    total: 0,
-                    count: 0
-                }
             };
         },
         computed: {
@@ -99,7 +89,9 @@
                 e.preventDefault();
                 if (!this.messageFlag) {
                     this.messageFlag = true;
-                    this.$Message.info('我已经感受到你传来的文件啦 😎');
+                    this.showMessage({
+                        message: '我已经感受到你传来的文件啦 😎'
+                    });
                     setTimeout(() => {
                         this.messageFlag = false;
                     }, 2000);
@@ -114,6 +106,7 @@
                         path.push(file.path);
                     });
 
+                    //TODO: Icon 组件不加载
                     //提示框
                     this.$Spin.show({
                         render: (h) => {
@@ -121,7 +114,7 @@
                                 h('Icon', {
                                     'class': 'demo-spin-icon-load',
                                     props: {
-                                        type: 'load-c',
+                                        type: 'ios-loading',
                                         size: 18
                                     }
                                 }),
@@ -195,9 +188,11 @@
                 this.uploadModal.isShow = true;
             },
             preUploadFile() {//上传文件前处理
-                this.status.show = true;
-                this.status.message = `文件上传中...`;
-                this.status.total = this.filePaths.length;
+                this.status_total = this.filePaths.length;
+                EventBus.$emit(Constants.Event.statusview, {
+                    show: true,
+                    message: `文件上传中...`,
+                });
 
                 this.uploadFile();
             },
@@ -208,15 +203,20 @@
                 let key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') +
                     file.key;
 
-                this.status.count += 1;
-                this.status.message = `文件上传中(${this.status.count}/${this.status.total})...0%`;
-                this.status.path = file.path;
+                this.status_count += 1;
+
+                EventBus.$emit(Constants.Event.statusview, {
+                    message: `文件上传中(${this.status_count}/${this.status_total})...0%`,
+                    path: file.path
+                });
                 let param = {
                     path: file.path,
                     key: key,
                     isOverwrite: this.setup_isOverwrite,
                     progressCallback: (progress) => {
-                        this.status.message = `文件上传中(${this.status.count}/${this.status.total})...${progress}%`;
+                        EventBus.$emit(Constants.Event.statusview, {
+                            message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
+                        });
                     }
                 };
 
@@ -239,11 +239,11 @@
                 if (this.filePaths.length > 0) {
                     this.uploadFile();
                 } else {
-                    this.status.message = '上传完成';
-                    this.status.path = '';
-                    this.status.show = false;
-                    this.status.total = 0;
-                    this.status.count = 0;
+                    EventBus.$emit(Constants.Event.statusview, {
+                        message: '上传完成',
+                        path: '',
+                        show: false,
+                    });
 
                     this.uploadModal.path = '';
                     this.uploadModal.input = '';
@@ -274,26 +274,6 @@
 
     .modal-url {
         margin: 0 0 20px 0;
-    }
-
-    .status-view {
-        opacity: 1;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        left: 0;
-        text-align: left;
-        background-color: rgba(0, 0, 0, 0.51);
-        color: #FFFFFF;
-        padding: 10px;
-        font-size: 12px;
-        z-index: 901;
-        transition: opacity 1s;
-    }
-
-    .status-view-none {
-        opacity: 0;
-        transition: opacity 2s;
     }
 </style>
 <style lang="scss">

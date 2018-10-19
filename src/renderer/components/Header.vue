@@ -1,10 +1,13 @@
 <style lang="scss" scoped>
+    @import "../style/params";
+
     .layout-header {
-        background: #fff;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+        background: $bg-header;
+        box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
         flex-shrink: 0;
         display: flex;
         align-items: center;
+        padding-top: 10px;
         padding-right: 15px;
         -webkit-app-region: drag;
 

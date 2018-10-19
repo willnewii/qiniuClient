@@ -20,43 +20,52 @@
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
-        <div class="gallery">
+        <div class="grid" v-if="type === 1">
             <Card v-for="(file,index) in files" :key="file.key" class="card" :padding="0" :bordered="false">
-                <div v-if="file._directory && file._icon === 'md-folder'" class="view" @click="showDirectory(file)"
-                     v-contextmenu:folderMenu :index="index">
-                    <div class="file">
-                        <Icon :type="file._icon" size="50"></Icon>
-                    </div>
-                    <span class="name">{{file._name}}</span>
-                </div>
-                <div v-else-if="file._directory && file._icon !== 'md-folder'" class="view"
-                     @click="showDirectory(file)">
-                    <div class="file">
-                        <Icon :type="file._icon" size="50"></Icon>
-                    </div>
-                    <span class="name">{{file._name}}</span>
-                </div>
-                <div v-else class="view" @click="show(file)" v-contextmenu:fileMenu :index="index">
-                    <img v-if="/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())" class="image"
-                         v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
-                    <div v-else-if="file.mimeType.indexOf('audio')===0" class="file">
-                        <Icon type="md-musical-notes" size="50"></Icon>
-                    </div>
-                    <div v-else class="file">
-                        <Icon type="md-document" size="50"></Icon>
-                    </div>
-                    <div class="btn">
-                        <Button shape="circle" size="small" icon="md-download"
-                                @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
-                        <Button shape="circle" size="small" icon="md-clipboard"
-                                @click.stop="copy(file)" style="background: #FFFFFF"></Button>
-                        <Button type="error" shape="circle" size="small" icon="md-trash"
-                                @click.stop="resourceRemove(file)"></Button>
-                    </div>
-                    <span class="name">{{file.key | getfileNameByUrl}}</span>
+                <div class="item" @click="clickItem(file,index)"
+                     v-contextmenu="file._contextmenu" :index="index">
+                    <template v-if="file._directory">
+                        <div class="file">
+                            <Icon :type="file._icon" size="50"></Icon>
+                        </div>
+                        <span class="name">{{file._name}}</span>
+                    </template>
+                    <template v-else>
+                        <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
+                             v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
+                        <div v-else class="file">
+                            <Icon :type="file._icon" size="50"></Icon>
+                        </div>
+                        <span class="name">{{file.key | getfileNameByUrl}}</span>
+                        <div class="btn">
+                            <Button shape="circle" size="small" icon="md-download"
+                                    @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
+                            <Button shape="circle" size="small" icon="md-clipboard"
+                                    @click.stop="copy(file)" style="background: #FFFFFF"></Button>
+                            <Button type="error" shape="circle" size="small" icon="md-trash"
+                                    @click.stop="resourceRemove(file)"></Button>
+                        </div>
+                    </template>
                 </div>
             </Card>
             <div style="flex-grow: 1"></div>
+        </div>
+        <div class="list" v-else-if="type === 0">
+            <!--<resource-list :files="files"></resource-list>-->
+            <div class="item" v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
+                 v-for="(file,index) in files" :key="file.key" @click="clickItem(file,index)"
+                 v-contextmenu="file._contextmenu" :index="index">
+                <template v-if="file._directory">
+                    <Icon :type="file._icon" size="15"></Icon>
+                    <span class="name">{{file._name}}</span>
+                </template>
+                <template v-else>
+                    <Icon :type="file._icon" size="15"></Icon>
+                    <span class="name">{{file.key | getfileNameByUrl}}</span>
+                    <span class="date">{{file.putTime | formatDate}}</span>
+                    <span class="size">{{file.fsize | formatFileSize}}</span>
+                </template>
+            </div>
         </div>
         <Modal v-model="folderInfoDialog.show" :title="folderInfoDialog.title" @on-ok="">
             <div style="white-space: pre-line">
@@ -75,14 +84,16 @@
     import * as util from '../service/util';
     import * as constants from '../service/constants';
     import * as qiniu from '../cos/qiniu';
+    import ResourceList from "@/components/ResourceList";
 
     export default {
         name: 'ResourceGrid',
+        components: {ResourceList},
         mixins: [resource, base],
         props: {
             type: {
                 type: Number,
-                default: 0 // 0:grid 1:file
+                default: 1 // 0:grid 1:list
             },
             keyWord: {//搜索关键字
                 type: String,
@@ -109,6 +120,8 @@
                 },
                 //当前路径
                 cacheName: '',
+                isMultiple: false,
+                selection: []
             };
         },
         watch: {
@@ -121,6 +134,11 @@
             'bucket.folderPath': function (newValue) {
                 this.fileFilter();
             },
+            'bucket.selection': function (newValue) {
+                if (newValue && newValue.length === 0) {
+                    this.selection = [];
+                }
+            },
             'keyWord': function () {
                 this.fileFilter((result) => {
                     if (this.keyWord) {
@@ -130,6 +148,26 @@
                     }
                 });
             },
+        },
+        created() {
+            document.onkeydown = (event) => {
+                let e = event || window.event || arguments.callee.caller.arguments[0];
+                switch (e.keyCode) {
+                    case 91://command
+                    case 93:
+                        this.isMultiple = true;
+                        break;
+                }
+            };
+            document.onkeyup = (event) => {
+                let e = event || window.event || arguments.callee.caller.arguments[0];
+                switch (e.keyCode) {
+                    case 91://command
+                    case 93:
+                        this.isMultiple = false;
+                        break;
+                }
+            };
         },
         mounted() {
             this.fileFilter();
@@ -228,19 +266,41 @@
                 });
                 return files;
             },
-            showDirectory(file) {
-                this.bucket.folderPath = file._path;
+            clickItem(file, index) {
+                if (this.isMultiple) {
+
+                    if (this.selection.indexOf(index) !== -1) {
+                        this.selection.splice(this.selection.indexOf(index), 1);
+                    } else {
+                        this.selection.push(index);
+                    }
+
+
+                    let files = [];
+                    for (const i of this.selection) {
+                        let file = this.files[i];
+                        if (file._directory) {
+                            files = files.concat(this.getFilebyPath(file._path));
+                        } else {
+                            files = files.concat(file);
+                        }
+                    }
+                    this.bucket.selection = files;
+                } else {
+                    if (file._directory) {
+                        this.bucket.folderPath = file._path;
+                    } else {
+                        this.show(file);
+                    }
+                }
             },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
              * @param callback  回调
              */
             fileFilter(callback) {
-                if (this.type === 0) {
-                    this.files = this.bucket.files;
-                    return;
-                }
-
+                this.selection = [];
+                this.bucket.selection = [];
                 let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
@@ -265,6 +325,14 @@
                         let temps = temp_key.split(qiniu.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
+                            if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
+                                file._icon = 'md-image';
+                            } else if (file.mimeType.indexOf('audio') === 0) {
+                                file._icon = 'md-musical-notes';
+                            } else {
+                                file._icon = 'md-document';
+                            }
+                            file._contextmenu = 'fileMenu';
                             files.push(file);
                         } else {
                             if (_dirs.indexOf(temps[0]) === -1) {
@@ -273,7 +341,8 @@
                                     _name: temps[0],
                                     _path: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
                                     _directory: true,
-                                    _icon: 'md-folder'
+                                    _icon: 'md-folder',
+                                    _contextmenu: 'folderMenu'
                                 });
                             }
                         }
@@ -316,17 +385,18 @@
     };
 </script>
 <style lang="scss" scoped>
+    @import "../style/params";
 
     $imageWidth: 80px;
 
     .layout-content {
         margin: 0 15px 15px 15px;
         overflow-y: scroll;
-        background: #fff;
+        background: $bg-resource;
         flex-grow: 1;
         border-radius: 4px;
 
-        .gallery {
+        .grid {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -337,51 +407,88 @@
                 height: 113px;
                 width: 113px;
                 margin: 5px;
-                .view {
+            }
+            .item {
+
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .image {
+                    height: $imageWidth;
+                    width: $imageWidth;
+                    min-height: $imageWidth;
+                    min-width: $imageWidth;
+                    padding: 10px;
+                }
+                .file {
+                    height: $imageWidth;
+                    width: $imageWidth;
                     display: flex;
-                    flex-direction: column;
+                    justify-content: center;
                     align-items: center;
-                    .image {
-                        height: $imageWidth;
-                        width: $imageWidth;
-                        min-height: $imageWidth;
-                        min-width: $imageWidth;
-                        padding: 10px;
-                    }
-                    .file {
-                        height: $imageWidth;
-                        width: $imageWidth;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                    }
-                    .name {
-                        font-size: 12px;
-                        max-width: $imageWidth;
-                        white-space: nowrap;
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                        margin-top: 5px;
-                        text-align: center;
-                    }
+                }
+                .name {
+                    font-size: 12px;
+                    max-width: $imageWidth;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    margin-top: 5px;
+                    text-align: center;
+                }
+                .btn {
+                    opacity: 0;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-around;
+                    align-items: center;
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    transition: all .2s;
+                }
+                &:hover {
                     .btn {
-                        opacity: 0;
-                        display: flex;
-                        flex-direction: row;
-                        justify-content: space-around;
-                        align-items: center;
-                        position: absolute;
-                        width: 100%;
-                        height: 100%;
-                        transition: all .2s;
-                    }
-                    &:hover {
-                        .btn {
-                            opacity: 1;
-                            background: rgba(28, 36, 56, 0.20);
-                        }
+                        opacity: 1;
+                        background: rgba(28, 36, 56, 0.20);
                     }
                 }
+            }
+        }
+
+        .list {
+            height: 100%;
+            .item {
+                display: flex;
+                flex-direction: row;
+                padding: 5px 10px 5px 10px;
+                align-items: center;
+                border-bottom: 1px solid #f1f1f1;
+                .name {
+                    flex-grow: 1;
+                    margin-left: 5px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .date {
+                    text-align: right;
+                    flex-shrink: 0;
+                    margin-left: 10px;
+                }
+                .size {
+                    width: 100px;
+                    text-align: right;
+                    flex-shrink: 0;
+                }
+                &:nth-child(2n) {
+                    background-color: #f1f1f1;
+                }
+            }
+            .item-select {
+                color: white;
+                background-color: $primary !important;
             }
         }
     }

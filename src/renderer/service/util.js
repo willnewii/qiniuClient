@@ -91,6 +91,9 @@ export function quickSort(arr, key) {
 }
 
 export function formatFileSize(size) {
+    if (!size)
+        return '';
+
     if (size >= 1024 * 1024) {
         return (size / 1024 / 1024).toFixed(2) + ' MB';
     } else if (size >= 1024 && size < 1024 * 1024) {
@@ -101,6 +104,9 @@ export function formatFileSize(size) {
 }
 
 export function formatDate(time) {
+    if (!time)
+        return '';
+
     return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
 

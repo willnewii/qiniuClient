@@ -112,20 +112,20 @@ const registerIPC = function () {
         });
     });
 
+    //选取文件
     ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
         event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(arg.files));
+    });
+
+    //预览文件
+    ipcMain.on(Constants.Listener.preview, function (event, arg) {
+        mainWindow.previewFile(arg);
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);
         // trayUtil.setTrayIcon();
     });
-
-    /*    ipcMain.on('previewFile', function (event, filePath) {
-            if (mainWindow) {
-                mainWindow.previewFile(filePath);
-            }
-        });*/
 };
 
 async function wrapperFiles(_files) {
