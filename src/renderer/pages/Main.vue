@@ -7,7 +7,7 @@
                     <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
                 <!--light dark-->
-                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
+                <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
@@ -268,20 +268,22 @@
         }
 
         .layout-menu-left {
-            background: $bg-menu;
-            color: $color-menu;
+            background: $menu-bg;
+            color: $menu-color;
             display: flex;
             flex-direction: column;
             /*border-radius: 4px;*/
             border-bottom-right-radius: 4px;
             padding-top: 20px;
             -webkit-app-region: drag;
+            z-index: 1;
+            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
 
             .navicon_btn {
                 font-weight: bold;
                 text-align: left;
                 padding-left: 22px;
-                color: $color-menu;
+                color: $menu-color;
                 &:hover {
                     color: $primary;
                 }
@@ -393,22 +395,5 @@
     .ivu-modal-footer {
         border-top: 0;
         /*padding: 0;*/
-    }
-
-    .ivu-menu {
-        background: none !important;
-        &:after {
-            background: none !important;
-        }
-        .ivu-menu-item-group-title {
-            font-size: 12px !important;
-            height: 30px !important;
-            line-height: 30px !important;
-            padding-left: 24px !important;
-        }
-
-        .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
-            border-right: 5px solid $primary;
-        }
     }
 </style>

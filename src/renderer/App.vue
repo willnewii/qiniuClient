@@ -29,4 +29,5 @@
 <style lang="scss">
     @import './style/animate';
     @import './style/base';
+    @import './style/theme';
 </style>

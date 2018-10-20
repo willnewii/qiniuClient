@@ -109,14 +109,14 @@
                         v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
                 </Button>
 
-                <Button-group size="small" style="background: #FFF;display: flex;">
+                <Button-group size="small">
                     <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)"
                             icon="md-list"></Button>
                     <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
                     <Button :type="showType === 1 ? 'primary' : 'default'" @click="changeShowType(1)"
                             icon="md-folder"></Button>
                 </Button-group>
-                <Button-group size="small" style="background: #FFF;margin-left: 10px;" v-if="bucket.marker">
+                <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
                     <Button @click="getResources()" icon="ios-arrow-forward"></Button>
                 </Button-group>
             </div>

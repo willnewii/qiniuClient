@@ -409,8 +409,6 @@
                 margin: 5px;
             }
             .item {
-
-                position: relative;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -431,9 +429,6 @@
                 .name {
                     font-size: 12px;
                     max-width: $imageWidth;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
                     margin-top: 5px;
                     text-align: center;
                 }
@@ -442,10 +437,11 @@
                     display: flex;
                     flex-direction: row;
                     justify-content: space-around;
-                    align-items: center;
                     position: absolute;
+                    align-items: center;
                     width: 100%;
                     height: 100%;
+                    border-radius: 4px;
                     transition: all .2s;
                 }
                 &:hover {
@@ -468,9 +464,7 @@
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
+
                 }
                 .date {
                     text-align: right;
@@ -489,6 +483,14 @@
             .item-select {
                 color: white;
                 background-color: $primary !important;
+            }
+        }
+        .item {
+            .name {
+                white-space: nowrap;
+                /*font-weight: bold;*/
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
         }
     }
