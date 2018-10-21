@@ -96,12 +96,21 @@
                 </Col>
             </Row>
         </div>
+        <div class="item">
+            主题：
+            <br>
+            <Radio-group :value="theme" @on-change="themesChange">
+                <Radio label="auto">自动</Radio>
+                <Radio label="light"></Radio>
+                <Radio label="dark"></Radio>
+            </Radio-group>
+        </div>
     </div>
 </template>
 
 <script>
     import {mapGetters, mapActions} from 'vuex';
-    import {Constants} from '../service';
+    import {Constants, util} from '../service';
     import * as types from '../vuex/mutation-types';
 
     export default {
@@ -113,7 +122,8 @@
                 imagestyle: '',
                 downloaddir: '',
                 deadline: 0,
-                privates: []
+                privates: [],
+                theme: '',
             };
         },
         computed: {
@@ -127,6 +137,7 @@
                 setup_imagestyle: types.setup.setup_imagestyle,
                 setup_downloaddir: types.setup.setup_downloaddir,
                 setup_privatebucket: types.setup.setup_privatebucket,
+                setup_theme: types.setup.setup_theme,
                 setup_deadline: types.setup.setup_deadline
             })
         },
@@ -137,11 +148,17 @@
             this.imagestyle = this.setup_imagestyle;
             this.downloaddir = this.setup_downloaddir;
             this.privates = this.setup_privatebucket;
+            this.theme = this.setup_theme;
             this.deadline = this.setup_deadline / 60;
 
             this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
+            });
+
+            this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
+                util.loadTheme(arg ? 'dark' : 'light');
+                this[types.setup.setup_a_theme]('auto');
             });
         },
         methods: {
@@ -154,6 +171,7 @@
                 types.setup.setup_a_privatebucket,
                 types.setup.setup_a_deadline,
                 types.setup.setup_a_isOverwrite,
+                types.setup.setup_a_theme,
             ]),
             deleteNoAskChange: function (state) {
                 this[types.setup.setup_a_deleteNoAsk](state);
@@ -166,6 +184,14 @@
             },
             privatesChange: function (privatebucket) {
                 this[types.setup.setup_a_privatebucket](privatebucket);
+            },
+            themesChange(item) {
+                if (item === 'auto') {
+                    this.$electron.ipcRenderer.send(Constants.Listener.darkMode);
+                } else {
+                    util.loadTheme(item);
+                    this[types.setup.setup_a_theme](item);
+                }
             },
             saveDir: function () {
                 this[types.setup.setup_a_savedir]([this.bucketname, this.bucketdir]);

@@ -18,9 +18,10 @@ export default {
             bucket_dir: '',
             customedomain: {},
             imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
-            downloaddir: '',//设置文件的下载路径
-            privatebucket: [],//七牛私有空间不能通过api获取,只能用户手动标记
-            privatedeadline: 3600//默认1小时
+            downloaddir: '',                                        //设置文件的下载路径
+            privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
+            privatedeadline: 3600,                                  //默认1小时
+            theme: 'auto'
         }
     },
     mutations: {
@@ -65,6 +66,10 @@ export default {
             state.setup.imagestyle = value;
             setAppSetup(state.setup);
         },
+        [types.setup.setup_theme](state, value) {
+            state.setup.theme = value;
+            setAppSetup(state.setup);
+        },
         [types.setup.setup_init](state, value) {
             state.setup = value;
         },
@@ -96,6 +101,9 @@ export default {
         },
         [types.setup.setup_a_customedomain](context, value) {
             context.commit(types.setup.setup_customedomain, value);
+        },
+        [types.setup.setup_a_theme](context, value) {
+            context.commit(types.setup.setup_theme, value);
         },
         async [types.setup.setup_init](context, callback) {
             let app = await storagePromise.get(Constants.Key.configuration);
@@ -135,6 +143,9 @@ export default {
         },
         [types.setup.setup_customedomain](state) {
             return ('customedomain' in state.setup) ? state.setup.customedomain : {};
+        },
+        [types.setup.setup_theme](state) {
+            return ('theme' in state.setup) ? state.setup.theme : 'auto';
         }
     }
 };

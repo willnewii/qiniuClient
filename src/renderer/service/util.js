@@ -139,3 +139,18 @@ export function wrapperFile(item, type) {
         mimeType: ''
     };
 }
+
+export function loadTheme(name) {
+    let head = document.getElementsByTagName("head")[0];
+
+    const style = document.createElement('link');
+    style.setAttribute("rel", "stylesheet");
+    style.setAttribute("type", "text/css");
+
+    if (name === 'dark') {
+        style.setAttribute("href", './static/styles-dark.css');
+    } else {
+        style.setAttribute("href", './static/styles.css');
+    }
+    head.appendChild(style);
+}

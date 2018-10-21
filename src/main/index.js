@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
 import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
@@ -125,6 +125,10 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);
         // trayUtil.setTrayIcon();
+    });
+
+    ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
+        event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
     });
 };
 

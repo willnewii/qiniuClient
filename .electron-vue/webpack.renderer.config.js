@@ -85,6 +85,7 @@ let rendererConfig = {
                 use: {
                     loader: 'url-loader',
                     query: {
+                        publicPath: '../',
                         limit: 10000,
                         name: 'fonts/[name]--[folder].[ext]'
                     }
@@ -97,7 +98,7 @@ let rendererConfig = {
         __filename: process.env.NODE_ENV !== 'production'
     },
     plugins: [
-        new ExtractTextPlugin('styles.css'),
+        new ExtractTextPlugin('./static/styles.css'),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, '../src/index.ejs'),

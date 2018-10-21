@@ -62,4 +62,5 @@ export const Listener = {
     readDirectory: 'read-directory',
     setBrand: 'setBrand',
     preview: 'preview',
+    darkMode: 'darkMode'
 };

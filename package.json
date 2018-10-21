@@ -7,15 +7,14 @@
     "license": "MIT",
     "main": "./dist/electron/main.js",
     "scripts": {
+        "dev": "node .electron-vue/dev-runner.js",
         "build": "node .electron-vue/build.js && electron-builder",
         "build:mac": "node .electron-vue/build.js && electron-builder --mac",
         "build:win32": "node .electron-vue/build.js && electron-builder --win --ia32",
         "build:dir": "node .electron-vue/build.js && electron-builder --dir",
         "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
         "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
-        "dev": "node .electron-vue/dev-runner.js",
-        "pack": "npm run pack:main && npm run pack:renderer",
-        "analyzer:renderer": "cross-env NODE_ENV=production ANALYZER=true webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+        "analyzer:renderer": "cross-env NODE_ENV=production ANALYZER=true webpack --config .electron-vue/webpack.renderer.config.js",
         "postinstall": ""
     },
     "dependencies": {

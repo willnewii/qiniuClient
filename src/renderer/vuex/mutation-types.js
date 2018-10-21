@@ -30,6 +30,9 @@ export const setup = {
 
     setup_customedomain: 'setup_customedomain',
     setup_a_customedomain: 'setup_a_customedomain',
+
+    setup_theme: 'setup_theme',
+    setup_a_theme: 'setup_a_theme',
 };
 
 export const app = {

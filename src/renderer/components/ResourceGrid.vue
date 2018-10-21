@@ -460,7 +460,7 @@
                 flex-direction: row;
                 padding: 5px 10px 5px 10px;
                 align-items: center;
-                border-bottom: 1px solid #f1f1f1;
+                border-bottom: 1px solid $bg-item-selected;
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
@@ -477,7 +477,7 @@
                     flex-shrink: 0;
                 }
                 &:nth-child(2n) {
-                    background-color: #f1f1f1;
+                    background-color: $bg-item-selected;
                 }
             }
             .item-select {
