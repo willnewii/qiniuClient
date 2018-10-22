@@ -105,6 +105,7 @@ export default {
         },
         resourceRename(files) {
             this.bucket.renameFile(files, () => {
+                this.$Spin.hide();
                 this.showMessage({
                     message: '文件修改成功'
                 });
@@ -125,10 +126,17 @@ export default {
          */
         removes() {
             this.bucket.removeFile(this.bucket.selection, (ret) => {
-                this.showMessage({
-                    message: '移除成功'
-                });
-                this.$emit('on-update', null, 'remove');
+                if (ret.error) {
+                    this.showMessage({
+                        type: 'error',
+                        message: '移除失败：' + ret.error
+                    });
+                } else {
+                    this.showMessage({
+                        message: '移除成功'
+                    });
+                    this.$emit('on-update', null, 'remove');
+                }
                 this.bucket.selection = [];
             });
 

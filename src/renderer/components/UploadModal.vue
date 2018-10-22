@@ -276,10 +276,3 @@
         margin: 0 0 20px 0;
     }
 </style>
-<style lang="scss">
-    .upload-modal {
-        .ivu-modal-body {
-            padding-bottom: 0;
-        }
-    }
-</style>

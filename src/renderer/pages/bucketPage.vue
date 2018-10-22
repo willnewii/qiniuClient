@@ -128,10 +128,8 @@
                        @on-update="onFilesUpdate"></resource-grid>-->
         <resource-grid :bucket="bucket" :type="showType" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
-        <Modal v-model="model_DeleteAsk"
-               title="确认删除文件？"
-               @on-ok="callRemove"
-               @on-cancel="cancelModal">
+        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
+               @on-ok="callRemove" @on-cancel="cancelModal">
             <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>

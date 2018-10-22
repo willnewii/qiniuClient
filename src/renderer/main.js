@@ -30,7 +30,7 @@ router.afterEach((to, from) => {
     }
 });
 
-import * as util from '@/service/util'
+import * as util from '@/service/util';
 
 //组件中直接显示文件名 'XXX/AAA/BBB/a.png => a.png'
 Vue.filter('getfileNameByUrl', function (value) {
@@ -58,8 +58,9 @@ axios.interceptors.response.use((response) => {
 import App from './App';
 
 new Vue({
+    el: '#app',
     router,
     store,
-    ...App
-}).$mount('#app');
+    render: h => h(App)
+});
 

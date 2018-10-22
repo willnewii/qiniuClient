@@ -134,7 +134,7 @@ export function sequence(file1, file2) {
 export function wrapperFile(item, type) {
     return {
         key: item.Key,
-        fsize: item.Size,
+        fsize: parseInt(item.Size),
         putTime: new Date(item.LastModified).getTime(),
         mimeType: ''
     };

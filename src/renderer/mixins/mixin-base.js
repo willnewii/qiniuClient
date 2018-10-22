@@ -8,7 +8,14 @@ export default {
     },
     methods: {
         showMessage(option) {
-            this.$Message.info(option.message);
+            switch (option.type) {
+                case 'error':
+                    this.$Message.error(option.message);
+                    break;
+                default:
+                    this.$Message.info(option.message);
+            }
+
         },
         doRequset(url, param, success, fail) {
             this._request('get', ...arguments);

@@ -40,7 +40,8 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
-        <Modal v-model="cosChoiceModel" class-name="vertical-center-modal" :closable="false" :mask-closable="false">
+        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
+               :mask-closable="false">
             <div class="choice-cos">
                 <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos">
                     <div class="choice-view" @click="selectCOS(item)">
@@ -208,19 +209,28 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$Modal.confirm({
-                            title: '切换账号',
-                            render: (h) => {
-                                return h('div', {
-                                    style: {
-                                        'padding-top': '10px'
-                                    }
-                                }, [
-                                    '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
-                                ]);
-                            },
-                            onOk: () => {
+                        this.$storage.getCOS((cos) => {
+                            if (cos.length === 0) {
                                 this.$router.push({path: Constants.PageName.login});
+                            } else if (cos.length === 1) {
+                                this.$Modal.confirm({
+                                    title: '切换账号',
+                                    render: (h) => {
+                                        return h('div', {
+                                            style: {
+                                                'padding-top': '10px'
+                                            }
+                                        }, [
+                                            '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
+                                        ]);
+                                    },
+                                    onOk: () => {
+                                        this.$router.push({path: Constants.PageName.login});
+                                    }
+                                });
+                            } else {
+                                this.cos = cos;
+                                this.cosChoiceModel = true;
                             }
                         });
                         break;
@@ -395,5 +405,12 @@
     .ivu-modal-footer {
         border-top: 0;
         /*padding: 0;*/
+    }
+
+    .cosModel {
+        .ivu-modal-footer {
+            padding: 0;
+            border-top: 0;
+        }
     }
 </style>

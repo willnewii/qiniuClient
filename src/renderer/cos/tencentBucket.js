@@ -1,40 +1,24 @@
+import * as qiniu from "@/cos/qiniu";
+
 const fs = require('fs');
 import {Constants, util} from '../service/index';
+import baseBucket from './baseBucket';
+import * as tencent from './tencent';
 
+console.log(baseBucket);
 const DELIMITER = '/';
 
-class Bucket {
+class Bucket extends baseBucket {
 
     constructor(name, cos) {
-        this.reset();
-
-        name && (this.name = name);
-        this.cos = cos;
+        super(name, cos);
     }
 
     reset() {
-        this.name = '';
-        this.location = '';//腾讯COS字段
-        this.domains = [];
-        this.isprivate = false;
+        super.reset();
 
-        this.dirs = [];
-        this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
-
-        //当前选择dir
-        this.currentDir = '';
-        //当前选择domain
-        this.domain = '';
-        //当前dir加载返回的marker
-        this.marker = '';
-
-        //已选的文件列表
-        this.selection = [];
-        //当前显示文件列表
-        this.files = [];
-        //其他文件列表(不含有请求时delimiter的文件列表)
-        this.withoutDelimiterFiles = [];
+        //腾讯COS字段
+        this.location = '';
     }
 
     /**
@@ -54,7 +38,7 @@ class Bucket {
         });
 
         if (this.location) {
-            this.getDirs();
+            // this.getDirs();
             this.getResources();
         }
         /*this.checkPrivate();
@@ -111,8 +95,8 @@ class Bucket {
 
                 if (data.Contents) {
                     data.Contents.forEach((item) => {
-                        this.withoutDelimiterFiles.push(util.wrapperFile(item))
-                    })
+                        this.withoutDelimiterFiles.push(util.wrapperFile(item));
+                    });
                 }
 
                 data.NextMarker && this.getDirs(data.NextMarker);
@@ -122,8 +106,6 @@ class Bucket {
 
 
     getResources(keyword) {
-
-        console.log(keyword);
         let params = {
             Bucket: this.name,
             Region: this.location,
@@ -142,18 +124,22 @@ class Bucket {
             if (err) {
                 console.log(err);
             } else {
-                console.log(data);
-
                 if (!this.marker) {
                     this.files = [];
                 }
+                let files = [];
                 data.Contents.forEach((item) => {
-                    if (item.Key.indexOf(DELIMITER) !== item.Key.length - 1) {
-                        this.files.push(util.wrapperFile(item));
+                    if (parseInt(item.Size) !== 0) {
+                        files.push(util.wrapperFile(item));
                     }
                 });
+                this.files = files;
 
                 this.marker = data.NextMarker ? data.NextMarker : '';
+
+                if (this.marker) {
+                    this.getResources(keyword);
+                }
             }
         });
     }
@@ -202,14 +188,21 @@ class Bucket {
     }
 
     removeFile(item, callback) {
-        this.cos.deleteObject({
-            Bucket: this.name, // Bucket 格式：test-1250000000
+        let params = {
+            Bucket: this.name,
             Region: this.location,
-            Key: item.key,
-        }, function (err, data) {
-            console.log(err || data);
-            callback && callback(data);
-        });
+        };
+
+        tencent.remove(params, item, callback);
+    }
+
+    renameFile(items, callback) {
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+        };
+
+        tencent.rename(params, items, callback);
     }
 
     /**
