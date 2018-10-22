@@ -91,6 +91,9 @@ export function quickSort(arr, key) {
 }
 
 export function formatFileSize(size) {
+    if (!size)
+        return '';
+
     if (size >= 1024 * 1024) {
         return (size / 1024 / 1024).toFixed(2) + ' MB';
     } else if (size >= 1024 && size < 1024 * 1024) {
@@ -101,6 +104,9 @@ export function formatFileSize(size) {
 }
 
 export function formatDate(time) {
+    if (!time)
+        return '';
+
     return dayjs(time).format('YYYY-MM-DD HH:mm:ss');
 }
 
@@ -128,8 +134,23 @@ export function sequence(file1, file2) {
 export function wrapperFile(item, type) {
     return {
         key: item.Key,
-        fsize: item.Size,
+        fsize: parseInt(item.Size),
         putTime: new Date(item.LastModified).getTime(),
         mimeType: ''
     };
+}
+
+export function loadTheme(name) {
+    let head = document.getElementsByTagName("head")[0];
+
+    const style = document.createElement('link');
+    style.setAttribute("rel", "stylesheet");
+    style.setAttribute("type", "text/css");
+
+    if (name === 'dark') {
+        style.setAttribute("href", './static/styles-dark.css');
+    } else {
+        style.setAttribute("href", './static/styles.css');
+    }
+    head.appendChild(style);
 }

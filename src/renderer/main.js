@@ -1,24 +1,14 @@
 import Vue from 'vue';
 
 import Router from 'vue-router';
-import Electron from 'vue-electron';
-import VueLazyload from 'vue-lazyload';
 import axios from 'axios';
-import contentmenu from 'v-contextmenu/src/index';
-import 'v-contextmenu/dist/index.css';
 
-import iView from 'iview';
-import 'iview/dist/styles/iview.css';
 
-import {util} from './service';
+import "@/service/loadComponent";
 import CloudObjectStorage from "@/cos/CloudObjectStorage";
 
 
-Vue.use(Electron);
 Vue.use(Router);
-Vue.use(iView);
-Vue.use(VueLazyload);
-Vue.use(contentmenu);
 
 Vue.prototype.$storage = new CloudObjectStorage();
 
@@ -40,9 +30,19 @@ router.afterEach((to, from) => {
     }
 });
 
+import * as util from '@/service/util';
+
 //组件中直接显示文件名 'XXX/AAA/BBB/a.png => a.png'
 Vue.filter('getfileNameByUrl', function (value) {
-    return value.substring(value.lastIndexOf('/') + 1, value.length);
+    return util.getPostfix(value);
+});
+
+Vue.filter('formatDate', function (value) {
+    return util.formatDate(value);
+});
+
+Vue.filter('formatFileSize', function (value) {
+    return util.formatFileSize(value);
 });
 
 //拦截器
@@ -58,8 +58,9 @@ axios.interceptors.response.use((response) => {
 import App from './App';
 
 new Vue({
+    el: '#app',
     router,
     store,
-    ...App
-}).$mount('#app');
+    render: h => h(App)
+});
 

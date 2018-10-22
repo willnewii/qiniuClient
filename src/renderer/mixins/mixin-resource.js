@@ -18,7 +18,10 @@ export default {
         }
     },
     data() {
-        return {};
+        return {
+            status_total: 0,
+            status_count: 0
+        };
     },
     created: function () {
         EventBus.$off(Constants.Event.remove);
@@ -33,12 +36,21 @@ export default {
 
         EventBus.$off(Constants.Event.download);
         EventBus.$on(Constants.Event.download, () => {
+            this.status_total = this.bucket.selection.length;
+            this.status_count = 0;
+            EventBus.$emit(Constants.Event.statusview, {
+                show: true,
+                message: '文件下载中',
+            });
             this.downloadFiles();
         });
 
         this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.updateDownloadProgress);
         this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
             this.$Loading.update(num * 100);
+            EventBus.$emit(Constants.Event.statusview, {
+                message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
+            });
             if (num === 1) {
                 this.$Loading.finish();
                 this.downloadFiles();
@@ -53,6 +65,7 @@ export default {
             return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
         show(file) {
+            // this.$electron.ipcRenderer.send(Constants.Listener.preview, this.getResoureUrl(file));
             this.$electron.shell.openExternal(this.getResoureUrl(file));
         },
         copy(file, copyType) {
@@ -63,6 +76,12 @@ export default {
         downloadFiles() {
             if (this.bucket.selection.length > 0) {
                 this.$Loading.start();
+
+                this.status_count += 1;
+                EventBus.$emit(Constants.Event.statusview, {
+                    message: `文件下载中(${this.status_count}/${this.status_total})...0%`,
+                });
+
                 let option = {};
                 if (this.setup_downloaddir) {
                     option.directory = this.setup_downloaddir;
@@ -70,16 +89,23 @@ export default {
                 option.count = this.bucket.selection.length;
                 //文件自带的虚拟路径
                 option.folder = '/' + util.getFakeFolder(this.bucket.selection[0].key);
-
                 this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0]), option);
                 this.bucket.selection.shift();
             } else {
                 this.$refs['table'] && this.$refs['table'].selectAll(false);
-                this.$Message.info('文件下载完成');
+                this.showMessage({
+                    message: '文件下载完成',
+                });
+                EventBus.$emit(Constants.Event.statusview, {
+                    message: '',
+                    path: '',
+                    show: false
+                });
             }
         },
         resourceRename(files) {
             this.bucket.renameFile(files, () => {
+                this.$Spin.hide();
                 this.showMessage({
                     message: '文件修改成功'
                 });
@@ -100,9 +126,17 @@ export default {
          */
         removes() {
             this.bucket.removeFile(this.bucket.selection, (ret) => {
-                this.$Message.info('移除成功');
-                this.$emit('on-update', null, 'remove');
-
+                if (ret.error) {
+                    this.showMessage({
+                        type: 'error',
+                        message: '移除失败：' + ret.error
+                    });
+                } else {
+                    this.showMessage({
+                        message: '移除成功'
+                    });
+                    this.$emit('on-update', null, 'remove');
+                }
                 this.bucket.selection = [];
             });
 

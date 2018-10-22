@@ -36,7 +36,8 @@ export const URL = {
 export const Event = {
     removes: 'removes',
     remove: 'remove',
-    download: 'download'
+    download: 'download',
+    statusview: 'statusview'
 };
 
 export const CopyType = {
@@ -60,4 +61,6 @@ export const Listener = {
     selectedDirectory: 'selected-directory',
     readDirectory: 'read-directory',
     setBrand: 'setBrand',
+    preview: 'preview',
+    darkMode: 'darkMode'
 };

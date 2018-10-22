@@ -6,7 +6,8 @@
                     <!--<Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>-->
                     {{menuState ? cos_name : ''}}
                 </i-button>
-                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
+                <!--light dark-->
+                <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
@@ -39,7 +40,8 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
-        <Modal v-model="cosChoiceModel" class-name="vertical-center-modal" :closable="false" :mask-closable="false">
+        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
+               :mask-closable="false">
             <div class="choice-cos">
                 <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos">
                     <div class="choice-view" @click="selectCOS(item)">
@@ -51,6 +53,10 @@
             </div>
             <div slot="footer"></div>
         </Modal>
+        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
+            <div>{{status.message}}</div>
+            <div>{{status.path}}</div>
+        </div>
     </div>
 </template>
 <script>
@@ -58,7 +64,7 @@
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
 
-    import {Constants, mixins} from '../service/index';
+    import {Constants, mixins, EventBus} from '../service/index';
     import brand from "@/cos/brand";
 
     export default {
@@ -90,7 +96,12 @@
                     name: Constants.Key.app_logout,
                     icon: 'md-exit',
                     title: '注销'
-                }]
+                }],
+                status: {
+                    show: false,
+                    path: '',
+                    message: '',
+                }
             };
         },
         computed: {
@@ -116,6 +127,10 @@
             this[types.setup.setup_init]();
 
             this.checkVersion();
+
+            EventBus.$on(Constants.Event.statusview, (option) => {
+                this.status = Object.assign(this.status, option);
+            });
         },
         methods: {
             ...mapActions([
@@ -194,19 +209,28 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$Modal.confirm({
-                            title: '切换账号',
-                            render: (h) => {
-                                return h('div', {
-                                    style: {
-                                        'padding-top': '10px'
-                                    }
-                                }, [
-                                    '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
-                                ]);
-                            },
-                            onOk: () => {
+                        this.$storage.getCOS((cos) => {
+                            if (cos.length === 0) {
                                 this.$router.push({path: Constants.PageName.login});
+                            } else if (cos.length === 1) {
+                                this.$Modal.confirm({
+                                    title: '切换账号',
+                                    render: (h) => {
+                                        return h('div', {
+                                            style: {
+                                                'padding-top': '10px'
+                                            }
+                                        }, [
+                                            '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
+                                        ]);
+                                    },
+                                    onOk: () => {
+                                        this.$router.push({path: Constants.PageName.login});
+                                    }
+                                });
+                            } else {
+                                this.cos = cos;
+                                this.cosChoiceModel = true;
                             }
                         });
                         break;
@@ -254,20 +278,29 @@
         }
 
         .layout-menu-left {
-            background: $bg-menu;
+            background: $menu-bg;
+            color: $menu-color;
             display: flex;
             flex-direction: column;
-            border-radius: 4px;
+            /*border-radius: 4px;*/
+            border-bottom-right-radius: 4px;
             padding-top: 20px;
             -webkit-app-region: drag;
+            z-index: 1;
+            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
 
             .navicon_btn {
-                background: $bg-menu;
+                font-weight: bold;
                 text-align: left;
-                color: rgba(255, 255, 255, .7);
                 padding-left: 22px;
+                color: $menu-color;
                 &:hover {
                     color: $primary;
+                }
+                & > span {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                 }
             }
 
@@ -295,7 +328,7 @@
 
             .version {
                 padding: 10px 20px;
-                color: #c5c5c5;
+                /*color: #c5c5c5;*/
                 &-new {
                     color: #ff3605;
                     cursor: pointer;
@@ -307,7 +340,6 @@
         }
 
         .layout-menu-right {
-            padding-top: 10px;
         }
     }
 
@@ -325,9 +357,40 @@
             }
         }
     }
+
+    .status-view {
+        opacity: 1;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0.51);
+        color: #FFFFFF;
+        padding: 10px;
+        font-size: 12px;
+        z-index: 901;
+        transition: opacity 1s;
+    }
+
+    .status-view-none {
+        opacity: 0;
+        transition: opacity 2s;
+    }
 </style>
 <style lang="scss">
     @import "../style/params";
+
+    .navicon_btn {
+        & > span {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            & > span {
+                margin-left: 6px;
+            }
+        }
+    }
 
     .vertical-center-modal {
         display: flex;
@@ -344,17 +407,10 @@
         /*padding: 0;*/
     }
 
-    .ivu-menu {
-        background: none !important;
-        .ivu-menu-item-group-title {
-            font-size: 12px !important;
-            height: 30px !important;
-            line-height: 30px !important;
-            padding-left: 24px !important;
-        }
-
-        .ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
-            border-right: 5px solid $primary;
+    .cosModel {
+        .ivu-modal-footer {
+            padding: 0;
+            border-top: 0;
         }
     }
 </style>

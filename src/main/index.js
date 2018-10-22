@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
 import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
@@ -112,8 +112,14 @@ const registerIPC = function () {
         });
     });
 
+    //选取文件
     ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
         event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(arg.files));
+    });
+
+    //预览文件
+    ipcMain.on(Constants.Listener.preview, function (event, arg) {
+        mainWindow.previewFile(arg);
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
@@ -121,11 +127,9 @@ const registerIPC = function () {
         // trayUtil.setTrayIcon();
     });
 
-    /*    ipcMain.on('previewFile', function (event, filePath) {
-            if (mainWindow) {
-                mainWindow.previewFile(filePath);
-            }
-        });*/
+    ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
+        event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+    });
 };
 
 async function wrapperFiles(_files) {

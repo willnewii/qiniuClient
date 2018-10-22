@@ -1,10 +1,10 @@
 import cosUtil from 'cos-nodejs-sdk-v5/sdk/util';
+
 cosUtil.isBrowser = false;
-
-
 import tencent from 'cos-nodejs-sdk-v5';
 
 import TencentBucket from "@/cos/tencentBucket";
+import qiniu from "qiniu";
 
 let cos = null;
 
@@ -38,48 +38,63 @@ function getBuckets(callback) {
 }
 
 /**
- * 通过url抓取文件
+ * 批量修改文件名
+ * @param bucket    名称
+ * @param items     需要处理的文件
+ * @param replace   需要处理的文件
+ * @param callback
  */
-function fetch(params, callback) {
-    let config = new qiniu.conf.Config();
-    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
+function rename(params, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
 
-    bucketManager.fetch(params.path, params.bucket, params.key, function (respErr, respBody, respInfo) {
-        if (respBody.error) {
-            respErr = {"error": respBody.error, 'status': respBody.status};
-        }
-        callback(respErr, respBody);
-    });
+    let files = [];
+
+    let changeName = function (item) {
+        params.Key = item._key;
+        params.CopySource = params.Bucket + '.cos.' + params.Region + '.myqcloud.com/' + encodeURIComponent(item.key).replace(/%2F/g, '/');
+
+        cos.sliceCopyFile(params, (error, data) => {
+            console.log(error, data);
+            if (!error) {
+                files.push(item);
+            }
+            index++;
+            if (index !== items.length) {
+                changeName(items[index]);
+            } else {
+                remove(params, files, callback);
+            }
+        });
+    };
+
+
+    let index = 0;
+    changeName(items[index]);
 }
 
 /**
- * 上传文件
- * @param params
+ * 批量删除文件
+ * @param params    bucket信息
+ * @param items     需要处理的文件
  * @param callback
  */
-function upload(params, callback) {
-    let options = {
-        scope: params.bucket,
-    };
-    let putPolicy = new qiniu.rs.PutPolicy(options);
-    let uploadToken = putPolicy.uploadToken(getToken());
+function remove(params, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+    params.Objects = [];
+    items.forEach((item) => {
+        params.Objects.push({Key: item.key});
+    });
 
-    let config = new qiniu.conf.Config();
-
-    let resumeUploader = new qiniu.resume_up.ResumeUploader(config);
-    let putExtra = new qiniu.resume_up.PutExtra();
-    putExtra.progressCallback = (uploadBytes, totalBytes) => {
-        if (params.progressCallback) {
-            params.progressCallback(parseInt((uploadBytes / totalBytes * 10000)) / 100);
+    cos.deleteMultipleObject(params, function (err, data) {
+        if (err) {
+            console.log(err);
+        } else {
+            callback && callback(data);
         }
-    };
-
-    resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
-        if (respBody.error) {
-            respErr = {"error": respBody.error};
-        }
-        console.log(respErr, respBody, respInfo);
-        callback(respErr, respBody);
     });
 }
 
@@ -87,4 +102,4 @@ function generateBucket(name) {
     return new TencentBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, upload, fetch, methods,};
+export {init, getBuckets, generateBucket, remove, rename, methods};

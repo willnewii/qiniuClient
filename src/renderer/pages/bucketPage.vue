@@ -70,7 +70,7 @@
 
         <div class="dir-layout">
             <div class="header-dir-view">
-                <Breadcrumb v-if="showType === 2" separator=">">
+                <Breadcrumb separator=">">
                     <div class="bread-sub" @click="changeFolderPath(-1)">
                         <BreadcrumbItem>
                             <Icon type="md-home" size="14"></Icon>
@@ -85,7 +85,6 @@
                         </div>
                     </template>
                 </Breadcrumb>
-                <Directory v-if="showType !== 2" :bucket="bucket" @on-click="changeDir"></Directory>
             </div>
 
             <div class="header-info-view">
@@ -110,29 +109,27 @@
                         v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
                 </Button>
 
-                <Button-group size="small" style="background: #FFF;display: flex;">
+                <Button-group size="small">
                     <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)"
                             icon="md-list"></Button>
                     <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
-                    <Button :type="showType === 2 ? 'primary' : 'default'" @click="changeShowType(2)"
+                    <Button :type="showType === 1 ? 'primary' : 'default'" @click="changeShowType(1)"
                             icon="md-folder"></Button>
                 </Button-group>
-                <Button-group size="small" style="background: #FFF;margin-left: 10px;" v-if="bucket.marker">
+                <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
                     <Button @click="getResources()" icon="ios-arrow-forward"></Button>
                 </Button-group>
             </div>
         </div>
 
-        <resource-table v-if="showType === 0" :bucket="bucket"
-                        @on-update="onFilesUpdate"></resource-table>
+        <!--<resource-table v-if="showType === 0" :bucket="bucket"
+                        @on-update="onFilesUpdate"></resource-table>-->
         <!--<resource-grid v-else-if="showType === 1" :bucket="bucket"
                        @on-update="onFilesUpdate"></resource-grid>-->
-        <resource-grid v-else-if="showType === 2" :bucket="bucket" :type="1" key="1"
+        <resource-grid :bucket="bucket" :type="showType" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
-        <Modal v-model="model_DeleteAsk"
-               title="确认删除文件？"
-               @on-ok="callRemove"
-               @on-cancel="cancelModal">
+        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
+               @on-ok="callRemove" @on-cancel="cancelModal">
             <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>
@@ -177,7 +174,7 @@
         data() {
             return {
                 bucket: null,
-                showType: 2, //0:列表 1:grid 2:folder
+                showType: 0, //0:列表 1:folder
                 folderPath: null,
                 folderKeyWord: null,
                 model_DeleteAsk: false,
@@ -336,20 +333,7 @@
              * @param action 触发的动作,upload/remove
              */
             onFilesUpdate(ret, action) {
-                if (this.showType === 2) {
-                    this.getResources();
-                } else {
-                    if (action === 'remove') {//如果是删除操作,直接更新当前目录
-                        this.getResources(this.bucket.currentDir);
-                    } else {
-                        if (ret && ret.key) {
-                            //更新文件所在的路径
-                            this.bucket.setCurrentDir(util.getPrefix(ret.key));
-                        } else {
-                            this.getResources();
-                        }
-                    }
-                }
+                this.getResources();
             },
             changeFolderPath(index) {
                 if (index === -1) {

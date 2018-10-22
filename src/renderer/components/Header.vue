@@ -1,10 +1,13 @@
 <style lang="scss" scoped>
+    @import "../style/params";
+
     .layout-header {
-        background: #fff;
-        box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+        background: $bg-header;
+        box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
         flex-shrink: 0;
         display: flex;
         align-items: center;
+        padding-top: 10px;
         padding-right: 15px;
         -webkit-app-region: drag;
 
@@ -16,6 +19,10 @@
         .input-search {
             width: 165px;
             margin: 8px 0;
+        }
+
+        .button {
+            color: $fontColor;
         }
     }
 </style>
@@ -31,7 +38,7 @@
         </div>
 
         <div v-if="isMac" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button type="text" @click="actionBtn(0)" v-if="bucket.name">
+            <i-button class="button" type="text" @click="actionBtn(0)" v-if="bucket.name">
                 <Tooltip content="文件、文件夹上传(支持多选)" placement="bottom">
                     <Icon type="md-cloud-upload" size="24"/>
                 </Tooltip>
@@ -39,7 +46,7 @@
         </div>
 
         <div v-if="isWin">
-            <i-button type="text" @click="actionBtn(3)" v-if="bucket.name">
+            <i-button class="button" type="text" @click="actionBtn(3)" v-if="bucket.name">
                 <Tooltip content="文件上传(支持多选)" placement="bottom">
                     <Icon type="md-document" size="24"/>
                 </Tooltip>
@@ -47,7 +54,7 @@
         </div>
 
         <div v-if="isWin">
-            <i-button type="text" @click="actionBtn(4)" v-if="bucket.name">
+            <i-button class="button" type="text" @click="actionBtn(4)" v-if="bucket.name">
                 <Tooltip content="文件夹上传(支持多选)" placement="bottom">
                     <Icon type="md-folder" size="24"></Icon>
                 </Tooltip>
@@ -55,7 +62,7 @@
         </div>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button type="text" @click="actionBtn(1)" v-if="bucket.name">
+            <i-button class="button" type="text" @click="actionBtn(1)" v-if="bucket.name">
                 <Tooltip content="通过url直接上传文件" placement="bottom">
                     <Icon type="md-link" size="24"/>
                 </Tooltip>
@@ -63,7 +70,7 @@
         </div>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button type="text" @click="actionBtn(5)" v-if="bucket.name">
+            <i-button class="button" type="text" @click="actionBtn(5)" v-if="bucket.name">
                 <Tooltip :content="`刷新bucket：${bucket.name}`" placement="bottom">
                     <Icon type="md-refresh" size="24"/>
                 </Tooltip>
