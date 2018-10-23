@@ -37,7 +37,8 @@ export const Event = {
     removes: 'removes',
     remove: 'remove',
     download: 'download',
-    statusview: 'statusview'
+    statusview: 'statusview',
+    loading: 'loading'
 };
 
 export const CopyType = {

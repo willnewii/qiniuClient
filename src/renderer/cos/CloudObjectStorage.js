@@ -72,7 +72,7 @@ export default class CloudObjectStorage {
      * @param callback
      */
     cleanCosKey(callback) {
-        storage.clear(this.name + '_key', (error, data) => {
+        storage.remove(this.name + '_key', (error, data) => {
             if (!error) {
                 callback && callback();
             }

@@ -40,10 +40,17 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
+        <Spin size="large" fix v-if="loading.show">
+            <div>
+
+            </div>
+            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
+            <span>{{loading.message}}</span>
+        </Spin>
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
                :mask-closable="false">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">
                         <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
                         <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
@@ -52,6 +59,7 @@
                 </Card>
             </div>
             <div slot="footer"></div>
+            <Icon></Icon>
         </Modal>
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
@@ -101,6 +109,10 @@
                     show: false,
                     path: '',
                     message: '',
+                },
+                loading: {
+                    show: false,
+                    message: '',
                 }
             };
         },
@@ -130,6 +142,9 @@
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
+            });
+            EventBus.$on(Constants.Event.loading, (option) => {
+                this.loading = option;
             });
         },
         methods: {

@@ -4,7 +4,6 @@
   background-color: $bg-header;
 }
 
-
 $barPadding: 0;
 /*@if ($platform == 'darwin') {
   $barPadding: 20px;
@@ -42,6 +41,10 @@ $barPadding: 0;
     background-color: $bg-card-hover;
     box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
   }
+}
+
+.ivu-spin-fix {
+  background-color: $bg-spin;
 }
 
 .ivu-select, .ivu-input {

@@ -64,7 +64,9 @@
         },
         created() {
             this.$electron.ipcRenderer.on(Constants.Listener.readDirectory, (event, files) => {
-                this.$Spin.hide();
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                });
                 if (files && files.length > 0) {
                     files.forEach((item, index) => {
                         if (item.dir) {
@@ -106,21 +108,9 @@
                         path.push(file.path);
                     });
 
-                    //TODO: Icon 组件不加载
-                    //提示框
-                    this.$Spin.show({
-                        render: (h) => {
-                            return h('div', [
-                                h('Icon', {
-                                    'class': 'demo-spin-icon-load',
-                                    props: {
-                                        type: 'ios-loading',
-                                        size: 18
-                                    }
-                                }),
-                                h('div', '文件读取中')
-                            ]);
-                        }
+                    EventBus.$emit(Constants.Event.loading, {
+                        show: true,
+                        message: '文件读取中...',
                     });
                     this.$electron.ipcRenderer.send(Constants.Listener.readDirectory, {files: path});
                 }

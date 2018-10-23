@@ -1,11 +1,8 @@
-import * as qiniu from "@/cos/qiniu";
-
 const fs = require('fs');
 import {Constants, util} from '../service/index';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
 
-console.log(baseBucket);
 const DELIMITER = '/';
 
 class Bucket extends baseBucket {

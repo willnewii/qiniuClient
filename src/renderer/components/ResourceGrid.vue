@@ -81,10 +81,9 @@
 </template>
 <script>
     import {resource, base} from '../mixins/index';
-    import * as util from '../service/util';
-    import * as constants from '../service/constants';
     import * as qiniu from '../cos/qiniu';
     import ResourceList from "@/components/ResourceList";
+    import {EventBus, Constants, util,} from "@/service/index";
 
     export default {
         name: 'ResourceGrid',
@@ -153,8 +152,9 @@
             document.onkeydown = (event) => {
                 let e = event || window.event || arguments.callee.caller.arguments[0];
                 switch (e.keyCode) {
-                    case 91://command
+                    case 91://command(mac)
                     case 93:
+                    case 17://control(win)
                         this.isMultiple = true;
                         break;
                 }
@@ -164,6 +164,7 @@
                 switch (e.keyCode) {
                     case 91://command
                     case 93:
+                    case 17://control
                         this.isMultiple = false;
                         break;
                 }
@@ -194,19 +195,9 @@
                         }
                     }
                 }
-                this.$Spin.show({
-                    render: (h) => {
-                        return h('div', [
-                            h('Icon', {
-                                'class': 'demo-spin-icon-load',
-                                props: {
-                                    type: 'ios-loading',
-                                    size: 18
-                                }
-                            }),
-                            h('div', '更新中...')
-                        ]);
-                    }
+                EventBus.$emit(Constants.Event.loading, {
+                    show: true,
+                    message: '更新中...',
                 });
                 this.resourceRename(files);
             },
@@ -253,10 +244,10 @@
                         this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}`;
                         break;
                     case 2:
-                        this.copy(file, constants.CopyType.URL);
+                        this.copy(file, Constants.CopyType.URL);
                         break;
                     case 3:
-                        this.copy(file, constants.CopyType.MARKDOWN);
+                        this.copy(file, Constants.CopyType.MARKDOWN);
                         break;
                     case 4:
                         this.changeFileNameDialog.show = true;

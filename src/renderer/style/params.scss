@@ -13,6 +13,7 @@ $menu-color: #515a6e;
 $bg-input: #FFFFFF;
 $input-border-width: 1px;
 $bg-card-hover: rgba(0, 0, 0, .01);
+$bg-spin: rgba(255, 255, 255, 0.7);
 
 @if ($dark==true) {
   $fontColor: rgba(255, 255, 255, .8);
@@ -26,4 +27,5 @@ $bg-card-hover: rgba(0, 0, 0, .01);
   $bg-input: #3C4043;
   $input-border-width: 0px;
   $bg-card-hover: rgba(255, 255, 255, 0.01);
+  $bg-spin: rgba(0, 0, 0, 0.7);
 }

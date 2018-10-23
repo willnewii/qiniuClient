@@ -140,17 +140,24 @@ export function wrapperFile(item, type) {
     };
 }
 
+/**
+ * 开发模式直接修改字段
+ * @param name
+ */
 export function loadTheme(name) {
-    let head = document.getElementsByTagName("head")[0];
+    if (process.env.NODE_ENV === 'production') {
+        let head = document.getElementsByTagName("head")[0];
 
-    const style = document.createElement('link');
-    style.setAttribute("rel", "stylesheet");
-    style.setAttribute("type", "text/css");
+        const style = document.createElement('link');
+        style.setAttribute("rel", "stylesheet");
+        style.setAttribute("type", "text/css");
 
-    if (name === 'dark') {
-        style.setAttribute("href", './static/styles-dark.css');
-    } else {
-        style.setAttribute("href", './static/styles.css');
+        if (name === 'dark') {
+            style.setAttribute("href", './static/styles-dark.css');
+        } else {
+            style.setAttribute("href", './static/styles.css');
+        }
+        head.appendChild(style);
     }
-    head.appendChild(style);
+
 }
