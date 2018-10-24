@@ -30,7 +30,7 @@
             </Radio-group>
         </div>
         <div class="item">
-            默认托盘上传位置：<br>
+            托盘上传位置：<br>
             <Row class="row-line">
                 <Col span="10">
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
@@ -43,7 +43,7 @@
                     <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-            <div v-if="setup_bucket_name && setup_bucket_dir">提示：默认文件将会被上传到 {{setup_bucket_name}}/{{setup_bucket_dir}}/
+            <div v-if="setup_bucket_name && setup_bucket_dir">提示：文件将会被保存到 {{setup_bucket_name}}/{{setup_bucket_dir}}/
                 目录下
             </div>
             <div v-else-if="setup_bucket_name">提示：默认文件将会被上传到 {{setup_bucket_name}}/ 目录下</div>

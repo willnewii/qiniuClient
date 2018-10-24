@@ -29,6 +29,24 @@ export function getClipboardText(type, url) {
 }
 
 /**
+ * {dir,path} dir 导入时源目录,path 文件路径
+ * 通过比较dir,path 保留目录结构
+ * 上传 目录a  , 文件  a/b/c/d.txt 得到的结果是b/c/d.txt
+ * @param item 文件
+ * @returns {string}
+ */
+export function getFileNameWithFolder(item) {
+    let key = '';
+    if (item.dir) {
+        let temp = item.dir.substring(0, item.dir.lastIndexOf('/') + 1);
+        key = item.path.replace(temp, '');
+    } else {
+        key = getPostfix(item.path);
+    }
+    return key;
+}
+
+/**
  * a/b/c/d/a.png => a/
  * @param key
  * @returns {string}
@@ -55,7 +73,7 @@ export function getFakeFolder(key) {
 }
 
 /**
- * 获取文件路径和链接的后缀
+ * 获取文件路径和链接的后缀 ≈获取文件名
  * @param path
  * @returns {*}
  */

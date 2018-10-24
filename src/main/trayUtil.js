@@ -24,9 +24,9 @@ export const createTray = function (_mainWindowId) {
         toggleTrayWindow();
     });
 
-    mTray.on('drop-files', (event, files) => {
+    mTray.on('drop-files', async (event, files) => {
         setTrayIcon(icon_upload);
-        mTrayWindow.webContents.send(Constants.Listener.uploadFile, files);
+        mTrayWindow.webContents.send(Constants.Listener.uploadFile, await util.wrapperFiles(files));
     });
 
     ipcMain.on(Constants.Listener.updateTrayTitle, function (event, title) {

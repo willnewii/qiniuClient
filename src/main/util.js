@@ -20,16 +20,32 @@ export const isWin = function () {
     return process.platform === 'win32';
 };
 
+export async function wrapperFiles(_files) {
+    let files = [];
+    for (const item of _files) {
+        if (isDirectory(item)) {
+            let temp = await readDir(item);
+            temp.forEach((path) => {
+                //path.sep 将window 的路径分割符 \  转换成 /
+                files.push({path: path.replace(/\\/g, '/'), dir: item.replace(/\\/g, '/')});
+            });
+        } else {
+            files.push({path: item.replace(/\\/g, '/')});
+        }
+    }
+
+    return files;
+}
+
 /**
  * 是否是目录类型
  * @param path
  * @returns {Stats | boolean}
  */
-export const isDirectory = function (path) {
+const isDirectory = function (path) {
     let stat = fs.statSync(path);
     return stat && stat.isDirectory();
 };
-
 
 /**
  * 遍历目录

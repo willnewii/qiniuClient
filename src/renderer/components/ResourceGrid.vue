@@ -32,7 +32,9 @@
                     </template>
                     <template v-else>
                         <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
-                             v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
+                             v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle"/>
+                        <img v-else-if="/image\/(svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
+                             v-lazy="'http://' + bucket.domain + '/' + file.key"/>
                         <div v-else class="file">
                             <Icon :type="file._icon" size="50"></Icon>
                         </div>
