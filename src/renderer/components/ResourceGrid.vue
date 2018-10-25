@@ -1,5 +1,5 @@
 <template>
-    <div class="layout-content">
+    <div ref="content" class="layout-content">
         <v-contextmenu ref="folderMenu" @contextmenu="handleFolderMenu">
             <v-contextmenu-item @click="handleFolderMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
@@ -21,7 +21,7 @@
             </v-contextmenu-item>
         </v-contextmenu>
         <div class="grid" v-if="type === 1">
-            <Card v-for="(file,index) in files" :key="file.key" class="card" :padding="0" :bordered="false">
+            <Card v-for="(file,index) in visitfiles" :key="file.key" class="card" :padding="0" :bordered="false">
                 <div class="item" @click="clickItem(file,index)"
                      v-contextmenu="file._contextmenu" :index="index">
                     <template v-if="file._directory">
@@ -53,22 +53,43 @@
             <div style="flex-grow: 1"></div>
         </div>
         <div class="list" v-else-if="type === 0">
-            <!--<resource-list :files="files"></resource-list>-->
-            <div class="item" v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
-                 v-for="(file,index) in files" :key="file.key" @click="clickItem(file,index)"
-                 v-contextmenu="file._contextmenu" :index="index">
-                <template v-if="file._directory">
-                    <Icon :type="file._icon" size="15"></Icon>
-                    <span class="name">{{file._name}}</span>
-                </template>
-                <template v-else>
-                    <Icon :type="file._icon" size="15"></Icon>
-                    <span class="name">{{file.key | getfileNameByUrl}}</span>
-                    <span class="date">{{file.putTime | formatDate}}</span>
-                    <span class="size">{{file.fsize | formatFileSize}}</span>
-                </template>
-            </div>
+            <virtual-list :size="32" :remain="80">
+                <div v-for="(file,index) of files" :key="file.key" class="item"
+                     v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
+                     @click="clickItem(file,index)"
+                     v-contextmenu="file._contextmenu" :index="index">
+                    <template v-if="file._directory">
+                        <Icon :type="file._icon" size="15"></Icon>
+                        <span class="name">{{file._name}}</span>
+                    </template>
+                    <template v-else>
+                        <Icon :type="file._icon" size="15"></Icon>
+                        <span class="name">{{file.key | getfileNameByUrl}}</span>
+                        <span class="date">{{file.putTime | formatDate}}</span>
+                        <span class="size">{{file.fsize | formatFileSize}}</span>
+                    </template>
+                </div>
+            </virtual-list>
         </div>
+        <!--<Scroll :height="scrollHeight" :on-reach-bottom="loadMore" v-else-if="type === 0">
+            <div class="list">
+                <div class="item" v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
+                     v-for="(file,index) in visitfiles" :key="file.key" @click="clickItem(file,index)"
+                     v-contextmenu="file._contextmenu" :index="index">
+                    <template v-if="file._directory">
+                        <Icon :type="file._icon" size="15"></Icon>
+                        <span class="name">{{file._name}}</span>
+                    </template>
+                    <template v-else>
+                        <Icon :type="file._icon" size="15"></Icon>
+                        <span class="name">{{file.key | getfileNameByUrl}}</span>
+                        <span class="date">{{file.putTime | formatDate}}</span>
+                        <span class="size">{{file.fsize | formatFileSize}}</span>
+                    </template>
+                </div>
+            </div>
+        </Scroll>-->
+
         <Modal v-model="folderInfoDialog.show" :title="folderInfoDialog.title" @on-ok="">
             <div style="white-space: pre-line">
                 {{folderInfoDialog.info}}
@@ -107,6 +128,7 @@
                 contextFolderMenuIndex: -1,
                 contextFileMenuIndex: -1,
                 files: [],
+                visitfiles: [],
                 folderInfoDialog: {
                     show: false,
                     title: '',
@@ -122,7 +144,10 @@
                 //当前路径
                 cacheName: '',
                 isMultiple: false,
-                selection: []
+                selection: [],
+                scrollHeight: 0,
+                isMore: false,
+                pageSize: 100,
             };
         },
         watch: {
@@ -173,9 +198,24 @@
             };
         },
         mounted() {
+            this.scrollHeight = this.$refs['content'].offsetHeight;
             this.fileFilter();
         },
         methods: {
+            loadMore() {
+                if (this.isMore) {
+                    if (this.visitfiles.length + this.pageSize < this.files.length) {
+                        this.visitfiles = this.files.slice(0, this.visitfiles.length + this.pageSize);
+                    } else {
+                        this.visitfiles = this.files;
+                        this.isMore = false;
+                    }
+                }
+                return new Promise(resolve => {
+                    console.log(this.isMore);
+                    resolve();
+                });
+            },
             changeFileName() {
                 let files = [];
                 let path = this.changeFileNameDialog.file.key;
@@ -345,6 +385,7 @@
                             if (_dirs.indexOf(temps[0]) === -1) {
                                 _dirs.push(temps[0]);
                                 files.push({
+                                    key: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
                                     _name: temps[0],
                                     _path: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
                                     _directory: true,
@@ -377,10 +418,17 @@
                     }
                 });
 
-                this.files = [];
+                this.visitfiles = [];
                 //TODO:优化显示速度
                 this.$nextTick(function () {
                     this.files = files;
+                    if (this.files.length < this.pageSize) {
+                        this.visitfiles = this.files;
+                        this.isMore = false;
+                    } else {
+                        this.visitfiles = this.files.slice(this.visitfiles.length, this.visitfiles.length + this.pageSize);
+                        this.isMore = true;
+                    }
                     callback && callback({searchCount: resultCount});
                 });
             },
@@ -486,6 +534,9 @@
                 &:nth-child(2n) {
                     background-color: $bg-item-selected;
                 }
+            }
+            .item-even {
+                background-color: $bg-item-selected;
             }
             .item-select {
                 color: white;

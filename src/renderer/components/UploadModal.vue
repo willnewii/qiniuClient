@@ -76,7 +76,7 @@
                             files[index].key = util.getPostfix(item.path);
                         }
                     });
-                    this.uploadModal.prepend = this.bucket.getCurrentDir();
+                    this.uploadModal.input = this.bucket.folderPath;
                     this.handleFile(files);
                 } else {
                     this.$Message.info('未检测到文件');
@@ -150,6 +150,7 @@
                         } else {
                             this.uploadModal.path = '';
                         }
+                        this.uploadModal.input = this.bucket.folderPath;
                         this.uploadModal.type = Constants.UploadType.FETCH;
                         this.uploadModal.isShow = true;
                         break;
