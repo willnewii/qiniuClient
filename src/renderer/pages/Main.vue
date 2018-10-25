@@ -3,7 +3,7 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="25"></Icon>
+                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
                     <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
                 <!--light dark-->
@@ -94,7 +94,7 @@
                 },
                 menus: [{
                     name: Constants.Key.app_switch,
-                    icon: 'md-swap',
+                    icon: 'md-switch',
                     title: '切换'
                 }, {
                     name: Constants.Key.app_setup,
@@ -182,14 +182,14 @@
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
-                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
+                        this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
                     } else {
                         switch (this.$storage.name) {
-                            case brand.qiniu:
+                            case brand.qiniu.key:
                                 this[types.app.a_buckets](data);
                                 break;
-                            case brand.tencent:
+                            case brand.tencent.key:
                                 let buckets = [];
                                 data.forEach((value) => {
                                     buckets.push(value.Name);
@@ -328,6 +328,9 @@
                     .layout-text {
                         margin-left: 0;
                         line-height: 25px;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
                     }
                     .layout-icon {
                         margin-left: 0;

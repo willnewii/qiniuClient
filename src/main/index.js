@@ -124,7 +124,7 @@ const registerIPC = function () {
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);
-        // trayUtil.setTrayIcon();
+        trayUtil.setTrayIcon('tray_' + arg.key + '.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {

@@ -32,7 +32,11 @@
         <div class="item">
             托盘上传位置：<br>
             <Row class="row-line">
-                <Col span="10">
+                <Col span="12">
+                    <!-- <Select v-model="brand" size="small" style="width:20%" placeholder="服务商">
+                         <Option :value="brands.qiniu.key">{{ brands.qiniu.name }}</Option>
+                         <Option :value="brands.tencent.key">{{ brands.tencent.name }}</Option>
+                     </Select>-->
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
                         <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
                     </Select>
@@ -43,20 +47,21 @@
                     <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-            <div v-if="setup_bucket_name && setup_bucket_dir">提示：文件将会被保存到 {{setup_bucket_name}}/{{setup_bucket_dir}}/
+
+            <div v-if="setup_bucket_name">提示：文件将会被上传至
+                {{brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir + '/' : ''}}
                 目录下
             </div>
-            <div v-else-if="setup_bucket_name">提示：默认文件将会被上传到 {{setup_bucket_name}}/ 目录下</div>
         </div>
 
         <div class="item">
             下载目录：<br>
             <Row class="row-line">
-                <Col span="10">
+                <Col span="12">
                     <Input v-model="downloaddir" size="small" placeholder="默认download目录" style="width: 100%;"
                            disabled/>
                 </Col>
-                <Col span="12" offset="1">
+                <Col span="11" offset="1">
                     <Button @click="choiceDownloadolder" size="small" class="save-btn"
                             icon="ios-folder-outline"/>
                 </Col>
@@ -65,14 +70,15 @@
         </div>
 
         <div class="item">
-            预览图片样式：<br>
+            预览图片样式：
+            <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
+            <br>
             <Row class="row-line">
-                <Col span="10">
+                <Col span="12">
                     <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
                 </Col>
-                <Col span="12" offset="1">
+                <Col span="11" offset="1">
                     <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
-                    <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
                 </Col>
             </Row>
         </div>
@@ -87,11 +93,11 @@
                 </Checkbox>
             </CheckboxGroup>
             <Row class="row-line">
-                <Col span="10" style="display: flex;align-items: center;">
+                <Col span="12">
                     <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
                            style="width: 20%; margin-right: 10px"/>分钟
                 </Col>
-                <Col span="12" offset="1">
+                <Col span="11" offset="1">
                     <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
@@ -112,11 +118,13 @@
     import {mapGetters, mapActions} from 'vuex';
     import {Constants, util} from '../service';
     import * as types from '../vuex/mutation-types';
+    import brands from '@/cos/brand';
 
     export default {
         name: 'setup-page',
         data() {
             return {
+                brand: '',
                 bucketname: '',
                 bucketdir: '',
                 imagestyle: '',
@@ -124,6 +132,7 @@
                 deadline: 0,
                 privates: [],
                 theme: '',
+                brands: brands
             };
         },
         computed: {
@@ -132,6 +141,7 @@
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
                 setup_isOverwrite: types.setup.setup_isOverwrite,
+                setup_brand: types.setup.setup_brand,
                 setup_bucket_name: types.setup.setup_bucket_name,
                 setup_bucket_dir: types.setup.setup_bucket_dir,
                 setup_imagestyle: types.setup.setup_imagestyle,
@@ -143,6 +153,7 @@
         },
         components: {},
         created: function () {
+            this.brand = this.setup_brand;
             this.bucketname = this.setup_bucket_name;
             this.bucketdir = this.setup_bucket_dir;
             this.imagestyle = this.setup_imagestyle;
@@ -150,6 +161,8 @@
             this.privates = this.setup_privatebucket;
             this.theme = this.setup_theme;
             this.deadline = this.setup_deadline / 60;
+
+            console.log(this.brand);
 
             this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
@@ -194,8 +207,12 @@
                 }
             },
             saveDir: function () {
-                this[types.setup.setup_a_savedir]([this.bucketname, this.bucketdir]);
-                this.$Message.success('默认托盘路径修改成功');
+                this.$electron.ipcRenderer.send(Constants.Listener.setBrand, {
+                    key: this.$storage.name
+                });
+                this.brand = this.$storage.name;
+                this[types.setup.setup_a_savedir]([this.bucketname, this.bucketdir, this.$storage.name]);
+                this.$Message.success('托盘保存路径修改成功');
             },
             saveImagestyle: function () {
                 this[types.setup.setup_a_imagestyle]([this.imagestyle]);

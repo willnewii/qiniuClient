@@ -6,7 +6,7 @@ import notifier from 'node-notifier';
 import * as util from './util';
 import * as Constants from '../renderer/service/constants';
 
-let icon_brand = 'tray.png';
+let icon_brand = 'tray_qiniu.png';
 const icon_tray = util.isWin() ? 'win_tray.png' : icon_brand;
 const icon_upload = util.isWin() ? 'win_upload.png' : 'upload.png';
 
@@ -120,6 +120,7 @@ export const setTrayTitle = function (title) {
 };
 
 export const setTrayIcon = function (image) {
-    mTray.setImage(util.getIconPath(image));
+    icon_brand = image;
+    mTray.setImage(util.getIconPath(icon_brand));
 };
 

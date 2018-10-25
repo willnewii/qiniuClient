@@ -57,6 +57,7 @@
     import * as types from '../vuex/mutation-types';
     import {util, Constants, storagePromise, mixins} from '../service';
     import storage from 'electron-json-storage';
+    import brand from "@/cos/brand";
 
     let ipc;
 
@@ -78,11 +79,16 @@
             })
         },
         async created() {
+            ipc = this.$electron.ipcRenderer;
+
             let app = await storagePromise.get(Constants.Key.configuration);
-            if (app && app.bucket_name) {
-                this.$storage.setName('qiniu');
+            if (app && app.brand && app.bucket_name) {
+                this.$storage.setName(app.brand);
                 this.$storage.initCOS((result) => {
                     if (result) {
+                        ipc.send(Constants.Listener.setBrand, {
+                            key: app.brand
+                        });
                         this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
                             this.domains = response.data;
                         });
@@ -91,20 +97,18 @@
                     }
                 });
             } else {
-                console.error('未设置bucket_name');
+                console.error('未设置托盘默认信息');
             }
 
-            ipc = this.$electron.ipcRenderer;
             ipc.removeAllListeners(Constants.Listener.uploadFile);
             ipc.on(Constants.Listener.uploadFile, (event, files) => {
                 storage.get(Constants.Key.configuration, (error, app) => {
-                    if (app && app.bucket_name) {
+                    if (app && app.brand && app.bucket_name) {
                         this.files = files;
                         this.config = app;
                         this.doUploadFile();
                     } else {
                         ipc.send(Constants.Listener.showNotifier, {
-                            title: 'qiniu-client',
                             message: '请先设置上传空间[设置->托盘上传位置]',
                         });
                         this.updateStatus('');
