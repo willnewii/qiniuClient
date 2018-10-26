@@ -88,7 +88,7 @@ export default {
                 }
                 option.count = this.bucket.selection.length;
                 //文件自带的虚拟路径
-                option.folder = '/' + util.getFakeFolder(this.bucket.selection[0].key);
+                option.folder = '/' + this.bucket.name + '/' + util.getFakeFolder(this.bucket.selection[0].key);
                 this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.selection[0]), option);
                 this.bucket.selection.shift();
             } else {
@@ -105,7 +105,9 @@ export default {
         },
         resourceRename(files) {
             this.bucket.renameFile(files, () => {
-                this.$Spin.hide();
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                });
                 this.showMessage({
                     message: '文件修改成功'
                 });

@@ -1,3 +1,6 @@
+//默认文件的分隔符
+export const DELIMITER = '/';
+
 export const protocol = 'http://';
 
 export const method = {
@@ -37,7 +40,8 @@ export const Event = {
     removes: 'removes',
     remove: 'remove',
     download: 'download',
-    statusview: 'statusview'
+    statusview: 'statusview',
+    loading: 'loading'
 };
 
 export const CopyType = {

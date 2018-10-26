@@ -21,19 +21,20 @@
             </Form-item>
             <Form-item>
                 <Button type="primary" @click="handleSubmit('formItem1')">设置</Button>
-                <Button type="ghost" @click="handleReset('formItem1')" style="margin-left: 8px">重置</Button>
+                <Button @click="handleReset('formItem1')" style="margin-left: 8px">重置</Button>
             </Form-item>
         </Form>
     </div>
 </template>
 <script>
     import {Constants, mixins} from '../service';
+    import brand from '@/cos/brand';
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
-                cos_key: 'qiniu',
+                cos_key: brand.qiniu.key,
                 formItem: {
                     access_key: '',
                     secret_key: '',
@@ -41,17 +42,14 @@
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
-                }
+                },
+                brands: [brand.qiniu, brand.tencent]
             };
         },
         computed: {},
         created: function () {
         },
         methods: {
-            onTabClick(name) {
-                this.cos_key = name;
-                this.handleReset('formItem');
-            },
             handleSubmit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
@@ -67,6 +65,7 @@
             validateKey(access_key, secret_key) {
                 this.$storage.setName(this.cos_key);
                 this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
+                //验证key&secret
                 this.$storage.getBuckets((error, result) => {
                     if (error) {
                         this.$Notice.error({
@@ -81,7 +80,7 @@
                             this.$router.push({name: Constants.PageName.main});
                         });
                     }
-                    console.log(error, result);
+                    console.log(error);
                 });
             },
             openBrowser(url) {

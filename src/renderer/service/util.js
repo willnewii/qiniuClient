@@ -29,6 +29,24 @@ export function getClipboardText(type, url) {
 }
 
 /**
+ * {dir,path} dir 导入时源目录,path 文件路径
+ * 通过比较dir,path 保留目录结构
+ * 上传 目录a  , 文件  a/b/c/d.txt 得到的结果是b/c/d.txt
+ * @param item 文件
+ * @returns {string}
+ */
+export function getFileNameWithFolder(item) {
+    let key = '';
+    if (item.dir) {
+        let temp = item.dir.substring(0, item.dir.lastIndexOf('/') + 1);
+        key = item.path.replace(temp, '');
+    } else {
+        key = getPostfix(item.path);
+    }
+    return key;
+}
+
+/**
  * a/b/c/d/a.png => a/
  * @param key
  * @returns {string}
@@ -55,7 +73,7 @@ export function getFakeFolder(key) {
 }
 
 /**
- * 获取文件路径和链接的后缀
+ * 获取文件路径和链接的后缀 ≈获取文件名
  * @param path
  * @returns {*}
  */
@@ -93,8 +111,11 @@ export function quickSort(arr, key) {
 export function formatFileSize(size) {
     if (!size)
         return '';
-
-    if (size >= 1024 * 1024) {
+    if (size >= Math.pow(1024, 4)) {
+        return (size / Math.pow(1024, 4)).toFixed(2) + ' TB';
+    } else if (size >= Math.pow(1024, 3)) {
+        return (size / Math.pow(1024, 3)).toFixed(2) + ' GB';
+    } else if (size >= 1024 * 1024) {
         return (size / 1024 / 1024).toFixed(2) + ' MB';
     } else if (size >= 1024 && size < 1024 * 1024) {
         return (size / 1024).toFixed(2) + ' KB';
@@ -140,17 +161,24 @@ export function wrapperFile(item, type) {
     };
 }
 
+/**
+ * 开发模式直接修改字段
+ * @param name
+ */
 export function loadTheme(name) {
-    let head = document.getElementsByTagName("head")[0];
+    if (process.env.NODE_ENV === 'production') {
+        let head = document.getElementsByTagName("head")[0];
 
-    const style = document.createElement('link');
-    style.setAttribute("rel", "stylesheet");
-    style.setAttribute("type", "text/css");
+        const style = document.createElement('link');
+        style.setAttribute("rel", "stylesheet");
+        style.setAttribute("type", "text/css");
 
-    if (name === 'dark') {
-        style.setAttribute("href", './static/styles-dark.css');
-    } else {
-        style.setAttribute("href", './static/styles.css');
+        if (name === 'dark') {
+            style.setAttribute("href", './static/styles-dark.css');
+        } else {
+            style.setAttribute("href", './static/styles.css');
+        }
+        head.appendChild(style);
     }
-    head.appendChild(style);
+
 }

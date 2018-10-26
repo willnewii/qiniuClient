@@ -101,7 +101,7 @@ let rendererConfig = {
         new ExtractTextPlugin('./static/styles.css'),
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: path.resolve(__dirname, '../src/index.ejs'),
+            template: path.resolve(__dirname, '../index.ejs'),
             minify: {
                 collapseWhitespace: true,
                 removeAttributeQuotes: true,

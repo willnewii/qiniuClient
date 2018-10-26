@@ -1,9 +1,8 @@
 @import './params';
 
-#app {
+#app, .ivu-message-notice-content, .ivu-modal-content {
   background-color: $bg-header;
 }
-
 
 $barPadding: 0;
 /*@if ($platform == 'darwin') {
@@ -44,13 +43,14 @@ $barPadding: 0;
   }
 }
 
-.ivu-select, .ivu-input {
-  color: $fontColor;
+.ivu-spin-fix {
+  background-color: $bg-spin;
 }
 
 .ivu-select-selection, .ivu-select-dropdown, .ivu-input {
   background-color: $bg-input;
   border-width: $input-border-width;
+  color: $fontColor;
 }
 
 .ivu-btn-text:hover {
@@ -58,12 +58,7 @@ $barPadding: 0;
 }
 
 .ivu-modal-content {
-  background-color: $bg-header;
   .ivu-modal-confirm-head-title, .ivu-modal-header-inner {
     color: $fontColor;
   }
-}
-
-.ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
-  width: 4px !important;
 }

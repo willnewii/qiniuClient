@@ -1,4 +1,10 @@
 export default {
-    qiniu: 'qiniu',
-    tencent: 'tencent'
+    qiniu: {
+        key: 'qiniu',
+        name: '七牛云'
+    },
+    tencent: {
+        key: 'tencent',
+        name: '腾讯云'
+    }
 };

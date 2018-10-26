@@ -1,8 +1,8 @@
 /**
  * Created by zhangweiwei on 2018/08/15.
  */
-import * as types from '../mutation-types';
-import {util, storagePromise, Constants} from '../../service';
+import {util, storagePromise, Constants} from '@/service';
+import * as types from '@/vuex/mutation-types';
 
 function setAppSetup(app) {
     storagePromise.set(Constants.Key.configuration, app);
@@ -14,6 +14,7 @@ export default {
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
             isOverwrite: true,                                     //上传时是否直接覆盖文件
             copyType: 'url',
+            brand: '',
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
@@ -59,6 +60,7 @@ export default {
         [types.setup.setup_savedir](state, value) {
             state.setup.bucket_name = value[0];
             state.setup.bucket_dir = value[1];
+            state.setup.brand = value[2];
 
             setAppSetup(state.setup);
         },
@@ -134,6 +136,9 @@ export default {
         },
         [types.setup.setup_copyType](state) {
             return ('copyType' in state.setup) ? state.setup.copyType : 'url';
+        },
+        [types.setup.setup_brand](state) {
+            return ('brand' in state.setup) ? state.setup.brand : '';
         },
         [types.setup.setup_bucket_name](state) {
             return ('bucket_name' in state.setup) ? state.setup.bucket_name : '';

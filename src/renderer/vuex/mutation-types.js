@@ -25,6 +25,7 @@ export const setup = {
     setup_savedir: 'setup_savedir',
     setup_a_savedir: 'setup_a_savedir',
 
+    setup_brand: 'setup_brand',
     setup_bucket_name: 'setup_bucket_name',
     setup_bucket_dir: 'setup_bucket_dir',
 

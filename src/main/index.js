@@ -107,14 +107,14 @@ const registerIPC = function () {
             properties: option.properties
         }, async function (_files) {
             if (_files) {
-                event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(_files));
+                event.sender.send(Constants.Listener.readDirectory, await util.wrapperFiles(_files));
             }
         });
     });
 
     //选取文件
     ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
-        event.sender.send(Constants.Listener.readDirectory, await wrapperFiles(arg.files));
+        event.sender.send(Constants.Listener.readDirectory, await util.wrapperFiles(arg.files));
     });
 
     //预览文件
@@ -124,7 +124,7 @@ const registerIPC = function () {
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
         console.log(arg);
-        // trayUtil.setTrayIcon();
+        trayUtil.setTrayIcon('tray_' + arg.key + '.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
@@ -132,22 +132,6 @@ const registerIPC = function () {
     });
 };
 
-async function wrapperFiles(_files) {
-    let files = [];
-    for (const item of _files) {
-        if (util.isDirectory(item)) {
-            let temp = await util.readDir(item);
-            temp.forEach((path) => {
-                //path.sep 将window 的路径分割符 \  转换成 /
-                files.push({path: path.replace(/\\/g, '/'), dir: item.replace(/\\/g, '/')});
-            });
-        } else {
-            files.push({path: item.replace(/\\/g, '/')});
-        }
-    }
-
-    return files;
-}
 
 /**
  * 检测更新asar

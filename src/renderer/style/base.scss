@@ -1,6 +1,5 @@
 @import './params';
 
-
 body {
   background-color: #FFFFFF;
   color: $fontColor;
@@ -15,6 +14,27 @@ body {
 
 .ivu-btn-text:focus {
   box-shadow: none;
+}
+
+.ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
+  width: 4px !important;
+}
+
+.spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes ani-demo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* 自定义scrollbar 效果不好

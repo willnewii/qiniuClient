@@ -40,10 +40,17 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
+        <Spin size="large" fix v-if="loading.show">
+            <div>
+
+            </div>
+            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
+            <span>{{loading.message}}</span>
+        </Spin>
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
                :mask-closable="false">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">
                         <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
                         <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
@@ -52,6 +59,7 @@
                 </Card>
             </div>
             <div slot="footer"></div>
+            <Icon></Icon>
         </Modal>
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
@@ -85,10 +93,6 @@
                     info: ''
                 },
                 menus: [{
-                    name: Constants.Key.app_switch,
-                    icon: 'md-swap',
-                    title: '切换'
-                }, {
                     name: Constants.Key.app_setup,
                     icon: 'md-cog',
                     title: '设置'
@@ -101,6 +105,11 @@
                     show: false,
                     path: '',
                     message: '',
+                },
+                loading: {
+                    show: false,
+                    message: '',
+                    flag: '' //可以用作计时的标记
                 }
             };
         },
@@ -130,6 +139,9 @@
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
+            });
+            EventBus.$on(Constants.Event.loading, (option) => {
+                this.loading = option;
             });
         },
         methods: {
@@ -167,14 +179,14 @@
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
-                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
+                        this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
                     } else {
                         switch (this.$storage.name) {
-                            case brand.qiniu:
+                            case brand.qiniu.key:
                                 this[types.app.a_buckets](data);
                                 break;
-                            case brand.tencent:
+                            case brand.tencent.key:
                                 let buckets = [];
                                 data.forEach((value) => {
                                     buckets.push(value.Name);
@@ -313,6 +325,9 @@
                     .layout-text {
                         margin-left: 0;
                         line-height: 25px;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
                     }
                     .layout-icon {
                         margin-left: 0;

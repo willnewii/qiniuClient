@@ -1,5 +1,5 @@
 <template>
-    <div class="layout-content">
+    <div ref="content" class="layout-content">
         <v-contextmenu ref="folderMenu" @contextmenu="handleFolderMenu">
             <v-contextmenu-item @click="handleFolderMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
@@ -18,40 +18,44 @@
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
-        <div class="grid" v-if="type === 1">
-            <Card v-for="(file,index) in files" :key="file.key" class="card" :padding="0" :bordered="false">
-                <div class="item" @click="clickItem(file,index)"
-                     v-contextmenu="file._contextmenu" :index="index">
-                    <template v-if="file._directory">
-                        <div class="file">
-                            <Icon :type="file._icon" size="50"></Icon>
-                        </div>
-                        <span class="name">{{file._name}}</span>
-                    </template>
-                    <template v-else>
-                        <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
-                             v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle">
-                        <div v-else class="file">
-                            <Icon :type="file._icon" size="50"></Icon>
-                        </div>
-                        <span class="name">{{file.key | getfileNameByUrl}}</span>
-                        <div class="btn">
-                            <Button shape="circle" size="small" icon="md-download"
-                                    @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
-                            <Button shape="circle" size="small" icon="md-clipboard"
-                                    @click.stop="copy(file)" style="background: #FFFFFF"></Button>
-                            <Button type="error" shape="circle" size="small" icon="md-trash"
-                                    @click.stop="resourceRemove(file)"></Button>
-                        </div>
-                    </template>
-                </div>
-            </Card>
-            <div style="flex-grow: 1"></div>
-        </div>
-        <div class="list" v-else-if="type === 0">
-            <!--<resource-list :files="files"></resource-list>-->
-            <div class="item" v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
-                 v-for="(file,index) in files" :key="file.key" @click="clickItem(file,index)"
+        <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
+            <div v-for="(items,index1) of getFilebyGrid(files)" class="grid2-item" :key="index1">
+                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false">
+                    <div class="item" @click="clickItem(file,index)"
+                         v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}"
+                         v-contextmenu="file._contextmenu" :index="index">
+                        <template v-if="file._directory">
+                            <div class="file">
+                                <Icon :type="file._icon" size="50"></Icon>
+                            </div>
+                            <span class="name">{{file._name}}</span>
+                        </template>
+                        <template v-else>
+                            <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
+                                 v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle"/>
+                            <img v-else-if="/image\/(svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
+                                 v-lazy="'http://' + bucket.domain + '/' + file.key"/>
+                            <div v-else class="file">
+                                <Icon :type="file._icon" size="50"></Icon>
+                            </div>
+                            <span class="name">{{file.key | getfileNameByUrl}}</span>
+                            <div class="btn">
+                                <Button shape="circle" size="small" icon="md-download"
+                                        @click.stop="handleDownload(file)" style="background: #FFFFFF"></Button>
+                                <Button shape="circle" size="small" icon="md-clipboard"
+                                        @click.stop="copy(file)" style="background: #FFFFFF"></Button>
+                                <Button type="error" shape="circle" size="small" icon="md-trash"
+                                        @click.stop="resourceRemove(file)"></Button>
+                            </div>
+                        </template>
+                    </div>
+                </Card>
+            </div>
+        </virtual-list>
+        <virtual-list :size="29" :remain="remain0" class="list" v-else-if="type === 0" key="0">
+            <div v-for="(file,index) of files" :key="file.key" class="item"
+                 v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
+                 @click="clickItem(file,index)"
                  v-contextmenu="file._contextmenu" :index="index">
                 <template v-if="file._directory">
                     <Icon :type="file._icon" size="15"></Icon>
@@ -64,7 +68,8 @@
                     <span class="size">{{file.fsize | formatFileSize}}</span>
                 </template>
             </div>
-        </div>
+        </virtual-list>
+
         <Modal v-model="folderInfoDialog.show" :title="folderInfoDialog.title" @on-ok="">
             <div style="white-space: pre-line">
                 {{folderInfoDialog.info}}
@@ -78,16 +83,14 @@
     </div>
 </template>
 <script>
-    import {resource, base} from '../mixins/index';
-    import * as util from '../service/util';
-    import * as constants from '../service/constants';
-    import * as qiniu from '../cos/qiniu';
+    import {resource, base, contextmenu} from '../mixins/index';
     import ResourceList from "@/components/ResourceList";
+    import {EventBus, Constants, util,} from "@/service/index";
 
     export default {
         name: 'ResourceGrid',
         components: {ResourceList},
-        mixins: [resource, base],
+        mixins: [resource, base, contextmenu],
         props: {
             type: {
                 type: Number,
@@ -100,26 +103,18 @@
         },
         data() {
             return {
-                self: this,
-                contextFolderMenuIndex: -1,
-                contextFileMenuIndex: -1,
                 files: [],
-                folderInfoDialog: {
-                    show: false,
-                    title: '',
-                    info: ''
-                },
-                changeFileNameDialog: {
-                    show: false,
-                    title: '',
-                    info: '',
-                    key: '',
-                    input: ''
-                },
-                //当前路径
+                //缓存当前路径
                 cacheName: '',
+                //是否在多选状态
                 isMultiple: false,
-                selection: []
+                //多选数组
+                selection: [],
+
+                //virtual-list
+                remain0: 0,
+                remain1: 0,
+                step: 6
             };
         },
         watch: {
@@ -127,7 +122,9 @@
                 if (this.cacheName !== this.bucket.name) {
                     this.cacheName = this.bucket.name;
                 }
+                console.time('bucket.files');
                 this.fileFilter();
+                console.timeEnd('bucket.files');
             },
             'bucket.folderPath': function (newValue) {
                 this.fileFilter();
@@ -151,8 +148,9 @@
             document.onkeydown = (event) => {
                 let e = event || window.event || arguments.callee.caller.arguments[0];
                 switch (e.keyCode) {
-                    case 91://command
+                    case 91://command(mac)
                     case 93:
+                    case 17://control(win)
                         this.isMultiple = true;
                         break;
                 }
@@ -162,131 +160,27 @@
                 switch (e.keyCode) {
                     case 91://command
                     case 93:
+                    case 17://control
                         this.isMultiple = false;
                         break;
                 }
             };
         },
         mounted() {
+            console.log(this.$refs['content'].offsetHeight/29);
+            this.remain0 = this.$refs['content'].offsetHeight / 29;
+            this.remain1 = this.$refs['content'].offsetHeight / 123;
+
             this.fileFilter();
         },
         methods: {
-            changeFileName() {
-                let files = [];
-                let path = this.changeFileNameDialog.file.key;
-                if (this.changeFileNameDialog.file._directory) {
-                    path = this.changeFileNameDialog.file._path;
-                }
-                let array = path.split(qiniu.DELIMITER);
-                array[array.length - 1] = this.changeFileNameDialog.input;
-                let newPath = array.join(qiniu.DELIMITER);
-
-                if (!this.changeFileNameDialog.file._directory) {
-                    this.changeFileNameDialog.file._key = newPath;
-                    files.push(this.changeFileNameDialog.file);
-                } else {
-                    for (let file of this.bucket.files) {
-                        if (file.key.indexOf(path + qiniu.DELIMITER) === 0) {
-                            file._key = file.key.replace(path, newPath);
-                            files.push(file);
-                        }
-                    }
-                }
-                this.$Spin.show({
-                    render: (h) => {
-                        return h('div', [
-                            h('Icon', {
-                                'class': 'demo-spin-icon-load',
-                                props: {
-                                    type: 'ios-loading',
-                                    size: 18
-                                }
-                            }),
-                            h('div', '更新中...')
-                        ]);
-                    }
-                });
-                this.resourceRename(files);
-            },
-            handleFolderMenu(ref) {
-                this.contextFolderMenuIndex = ref.data.attrs.index;
-            },
-            handleFolderMenuClick(action) {
-                let path = this.files[this.contextFolderMenuIndex]._path;
-
-                switch (action) {
-                    case 0://删除操作
-                        this.resourceRemove(this.getFilebyPath(path));
-                        break;
-                    case 1://目录详情
-                        let files = this.getFilebyPath(path);
-                        let size = 0;
-                        files.forEach((item) => {
-                            size += item.fsize;
-                        });
-                        this.folderInfoDialog.show = true;
-                        this.folderInfoDialog.title = `${path}简介`;
-                        this.folderInfoDialog.info = `共${files.length}个文件\n大小：${util.formatFileSize(size)}`;
-                        break;
-                    case 2://修改文件夹
-                        this.changeFileNameDialog.show = true;
-                        this.changeFileNameDialog.input = this.files[this.contextFolderMenuIndex]._name;
-                        this.changeFileNameDialog.file = this.files[this.contextFolderMenuIndex];
-                        break;
-                }
-            },
-            handleFileMenu(ref) {
-                this.contextFileMenuIndex = ref.data.attrs.index;
-            },
-            handleFileMenuClick(action) {
-                let file = this.files[this.contextFileMenuIndex];
-
-                switch (action) {
-                    case 0://删除操作
-                        this.resourceRemove(file);
-                        break;
-                    case 1:
-                        this.folderInfoDialog.show = true;
-                        this.folderInfoDialog.title = `${util.getPostfix(file.key)}简介`;
-                        this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}`;
-                        break;
-                    case 2:
-                        this.copy(file, constants.CopyType.URL);
-                        break;
-                    case 3:
-                        this.copy(file, constants.CopyType.MARKDOWN);
-                        break;
-                    case 4:
-                        this.changeFileNameDialog.show = true;
-                        this.changeFileNameDialog.input = util.getPostfix(file.key);
-                        // this.changeFileNameDialog.input = file.key;
-                        this.changeFileNameDialog.file = file;
-                        break;
-                }
-            },
-            /**
-             * 根据前缀获取当前目录下的所有文件
-             * @param prefix
-             */
-            getFilebyPath(prefix) {
-                let files = [];
-                this.bucket.files.forEach((file) => {
-                    let temp_key = file.key;
-                    if (temp_key.indexOf(prefix + qiniu.DELIMITER) === 0) {
-                        files.push(file);
-                    }
-                });
-                return files;
-            },
             clickItem(file, index) {
                 if (this.isMultiple) {
-
                     if (this.selection.indexOf(index) !== -1) {
                         this.selection.splice(this.selection.indexOf(index), 1);
                     } else {
                         this.selection.push(index);
                     }
-
 
                     let files = [];
                     for (const i of this.selection) {
@@ -306,6 +200,27 @@
                     }
                 }
             },
+            getFilebyGrid() {
+                let array = [];
+                for (let i = 0; i < this.files.length; i += this.step) {
+                    array.push(this.files.slice(i, i + this.step > this.files.length ? this.files.length : i + this.step));
+                }
+                return array;
+            },
+            /**
+             * 根据前缀获取当前目录下的所有文件
+             * @param prefix
+             */
+            getFilebyPath(prefix) {
+                let files = [];
+                this.bucket.files.forEach((file) => {
+                    let temp_key = file.key;
+                    if (temp_key.indexOf(prefix + Constants.DELIMITER) === 0) {
+                        files.push(file);
+                    }
+                });
+                return files;
+            },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
              * @param callback  回调
@@ -320,7 +235,7 @@
 
                 this.bucket.files.forEach((file) => {
                     let temp_key = file.key;
-                    if (folderPath === '' || temp_key.indexOf(folderPath + qiniu.DELIMITER) === 0) {
+                    if (folderPath === '' || temp_key.indexOf(folderPath + Constants.DELIMITER) === 0) {
 
                         if (this.keyWord) {
                             if (temp_key.indexOf(this.keyWord) === -1) {
@@ -332,9 +247,9 @@
 
                         //去除前缀然后再split
                         if (folderPath.length > 0) {
-                            temp_key = temp_key.replace(folderPath + qiniu.DELIMITER, '');
+                            temp_key = temp_key.replace(folderPath + Constants.DELIMITER, '');
                         }
-                        let temps = temp_key.split(qiniu.DELIMITER);
+                        let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
                             if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
@@ -350,8 +265,9 @@
                             if (_dirs.indexOf(temps[0]) === -1) {
                                 _dirs.push(temps[0]);
                                 files.push({
+                                    key: (folderPath ? folderPath + Constants.DELIMITER : '') + temps[0],
                                     _name: temps[0],
-                                    _path: (folderPath ? folderPath + qiniu.DELIMITER : '') + temps[0],
+                                    _path: (folderPath ? folderPath + Constants.DELIMITER : '') + temps[0],
                                     _directory: true,
                                     _icon: 'md-folder',
                                     _contextmenu: 'folderMenu'
@@ -382,10 +298,10 @@
                     }
                 });
 
+                // files.length = parseInt(files.length / 2);
                 this.files = [];
-                //TODO:优化显示速度
                 this.$nextTick(function () {
-                    this.files = files;
+                    this.files = Object.freeze(files);
                     callback && callback({searchCount: resultCount});
                 });
             },
@@ -415,11 +331,21 @@
             justify-content: space-between;
             align-content: flex-start;
             padding: 10px;
-            .card {
-                height: 113px;
-                width: 113px;
-                margin: 5px;
+        }
+
+        .grid2 {
+            padding: 10px;
+            box-sizing: content-box;
+            .grid2-item {
+                display: flex;
+                flex-direction: row;
             }
+        }
+
+        .card {
+            height: 113px;
+            width: 113px;
+            margin: 5px;
             .item {
                 display: flex;
                 flex-direction: column;
@@ -491,6 +417,9 @@
                 &:nth-child(2n) {
                     background-color: $bg-item-selected;
                 }
+            }
+            .item-even {
+                background-color: $bg-item-selected;
             }
             .item-select {
                 color: white;
