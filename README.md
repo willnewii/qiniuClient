@@ -26,6 +26,7 @@
 9. 增加dark配色(mac会自动判断,您也可以在设置页手动设置)
 10. 支持腾讯云COS([部分功能不支持](https://github.com/willnewii/qiniuClient/wiki/%E8%85%BE%E8%AE%AFCOS%E4%B8%8D%E6%94%AF%E6%8C%81%E6%83%85%E5%86%B5))
 11. 支持搜索功能(默认会读取您COS的全部文件列表,这样就可以支持模糊查询,坏处就是bucket切换特别慢...)
+12. 优化了大空间(主要是文件个数多)的加载.
 
 ## Build Setup
 ``` bash
@@ -45,6 +46,7 @@ npm run build:win32
 - [vue2.0 + axios + router + vuex](https://github.com/vuejs/vue)
 - [iview 3.0](https://github.com/iview/iview)
 - [v-contextmenu '右键菜单'](https://github.com/snokier/v-contextmenu)
+- [vue-virtual-scroll-list](https://github.com/tangbc/vue-virtual-scroll-list)
 
 ## 参考资料
 - [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)

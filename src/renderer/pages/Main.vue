@@ -135,7 +135,7 @@
 
             this[types.setup.setup_init]();
 
-            this.checkVersion();
+            //this.checkVersion();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
