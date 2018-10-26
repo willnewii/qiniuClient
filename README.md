@@ -1,4 +1,4 @@
-# qiniuClient v1.0.0
+# qiniuClient v0.2.0
 ![](http://blog-res.mayday5.me/niu_128.png?imageView2/1/w/30/h/30/q/75|imageslim)
 > 七牛存储文件管理客户端.跟七牛云官网后台相比,增加了按目录显示,删除,修改等操作.支持URL上传,文件夹上传。腾讯COS也顺手支持了一下
 
