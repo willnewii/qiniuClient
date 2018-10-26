@@ -1,7 +1,7 @@
 {
     "name": "qiniuclient",
     "cnname": "COS管理客户端",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "七牛COS管理客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",

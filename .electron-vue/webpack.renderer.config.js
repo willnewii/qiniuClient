@@ -13,6 +13,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
+const appExtract = new ExtractTextPlugin('./static/styles.css');
+
 /**
  * List of node_modules to include in webpack bundle
  *
@@ -34,7 +37,7 @@ let rendererConfig = {
         rules: [
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
+                use: commonExtract.extract({
                     fallback: 'style-loader',
                     use: 'css-loader'
                 })
@@ -57,7 +60,7 @@ let rendererConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
-                        loaders: utils.cssLoaders({extract: process.env.NODE_ENV === 'production'})
+                        loaders: utils.cssLoaders({extract: process.env.NODE_ENV === 'production' , appExtract})
                     }
 
                 }
@@ -98,7 +101,8 @@ let rendererConfig = {
         __filename: process.env.NODE_ENV !== 'production'
     },
     plugins: [
-        new ExtractTextPlugin('./static/styles.css'),
+        commonExtract,
+        appExtract,
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, '../index.ejs'),

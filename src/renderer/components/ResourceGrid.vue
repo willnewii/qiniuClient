@@ -23,9 +23,9 @@
         <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
             <div v-for="(items,index1) of getFilebyGrid(files)" class="grid2-item" :key="index1">
                 <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false">
-                    <div class="item" @click="clickItem(file,index)"
+                    <div class="item" @click="clickItem(file,files.indexOf(file))"
                          v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}"
-                         v-contextmenu="file._contextmenu" :index="index">
+                         v-contextmenu="file._contextmenu" :index="files.indexOf(file)">
                         <template v-if="file._directory">
                             <div class="file">
                                 <Icon :type="file._icon" size="50"></Icon>
@@ -124,9 +124,7 @@
                 if (this.cacheName !== this.bucket.name) {
                     this.cacheName = this.bucket.name;
                 }
-                console.time('bucket.files');
                 this.fileFilter();
-                console.timeEnd('bucket.files');
             },
             'bucket.folderPath': function (newValue) {
                 this.fileFilter();
