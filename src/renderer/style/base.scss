@@ -1,28 +1,8 @@
-// 样式调整
+@import './params';
 
-.ivu-menu-item-group-title {
-  font-size: 12px !important;
-  height: 30px !important;
-  line-height: 30px !important;
-  padding-left: 24px !important;
-}
-
-.ivu-menu-dark.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu), .ivu-menu-dark.ivu-menu-vertical .ivu-menu-submenu-title-active:not(.ivu-menu-submenu) {
-  border-right-width: 5px;
-}
-
-.ivu-loading-bar {
-  top: 22px;
-}
-
-.ivu-loading-bar-win {
-  top: 0;
-}
-
-.layout-menu-left {
-  background: #495060 !important;
-  border-radius: 5px;
-  //box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+body {
+  background-color: #FFFFFF;
+  color: $fontColor;
 }
 
 //表格 多选 图标边距修改
@@ -32,6 +12,30 @@
   }
 }
 
+.ivu-btn-text:focus {
+  box-shadow: none;
+}
+
+.ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
+  width: 4px !important;
+}
+
+.spin-icon-load {
+  animation: ani-demo-spin 1s linear infinite;
+  margin-right: 10px;
+}
+
+@keyframes ani-demo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* 自定义scrollbar 效果不好
 ::-webkit-scrollbar

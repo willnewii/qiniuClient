@@ -6,7 +6,8 @@ import notifier from 'node-notifier';
 import * as util from './util';
 import * as Constants from '../renderer/service/constants';
 
-const icon_tray = util.isWin() ? 'win_tray.png' : 'tray.png';
+let icon_brand = 'tray_qiniu.png';
+const icon_tray = util.isWin() ? 'win_tray.png' : icon_brand;
 const icon_upload = util.isWin() ? 'win_upload.png' : 'upload.png';
 
 let mTray, mTrayWindow;
@@ -23,9 +24,9 @@ export const createTray = function (_mainWindowId) {
         toggleTrayWindow();
     });
 
-    mTray.on('drop-files', (event, files) => {
+    mTray.on('drop-files', async (event, files) => {
         setTrayIcon(icon_upload);
-        mTrayWindow.webContents.send(Constants.Listener.uploadFile, files);
+        mTrayWindow.webContents.send(Constants.Listener.uploadFile, await util.wrapperFiles(files));
     });
 
     ipcMain.on(Constants.Listener.updateTrayTitle, function (event, title) {
@@ -65,7 +66,7 @@ const createTrayWindow = () => {
         }
     });
 
-    trayWindow.loadURL(util.winURL + '#/tray');
+    trayWindow.loadURL(util.mainURL + '#/tray');
 
     // Hide the window when it loses focus
     trayWindow.on('blur', () => {
@@ -119,6 +120,7 @@ export const setTrayTitle = function (title) {
 };
 
 export const setTrayIcon = function (image) {
-    mTray.setImage(util.getIconPath(image));
+    icon_brand = image;
+    mTray.setImage(util.getIconPath(icon_brand));
 };
 

@@ -4,12 +4,17 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const {dependencies} = require('../package.json');
+const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
+const MinifyPlugin = require("babel-minify-webpack-plugin");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
+const appExtract = new ExtractTextPlugin('./static/styles.css');
 
 /**
  * List of node_modules to include in webpack bundle
@@ -32,7 +37,7 @@ let rendererConfig = {
         rules: [
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract({
+                use: commonExtract.extract({
                     fallback: 'style-loader',
                     use: 'css-loader'
                 })
@@ -55,12 +60,9 @@ let rendererConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
-                        extractCSS: process.env.NODE_ENV === 'production',
-                        loaders: {
-                            sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-                            scss: 'vue-style-loader!css-loader!sass-loader'
-                        }
+                        loaders: utils.cssLoaders({extract: process.env.NODE_ENV === 'production' , appExtract})
                     }
+
                 }
             },
             {
@@ -86,6 +88,7 @@ let rendererConfig = {
                 use: {
                     loader: 'url-loader',
                     query: {
+                        publicPath: '../',
                         limit: 10000,
                         name: 'fonts/[name]--[folder].[ext]'
                     }
@@ -98,10 +101,11 @@ let rendererConfig = {
         __filename: process.env.NODE_ENV !== 'production'
     },
     plugins: [
-        new ExtractTextPlugin('styles.css'),
+        commonExtract,
+        appExtract,
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            template: path.resolve(__dirname, '../src/index.ejs'),
+            template: path.resolve(__dirname, '../index.ejs'),
             minify: {
                 collapseWhitespace: true,
                 removeAttributeQuotes: true,
@@ -147,7 +151,7 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
-        new BabiliWebpackPlugin(),
+        new MinifyPlugin(),
         new CopyWebpackPlugin([
             {
                 from: path.join(__dirname, '../static'),
@@ -162,6 +166,12 @@ if (process.env.NODE_ENV === 'production') {
             minimize: true
         })
     );
+
+    if (process.env.ANALYZER === 'true') {
+        rendererConfig.plugins.push(
+            new BundleAnalyzerPlugin(),
+        );
+    }
 }
 
 module.exports = rendererConfig;

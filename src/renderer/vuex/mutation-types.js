@@ -4,6 +4,9 @@ export const setup = {
     setup_deadline: 'setup_deadline',
     setup_a_deadline: 'setup_a_deadline',
 
+    setup_isOverwrite: 'setup_isOverwrite',
+    setup_a_isOverwrite: 'setup_a_isOverwrite',
+
     setup_privatebucket: 'setup_privatebucket',
     setup_a_privatebucket: 'setup_a_privatebucket',
 
@@ -22,11 +25,15 @@ export const setup = {
     setup_savedir: 'setup_savedir',
     setup_a_savedir: 'setup_a_savedir',
 
+    setup_brand: 'setup_brand',
     setup_bucket_name: 'setup_bucket_name',
     setup_bucket_dir: 'setup_bucket_dir',
 
     setup_customedomain: 'setup_customedomain',
     setup_a_customedomain: 'setup_a_customedomain',
+
+    setup_theme: 'setup_theme',
+    setup_a_theme: 'setup_a_theme',
 };
 
 export const app = {

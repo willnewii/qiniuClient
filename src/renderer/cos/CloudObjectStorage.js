@@ -5,7 +5,6 @@ import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
 
-
 export default class CloudObjectStorage {
     constructor() {
     }
@@ -13,10 +12,10 @@ export default class CloudObjectStorage {
     setName(name) {
         this.name = name;
         switch (name) {
-            case brand.qiniu:
+            case brand.qiniu.key:
                 this.cos = qiniu;
                 break;
-            case brand.tencent:
+            case brand.tencent.key:
                 this.cos = tencent;
                 break;
         }
@@ -24,6 +23,20 @@ export default class CloudObjectStorage {
 
     getBuckets(callback) {
         this.cos.getBuckets(callback);
+    }
+
+    async getCOS(callback) {
+        let cos = [brand.qiniu, brand.tencent];
+        let _cos = [];
+
+        for (let i = 0; i < cos.length; i++) {
+            let data = await storagePromise.get(cos[i].key + '_key');
+            if (data && data.access_key && data.secret_key) {
+                _cos.push(cos[i]);
+            }
+        }
+
+        callback(_cos);
     }
 
     /**
@@ -59,7 +72,7 @@ export default class CloudObjectStorage {
      * @param callback
      */
     cleanCosKey(callback) {
-        storage.clear(this.name + '_key', (error, data) => {
+        storage.remove(this.name + '_key', (error, data) => {
             if (!error) {
                 callback && callback();
             }

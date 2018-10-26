@@ -40,10 +40,8 @@
     @import "../style/params";
 
     .layout-tag {
-        flex-grow: 1;
-        overflow-x: scroll;
+        //flex-grow: 1;
         white-space: nowrap;
-        margin-right: 10px;
         .blue-tag {
             color: $primary !important;
             border: 1px solid $primary !important;

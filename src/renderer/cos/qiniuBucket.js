@@ -1,38 +1,17 @@
-import {Constants} from '../service/index';
+import {Constants, EventBus} from '../service/index';
 import * as qiniu from '../cos/qiniu';
+import baseBucket from './baseBucket';
 
-const DELIMITER = '/';
+let tempFiles = [];
 
-class Bucket {
+class Bucket extends baseBucket {
 
-    constructor(name) {
-        this.reset();
-
-        name && (this.name = name);
+    constructor(name, cos) {
+        super(name, cos);
     }
 
     reset() {
-        this.name = '';
-        this.domains = [];
-        this.isprivate = false;
-
-        this.dirs = [];
-        this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
-
-        //当前选择dir
-        this.currentDir = '';
-        //当前选择domain
-        this.domain = '';
-        //当前dir加载返回的marker
-        this.marker = '';
-
-        //已选的文件列表
-        this.selection = [];
-        //当前显示文件列表
-        this.files = [];
-        //其他文件列表(不含有请求时delimiter的文件列表)
-        this.withoutDelimiterFiles = [];
+        super.reset();
     }
 
     /**
@@ -48,7 +27,13 @@ class Bucket {
         this.checkPrivate();
 
         this.getDomains();
-        this.getDirs();
+
+        EventBus.$emit(Constants.Event.loading, {
+            show: true,
+            message: '数据加载中,请稍后',
+            flag: 'getResources'
+        });
+        console.time('getResources');
         this.getResources();
     }
 
@@ -58,14 +43,6 @@ class Bucket {
      */
     getCurrentDir() {
         return this.currentDir === Constants.Key.withoutDelimiter ? '' : this.currentDir;
-    }
-
-    /**
-     * 返回目录数组,忽略前两个手动添加的'全部'，'其它'
-     * @returns {T[]}
-     */
-    getDirArray() {
-        return this.dirs.slice(2);
     }
 
     /**
@@ -102,45 +79,13 @@ class Bucket {
         });
     }
 
-    /**
-     * 获取该bucket下的目录
-     * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
-     */
-    getDirs(marker) {//获取目录
-        let data = {
-            bucket: this.name,
-            delimiter: DELIMITER,
-            limit: 1000
-        };
-        if (marker) {
-            data.marker = marker;
-        }
-
-        this.vm.doRequset(qiniu.methods.resources, data, (response) => {
-            if (!response)
-                return;
-
-            let data = response.data;
-            if (data.commonPrefixes) {
-                this.dirs = this.dirs.concat(data.commonPrefixes);
-            }
-
-            if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
-                this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
-            }
-
-            response.data.marker && this.getDirs(response.data.marker);
-        });
-    }
-
-
     getResources(keyword) {
         //重置多选数组
         this.selection = [];
 
         let param = {
             bucket: this.name,
-            limit: 100
+            limit: 1000
         };
 
         if (keyword) {
@@ -151,39 +96,26 @@ class Bucket {
             param.marker = this.marker;
         }
 
-        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
-            if (!response)
-                return;
+        qiniu.list(param, (respErr, respBody, respInfo) => {
+            let data = respInfo.data;
+            data.items.forEach((item, index) => {
+                data.items[index].putTime = item.putTime / 10000;
+            });
 
-            let data = response.data;
-            this.files = this.marker ? this.files.concat(data.items) : data.items;
+            tempFiles = this.marker ? tempFiles.concat(data.items) : data.items;
             this.marker = data.marker ? data.marker : '';
+
+            if (this.marker) {
+                this.getResources(keyword);
+            } else {
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                    flag: 'getResources'
+                });
+                this.files = Object.freeze(tempFiles);
+                tempFiles = [];
+            }
         });
-    }
-
-    /**
-     * 搜索操作
-     *  dir：目录
-     *  search：关键字
-     */
-    search(dir, search = '') {
-        this.marker = '';
-        this.getResources(dir + search);
-    }
-
-    /**
-     * 设置当前目录
-     * @param dir
-     */
-    setCurrentDir(dir) {
-        this.currentDir = dir;
-        this.marker = '';
-
-        if (dir === Constants.Key.withoutDelimiter) {
-            this.files = this.withoutDelimiterFiles;
-        } else {
-            this.search(this.currentDir);
-        }
     }
 
     createFile(_param, type, callback) {
@@ -198,13 +130,14 @@ class Bucket {
         }
     }
 
-    removeFile(item, callback) {
-        let param = {
-            key: item.key,
-            bucket: this.name
-        };
+    removeFile(items, callback) {
+        qiniu.remove(this.name, items, (ret) => {
+            callback && callback(ret);
+        });
+    }
 
-        qiniu.remove(param, (ret) => {
+    renameFile(items, callback) {
+        qiniu.rename(this.name, items, (ret) => {
             callback && callback(ret);
         });
     }
@@ -218,6 +151,77 @@ class Bucket {
      */
     generateUrl(key, deadline) {
         return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
+    }
+
+    /**
+     *  已弃用
+     * 返回目录数组,忽略前两个手动添加的'全部'，'其它'
+     * @returns {T[]}
+     */
+    getDirArray() {
+        return this.dirs.slice(2);
+    }
+
+    /**
+     *  已弃用
+     * 获取该bucket下的目录
+     * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
+     */
+    getDirs(marker) {//获取目录
+        let param = {
+            bucket: this.name,
+            delimiter: qiniu.DELIMITER,
+            limit: 1000
+        };
+        if (marker) {
+            data.marker = marker;
+        }
+
+        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
+            if (!response)
+                return;
+
+            let data = response.data;
+            if (data.commonPrefixes) {
+                this.dirs = this.dirs.concat(data.commonPrefixes);
+            }
+
+            if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
+                data.items.forEach((item, index) => {
+                    data.items[index].putTime = item.putTime / 10000;
+                });
+                this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
+            }
+
+            response.data.marker && this.getDirs(response.data.marker);
+        });
+    }
+
+    /**
+     *  已弃用
+     *  搜索操作
+     *  dir：目录
+     *  search：关键字
+     */
+    search(dir, search = '') {
+        this.marker = '';
+        this.getResources(dir + search);
+    }
+
+    /**
+     * 已弃用
+     * 设置当前目录
+     * @param dir
+     */
+    setCurrentDir(dir) {
+        this.currentDir = dir;
+        this.marker = '';
+
+        if (dir === Constants.Key.withoutDelimiter) {
+            this.files = this.withoutDelimiterFiles;
+        } else {
+            this.search(this.currentDir);
+        }
     }
 }
 

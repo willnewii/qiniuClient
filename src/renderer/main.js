@@ -1,24 +1,19 @@
 import Vue from 'vue';
 
 import Router from 'vue-router';
-import Electron from 'vue-electron';
-import VueLazyload from 'vue-lazyload';
 import axios from 'axios';
 
-import iView from 'iview';
-import 'iview/dist/styles/iview.css';
 
-import {util} from './service';
+import "@/service/loadComponent";
 import CloudObjectStorage from "@/cos/CloudObjectStorage";
-import brand from "@/cos/brand";
 
-Vue.use(Electron);
+
 Vue.use(Router);
-Vue.use(iView);
-Vue.use(VueLazyload);
 
 Vue.prototype.$storage = new CloudObjectStorage();
-Vue.prototype.$storage.setName(brand.qiniu);
+
+//import brand from "@/cos/brand";
+// Vue.prototype.$storage.setName(brand.qiniu);
 // Vue.config.debug = false;
 
 import routes from './routes';
@@ -29,8 +24,25 @@ const router = new Router({
     routes
 });
 
-Vue.filter('getfileNameByPath', function (value) {
+router.afterEach((to, from) => {
+    if (to.meta && to.meta.hideTitle) {
+        document.getElementById('title') && document.getElementById('title').remove();
+    }
+});
+
+import * as util from '@/service/util';
+
+//组件中直接显示文件名 'XXX/AAA/BBB/a.png => a.png'
+Vue.filter('getfileNameByUrl', function (value) {
     return util.getPostfix(value);
+});
+
+Vue.filter('formatDate', function (value) {
+    return util.formatDate(value);
+});
+
+Vue.filter('formatFileSize', function (value) {
+    return util.formatFileSize(value);
 });
 
 //拦截器
@@ -44,9 +56,11 @@ axios.interceptors.response.use((response) => {
 });
 
 import App from './App';
+
 new Vue({
+    el: '#app',
     router,
     store,
-    ...App
-}).$mount('#app');
+    render: h => h(App)
+});
 

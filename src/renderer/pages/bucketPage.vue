@@ -1,66 +1,141 @@
 <style lang="scss" scoped>
-    .layout-copy {
-        text-align: center;
-        padding: 10px 0 20px;
-        color: #9ea7b4;
+    @import '../style/params';
+
+    .bucketpage {
+        background-color: $bg-bucketpage;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     .dir-layout {
         display: flex;
         flex-direction: row;
         align-items: center;
-        padding: 15px 15px 0 15px;
+        padding: 15px;
+        flex-shrink: 0;
+        .header-dir-view {
+            flex-grow: 1;
+            flex-shrink: 1;
+            overflow-x: scroll;
+            margin-right: 10px;
+            .ivu-breadcrumb {
+                display: flex;
+                flex-direction: row;
+                color: $fontColor;
+                .bread-sub {
+                    flex-shrink: 0;
+                    .ivu-breadcrumb-item-separator {
+                        color: $fontColor;
+                    }
+                }
+            }
+        }
+        .header-info-view {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-shrink: 0;
+            margin-right: 10px;
+            .icon {
+                font-size: 14px;
+            }
+            .count {
+                margin-right: 5px;
+                padding-left: 5px;
+            }
+            .size {
+                padding-left: 5px;
+            }
+        }
+        .header-button-view {
+            display: flex;
+            flex-direction: row;
+            flex-shrink: 0;
+        }
+    }
+</style>
+<style lang="scss">
+    @import '../style/params';
+
+    .bread-sub {
+        .ivu-breadcrumb-item-separator {
+            color: $fontColor;
+        }
     }
 </style>
 <template>
-    <div class="layout" v-if="bucket">
-        <Header :bucket="bucket" @on-update="onTableUpdate" @on-search="doSearch"></Header>
+    <div class="bucketpage" v-if="bucket">
+        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <Directory :bucket="bucket" @on-click="changeDir"></Directory>
-            <Button type="ghost" size="small" @click="query()" icon="funnel"
-                    style="margin-right: 10px;background: #FFFFFF;">
-            </Button>
+            <div class="header-dir-view">
+                <Breadcrumb separator=">">
+                    <div class="bread-sub" @click="changeFolderPath(-1)">
+                        <BreadcrumbItem>
+                            <Icon type="md-home" size="14"></Icon>
+                        </BreadcrumbItem>
+                    </div>
+                    <template v-if="bucket.folderPath">
+                        <div class="bread-sub" v-for="(item,index) in bucket.folderPath.split('/')"
+                             @click="changeFolderPath(index)">
+                            <BreadcrumbItem>
+                                {{item}}
+                            </BreadcrumbItem>
+                        </div>
+                    </template>
+                </Breadcrumb>
+            </div>
 
-            <Button type="ghost" size="small" @click="downloads()" icon="ios-download"
-                    style="margin-right: 10px;background: #FFFFFF;"
-                    v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
-            </Button>
+            <div class="header-info-view">
+                <span class="icon iconfont icon-wenjian"></span>
+                <span class="count">共{{bucket.files.length}}个 文件</span>
+                <span class="icon iconfont icon-fuwuqi"></span>
+                <span class="size">共{{totalSize}} 存储量</span>
+            </div>
 
-            <Button type="error" size="small" @click="askRemove()" icon="trash-b" style="margin-right: 10px;"
-                    v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
-            </Button>
+            <div class="header-button-view">
+                <Button size="small" @click="query()" icon="md-funnel"
+                        style="margin-right: 10px;background: #FFFFFF;">
+                </Button>
 
-            <Button-group size="small" style="background: #FFF;margin-right: 10px;display: flex;">
-                <Button :type="showType === 0 ? 'primary' : 'ghost'" @click="changeShowType(0)"
-                        icon="navicon-round"></Button>
-                <Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>
-            </Button-group>
+                <Button size="small" @click="downloads()" icon="md-download"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
+                </Button>
 
-            <Button-group size="small" style="background: #FFF" v-if="bucket.marker">
-                <Button type="ghost" @click="getResources" icon="chevron-right"></Button>
-            </Button-group>
+                <Button type="error" size="small" @click="askRemove()" icon="md-trash"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
+                </Button>
+
+                <Button-group size="small">
+                    <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)"
+                            icon="md-list"></Button>
+                    <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
+                    <Button :type="showType === 1 ? 'primary' : 'default'" @click="changeShowType(1)"
+                            icon="md-folder"></Button>
+                </Button-group>
+                <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
+                    <Button @click="getResources()" icon="ios-arrow-forward"></Button>
+                </Button-group>
+            </div>
         </div>
 
-        <resource-table v-if="showType === 0" :bucket="bucket"
-                        @on-update="onTableUpdate"></resource-table>
-        <resource-grid v-else-if="showType === 1" :bucket="bucket"
-                       @on-update="onTableUpdate"></resource-grid>
-        <Modal
-                v-model="model_DeleteAsk"
-                title="确认删除文件？"
-                @on-ok="callRemove"
-                @on-cancel="cancelModal">
-            <p v-if="model_DeleteAskKey">{{model_DeleteAskKey}}</p>
-            <template v-else>
+        <!--<resource-table v-if="showType === 0" :bucket="bucket"
+                        @on-update="onFilesUpdate"></resource-table>-->
+        <!--<resource-grid v-else-if="showType === 1" :bucket="bucket"
+                       @on-update="onFilesUpdate"></resource-grid>-->
+        <resource-grid :bucket="bucket" :type="showType" key="1"
+                       @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
+        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
+               @on-ok="callRemove" @on-cancel="cancelModal">
+            <template>
                 <p v-for="file in bucket.selection">{{file.key}}</p>
             </template>
         </Modal>
         <!-- 筛选文件-->
-        <Modal
-                v-model="model_Query.show"
-                title="请选择你要筛选的范围"
-                @on-ok="filter">
+        <Modal v-model="model_Query.show" title="请选择你要筛选的范围" @on-ok="filter">
             <span>按文件大小：</span>
             {{tipFormatSize(model_Query.fileSize[0])}} ~ {{tipFormatSize(model_Query.fileSize[1])}}
             <Slider v-model="model_Query.fileSize" range :min='0' :max="model_Query.sizeArray.length -1"
@@ -99,10 +174,10 @@
         data() {
             return {
                 bucket: null,
-                showType: 0, //0:列表 1:grid
-                model_DeleteAsk_Multiple: false,
+                showType: 1, //0:列表 1:folder
+                folderPath: null,
+                folderKeyWord: null,
                 model_DeleteAsk: false,
-                model_DeleteAskKey: '',
                 model_Query: {
                     show: false,
                     fileSize: [0, 0],
@@ -118,7 +193,16 @@
                 privatebucket: types.setup.setup_privatebucket,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
                 customeDomains: types.setup.setup_customedomain
-            })
+            }),
+            totalSize() {
+                let totalSzie = 0;
+                if (this.bucket && this.bucket.files) {
+                    this.bucket.files.forEach((item) => {
+                        totalSzie += item.fsize;
+                    });
+                }
+                return util.formatFileSize(totalSzie);
+            }
         },
         watch: {
             bucketName: function (val, oldVal) {
@@ -155,7 +239,11 @@
              *  search：关键字
              */
             doSearch: function (dir, search) {
-                this.bucket.search(dir, search);
+                if (this.showType === 2) {
+                    this.folderKeyWord = search;
+                } else {
+                    this.bucket.search(dir, search);
+                }
             },
             /**
              * 切换目录
@@ -164,8 +252,10 @@
             changeDir: function (dir) {
                 this.bucket.setCurrentDir(dir);
             },
-            askRemove(key) {
-                this.model_DeleteAskKey = key;
+            /**
+             * 根据配置,是否弹出确认框
+             */
+            askRemove() {
                 if (this.setup_deleteNoAsk) {
                     this.callRemove();
                 } else {
@@ -173,15 +263,10 @@
                 }
             },
             callRemove() {
-                if (this.model_DeleteAskKey) {
-                    this.model_DeleteAskKey = '';
-                    EventBus.$emit(Constants.Event.remove);
-                } else {
-                    EventBus.$emit(Constants.Event.removes);
-                }
+                EventBus.$emit(Constants.Event.removes);
             },
             cancelModal() {
-                this.model_DeleteAskKey = '';
+                this.bucket.selection = [];
             },
             query() {
                 this.model_Query.show = true;
@@ -237,25 +322,27 @@
             changeShowType(type) {
                 this.bucket.selection = [];
                 this.showType = type;
+
+                if (type === 2) {
+                    this.changeDir('');
+                }
             },
             /**
              * table数据项更新回调
              * @param ret 变更的资源
              * @param action 触发的动作,upload/remove
              */
-            onTableUpdate(ret, action) {
-                if (action === 'remove') {//如果是删除操作,直接更新当前目录
-                    this.getResources(this.bucket.currentDir);
-                } else {
-                    let dir = '';
-                    if (ret && ret.key) {
-                        dir = util.getPrefix(ret.key);
-                        this.bucket.setCurrentDir(dir);
-                    } else {
-                        this.getResources();
-                    }
+            onFilesUpdate(ret, action) {
+                this.getResources();
+            },
+            changeFolderPath(index) {
+                if (index === -1) {
+                    this.bucket.folderPath = '';
+                    return;
                 }
-            }
+                let arrays = this.bucket.folderPath.split('/');
+                this.bucket.folderPath = arrays.slice(0, index + 1).join('/');
+            },
         }
 
     };

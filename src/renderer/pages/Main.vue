@@ -3,22 +3,28 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon type="navicon" size="32"></Icon>
+                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
+                    <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
-                <Menu ref='menu' theme="dark" width="auto" v-if="buckets && buckets.length > 0"
+                <!--light dark-->
+                <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="privatebucket.indexOf(item) !==  -1 ? 'android-lock' : 'folder'"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item}}</span>
+                            <template v-if="menuState">
+                                <Icon :size="item.size ? item.icon : 25"
+                                      :type="privatebucket.indexOf(item) !==  -1 ? 'md-lock' : 'md-folder'"></Icon>
+                                <span class="layout-text">{{item}}</span>
+                            </template>
+                            <template v-else>
+                                <span class="layout-icon">{{item.substring(0,1)}}</span>
+                            </template>
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
                         <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
-                            <Icon :style="iconStyle" :size="parseInt(iconStyle.width)"
-                                  :type="item.icon"></Icon>
-                            <span class="layout-text" :class="{'layout-hide-text': !menuState}">{{item.title}}</span>
+                            <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
+                            <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
                     </Menu-group>
                 </Menu>
@@ -30,10 +36,35 @@
                     </Poptip>
                 </div>
             </i-col>
-            <i-col :span="menuSpace.right">
+            <i-col :span="menuSpace.right" class="layout-menu-right">
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
+        <Spin size="large" fix v-if="loading.show">
+            <div>
+
+            </div>
+            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
+            <span>{{loading.message}}</span>
+        </Spin>
+        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
+               :mask-closable="false">
+            <div class="choice-cos">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
+                    <div class="choice-view" @click="selectCOS(item)">
+                        <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
+                        <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
+                        <span class="name">{{item.name}}</span>
+                    </div>
+                </Card>
+            </div>
+            <div slot="footer"></div>
+            <Icon></Icon>
+        </Modal>
+        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
+            <div>{{status.message}}</div>
+            <div>{{status.path}}</div>
+        </div>
     </div>
 </template>
 <script>
@@ -41,18 +72,19 @@
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
 
-    import {Constants, mixins} from '../service/index';
+    import {Constants, mixins, EventBus} from '../service/index';
     import brand from "@/cos/brand";
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
+                cos: [],
+                cos_key: '',
+                cos_name: '',
+                cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
-                iconStyle: {
-                    width: '25px'
-                },
                 appVersion: pkg.version,
                 version: {
                     github: Constants.URL.github,
@@ -61,14 +93,28 @@
                     info: ''
                 },
                 menus: [{
+                    name: Constants.Key.app_switch,
+                    icon: 'md-switch',
+                    title: '切换'
+                }, {
                     name: Constants.Key.app_setup,
-                    icon: 'ios-gear',
+                    icon: 'md-cog',
                     title: '设置'
                 }, {
                     name: Constants.Key.app_logout,
-                    icon: 'android-exit',
+                    icon: 'md-exit',
                     title: '注销'
-                }]
+                }],
+                status: {
+                    show: false,
+                    path: '',
+                    message: '',
+                },
+                loading: {
+                    show: false,
+                    message: '',
+                    flag:'' //可以用作计时的标记
+                }
             };
         },
         computed: {
@@ -94,6 +140,13 @@
             this[types.setup.setup_init]();
 
             this.checkVersion();
+
+            EventBus.$on(Constants.Event.statusview, (option) => {
+                this.status = Object.assign(this.status, option);
+            });
+            EventBus.$on(Constants.Event.loading, (option) => {
+                this.loading = option;
+            });
         },
         methods: {
             ...mapActions([
@@ -102,7 +155,24 @@
                 types.setup.setup_init,
             ]),
             initCOS() {
+                this.$storage.getCOS((cos) => {
+                    if (cos.length === 0) {
+                        this.$router.push({path: Constants.PageName.login});
+                    } else if (cos.length === 1) {
+                        this.selectCOS(cos[0]);
+                    } else {
+                        this.cos = cos;
+                        this.cosChoiceModel = true;
+                    }
+                });
+            },
+            selectCOS(item) {
+                this.cos_name = item.name + "COS客户端";
+                document.getElementById("title") && (document.getElementById("title").innerText = item.name + "COS客户端");
+                this.cos_key = item.key;
+                this.$storage.setName(item.key);
                 this.$storage.initCOS((result) => {
+                    this.cosChoiceModel = false;
                     if (result) {
                         this.getBuckets();
                     } else {
@@ -113,14 +183,14 @@
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
-                        this.$Message.info('获取buckets信息失败. 请确认七牛密钥信息正确,且已创建至少一个存储空间');
+                        this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
                     } else {
                         switch (this.$storage.name) {
-                            case brand.qiniu:
+                            case brand.qiniu.key:
                                 this[types.app.a_buckets](data);
                                 break;
-                            case brand.tencent:
+                            case brand.tencent.key:
                                 let buckets = [];
                                 data.forEach((value) => {
                                     buckets.push(value.Name);
@@ -153,6 +223,32 @@
                     default:
                         this.bucketName = name;
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        break;
+                    case Constants.Key.app_switch:
+                        this.$storage.getCOS((cos) => {
+                            if (cos.length === 0) {
+                                this.$router.push({path: Constants.PageName.login});
+                            } else if (cos.length === 1) {
+                                this.$Modal.confirm({
+                                    title: '切换账号',
+                                    render: (h) => {
+                                        return h('div', {
+                                            style: {
+                                                'padding-top': '10px'
+                                            }
+                                        }, [
+                                            '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
+                                        ]);
+                                    },
+                                    onOk: () => {
+                                        this.$router.push({path: Constants.PageName.login});
+                                    }
+                                });
+                            } else {
+                                this.cos = cos;
+                                this.cosChoiceModel = true;
+                            }
+                        });
                         break;
                     case Constants.Key.app_logout:
                         this.$Modal.confirm({
@@ -189,51 +285,69 @@
     };
 </script>
 <style lang="scss" scoped>
+    @import "../style/params";
+
     .layout {
         height: 100%;
-        background: #f5f7f9;
-        position: relative;
-        border-radius: 4px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
         .ivu-row-flex {
             height: 100%;
         }
 
         .layout-menu-left {
-            background: #464c5b;
+            background: $menu-bg;
+            color: $menu-color;
             display: flex;
             flex-direction: column;
+            /*border-radius: 4px;*/
+            border-bottom-right-radius: 4px;
+            padding-top: 20px;
+            -webkit-app-region: drag;
+            z-index: 1;
+            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
 
             .navicon_btn {
+                font-weight: bold;
                 text-align: left;
-                color: #c5c5c5;
+                padding-left: 22px;
+                color: $menu-color;
                 &:hover {
-                    color: #57a3f3;
+                    color: $primary;
+                }
+                & > span {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                 }
             }
 
             .ivu-menu-vertical {
                 flex-grow: 1;
-            }
-
-            .ivu-menu-item {
-                padding: 8px 24px;
-                display: flex;
-                align-items: center;
-                .layout-text {
-                    margin-left: 0px;
+                .ivu-menu-item {
+                    padding: 8px 24px;
+                    display: flex;
+                    align-items: center;
+                    .layout-text {
+                        margin-left: 0;
+                        line-height: 25px;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                    }
+                    .layout-icon {
+                        margin-left: 0;
+                        line-height: 25px;
+                        background: rgba(255, 255, 255, .7);
+                        width: 25px;
+                        color: $fontColor;
+                        text-align: center;
+                        text-transform: capitalize;
+                    }
                 }
-            }
-
-            .layout-hide-text {
-                display: none;
             }
 
             .version {
                 padding: 10px 20px;
-                color: #c5c5c5;
+                /*color: #c5c5c5;*/
                 &-new {
                     color: #ff3605;
                     cursor: pointer;
@@ -243,6 +357,79 @@
                 }
             }
         }
+
+        .layout-menu-right {
+        }
     }
 
+    .choice-cos {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        .choice-view {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            .name {
+                font-size: 13px;
+                margin-top: 5px;
+            }
+        }
+    }
+
+    .status-view {
+        opacity: 1;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        left: 0;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0.51);
+        color: #FFFFFF;
+        padding: 10px;
+        font-size: 12px;
+        z-index: 901;
+        transition: opacity 1s;
+    }
+
+    .status-view-none {
+        opacity: 0;
+        transition: opacity 2s;
+    }
+</style>
+<style lang="scss">
+    @import "../style/params";
+
+    .navicon_btn {
+        & > span {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            & > span {
+                margin-left: 6px;
+            }
+        }
+    }
+
+    .vertical-center-modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .ivu-modal {
+            top: 0;
+        }
+    }
+
+    .ivu-modal-footer {
+        border-top: 0;
+        /*padding: 0;*/
+    }
+
+    .cosModel {
+        .ivu-modal-footer {
+            padding: 0;
+            border-top: 0;
+        }
+    }
 </style>

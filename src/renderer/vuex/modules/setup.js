@@ -1,8 +1,8 @@
 /**
  * Created by zhangweiwei on 2018/08/15.
  */
-import * as types from '../mutation-types';
-import {util, storagePromise, Constants} from '../../service';
+import {util, storagePromise, Constants} from '@/service';
+import * as types from '@/vuex/mutation-types';
 
 function setAppSetup(app) {
     storagePromise.set(Constants.Key.configuration, app);
@@ -11,20 +11,27 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
-            deleteNoAsk: false,//文件删除前是否弹出对话框
-            copyType: 'markdown',
+            deleteNoAsk: false,                                     //文件删除前是否弹出对话框
+            isOverwrite: true,                                     //上传时是否直接覆盖文件
+            copyType: 'url',
+            brand: '',
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
             imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
-            downloaddir: '',//设置文件的下载路径
-            privatebucket: [],//七牛私有空间不能通过api获取,只能用户手动标记
-            privatedeadline: 3600//默认1小时
+            downloaddir: '',                                        //设置文件的下载路径
+            privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
+            privatedeadline: 3600,                                  //默认1小时
+            theme: 'auto'
         }
     },
     mutations: {
         [types.setup.setup_privatebucket](state, value) {
             state.setup.privatebucket = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.setup_isOverwrite](state, value) {
+            state.setup.isOverwrite = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_deadline](state, value) {
@@ -53,6 +60,7 @@ export default {
         [types.setup.setup_savedir](state, value) {
             state.setup.bucket_name = value[0];
             state.setup.bucket_dir = value[1];
+            state.setup.brand = value[2];
 
             setAppSetup(state.setup);
         },
@@ -60,11 +68,18 @@ export default {
             state.setup.imagestyle = value;
             setAppSetup(state.setup);
         },
+        [types.setup.setup_theme](state, value) {
+            state.setup.theme = value;
+            setAppSetup(state.setup);
+        },
         [types.setup.setup_init](state, value) {
             state.setup = value;
         },
     },
     actions: {
+        [types.setup.setup_a_isOverwrite](context, value) {
+            context.commit(types.setup.setup_isOverwrite, value);
+        },
         [types.setup.setup_a_deadline](context, value) {
             context.commit(types.setup.setup_deadline, value);
         },
@@ -89,6 +104,9 @@ export default {
         [types.setup.setup_a_customedomain](context, value) {
             context.commit(types.setup.setup_customedomain, value);
         },
+        [types.setup.setup_a_theme](context, value) {
+            context.commit(types.setup.setup_theme, value);
+        },
         async [types.setup.setup_init](context, callback) {
             let app = await storagePromise.get(Constants.Key.configuration);
             if (!util.isEmptyObject(app)) {
@@ -98,6 +116,9 @@ export default {
         },
     },
     getters: {
+        [types.setup.setup_isOverwrite](state) {
+            return ('isOverwrite' in state.setup) ? state.setup.isOverwrite : true;
+        },
         [types.setup.setup_deadline](state) {
             return ('privatedeadline' in state.setup) ? state.setup.privatedeadline : 3600;
         },
@@ -116,6 +137,9 @@ export default {
         [types.setup.setup_copyType](state) {
             return ('copyType' in state.setup) ? state.setup.copyType : 'url';
         },
+        [types.setup.setup_brand](state) {
+            return ('brand' in state.setup) ? state.setup.brand : '';
+        },
         [types.setup.setup_bucket_name](state) {
             return ('bucket_name' in state.setup) ? state.setup.bucket_name : '';
         },
@@ -124,6 +148,9 @@ export default {
         },
         [types.setup.setup_customedomain](state) {
             return ('customedomain' in state.setup) ? state.setup.customedomain : {};
+        },
+        [types.setup.setup_theme](state) {
+            return ('theme' in state.setup) ? state.setup.theme : 'auto';
         }
     }
 };

@@ -1,38 +1,21 @@
-import {Constants} from '../service/index';
-import * as qiniu from '../cos/qiniu';
+const fs = require('fs');
+import {Constants, util} from '../service/index';
+import baseBucket from './baseBucket';
+import * as tencent from './tencent';
 
 const DELIMITER = '/';
 
-class Bucket {
+class Bucket extends baseBucket {
 
-    constructor(name) {
-        this.reset();
-
-        name && (this.name = name);
+    constructor(name, cos) {
+        super(name, cos);
     }
 
     reset() {
-        this.name = '';
-        this.domains = [];
-        this.isprivate = false;
+        super.reset();
 
-        this.dirs = [];
-        this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
-
-        //当前选择dir
-        this.currentDir = '';
-        //当前选择domain
-        this.domain = '';
-        //当前dir加载返回的marker
-        this.marker = '';
-
-        //已选的文件列表
-        this.selection = [];
-        //当前显示文件列表
-        this.files = [];
-        //其他文件列表(不含有请求时delimiter的文件列表)
-        this.withoutDelimiterFiles = [];
+        //腾讯COS字段
+        this.location = '';
     }
 
     /**
@@ -45,13 +28,19 @@ class Bucket {
     bindPage(vm) {
         this.vm = vm;
 
-        console.log(this.vm.buckets_info);
-        //Location
-        /*this.checkPrivate();
+        this.vm.buckets_info.forEach((item) => {
+            if (item.Name === this.name) {
+                this.location = item.Location;
+            }
+        });
 
+        if (this.location) {
+            // this.getDirs();
+            this.getResources();
+        }
+        /*this.checkPrivate();
         this.getDomains();
-        this.getDirs();
-        this.getResources();*/
+        */
     }
 
     /**
@@ -70,38 +59,10 @@ class Bucket {
         return this.dirs.slice(2);
     }
 
-    /**
-     * 检测是否属于私密空间
-     */
     checkPrivate() {
-        let privateBuckets = this.vm.privatebucket;
-        this.isprivate = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1);
     }
 
-    /**
-     * 设置domains
-     * 如果正常读取domains,默认匹配最后一个(目前clouddn.com域名在最前,正好最后可以匹配自定义域名)
-     * 如果domains为空,查询customeDomains
-     */
     getDomains() {
-        this.vm.doRequset(qiniu.methods.domains, {tbl: this.name}, (response) => {
-            if (!response)
-                return;
-
-            let domains = response.data;
-            let customeDomains = this.vm.customeDomains;
-            if (domains && domains.length > 0) {
-                this.domains = domains;
-                //默认选择最后一个域名
-                this.domain = this.domains[this.domains.length - 1];
-            } else {
-                if (customeDomains && customeDomains[this.name]) {
-                    this.domain = customeDomains[this.name];
-                } else {
-                    this.domain = '';
-                }
-            }
-        });
     }
 
     /**
@@ -109,57 +70,74 @@ class Bucket {
      * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
      */
     getDirs(marker) {//获取目录
-        let data = {
-            bucket: this.name,
-            delimiter: DELIMITER,
-            limit: 1000
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+            Delimiter: DELIMITER,
+            MaxKeys: 1000,
         };
         if (marker) {
-            data.marker = marker;
+            params.Marker = marker;
         }
 
-        this.vm.doRequset(qiniu.methods.resources, data, (response) => {
-            if (!response)
-                return;
+        this.cos.getBucket(params, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                if (data.CommonPrefixes) {
+                    data.CommonPrefixes.forEach((item) => {
+                        this.dirs.push(item.Prefix);
+                    });
+                }
 
-            let data = response.data;
-            if (data.commonPrefixes) {
-                this.dirs = this.dirs.concat(data.commonPrefixes);
+                if (data.Contents) {
+                    data.Contents.forEach((item) => {
+                        this.withoutDelimiterFiles.push(util.wrapperFile(item));
+                    });
+                }
+
+                data.NextMarker && this.getDirs(data.NextMarker);
             }
-
-            if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
-                this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
-            }
-
-            response.data.marker && this.getDirs(response.data.marker);
         });
     }
 
 
     getResources(keyword) {
-        //重置多选数组
-        this.selection = [];
-
-        let param = {
-            bucket: this.name,
-            limit: 100
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+            MaxKeys: 1000,
         };
 
         if (keyword) {
-            param.prefix = keyword;
+            params.Prefix = keyword;
         }
 
         if (this.marker) {
-            param.marker = this.marker;
+            params.Marker = this.marker;
         }
 
-        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
-            if (!response)
-                return;
+        this.cos.getBucket(params, (err, data) => {
+            if (err) {
+                console.log(err);
+            } else {
+                if (!this.marker) {
+                    this.files = [];
+                }
+                let files = [];
+                data.Contents.forEach((item) => {
+                    if (parseInt(item.Size) !== 0) {
+                        files.push(util.wrapperFile(item));
+                    }
+                });
+                this.files = files;
 
-            let data = response.data;
-            this.files = this.marker ? this.files.concat(data.items) : data.items;
-            this.marker = data.marker ? data.marker : '';
+                this.marker = data.NextMarker ? data.NextMarker : '';
+
+                if (this.marker) {
+                    this.getResources(keyword);
+                }
+            }
         });
     }
 
@@ -190,25 +168,38 @@ class Bucket {
 
     createFile(_param, type, callback) {
         let param = {
-            bucket: this.name
+            Bucket: this.name,
+            Region: this.location,
+            Key: _param.key,
+            // Body: fs.readFileSync(_param.path),//onProgress 无响应
+            Body: fs.createReadStream(_param.path),
+            ContentLength: fs.statSync(_param.path).size,
+            onProgress: function (progressData) {
+                _param.progressCallback(progressData.percent * 100);
+            }
         };
-        Object.assign(param, _param);
-        if (type === 'fetch') {
-            qiniu.fetch(param, callback);
-        } else {
-            qiniu.upload(param, callback);
-        }
+
+        this.cos.putObject(param, (err, data) => {
+            callback(err, {key: _param.key});
+        });
     }
 
     removeFile(item, callback) {
-        let param = {
-            key: item.key,
-            bucket: this.name
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
         };
 
-        qiniu.remove(param, (ret) => {
-            callback && callback(ret);
-        });
+        tencent.remove(params, item, callback);
+    }
+
+    renameFile(items, callback) {
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+        };
+
+        tencent.rename(params, items, callback);
     }
 
     /**
@@ -219,7 +210,15 @@ class Bucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
+        let params = {
+            Bucket: this.name,
+            Region: this.location,
+            Key: key
+        };
+
+        return this.cos.getObjectUrl(params, (err, data) => {
+            //console.log(err || data);
+        });
     }
 }
 

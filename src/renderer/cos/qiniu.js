@@ -6,6 +6,8 @@ import Request from '../api/API';
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
+//默认文件的分隔符
+const DELIMITER = '/';
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
@@ -27,7 +29,7 @@ function init(param) {
 function getBuckets(callback) {
     let error = null;
     let request = new Request();
-    request.setAuthorization(httpAuthorization(methods.buckets));
+    request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
         callback(null, result.data);
     }).catch((error) => {
@@ -45,7 +47,7 @@ function getToken() {
  * @param url
  * @returns {*}
  */
-function httpAuthorization(url) {
+function _httpAuthorization(url) {
     return qiniu.util.generateAccessToken(getToken(), url, null);
 }
 
@@ -65,6 +67,22 @@ function generateUrl(domain, key, deadline) {
     } else {
         return PROTOCOL + domain + '/' + encodeURI(key);
     }
+}
+
+/**
+ * 返回当前bucket文件列表
+ */
+function list(params, callback) {
+    let config = new qiniu.conf.Config();
+    let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
+
+    bucketManager.listPrefix(params.bucket, params, function (respErr, respBody, respInfo) {
+        if (respBody.error) {
+            respErr = {"error": respBody.error, 'status': respBody.status};
+        }
+        callback(respErr, respBody, respInfo);
+    });
+
 }
 
 /**
@@ -89,7 +107,7 @@ function fetch(params, callback) {
  */
 function upload(params, callback) {
     let options = {
-        scope: params.bucket,
+        scope: params.isOverwrite ? params.bucket : `${params.bucket}:${params.key}`,
     };
     let putPolicy = new qiniu.rs.PutPolicy(options);
     let uploadToken = putPolicy.uploadToken(getToken());
@@ -100,7 +118,7 @@ function upload(params, callback) {
     let putExtra = new qiniu.resume_up.PutExtra();
     putExtra.progressCallback = (uploadBytes, totalBytes) => {
         if (params.progressCallback) {
-            params.progressCallback(parseInt((uploadBytes / totalBytes * 10000)) / 100);
+            params.progressCallback(parseInt((uploadBytes / totalBytes * 100)));
         }
     };
 
@@ -114,24 +132,75 @@ function upload(params, callback) {
 }
 
 /**
- * 删除文件操作
+ * 批量修改文件名
+ * @param bucket    名称
+ * @param items     需要处理的文件
+ * @param replace   需要处理的文件
+ * @param callback
  */
-function remove(params, callback) {
+function rename(bucket, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+
+    //批量删除
+    let operations = [];
+    items.forEach((item) => {
+        operations.push(qiniu.rs.moveOp(bucket, item.key, bucket, item._key));
+    });
+
+    _batch(operations, callback);
+}
+
+/**
+ * 批量删除文件
+ * @param bucket    名称
+ * @param items     需要处理的文件
+ * @param callback
+ */
+function remove(bucket, items, callback) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+
+    //批量删除
+    let operations = [];
+    items.forEach((item) => {
+        operations.push(qiniu.rs.deleteOp(bucket, item.key));
+    });
+
+    _batch(operations, callback);
+}
+
+//https://github.com/qiniu/nodejs-sdk/blob/master/examples/rs_batch_delete.js
+function _batch(operations, callback) {
     let config = new qiniu.conf.Config();
     let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
 
-    bucketManager.delete(params.bucket, params.key, function (err, respBody, respInfo) {
-        console.log(respBody, respInfo);
-        if (!err) {
-            callback(respInfo);
-        } else {
+    bucketManager.batch(operations, function (err, respBody, respInfo) {
+        if (err) {
             console.log(err);
+        } else {
+            // 200 is success, 298 is part success
+            if (parseInt(respInfo.statusCode / 100) === 2) {
+                respBody.forEach(function (item) {
+                    if (item.code === 200) {
+                        console.log(item.code + "\tsuccess");
+                    } else {
+                        console.log(item.code + "\t" + item.data.error);
+                    }
+                });
+                callback(respInfo);
+            } else {
+                console.log(respInfo, respBody);
+            }
         }
     });
+
 }
 
 function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, httpAuthorization, generateUrl, remove, upload, fetch, methods, generateBucket,};
+export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, rename, upload, fetch, methods, DELIMITER};

@@ -57,6 +57,7 @@
     import * as types from '../vuex/mutation-types';
     import {util, Constants, storagePromise, mixins} from '../service';
     import storage from 'electron-json-storage';
+    import brand from "@/cos/brand";
 
     let ipc;
 
@@ -78,13 +79,16 @@
             })
         },
         async created() {
-            document.getElementById('title') && document.getElementById('title').remove();
+            ipc = this.$electron.ipcRenderer;
 
             let app = await storagePromise.get(Constants.Key.configuration);
-            if (app && app.bucket_name) {
-                this.$storage.setName('qiniu');
+            if (app && app.brand && app.bucket_name) {
+                this.$storage.setName(app.brand);
                 this.$storage.initCOS((result) => {
                     if (result) {
+                        ipc.send(Constants.Listener.setBrand, {
+                            key: app.brand
+                        });
                         this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
                             this.domains = response.data;
                         });
@@ -93,21 +97,19 @@
                     }
                 });
             } else {
-                console.error('未设置bucket_name');
+                console.error('未设置托盘默认信息');
             }
 
-            ipc = this.$electron.ipcRenderer;
             ipc.removeAllListeners(Constants.Listener.uploadFile);
             ipc.on(Constants.Listener.uploadFile, (event, files) => {
-                this.files = files;
                 storage.get(Constants.Key.configuration, (error, app) => {
-                    if (app && app.bucket_name) {
+                    if (app && app.brand && app.bucket_name) {
+                        this.files = files;
                         this.config = app;
                         this.doUploadFile();
                     } else {
                         ipc.send(Constants.Listener.showNotifier, {
-                            title: 'qiniu-client',
-                            message: '请先设置上传空间',
+                            message: '请先设置上传空间[设置->托盘上传位置]',
                         });
                         this.updateStatus('');
                     }
@@ -125,7 +127,7 @@
             sendNotify() {
                 ipc.send(Constants.Listener.showNotifier, {
                     title: '上传完成',
-                    message: '上传完成  (＾－＾)V',
+                    message: '上传完成',
                     icon: 'notify-success.png'
                 });
             },
@@ -138,18 +140,19 @@
                     this.uploadFile(this.files[this.current - 1]);
                 }
             },
-            uploadFile(filePath) {
-                let key = (this.config.bucket_dir ? this.config.bucket_dir + '/' : '') + util.getName(filePath);
-
+            uploadFile(item) {
+                this.updateStatus(`${this.current}/${this.files.length}`);
+                let key = '';
+                key = (this.config.bucket_dir ? this.config.bucket_dir + '/' : '') + util.getFileNameWithFolder(item);
                 let log = {
-                    path: filePath,
-                    key: key
+                    path: item.path,
+                    key
                 };
                 try {
                     this.$storage.cos.upload({
                         bucket: this.config.bucket_name,
-                        key: key,
-                        path: filePath,
+                        key,
+                        path: item.path,
                         progressCallback: (progress) => {
                             if (progress !== 100) {
                                 this.updateStatus(`(${progress}%)${this.current}/${this.files.length}`);
@@ -180,7 +183,7 @@
             },
             copy(key) {
                 let url = this.$storage.cos.generateUrl(this.domains[0], key);
-                util.setClipboardText(this, this.config.copyType, url);
+                util.getClipboardText(this.config.copyType, url);
             },
             openInFolder(path) {
                 this.$electron.shell.showItemInFolder(path);

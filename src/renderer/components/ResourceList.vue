@@ -1,24 +1,17 @@
 <style lang="scss" scoped>
-    .layout-content {
-        margin: 15px;
-        flex-grow: 1;
-        background: #fff;
-    }
 
 </style>
 <template>
-    <div class="layout-content">
-        <Table ref="table" border :columns="columns" :context="self"
-               :height="tableHeight" :data="bucket.files" no-data-text="暂无数据"
-               @on-selection-change="onSelectionChange"></Table>
-    </div>
+    <Table ref="table" border :columns="columns" :context="self"
+           :height="tableHeight" :data="files" no-data-text="暂无数据"
+           @on-selection-change="onSelectionChange"></Table>
 </template>
 <script>
     import {Constants, EventBus, util} from '../service/index';
     import mixin_resource from '../mixins/mixin-resource';
 
     export default {
-        name: 'ResourceTable',
+        name: 'ResourceList',
         mixins: [mixin_resource],
         data() {
             return {
@@ -30,7 +23,13 @@
                         width: 50,
                         align: 'center'
                     },
-                    {title: '文件名', key: 'key', ellipsis: false},
+                    {
+                        title: '文件名', key: 'key', ellipsis: false,
+                        render(h, item) {
+                            let name = item.row.key ? item.row.key : item.row._name;
+                            return h('span', {}, name);
+                        }
+                    },
                     {
                         title: '大小', key: 'fsize', sortable: true, width: 100,
                         render(h, item) {
@@ -91,10 +90,19 @@
                     }],
             };
         },
+        props: {
+            files: {
+                type: Array,
+                default: []
+            },
+        },
         created() {
         },
         mounted() {
-            this.updateTableSize();
+            this.$nextTick(() => {
+                this.updateTableSize();
+            });
+
             window.onresize = () => {
                 this.updateTableSize();
             };
@@ -104,7 +112,7 @@
                 this.bucket.selection = selection;
             },
             updateTableSize() {
-                this.tableHeight = this.$el.clientHeight;
+                this.tableHeight = this.$parent.$el.clientHeight;
             },
         }
     };

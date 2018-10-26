@@ -1,3 +1,6 @@
+//默认文件的分隔符
+export const DELIMITER = '/';
+
 export const protocol = 'http://';
 
 export const method = {
@@ -13,14 +16,16 @@ export const Key = {
     withoutDelimiter: '__withoutDelimiter__',
     filter: '__filter__',
     app_setup: '__app__setup__',
+    app_switch: '__app__switch__',
     app_logout: '__app__logout__',
-    configuration:'configuration',
+    configuration: 'configuration',
 };
 
 export const PageName = {
     login: 'login',
     main: 'main',
     tray: 'tray',
+    about: 'about',
     bucketPage: 'bucketPage',
     setup: 'setup',
 };
@@ -34,7 +39,9 @@ export const URL = {
 export const Event = {
     removes: 'removes',
     remove: 'remove',
-    download: 'download'
+    download: 'download',
+    statusview: 'statusview',
+    loading: 'loading'
 };
 
 export const CopyType = {
@@ -56,4 +63,8 @@ export const Listener = {
     updateDownloadProgress: 'updateDownloadProgress',
     openFileDialog: 'open-file-dialog',
     selectedDirectory: 'selected-directory',
+    readDirectory: 'read-directory',
+    setBrand: 'setBrand',
+    preview: 'preview',
+    darkMode: 'darkMode'
 };
