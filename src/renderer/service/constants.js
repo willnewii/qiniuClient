@@ -1,3 +1,6 @@
+//默认文件的分隔符
+export const DELIMITER = '/';
+
 export const protocol = 'http://';
 
 export const method = {

@@ -1,8 +1,10 @@
-import {Constants} from '../service/index';
+import {Constants, EventBus} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
 
-class Bucket extends baseBucket{
+let tempFiles = [];
+
+class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
@@ -25,7 +27,13 @@ class Bucket extends baseBucket{
         this.checkPrivate();
 
         this.getDomains();
-        // this.getDirs();
+
+        EventBus.$emit(Constants.Event.loading, {
+            show: true,
+            message: '数据加载中,请稍后',
+            flag: 'getResources'
+        });
+        console.time('getResources');
         this.getResources();
     }
 
@@ -93,11 +101,19 @@ class Bucket extends baseBucket{
             data.items.forEach((item, index) => {
                 data.items[index].putTime = item.putTime / 10000;
             });
-            this.files = this.marker ? this.files.concat(data.items) : data.items;
+
+            tempFiles = this.marker ? tempFiles.concat(data.items) : data.items;
             this.marker = data.marker ? data.marker : '';
 
             if (this.marker) {
                 this.getResources(keyword);
+            } else {
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                    flag: 'getResources'
+                });
+                this.files = Object.freeze(tempFiles);
+                tempFiles = [];
             }
         });
     }

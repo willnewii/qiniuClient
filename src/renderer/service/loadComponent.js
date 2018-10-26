@@ -12,7 +12,9 @@ import 'v-contextmenu/dist/index.css';
 import 'iview/dist/styles/iview.css';
 
 Vue.use(Electron);
-Vue.use(VueLazyload);
+Vue.use(VueLazyload, {
+    throttleWait: 800,
+});
 Vue.component('virtual-list', VirtualScrollList);
 
 menuDirective.inserted = function (el, binding, vnode) {

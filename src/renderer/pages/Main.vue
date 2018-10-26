@@ -113,6 +113,7 @@
                 loading: {
                     show: false,
                     message: '',
+                    flag:'' //可以用作计时的标记
                 }
             };
         },
