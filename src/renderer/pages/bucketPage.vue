@@ -239,11 +239,7 @@
              *  search：关键字
              */
             doSearch: function (dir, search) {
-                if (this.showType === 2) {
-                    this.folderKeyWord = search;
-                } else {
-                    this.bucket.search(dir, search);
-                }
+                this.folderKeyWord = search;
             },
             /**
              * 切换目录
