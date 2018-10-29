@@ -5,6 +5,8 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(2)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
@@ -13,6 +15,8 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(2)">复制链接</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
@@ -20,9 +24,9 @@
         </v-contextmenu>
         <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
             <div v-for="(items,index1) of getFilebyGrid(files)" class="grid2-item" :key="index1">
-                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false">
+                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false"
+                      v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}">
                     <div class="item" @click="clickItem(file,files.indexOf(file))"
-                         v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}"
                          v-contextmenu="file._contextmenu" :index="files.indexOf(file)">
                         <template v-if="file._directory">
                             <div class="file">
@@ -143,7 +147,7 @@
             },
         },
         created() {
-            document.onkeydown = (event) => {
+           /* document.onkeydown = (event) => {
                 let e = event || window.event || arguments.callee.caller.arguments[0];
                 switch (e.keyCode) {
                     case 91://command(mac)
@@ -162,7 +166,7 @@
                         this.isMultiple = false;
                         break;
                 }
-            };
+            };*/
         },
         mounted() {
             console.log(this.$refs['content'].offsetHeight/29);
@@ -174,22 +178,7 @@
         methods: {
             clickItem(file, index) {
                 if (this.isMultiple) {
-                    if (this.selection.indexOf(index) !== -1) {
-                        this.selection.splice(this.selection.indexOf(index), 1);
-                    } else {
-                        this.selection.push(index);
-                    }
-
-                    let files = [];
-                    for (const i of this.selection) {
-                        let file = this.files[i];
-                        if (file._directory) {
-                            files = files.concat(this.getFilebyPath(file._path));
-                        } else {
-                            files = files.concat(file);
-                        }
-                    }
-                    this.bucket.selection = files;
+                    this.selectFile(index);
                 } else {
                     if (file._directory) {
                         this.bucket.folderPath = file._path;
@@ -236,7 +225,7 @@
                     if (folderPath === '' || temp_key.indexOf(folderPath + Constants.DELIMITER) === 0) {
 
                         if (this.keyWord) {
-                            if (temp_key.indexOf(this.keyWord) === -1) {
+                            if (temp_key.toLowerCase().indexOf(this.keyWord.toLowerCase()) === -1) {
                                 return;
                             } else {
                                 resultCount++;
@@ -419,11 +408,13 @@
             .item-even {
                 background-color: $bg-item-selected;
             }
-            .item-select {
-                color: white;
-                background-color: $primary !important;
-            }
         }
+
+        .item-select {
+            color: white;
+            background-color: $primary !important;
+        }
+
         .item {
             .name {
                 white-space: nowrap;

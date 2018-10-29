@@ -156,7 +156,7 @@
                         this.$refs['uploadModal'].uploadAction(index);
                         break;
                     case 2://搜索事件
-                        this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);
+                        this.$emit('on-search', this.search, event);
                         break;
                     case 5://刷新当前bucket
                         this.$parent.getResources();

@@ -20,6 +20,24 @@ export default {
         };
     },
     methods: {
+        selectFile(index) {
+            if (this.selection.indexOf(index) !== -1) {
+                this.selection.splice(this.selection.indexOf(index), 1);
+            } else {
+                this.selection.push(index);
+            }
+
+            let files = [];
+            for (const i of this.selection) {
+                let file = this.files[i];
+                if (file._directory) {
+                    files = files.concat(this.getFilebyPath(file._path));
+                } else {
+                    files = files.concat(file);
+                }
+            }
+            this.bucket.selection = files;
+        },
         changeFileName() {
             let files = [];
             let path = this.changeFileNameDialog.file.key;
@@ -72,6 +90,9 @@ export default {
                     this.changeFileNameDialog.input = this.files[this.contextFolderMenuIndex]._name;
                     this.changeFileNameDialog.file = this.files[this.contextFolderMenuIndex];
                     break;
+                case 3://多选
+                    this.selectFile(this.contextFolderMenuIndex);
+                    break;
             }
         },
         handleFileMenu(ref) {
@@ -100,6 +121,9 @@ export default {
                     this.changeFileNameDialog.input = util.getPostfix(file.key);
                     // this.changeFileNameDialog.input = file.key;
                     this.changeFileNameDialog.file = file;
+                    break;
+                case 5://多选
+                    this.selectFile(this.contextFileMenuIndex);
                     break;
             }
         },

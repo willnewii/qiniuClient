@@ -9,7 +9,7 @@
                 <!--light dark-->
                 <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
-                    <Menu-group title="存储空间">
+                    <Menu-group class="buckets-menu" title="存储空间">
                         <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
@@ -314,6 +314,11 @@
                     flex-direction: row;
                     align-items: center;
                 }
+            }
+
+            .buckets-menu {
+                overflow-y: scroll;
+                max-height: 400px;
             }
 
             .ivu-menu-vertical {

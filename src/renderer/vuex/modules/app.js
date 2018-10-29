@@ -6,9 +6,9 @@ import * as types from '../mutation-types';
 export default {
     state: {
         app: {
-            name: '', //cos name
-            buckets: [],
-            buckets_info: [],
+            name: '',               //cos name
+            buckets: [],            //bucket name 列表 ['','']
+            buckets_info: [],       //腾讯COS bucket对象列表
         }
 
     },
