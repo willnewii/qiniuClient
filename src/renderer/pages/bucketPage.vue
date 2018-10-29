@@ -98,6 +98,10 @@
                 <Button size="small" @click="query()" icon="md-funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
                 </Button>
+                <Button size="small" @click="cancleSelec()"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">取消
+                </Button>
 
                 <Button size="small" @click="downloads()" icon="md-download"
                         style="margin-right: 10px;"
@@ -238,15 +242,8 @@
              *  dir：目录
              *  search：关键字
              */
-            doSearch: function (dir, search) {
+            doSearch: function (search) {
                 this.folderKeyWord = search;
-            },
-            /**
-             * 切换目录
-             * @param dir
-             */
-            changeDir: function (dir) {
-                this.bucket.setCurrentDir(dir);
             },
             /**
              * 根据配置,是否弹出确认框
@@ -308,6 +305,9 @@
                     return '';
                 }
             },
+            cancleSelec() {
+                this.bucket.selection = [];
+            },
             downloads() {
                 EventBus.$emit(Constants.Event.download);
             },
@@ -318,10 +318,6 @@
             changeShowType(type) {
                 this.bucket.selection = [];
                 this.showType = type;
-
-                if (type === 2) {
-                    this.changeDir('');
-                }
             },
             /**
              * table数据项更新回调
