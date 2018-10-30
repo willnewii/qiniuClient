@@ -125,6 +125,8 @@ export default {
                 case 5://多选
                     this.selectFile(this.contextFileMenuIndex);
                     break;
+                case 6://下载
+                    this.handleDownload(file);
             }
         },
     }

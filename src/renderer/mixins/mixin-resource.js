@@ -42,7 +42,7 @@ export default {
                 show: true,
                 message: '文件下载中',
             });
-            this.downloadFiles();
+            this.resourceDownload();
         });
 
         this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.updateDownloadProgress);
@@ -53,7 +53,7 @@ export default {
             });
             if (num === 1) {
                 this.$Loading.finish();
-                this.downloadFiles();
+                this.resourceDownload();
             }
         });
     },
@@ -73,7 +73,7 @@ export default {
             this.$electron.clipboard.writeText(url);
             this.$Message.info('文件路径以复制到剪贴板');
         },
-        downloadFiles() {
+        resourceDownload() {
             if (this.bucket.selection.length > 0) {
                 this.$Loading.start();
 

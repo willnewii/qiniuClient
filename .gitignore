@@ -10,3 +10,5 @@ build/*
 node_modules/
 !.gitkeep
 .idea
+static/styles-dark.css
+static/dll/*

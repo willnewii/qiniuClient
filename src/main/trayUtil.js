@@ -5,6 +5,7 @@ import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron';
 import notifier from 'node-notifier';
 import * as util from './util';
 import * as Constants from '../renderer/service/constants';
+import pkg from '../../package';
 
 let icon_brand = 'tray_qiniu.png';
 const icon_tray = util.isWin() ? 'win_tray.png' : icon_brand;
@@ -37,9 +38,8 @@ export const createTray = function (_mainWindowId) {
     });
 
     ipcMain.on(Constants.Listener.showNotifier, function (event, option) {
-        if (option.icon) {
-            option.icon = util.getIconPath(option.icon);
-        }
+        option.icon = util.getIconPath(option.icon || 'icon.png');
+        option.title = option.title || pkg.cnname;
 
         notifier.notify(option, (err, response) => {
             event.sender.send('log', err);

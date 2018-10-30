@@ -6,7 +6,6 @@
                     <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
                     <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
-                <!--light dark-->
                 <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
@@ -36,14 +35,11 @@
                     </Poptip>
                 </div>
             </i-col>
-            <i-col :span="menuSpace.right" class="layout-menu-right">
+            <i-col :span="menuSpace.right">
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
         <Spin size="large" fix v-if="loading.show">
-            <div>
-
-            </div>
             <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
             <span>{{loading.message}}</span>
         </Spin>
@@ -298,12 +294,11 @@
             color: $menu-color;
             display: flex;
             flex-direction: column;
-            /*border-radius: 4px;*/
             border-bottom-right-radius: 4px;
             padding-top: 20px;
-            -webkit-app-region: drag;
             z-index: 1;
             box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
+            -webkit-app-region: drag;
 
             .navicon_btn {
                 font-weight: bold;
@@ -361,9 +356,6 @@
                     color: #555;
                 }
             }
-        }
-
-        .layout-menu-right {
         }
     }
 
