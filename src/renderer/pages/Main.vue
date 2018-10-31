@@ -133,8 +133,6 @@
         created: function () {
             this.initCOS();
 
-            this[types.setup.setup_init]();
-
             this.checkVersion();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
@@ -148,7 +146,6 @@
             ...mapActions([
                 types.app.a_buckets,
                 types.app.a_buckets_info,
-                types.setup.setup_init,
             ]),
             initCOS() {
                 this.$storage.getCOS((cos) => {
