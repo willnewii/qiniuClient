@@ -79,7 +79,7 @@
     },
     "build": {
         "productName": "COS管理客户端",
-        "appId": "com.willnewii.${name}",
+        "appId": "com.willnewii.qiniuclient",
         "asar": true,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
