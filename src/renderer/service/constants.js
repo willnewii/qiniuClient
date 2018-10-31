@@ -41,7 +41,8 @@ export const Event = {
     remove: 'remove',
     download: 'download',
     statusview: 'statusview',
-    loading: 'loading'
+    loading: 'loading',
+    updateFiles: 'updateFiles'
 };
 
 export const CopyType = {

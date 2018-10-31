@@ -41,7 +41,7 @@ exports.cssLoaders = function (options) {
         css: generateLoaders(),
         /*sass: generateLoaders('sass'),*/
         scss: generateLoaders('sass', {
-            data: `$platform: '${process.platform}';`
+            data: `$platform: '${process.platform}';$theme:'${options.theme}';`
         }),
     };
 };

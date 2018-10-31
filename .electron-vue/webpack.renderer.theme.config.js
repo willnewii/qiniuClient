@@ -8,14 +8,9 @@ const {dependencies} = require('../package.json');
 const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
-const MinifyPlugin = require("babel-minify-webpack-plugin");
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
-const appExtract = new ExtractTextPlugin('./static/styles.css');
+const appExtract = new ExtractTextPlugin('../../static/styles-dark.css');
 
 /**
  * List of node_modules to include in webpack bundle
@@ -33,23 +28,12 @@ let rendererConfig = {
         rules: [
             {
                 test: /\.css$/,
-                use: commonExtract.extract({
-                    fallback: 'style-loader',
-                    use: 'css-loader'
-                })
-            },
-            {
-                test: /\.html$/,
-                use: 'vue-html-loader'
+                use: 'css-loader',
             },
             {
                 test: /\.js$/,
                 use: 'babel-loader',
                 exclude: /node_modules/
-            },
-            {
-                test: /\.node$/,
-                use: 'node-loader'
             },
             {
                 test: /\.vue$/,
@@ -59,32 +43,13 @@ let rendererConfig = {
                         loaders: utils.cssLoaders({
                             extract: process.env.NODE_ENV === 'production',
                             appExtract,
-                            theme: 'light'
+                            theme: 'dark'
                         })
                     }
-
                 }
             },
             {
-                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-                use: {
-                    loader: 'url-loader',
-                    query: {
-                        limit: 10000,
-                        name: 'imgs/[name].[ext]'
-                    }
-                }
-            },
-            {
-                test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: 'media/[name].[ext]'
-                }
-            },
-            {
-                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+                test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf)(\?.*)?$/,
                 use: {
                     loader: 'url-loader',
                     query: {
@@ -101,22 +66,7 @@ let rendererConfig = {
         __filename: process.env.NODE_ENV !== 'production'
     },
     plugins: [
-        commonExtract,
         appExtract,
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: path.resolve(__dirname, '../index.ejs'),
-            minify: {
-                collapseWhitespace: true,
-                removeAttributeQuotes: true,
-                removeComments: true
-            },
-            nodeModules: process.env.NODE_ENV !== 'production'
-                ? path.resolve(__dirname, '../node_modules')
-                : false
-        }),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoEmitOnErrorsPlugin(),
     ],
     output: {
         filename: '[name].js',
@@ -162,14 +112,6 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
-        new MinifyPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: path.join(__dirname, '../static'),
-                to: path.join(__dirname, '../dist/electron/static'),
-                ignore: ['.*']
-            }
-        ]),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),
@@ -177,12 +119,6 @@ if (process.env.NODE_ENV === 'production') {
             minimize: true
         })
     );
-
-    if (process.env.ANALYZER === 'true') {
-        rendererConfig.plugins.push(
-            new BundleAnalyzerPlugin(),
-        );
-    }
 }
 
 module.exports = rendererConfig;

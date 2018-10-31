@@ -3,19 +3,16 @@
 process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
-const fs = require('fs');
-const {dependencies} = require('../package.json');
 const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
-const appExtract = new ExtractTextPlugin('./static/styles.css');
+const srcPath = path.join(__dirname, '../static/dll/');
+const commonExtract = new ExtractTextPlugin('[name].css');
 
 /**
  * List of node_modules to include in webpack bundle
@@ -27,7 +24,24 @@ const appExtract = new ExtractTextPlugin('./static/styles.css');
 let rendererConfig = {
     devtool: '#cheap-module-eval-source-map',
     entry: {
-        renderer: path.join(__dirname, '../src/renderer/main.js')
+        core: [
+            'vue',
+            'vue-router',
+            'vuex',
+            'axios',
+            'qs',
+            'vue-lazyload',
+            'vue-electron',
+            'iview',
+            'v-contextmenu/src/directive',
+            'v-contextmenu/src/index',
+            'electron-json-storage',
+            'dayjs',
+            'qiniu',
+            'cos-nodejs-sdk-v5',
+            'v-contextmenu/dist/index.css',
+            'iview/dist/styles/iview.css'
+        ]
     },
     module: {
         rules: [
@@ -56,13 +70,8 @@ let rendererConfig = {
                 use: {
                     loader: 'vue-loader',
                     options: {
-                        loaders: utils.cssLoaders({
-                            extract: process.env.NODE_ENV === 'production',
-                            appExtract,
-                            theme: 'light'
-                        })
+                        loaders: utils.cssLoaders({extract: process.env.NODE_ENV === 'production', appExtract: commonExtract})
                     }
-
                 }
             },
             {
@@ -71,7 +80,7 @@ let rendererConfig = {
                     loader: 'url-loader',
                     query: {
                         limit: 10000,
-                        name: 'imgs/[name].[ext]'
+                        name: 'imgs/[name]--[folder].[ext]'
                     }
                 }
             },
@@ -80,7 +89,7 @@ let rendererConfig = {
                 loader: 'url-loader',
                 options: {
                     limit: 10000,
-                    name: 'media/[name].[ext]'
+                    name: 'media/[name]--[folder].[ext]'
                 }
             },
             {
@@ -88,9 +97,9 @@ let rendererConfig = {
                 use: {
                     loader: 'url-loader',
                     query: {
-                        publicPath: '../',
+                        //publicPath: '../',
                         limit: 10000,
-                        name: 'fonts/[name].[ext]'
+                        name: 'fonts/[name]--[folder].[ext]'
                     }
                 }
             }
@@ -102,26 +111,17 @@ let rendererConfig = {
     },
     plugins: [
         commonExtract,
-        appExtract,
-        new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: path.resolve(__dirname, '../index.ejs'),
-            minify: {
-                collapseWhitespace: true,
-                removeAttributeQuotes: true,
-                removeComments: true
-            },
-            nodeModules: process.env.NODE_ENV !== 'production'
-                ? path.resolve(__dirname, '../node_modules')
-                : false
+        new webpack.DllPlugin({
+            path: path.join(srcPath, '[name]-mainfest.json'), // 描述依赖对应关系的json文件
+            name: '[name]_library',
+            context: __dirname // 执行的上下文环境，对之后DllReferencePlugin有用
         }),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoEmitOnErrorsPlugin(),
+        new CleanWebpackPlugin([path.join(__dirname, '../static/dll/*.*')], {root: path.join(__dirname, '../')}),
     ],
     output: {
         filename: '[name].js',
-        libraryTarget: 'commonjs2',
-        path: path.join(__dirname, '../dist/electron')
+        path: path.join(__dirname, '../static/dll/'),
+        library: '[name]_library'
     },
     resolve: {
         alias: {
@@ -132,17 +132,6 @@ let rendererConfig = {
     },
     target: 'electron-renderer'
 };
-
-let jsonPath = path.join(__dirname, '..', 'static/dll/core-mainfest.json');
-if (process.env.ENV_DLL && fs.existsSync(jsonPath)) {
-    console.log('build with DllReferencePlugin');
-    rendererConfig.plugins.push(new webpack.DllReferencePlugin({
-        context: __dirname,
-        manifest: require('../static/dll/core-mainfest.json') // 指向这个json
-    }));
-} else {
-    console.log('build without DllReferencePlugin');
-}
 
 /**
  * Adjust rendererConfig for development settings
@@ -163,13 +152,6 @@ if (process.env.NODE_ENV === 'production') {
 
     rendererConfig.plugins.push(
         new MinifyPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: path.join(__dirname, '../static'),
-                to: path.join(__dirname, '../dist/electron/static'),
-                ignore: ['.*']
-            }
-        ]),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"'
         }),

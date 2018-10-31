@@ -5,6 +5,8 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(2)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
@@ -13,33 +15,31 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(2)">复制链接</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(3)">复制链接(Markdown)</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(6)">下载</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
         <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
             <div v-for="(items,index1) of getFilebyGrid(files)" class="grid2-item" :key="index1">
-                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false">
+                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false"
+                      v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}">
                     <div class="item" @click="clickItem(file,files.indexOf(file))"
-                         v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}"
                          v-contextmenu="file._contextmenu" :index="files.indexOf(file)">
                         <template v-if="file._directory">
-                            <div class="file">
-                                <Icon :type="file._icon" size="50"></Icon>
-                            </div>
+                            <Icon class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file._name}}</span>
                         </template>
                         <template v-else>
-                            <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle"/>
-                            <img v-else-if="/image\/(svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="'http://' + bucket.domain + '/' + file.key"/>
-                            <div v-else class="file">
-                                <Icon :type="file._icon" size="50"></Icon>
-                            </div>
+                            <img v-if="/image\/(png|img|jpe?g|svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
+                                 v-lazy="getUrlbyMimeType(file)"/>
+                            <Icon v-else class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file.key | getfileNameByUrl}}</span>
                             <div class="btn">
                                 <Button shape="circle" size="small" icon="md-download"
@@ -86,12 +86,11 @@
 </template>
 <script>
     import {resource, base, contextmenu} from '../mixins/index';
-    import ResourceList from "@/components/ResourceList";
     import {EventBus, Constants, util,} from "@/service/index";
 
     export default {
         name: 'ResourceGrid',
-        components: {ResourceList},
+        components: {},
         mixins: [resource, base, contextmenu],
         props: {
             type: {
@@ -135,11 +134,13 @@
                 }
             },
             'keyWord': function () {
-                this.fileFilter((result) => {
-                    if (this.keyWord) {
-                        this.showMessage({
-                            message: `匹配到${result.searchCount}个文件`
-                        });
+                this.fileFilter({
+                    callback: (result) => {
+                        if (this.keyWord) {
+                            this.showMessage({
+                                message: `匹配到${result.searchCount}个文件`
+                            });
+                        }
                     }
                 });
             },
@@ -165,6 +166,19 @@
                         break;
                 }
             };
+            EventBus.$on(Constants.Event.updateFiles, (files) => {
+                this.files = files;
+                /*this.fileFilter({
+                    source: files,
+                    callback: (result) => {
+                        if (this.keyWord) {
+                            this.showMessage({
+                                message: `筛选到${result.searchCount}个文件`
+                            });
+                        }
+                    }
+                });*/
+            });
         },
         mounted() {
             this.remain0 = this.$refs['content'].offsetHeight / 29;
@@ -175,22 +189,7 @@
         methods: {
             clickItem(file, index) {
                 if (this.isMultiple) {
-                    if (this.selection.indexOf(index) !== -1) {
-                        this.selection.splice(this.selection.indexOf(index), 1);
-                    } else {
-                        this.selection.push(index);
-                    }
-
-                    let files = [];
-                    for (const i of this.selection) {
-                        let file = this.files[i];
-                        if (file._directory) {
-                            files = files.concat(this.getFilebyPath(file._path));
-                        } else {
-                            files = files.concat(file);
-                        }
-                    }
-                    this.bucket.selection = files;
+                    this.selectFile(index);
                 } else {
                     if (file._directory) {
                         this.bucket.folderPath = file._path;
@@ -198,6 +197,13 @@
                         this.show(file);
                     }
                 }
+            },
+            getUrlbyMimeType(file) {
+                let temp = '?' + this.setup_imagestyle;
+                if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
+                    temp = '';
+                }
+                return `http://${this.bucket.domain}/${file.key}${temp}`;
             },
             getFilebyGrid() {
                 let array = [];
@@ -222,9 +228,9 @@
             },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
-             * @param callback  回调
+             * @param option  {source , callback}
              */
-            fileFilter(callback) {
+            fileFilter(option = {}) {
                 this.selection = [];
                 this.bucket.selection = [];
                 let folderPath = this.bucket.folderPath;
@@ -232,12 +238,12 @@
                 let files = [];
                 let resultCount = 0;
 
-                this.bucket.files.forEach((file) => {
+                (option.source || this.bucket.files).forEach((file) => {
                     let temp_key = file.key;
                     if (folderPath === '' || temp_key.indexOf(folderPath + Constants.DELIMITER) === 0) {
 
                         if (this.keyWord) {
-                            if (temp_key.indexOf(this.keyWord) === -1) {
+                            if (temp_key.toLowerCase().indexOf(this.keyWord.toLowerCase()) === -1) {
                                 return;
                             } else {
                                 resultCount++;
@@ -301,12 +307,12 @@
                 this.files = [];
                 this.$nextTick(function () {
                     this.files = Object.freeze(files);
-                    callback && callback({searchCount: resultCount});
+                    option.callback && option.callback({searchCount: resultCount});
                 });
             },
             handleDownload(file) {
                 this.bucket.selection = [file];
-                this.downloadFiles();
+                this.resourceDownload();
             },
         }
     };
@@ -322,15 +328,6 @@
         background: $bg-resource;
         flex-grow: 1;
         border-radius: 4px;
-
-        .grid {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-content: flex-start;
-            padding: 10px;
-        }
 
         .grid2 {
             padding: 10px;
@@ -359,9 +356,8 @@
                 .file {
                     height: $imageWidth;
                     width: $imageWidth;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    line-height: $imageWidth;
+                    text-align: center;
                 }
                 .name {
                     font-size: 12px;
@@ -401,7 +397,6 @@
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
-
                 }
                 .date {
                     text-align: right;
@@ -420,18 +415,19 @@
             .item-even {
                 background-color: $bg-item-selected;
             }
-            .item-select {
+        }
+
+        .item {
+            .name {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            &-select {
                 color: white;
                 background-color: $primary !important;
             }
         }
-        .item {
-            .name {
-                white-space: nowrap;
-                /*font-weight: bold;*/
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-        }
+
     }
 </style>

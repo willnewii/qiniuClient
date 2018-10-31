@@ -8,6 +8,7 @@ import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
 
+
 import 'v-contextmenu/dist/index.css';
 import 'iview/dist/styles/iview.css';
 

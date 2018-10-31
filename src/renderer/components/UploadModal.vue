@@ -12,10 +12,10 @@
                    icon="trash-b" @on-click="uploadModal.path = '';filePaths=[]"/>
 
             <div class="modal-input">
-                <Select v-model="uploadModal.prepend" style="width: 100px">
+                <!--<Select v-model="uploadModal.prepend" style="width: 100px">
                     <Option value="">无</Option>
                     <Option v-for="item of bucket.getDirArray()" :key="item" :value="item">{{item}}</Option>
-                </Select>
+                </Select>-->
                 <Input v-model="uploadModal.input"/>
             </div>
 
@@ -142,6 +142,7 @@
                             let urls = this.uploadModal.path.split('\n');
 
                             urls.forEach((url) => {
+                                url = url.trim();
                                 this.filePaths.push({
                                     path: url,
                                     key: util.getPostfix(url)
@@ -164,8 +165,8 @@
                 this.filePaths = [];
                 //录入input后,换行符会变成空格
                 let urls = this.uploadModal.path.split(' ');
-                console.log(urls);
                 urls.forEach((url) => {
+                    url = url.trim();
                     this.filePaths.push({
                         path: url,
                         key: util.getPostfix(url)
@@ -179,6 +180,7 @@
                 this.uploadModal.isShow = true;
             },
             preUploadFile() {//上传文件前处理
+                this.status_count = 0;
                 this.status_total = this.filePaths.length;
                 EventBus.$emit(Constants.Event.statusview, {
                     show: true,
