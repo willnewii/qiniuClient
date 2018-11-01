@@ -3,6 +3,7 @@
  */
 const path = require('path');
 const fs = require('fs');
+const qetag = require('./util/qetag');
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
@@ -38,6 +39,45 @@ export async function wrapperFiles(_files) {
 }
 
 /**
+ * 获取文件 Etag 值
+ * @param filePath
+ * @param type
+ * @param callback
+ */
+export const getEtag = function (filePath, type, callback = null) {
+    return new Promise(function (resolve, reject) {
+        switch (type) {
+            case 0:
+                qetag(filePath, (hash) => {
+                    resolve(hash);
+                });
+                break;
+            case 1:
+                getFileMd5(filePath, (error, hash) => {
+                    resolve(hash);
+                });
+                break;
+        }
+    });
+};
+
+const getFileMd5 = function (filepath, callback) {
+    const md5 = require('crypto').createHash('md5');
+    let readStream = require('fs').createReadStream(filepath);
+
+    readStream.on('data', function (chunk) {
+        md5.update(chunk);
+    });
+    readStream.on('error', function (err) {
+        callback(err);
+    });
+    readStream.on('end', function () {
+        var hash = md5.digest('hex');
+        callback(null, hash);
+    });
+};
+
+/**
  * 是否是目录类型
  * @param path
  * @returns {Stats | boolean}
@@ -70,6 +110,12 @@ export const readDir = async function (dir) {
     return children;
 };
 
+/**
+ * 获取目录
+ * @param dir
+ * @returns {Promise<any>}
+ * @private
+ */
 function _readdir(dir) {
     return new Promise((resolve, reject) => {
         fs.readdir(dir, 'utf-8', (err, data) => {

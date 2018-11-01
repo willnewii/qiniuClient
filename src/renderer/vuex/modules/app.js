@@ -9,6 +9,7 @@ export default {
             name: '',               //cos name
             buckets: [],            //bucket name 列表 ['','']
             buckets_info: [],       //腾讯COS bucket对象列表
+            datas: [],               //上传/下载日志列表
         }
 
     },
@@ -22,6 +23,9 @@ export default {
         [types.app.name](state, value) {
             state.app.name = value;
         },
+        [types.app.datas](state, value) {
+            state.app.datas = value;
+        },
     },
     actions: {
         [types.app.a_buckets_info](context, value) {
@@ -33,6 +37,9 @@ export default {
         [types.app.a_name](context, value) {
             context.commit(types.app.name, value);
         },
+        [types.app.a_datas](context, value) {
+            context.commit(types.app.datas, value);
+        },
     },
     getters: {
         [types.app.buckets_info](state) {
@@ -43,6 +50,9 @@ export default {
         },
         [types.app.name](state) {
             return state.app.name;
+        },
+        [types.app.datas](state) {
+            return state.app.datas;
         },
     }
 };

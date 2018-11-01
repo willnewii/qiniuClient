@@ -1,3 +1,5 @@
+import EventBus from "@/service/EventBus";
+
 const fs = require('fs');
 import {Constants, util} from '../service/index';
 import baseBucket from './baseBucket';
@@ -92,7 +94,7 @@ class Bucket extends baseBucket {
 
                 if (data.Contents) {
                     data.Contents.forEach((item) => {
-                        this.withoutDelimiterFiles.push(util.wrapperFile(item));
+                        this.withoutDelimiterFiles.push(util.convertMeta(item));
                     });
                 }
 
@@ -106,7 +108,7 @@ class Bucket extends baseBucket {
         let params = {
             Bucket: this.name,
             Region: this.location,
-            MaxKeys: 1000,
+            MaxKeys: this.limit,
         };
 
         if (keyword) {
@@ -127,16 +129,12 @@ class Bucket extends baseBucket {
                 let files = [];
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
-                        files.push(util.wrapperFile(item));
+                        files.push(util.convertMeta(item, 1));
                     }
                 });
-                this.files = files;
 
-                this.marker = data.NextMarker ? data.NextMarker : '';
-
-                if (this.marker) {
-                    this.getResources(keyword);
-                }
+                data.items = files;
+                this.appendResources(data, keyword);
             }
         });
     }

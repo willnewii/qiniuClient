@@ -86,7 +86,7 @@
 </template>
 <script>
     import {resource, base, contextmenu} from '../mixins/index';
-    import {EventBus, Constants, util,} from "@/service/index";
+    import {EventBus, Constants, util, brand} from "@/service/index";
 
     export default {
         name: 'ResourceGrid',
@@ -203,7 +203,12 @@
                 if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
                     temp = '';
                 }
-                return `http://${this.bucket.domain}/${file.key}${temp}`;
+                switch (this.$storage.name) {
+                    case brand.qiniu.key:
+                        return `${this.bucket.generateUrl(file.key)}${temp}`;
+                    case brand.tencent.key:
+                        return this.bucket.generateUrl(file.key);
+                }
             },
             getFilebyGrid() {
                 let array = [];

@@ -1,4 +1,4 @@
-import * as Constants from "@/service/constants";
+import {Constants, EventBus, util} from '../service/index';
 
 class baseBucket {
 
@@ -7,6 +7,8 @@ class baseBucket {
 
         name && (this.name = name);
         this.cos = cos;
+
+        this.limit = 1000;
     }
 
     reset() {
@@ -23,6 +25,8 @@ class baseBucket {
 
         //当前bucket源数据
         this.files = [];
+        //分页加载,数据加载后先保存在tempFiles,加载完毕后在使用files
+        this.tempFiles = [];
         //已选的文件列表,批处理时使用
         this.selection = [];
         //当前路径
@@ -37,6 +41,30 @@ class baseBucket {
         this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
+    }
+
+    getResources() {
+        EventBus.$emit(Constants.Event.loading, {
+            show: true,
+            message: '数据加载中,请稍后',
+            flag: 'getResources'
+        });
+    }
+
+    appendResources(data, keyword) {
+        this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
+        this.marker = data.marker ? data.marker : '';
+
+        if (this.marker) {
+            this.getResources(keyword);
+        } else {
+            EventBus.$emit(Constants.Event.loading, {
+                show: false,
+                flag: 'getResources'
+            });
+            this.files = Object.freeze(this.tempFiles);
+            this.tempFiles = [];
+        }
     }
 }
 

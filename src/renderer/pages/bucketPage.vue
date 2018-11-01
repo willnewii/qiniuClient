@@ -98,9 +98,15 @@
                 <Button size="small" @click="showFilter" icon="md-funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
                 </Button>
+
                 <Button size="small" @click="cleanSelection()"
                         style="margin-right: 10px;"
                         v-if="bucket.selection.length > 0">取消
+                </Button>
+
+                <Button size="small" @click="allSelection()"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">全选
                 </Button>
 
                 <Button size="small" @click="downloads()" icon="md-download"
@@ -128,7 +134,7 @@
 
         <!--<resource-table v-if="showType === 0" :bucket="bucket"
                         @on-update="onFilesUpdate"></resource-table>-->
-        <resource-grid :bucket="bucket" :type="showType" key="1"
+        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
 
         <resource-filter ref="resource-filter" :bucket="bucket"></resource-filter>
@@ -245,6 +251,12 @@
             },
             cleanSelection() {
                 this.bucket.selection = [];
+            },
+            allSelection() {
+                this.$refs['resource-grid'].selection = [];
+                for (let i = 0; i < this.$refs['resource-grid'].files.length; i++) {
+                    this.$refs['resource-grid'].selectFile(i);
+                }
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);

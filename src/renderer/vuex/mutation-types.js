@@ -46,4 +46,7 @@ export const app = {
     //存储buckets 其他信息
     buckets_info: 'buckets_info',
     a_buckets_info: 'action_buckets_info',
+
+    datas : 'datas',
+    a_datas : 'a_datas',
 };

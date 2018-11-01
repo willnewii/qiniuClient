@@ -108,7 +108,7 @@ export default {
                 case 1:
                     this.folderInfoDialog.show = true;
                     this.folderInfoDialog.title = `${util.getPostfix(file.key)}简介`;
-                    this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}`;
+                    this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}\nETag：${file.ETag}`;
                     break;
                 case 2:
                     this.copy(file, Constants.CopyType.URL);
