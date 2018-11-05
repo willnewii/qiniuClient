@@ -1,4 +1,4 @@
-import {Constants, util, EventBus} from "@/service/index";
+import {Constants, util, EventBus, brand} from "@/service/index";
 
 export default {
     data() {
@@ -70,13 +70,14 @@ export default {
         },
         handleFolderMenuClick(action) {
             let path = this.files[this.contextFolderMenuIndex]._path;
+            let files = [];
 
             switch (action) {
                 case 0://删除操作
                     this.resourceRemove(this.getFilebyPath(path));
                     break;
                 case 1://目录详情
-                    let files = this.getFilebyPath(path);
+                    files = this.getFilebyPath(path);
                     let size = 0;
                     files.forEach((item) => {
                         size += item.fsize;

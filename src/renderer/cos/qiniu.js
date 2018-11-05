@@ -59,6 +59,7 @@ function _httpAuthorization(url) {
  * @returns {string}
  */
 function generateUrl(domain, key, deadline) {
+    key = key.trim();
     if (deadline) {
         let config = new qiniu.conf.Config();
         let bucketManager = new qiniu.rs.BucketManager(getToken(), config);

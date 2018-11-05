@@ -32,6 +32,11 @@ class baseBucket {
         //当前路径
         this.folderPath = '';
 
+        //下载列表
+        this.downloads = [];
+        //上传列表
+        this.uploads = [];
+
 
         //旧设计,Table 中使用,稍后会弃用
         this.dirs = [];

@@ -77,6 +77,14 @@
             </i-button>
         </div>
 
+        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <i-button class="button" type="text" @click="actionBtn(6)" v-if="bucket.name">
+                <Tooltip :content="`同步bucket：${bucket.name}`" placement="bottom">
+                    <Icon type="md-sync" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
         <Input class="input-search" v-model="search" :placeholder="placeholder" icon="ios-close-outline"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
@@ -160,6 +168,9 @@
                         break;
                     case 5://刷新当前bucket
                         this.$parent.getResources();
+                        break;
+                    case 6:// 同步当前bucket
+                        this.$parent.showSyncFolder();
                         break;
                 }
             }

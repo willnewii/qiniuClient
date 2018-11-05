@@ -156,11 +156,11 @@ export function sequence(file1, file2) {
 /**
  * 转换个平台数据信息至统一格式
  * @param item
- * @param type 0: qiniu 1:tencent
+ * @param platformType 0: qiniu 1:tencent
  * @returns {{key: *, fsize: number, putTime: number, mimeType: string},ETag:String}
  */
-export function convertMeta(item, type = 0) {
-    switch (type) {
+export function convertMeta(item, platformType = 0) {
+    switch (platformType) {
         case 0:
             item.putTime = item.putTime / 10000;
             item.ETag = item.hash;

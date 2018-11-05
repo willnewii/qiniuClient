@@ -55,6 +55,17 @@ export const UploadType = {
     FETCH: 'fetch'
 };
 
+/**
+ * 以本地为基准,云对应不上的文件会被删除
+ * 以云为基准,本地对应不上的文件会被删除
+ * @type {{normal: number, baseCloud: number, baseLocal: number}}
+ */
+export const mergeType = {
+    normal: 0,
+    coverCloud: 1,
+    coverLocal: 2
+};
+
 export const Listener = {
     uploadFile: 'upload-Files',
     downloadFile: 'downloadFile',
@@ -67,5 +78,6 @@ export const Listener = {
     readDirectory: 'read-directory',
     setBrand: 'setBrand',
     preview: 'preview',
+    syncDirectory: 'syncDirectory',
     darkMode: 'darkMode'
 };

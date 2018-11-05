@@ -3,6 +3,7 @@
  */
 const path = require('path');
 const fs = require('fs');
+const klaw = require('klaw-sync');
 const qetag = require('./util/qetag');
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
@@ -21,17 +22,29 @@ export const isWin = function () {
     return process.platform === 'win32';
 };
 
-export async function wrapperFiles(_files) {
+/**
+ * 根据选取的文件和文件夹,返回文件列表
+ * path：文件绝对路径
+ * dir：选择的文件夹路径,用来保持上传至云后计算相对路径
+ * @param _files
+ * @returns {Array}
+ */
+export function wrapperFiles(_files) {
     let files = [];
-    for (const item of _files) {
-        if (isDirectory(item)) {
-            let temp = await readDir(item);
-            temp.forEach((path) => {
-                //path.sep 将window 的路径分割符 \  转换成 /
-                files.push({path: path.replace(/\\/g, '/'), dir: item.replace(/\\/g, '/')});
+    for (const path of _files) {
+        if (isDirectory(path)) {
+            let result = klaw(path, {
+                nodir: true,
+                filter: function (item) {
+                    return !/\.(DS_Store)$/.test(item.path);
+                }
             });
+            let _path = convertPath(path);
+            for (let file of result) {
+                files.push({path: convertPath(file.path), dir: _path});
+            }
         } else {
-            files.push({path: item.replace(/\\/g, '/')});
+            files.push({path: convertPath(path)});
         }
     }
 
@@ -39,14 +52,23 @@ export async function wrapperFiles(_files) {
 }
 
 /**
+ * 统一win的分割符 \ => /
+ * @param path
+ * @returns {*}
+ */
+export function convertPath(path) {
+    return path.replace(/\\/g, '/');
+}
+
+/**
  * 获取文件 Etag 值
  * @param filePath
- * @param type
+ * @param platformType
  * @param callback
  */
-export const getEtag = function (filePath, type, callback = null) {
+export const getEtag = function (filePath, platformType, callback = null) {
     return new Promise(function (resolve, reject) {
-        switch (type) {
+        switch (platformType) {
             case 0:
                 qetag(filePath, (hash) => {
                     resolve(hash);
@@ -72,7 +94,7 @@ const getFileMd5 = function (filepath, callback) {
         callback(err);
     });
     readStream.on('end', function () {
-        var hash = md5.digest('hex');
+        let hash = md5.digest('hex');
         callback(null, hash);
     });
 };
@@ -83,47 +105,5 @@ const getFileMd5 = function (filepath, callback) {
  * @returns {Stats | boolean}
  */
 const isDirectory = function (path) {
-    let stat = fs.statSync(path);
-    return stat && stat.isDirectory();
+    return fs.statSync(path).isDirectory();
 };
-
-/**
- * 遍历目录
- * @param dir
- */
-export const readDir = async function (dir) {
-    let children = [];
-
-    let root = await _readdir(dir);
-    for (const filename of root) {
-        if (!/\.(DS_Store)$/.test(filename)) {
-            let path = dir + "/" + filename;
-            let stat = fs.statSync(path);
-            if (stat && stat.isDirectory()) {
-                let temp = await readDir(path);
-                children = children.concat(temp);
-            } else {
-                children.push(path);
-            }
-        }
-    }
-    return children;
-};
-
-/**
- * 获取目录
- * @param dir
- * @returns {Promise<any>}
- * @private
- */
-function _readdir(dir) {
-    return new Promise((resolve, reject) => {
-        fs.readdir(dir, 'utf-8', (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    });
-}

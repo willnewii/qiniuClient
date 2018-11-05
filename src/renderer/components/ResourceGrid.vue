@@ -316,7 +316,7 @@
                 });
             },
             handleDownload(file) {
-                this.bucket.selection = [file];
+                this.bucket.downloads = [file];
                 this.resourceDownload();
             },
         }
