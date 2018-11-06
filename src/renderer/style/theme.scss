@@ -58,6 +58,7 @@ $barPadding: 0;
 }
 
 .ivu-modal-content {
+  user-select: text;
   .ivu-modal-confirm-head-title, .ivu-modal-header-inner {
     color: $fontColor;
   }

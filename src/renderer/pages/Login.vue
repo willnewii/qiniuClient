@@ -14,7 +14,7 @@
         <Tabs type="card" @on-click="onTabClick">
             <TabPane v-for="(item,index) in brands" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
-                <Form :model="formItem" :ref="'formItem' + index" :rules="ruleItem" :label-width="150">
+                <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
                     <Form-item label="ACCESS_KEY" prop="access_key">
                         <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
                     </Form-item>
@@ -22,8 +22,8 @@
                         <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
                     </Form-item>
                     <Form-item>
-                        <Button type="primary" @click="handleSubmit('formItem' + index)">设置</Button>
-                        <Button @click="handleReset('formItem' + index)" style="margin-left: 8px">重置</Button>
+                        <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
+                        <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
                     </Form-item>
                     <div v-if="item.key === brands[0].key" style="margin-left: 150px">＊如何获取密钥信息:登录<a
                             @click="openBrowser('https://portal.qiniu.com/user/key')">{{item.name}}</a>->个人面板->密钥管理
@@ -62,7 +62,7 @@
         methods: {
             onTabClick(name) {
                 this.cos_key = name;
-                this.handleReset(name === brand.qiniu.key ? 'formItem0' : 'formItem1');
+                this.handleReset(name);
             },
             handleSubmit(name) {
                 this.$refs[name][0].validate((valid) => {

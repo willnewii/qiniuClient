@@ -98,9 +98,15 @@
                 <Button size="small" @click="showFilter" icon="md-funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
                 </Button>
+
                 <Button size="small" @click="cleanSelection()"
                         style="margin-right: 10px;"
                         v-if="bucket.selection.length > 0">取消
+                </Button>
+
+                <Button size="small" @click="allSelection()"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">全选
                 </Button>
 
                 <Button size="small" @click="downloads()" icon="md-download"
@@ -128,10 +134,12 @@
 
         <!--<resource-table v-if="showType === 0" :bucket="bucket"
                         @on-update="onFilesUpdate"></resource-table>-->
-        <resource-grid :bucket="bucket" :type="showType" key="1"
+        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
 
-        <resource-filter ref="resource-filter" :bucket="bucket"></resource-filter>
+        <resource-filter ref="resource-filter" :bucket="bucket"
+                         @on-update="onFilesUpdate"></resource-filter>
+        <!--grid filter 同时引用了mixin-resource on-update 触发父对象不一致 -->
 
         <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
                @on-ok="callRemove" @on-cancel="cleanSelection">
@@ -140,18 +148,34 @@
             </template>
         </Modal>
 
+        <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
+               @on-ok="syncFolder">
+            <template>
+                <RadioGroup v-model="model_merge.mode" vertical>
+                    <Radio :label="0">
+                        <span>合并</span>
+                    </Radio>
+                    <Radio :label="1">
+                        <span>覆盖云盘(以本地文件为基准,云盘未对应的文件会被删除)</span>
+                    </Radio>
+                    <Radio :label="2">
+                        <span>覆盖本地(以云盘文件为基准,本地未对应的文件会被删除)</span>
+                    </Radio>
+                </RadioGroup>
+            </template>
+        </Modal>
     </div>
 </template>
 <script>
-    import Header from '../components/Header';
-    import ResourceTable from '../components/ResourceTable.vue';
-    import ResourceGrid from "../components/ResourceGrid.vue";
+    import Header from '@/components/Header';
+    import ResourceTable from '@/components/ResourceTable.vue';
+    import ResourceGrid from "@/components/ResourceGrid.vue";
+    import ResourceFilter from "@/components/ResourceFilter";
 
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
-    import {Constants, util, EventBus, mixins} from '../service/index';
-    import ResourceFilter from "@/components/ResourceFilter";
+    import {Constants, util, EventBus, mixins, brand} from '../service/index';
 
     export default {
         name: 'bucketPage',
@@ -173,7 +197,11 @@
                 folderPath: null,
                 folderKeyWord: null,
                 model_DeleteAsk: false,
-                model_query_show: false
+                model_query_show: false,
+                model_merge: {
+                    show: false,
+                    mode: 0
+                }
             };
         },
         computed: {
@@ -231,7 +259,7 @@
                 this.folderKeyWord = search;
             },
             /**
-             * 根据配置,是否弹出确认框
+             * 根据配置,是否弹出删除确认框
              */
             askRemove() {
                 if (this.setup_deleteNoAsk) {
@@ -243,8 +271,16 @@
             callRemove() {
                 EventBus.$emit(Constants.Event.removes);
             },
+            //取消选择
             cleanSelection() {
                 this.bucket.selection = [];
+            },
+            //全部选择
+            allSelection() {
+                this.$refs['resource-grid'].selection = [];
+                for (let i = 0; i < this.$refs['resource-grid'].files.length; i++) {
+                    this.$refs['resource-grid'].selectFile(i);
+                }
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);
@@ -263,6 +299,7 @@
              * @param action 触发的动作,upload/remove
              */
             onFilesUpdate(ret, action) {
+                console.log(ret, action);
                 this.getResources();
             },
             changeFolderPath(index) {
@@ -276,6 +313,33 @@
             showFilter() {
                 this.$refs['resource-filter'].toggle();
             },
+            showSyncFolder() {
+                this.model_merge.show = true;
+                this.model_merge.mode = 0;
+            },
+            syncFolder() {
+                let files = this.bucket.files;
+                files.forEach((item, index) => {
+                    files[index].url = this.$refs['resource-filter'].getResoureUrl(item);
+                });
+
+                let type = 0;
+                switch (this.$storage.name) {
+                    case brand.qiniu.key:
+                        type = 0;
+                        break;
+                    case brand.tencent.key:
+                        type = 1;
+                        break;
+                }
+
+                this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
+                    properties: ['openDirectory'],
+                    files,
+                    type,
+                    mergeType: this.model_merge.mode,
+                });
+            }
         }
 
     };

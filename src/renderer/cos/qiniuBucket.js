@@ -1,8 +1,6 @@
-import {Constants, EventBus} from '../service/index';
+import {Constants, EventBus, util} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
-
-let tempFiles = [];
 
 class Bucket extends baseBucket {
 
@@ -28,12 +26,6 @@ class Bucket extends baseBucket {
 
         this.getDomains();
 
-        EventBus.$emit(Constants.Event.loading, {
-            show: true,
-            message: '数据加载中,请稍后',
-            flag: 'getResources'
-        });
-        console.time('getResources');
         this.getResources();
     }
 
@@ -80,12 +72,13 @@ class Bucket extends baseBucket {
     }
 
     getResources(keyword) {
+        super.getResources();
         //重置多选数组
         this.selection = [];
 
         let param = {
             bucket: this.name,
-            limit: 1000
+            limit: this.limit
         };
 
         if (keyword) {
@@ -98,23 +91,12 @@ class Bucket extends baseBucket {
 
         qiniu.list(param, (respErr, respBody, respInfo) => {
             let data = respInfo.data;
+
             data.items.forEach((item, index) => {
-                data.items[index].putTime = item.putTime / 10000;
+                data.items[index] = util.convertMeta(item, 0);
             });
 
-            tempFiles = this.marker ? tempFiles.concat(data.items) : data.items;
-            this.marker = data.marker ? data.marker : '';
-
-            if (this.marker) {
-                this.getResources(keyword);
-            } else {
-                EventBus.$emit(Constants.Event.loading, {
-                    show: false,
-                    flag: 'getResources'
-                });
-                this.files = Object.freeze(tempFiles);
-                tempFiles = [];
-            }
+            this.appendResources(data, keyword);
         });
     }
 

@@ -34,7 +34,7 @@
 
     export default {
         name: 'UploadModal',
-        mixins: [mixins.base],
+        mixins: [mixins.base, mixins.resource],
         props: {
             bucket: {
                 type: Object
@@ -191,10 +191,8 @@
             },
             uploadFile() {
                 let file = this.filePaths[0];
-
-                //处理路径
-                let key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') +
-                    file.key;
+                //处理文件的虚拟路径
+                file.key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') + file.key;
 
                 this.status_count += 1;
 
@@ -202,18 +200,17 @@
                     message: `文件上传中(${this.status_count}/${this.status_total})...0%`,
                     path: file.path
                 });
-                let param = {
-                    path: file.path,
-                    key: key,
+
+                this.resourceCreate(file, {
                     isOverwrite: this.setup_isOverwrite,
+                    uploadType: this.uploadModal.type,
                     progressCallback: (progress) => {
                         EventBus.$emit(Constants.Event.statusview, {
                             message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
                         });
-                    }
-                };
-
-                this.bucket.createFile(param, this.uploadModal.type, this.handleResult);
+                    },
+                    callback: this.handleResult
+                });
             },
             handleResult(err, ret) {
                 if (!err) {
@@ -254,7 +251,7 @@
     }
 
     .file-list {
-        padding-top: 10px;
+        margin-top: 10px;
         overflow: scroll;
         max-height: 300px;
     }

@@ -10,6 +10,7 @@ import pkg from '../../package';
 import * as util from './util';
 import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
+import * as diffFolder from './util/diffFolder';
 
 let mainWindow, aboutWindow;
 
@@ -90,7 +91,7 @@ const registerIPC = function () {
             option.directory = path.join(option.directory, option.folder);
         }
 
-        download(BrowserWindow.getFocusedWindow(), file, option).then(dl => {
+        download(mainWindow, file, option).then(dl => {
             if (option.count === 1) {
                 shell.showItemInFolder(dl.getSavePath());
             }
@@ -105,16 +106,31 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
         dialog.showOpenDialog({
             properties: option.properties
-        }, async function (_files) {
+        }, function (_files) {
             if (_files) {
-                event.sender.send(Constants.Listener.readDirectory, await util.wrapperFiles(_files));
+                event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(_files));
             }
         });
     });
 
     //选取文件
-    ipcMain.on(Constants.Listener.readDirectory, async function (event, arg) {
-        event.sender.send(Constants.Listener.readDirectory, await util.wrapperFiles(arg.files));
+    ipcMain.on(Constants.Listener.readDirectory, function (event, arg) {
+        event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(arg.files));
+    });
+
+    //同步文件夹
+    ipcMain.on(Constants.Listener.syncDirectory, function (event, option) {
+        dialog.showOpenDialog({
+            title: '请选择需要同步的目录(beta)',
+            buttonLabel: '同步',
+            properties: option.properties
+        }, async function (directory) {
+            console.dir(directory);
+            let results = await diffFolder.diff(directory[0], option.files, option.type, option.mergeType);
+            console.dir(results);
+
+            event.sender.send(Constants.Listener.syncDirectory, results);
+        });
     });
 
     //预览文件

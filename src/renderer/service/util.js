@@ -1,6 +1,8 @@
 import * as Constants from '../service/constants';
 import dayjs from 'dayjs';
 
+const mime = require('mime-types');
+
 /**
  * Created by zhangweiwei on 2017/4/13.
  */
@@ -151,18 +153,31 @@ export function sequence(file1, file2) {
     }
 }
 
-
-export function wrapperFile(item, type) {
-    return {
-        key: item.Key,
-        fsize: parseInt(item.Size),
-        putTime: new Date(item.LastModified).getTime(),
-        mimeType: ''
-    };
+/**
+ * 转换个平台数据信息至统一格式
+ * @param item
+ * @param platformType 0: qiniu 1:tencent
+ * @returns {{key: *, fsize: number, putTime: number, mimeType: string},ETag:String}
+ */
+export function convertMeta(item, platformType = 0) {
+    switch (platformType) {
+        case 0:
+            item.putTime = item.putTime / 10000;
+            item.ETag = item.hash;
+            break;
+        case 1:
+            item.key = item.Key;
+            item.fsize = parseInt(item.Size);
+            item.putTime = new Date(item.LastModified).getTime();
+            item.mimeType = mime.lookup(item.key);
+            item.marker = item.NextMarker;
+            break;
+    }
+    return item;
 }
 
 /**
- * 开发模式直接修改字段
+ * 开发模式请直接修改params.scss
  * @param name
  */
 export function loadTheme(name) {
