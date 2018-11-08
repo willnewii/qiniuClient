@@ -87,13 +87,26 @@
                 e.preventDefault();
             };
 
+            window.ondragleave = (e) => {
+                e.preventDefault();
+                if (e.screenY === e.screenX && e.screenX === 0) {
+                    EventBus.$emit(Constants.Event.dropview, {
+                        show: false,
+                    });
+                }
+            };
+
             window.ondragenter = (e) => {
                 e.preventDefault();
                 if (!this.messageFlag) {
                     this.messageFlag = true;
-                    this.showMessage({
-                        message: '我已经感受到你传来的文件啦 😎'
+                    EventBus.$emit(Constants.Event.dropview, {
+                        show: true,
+                        message: `文件将会被上传至 ${this.bucket.name} 存储桶下的: ${this.bucket.folderPath }/`,
                     });
+                    /*this.showMessage({
+                        message: '我已经感受到你传来的文件啦 😎'
+                    });*/
                     setTimeout(() => {
                         this.messageFlag = false;
                     }, 2000);
@@ -108,6 +121,9 @@
                         path.push(file.path);
                     });
 
+                    EventBus.$emit(Constants.Event.dropview, {
+                        show: false,
+                    });
                     EventBus.$emit(Constants.Event.loading, {
                         show: true,
                         message: '文件读取中...',
@@ -214,14 +230,15 @@
             },
             handleResult(err, ret) {
                 if (!err) {
-                    this.$Notice.success({
+                    util.notification({
                         title: '上传成功',
-                        desc: ret.key,
+                        icon: this.bucket.generateUrl(ret.key, this.setup_deadline),
+                        body: ret.key,
                     });
                 } else {
-                    this.$Notice.error({
+                    util.notification({
                         title: '上传失败',
-                        desc: err.error,
+                        body: err.error,
                     });
                 }
 

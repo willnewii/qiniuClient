@@ -39,10 +39,12 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
+        <!-- 数据加载框-->
         <Spin size="large" fix v-if="loading.show">
             <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
             <span>{{loading.message}}</span>
         </Spin>
+        <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
                :mask-closable="false">
             <div class="choice-cos">
@@ -57,9 +59,16 @@
             <div slot="footer"></div>
             <Icon></Icon>
         </Modal>
+        <!-- 上传/下载进度提示框-->
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
             <div>{{status.path}}</div>
+        </div>
+        <!-- 文件拖拽提示框-->
+        <div class="drop-view" v-if="drop.show">
+            <div class="drop-sub">
+                <span>{{drop.message}}</span>
+            </div>
         </div>
     </div>
 </template>
@@ -109,7 +118,11 @@
                 loading: {
                     show: false,
                     message: '',
-                    flag: '' //可以用作计时的标记
+                    flag: '' //可以用作统计计时的标记
+                },
+                drop: {
+                    show: false,
+                    message: ''
                 }
             };
         },
@@ -137,6 +150,9 @@
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
+            });
+            EventBus.$on(Constants.Event.dropview, (option) => {
+                this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {
                 this.loading = option;
@@ -389,6 +405,31 @@
     .status-view-none {
         opacity: 0;
         transition: opacity 2s;
+    }
+
+    .drop-view {
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.1);
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        .drop-sub {
+            border: 2px dashed;
+            border-radius: 10px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
     }
 </style>
 <style lang="scss">

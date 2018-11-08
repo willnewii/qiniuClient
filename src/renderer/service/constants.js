@@ -41,6 +41,7 @@ export const Event = {
     remove: 'remove',
     download: 'download',
     statusview: 'statusview',
+    dropview: 'dropview',
     loading: 'loading',
     updateFiles: 'updateFiles'
 };
