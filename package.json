@@ -19,9 +19,7 @@
         "analyzer:renderer": "cross-env NODE_ENV=production ENV_DLL=true ANALYZER=false webpack --config .electron-vue/webpack.renderer.config.js",
         "postinstall": ""
     },
-    "dependencies": {
-        "node-notifier": "^5.2.1"
-    },
+    "dependencies": {},
     "devDependencies": {
         "animate.css": "^3.7.0",
         "axios": "^0.16.2",

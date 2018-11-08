@@ -195,5 +195,14 @@ export function loadTheme(name) {
         }
         head.appendChild(style);
     }
+}
 
+/**
+ * notification api
+ * @param option
+ */
+export function notification(option = {}) {
+    new Notification(option.title, Object.assign({
+        silent: true
+    }, option));
 }
