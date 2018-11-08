@@ -19,6 +19,7 @@ export default {
     },
     data() {
         return {
+            previewImages: [],
             status_total: 0,
             status_count: 0,
             //同步文件时,缓存文件父路径
@@ -119,7 +120,14 @@ export default {
             return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
         show(file) {
-            this.$electron.shell.openExternal(this.getResoureUrl(file));
+            if (/image\/(png|img|jpe?g|svg|gif)/.test(file.mimeType.toLowerCase())) {
+                this.previewImages = [this.getResoureUrl(file)];
+                this.$nextTick(() => {
+                    this.$nextTick(() => {
+                        this.$viewer.show();
+                    });
+                });
+            }
         },
         copy(file, copyType) {
             let url = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file));

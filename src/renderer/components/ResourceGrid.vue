@@ -82,6 +82,11 @@
         <Modal v-model="changeFileNameDialog.show" title="重命名" @on-ok="changeFileName">
             <Input v-model="changeFileNameDialog.input"/>
         </Modal>
+
+        <viewer :options="options" :images="previewImages" class="viewer" ref="viewer" @inited="inited">
+            <img class="image-wrapper" v-for="src in previewImages" :key="src"
+                 :src="src" :data-source="src" :alt="src.split('?image=').pop()">
+        </viewer>
     </div>
 </template>
 <script>
@@ -115,7 +120,24 @@
                 //virtual-list
                 remain0: 0,
                 remain1: 0,
-                step: 6
+                step: 6,
+                //virtual-list
+                options: {
+                    inline: false,
+                    button: true,
+                    navbar: false,
+                    title: true,
+                    toolbar: true,
+                    tooltip: true,
+                    movable: true,
+                    zoomable: true,
+                    rotatable: true,
+                    scalable: true,
+                    transition: true,
+                    fullscreen: true,
+                    keyboard: true,
+                    url: 'data-source'
+                },
             };
         },
         watch: {
@@ -187,6 +209,9 @@
             this.fileFilter();
         },
         methods: {
+            inited(viewer) {
+                this.$viewer = viewer;
+            },
             clickItem(file, index) {
                 if (this.isMultiple) {
                     this.selectFile(index);
@@ -337,6 +362,7 @@
         .grid2 {
             padding: 10px;
             box-sizing: content-box;
+            transform: translateZ(0);
             .grid2-item {
                 display: flex;
                 flex-direction: row;
@@ -392,6 +418,7 @@
         }
 
         .list {
+            transform: translateZ(0);
             height: 100%;
             .item {
                 display: flex;
