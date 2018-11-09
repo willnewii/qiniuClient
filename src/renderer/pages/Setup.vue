@@ -15,9 +15,14 @@
 <template>
     <div>
         <div class="item">
-            直接删除,不需要确认：
+            直接删除,不显示确认框：
             <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
+        <div class="item">
+            直接上传,不显示确认框：
+            <i-switch :value="setup_uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch>
+        </div>
+
         <div class="item">
             如果文件已存在,是否覆盖上传：
             <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
@@ -140,6 +145,7 @@
                 buckets: types.app.buckets,
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                setup_uploadNoAsk: types.setup.setup_uploadNoAsk,
                 setup_isOverwrite: types.setup.setup_isOverwrite,
                 setup_brand: types.setup.setup_brand,
                 setup_bucket_name: types.setup.setup_bucket_name,
@@ -162,8 +168,6 @@
             this.theme = this.setup_theme;
             this.deadline = this.setup_deadline / 60;
 
-            console.log(this.brand);
-
             this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
@@ -178,6 +182,7 @@
             ...mapActions([
                 types.setup.setup_a_copyType,
                 types.setup.setup_a_deleteNoAsk,
+                types.setup.setup_a_uploadNoAsk,
                 types.setup.setup_a_savedir,
                 types.setup.setup_a_imagestyle,
                 types.setup.setup_a_downloaddir,
@@ -188,6 +193,9 @@
             ]),
             deleteNoAskChange: function (state) {
                 this[types.setup.setup_a_deleteNoAsk](state);
+            },
+            uploadNoAskChange: function (state) {
+                this[types.setup.setup_a_uploadNoAsk](state);
             },
             isOverwriteChange: function (state) {
                 this[types.setup.setup_a_isOverwrite](state);

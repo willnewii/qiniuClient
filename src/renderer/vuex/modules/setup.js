@@ -12,7 +12,8 @@ export default {
     state: {
         setup: {
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
-            isOverwrite: true,                                     //上传时是否直接覆盖文件
+            uploadNoAsk: true,                                      //文件上传时是否弹出对话框
+            isOverwrite: true,                                      //上传时是否直接覆盖文件
             copyType: 'url',
             brand: '',
             bucket_name: '',
@@ -22,7 +23,8 @@ export default {
             downloaddir: '',                                        //设置文件的下载路径
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
             privatedeadline: 3600,                                  //默认1小时
-            theme: 'auto'
+            theme: 'auto',
+            recentname: ''                                          //最近使用的bucketname
         }
     },
     mutations: {
@@ -44,6 +46,10 @@ export default {
         },
         [types.setup.setup_deleteNoAsk](state, value) {
             state.setup.deleteNoAsk = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.setup_uploadNoAsk](state, value) {
+            state.setup.uploadNoAsk = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_copyType](state, value) {
@@ -72,6 +78,10 @@ export default {
             state.setup.theme = value;
             setAppSetup(state.setup);
         },
+        [types.setup.setup_recentname](state, value) {
+            state.setup.recentname = value;
+            setAppSetup(state.setup);
+        },
         [types.setup.setup_init](state, value) {
             state.setup = value;
         },
@@ -92,6 +102,9 @@ export default {
         [types.setup.setup_a_deleteNoAsk](context, json) {
             context.commit(types.setup.setup_deleteNoAsk, json);
         },
+        [types.setup.setup_a_uploadNoAsk](context, json) {
+            context.commit(types.setup.setup_uploadNoAsk, json);
+        },
         [types.setup.setup_a_downloaddir](context, json) {
             context.commit(types.setup.setup_downloaddir, json);
         },
@@ -106,6 +119,9 @@ export default {
         },
         [types.setup.setup_a_theme](context, value) {
             context.commit(types.setup.setup_theme, value);
+        },
+        [types.setup.setup_a_recentname](context, value) {
+            context.commit(types.setup.setup_recentname, value);
         },
         async [types.setup.setup_init](context, callback) {
             let app = await storagePromise.get(Constants.Key.configuration);
@@ -134,6 +150,9 @@ export default {
         [types.setup.setup_deleteNoAsk](state) {
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;
         },
+        [types.setup.setup_uploadNoAsk](state) {
+            return ('uploadNoAsk' in state.setup) ? state.setup.uploadNoAsk : false;
+        },
         [types.setup.setup_copyType](state) {
             return ('copyType' in state.setup) ? state.setup.copyType : 'url';
         },
@@ -151,6 +170,9 @@ export default {
         },
         [types.setup.setup_theme](state) {
             return ('theme' in state.setup) ? state.setup.theme : 'auto';
+        },
+        [types.setup.setup_recentname](state) {
+            return ('recentname' in state.setup) ? state.setup.recentname : '';
         }
     }
 };

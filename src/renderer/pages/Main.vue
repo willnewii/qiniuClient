@@ -39,11 +39,6 @@
                 <router-view :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
-        <!-- 数据加载框-->
-        <Spin size="large" fix v-if="loading.show">
-            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
-            <span>{{loading.message}}</span>
-        </Spin>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
                :mask-closable="false">
@@ -59,6 +54,11 @@
             <div slot="footer"></div>
             <Icon></Icon>
         </Modal>
+        <!-- 数据加载框-->
+        <Spin size="large" fix v-if="loading.show">
+            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
+            <span>{{loading.message}}</span>
+        </Spin>
         <!-- 上传/下载进度提示框-->
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
@@ -130,6 +130,7 @@
             ...mapGetters({
                 buckets: types.app.buckets,
                 privatebucket: types.setup.setup_privatebucket,
+                setup_recentname: types.setup.setup_recentname,
             }),
             menuSpace() {
                 return {
@@ -149,19 +150,22 @@
             this.checkVersion();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
+                console.trace();
+                console.log(option);
                 this.status = Object.assign(this.status, option);
             });
             EventBus.$on(Constants.Event.dropview, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {
-                this.loading = option;
+                this.loading = Object.assign(this.loading, option);
             });
         },
         methods: {
             ...mapActions([
                 types.app.a_buckets,
                 types.app.a_buckets_info,
+                types.setup.setup_a_recentname,
             ]),
             initCOS() {
                 this.$storage.getCOS((cos) => {
@@ -210,7 +214,11 @@
                                 break;
                         }
 
-                        this.onMenuSelect(this.buckets[0]);
+                        if (this.setup_recentname && this.buckets.indexOf(this.setup_recentname) !== -1) {
+                            this.onMenuSelect(this.buckets[this.buckets.indexOf(this.setup_recentname)]);
+                        } else {
+                            this.onMenuSelect(this.buckets[0]);
+                        }
                     }
                 });
             },
@@ -231,6 +239,7 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
+                        this.setup_a_recentname(name);
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
@@ -404,7 +413,7 @@
 
     .status-view-none {
         opacity: 0;
-        transition: opacity 2s;
+        transition: opacity .5s;
     }
 
     .drop-view {
@@ -419,7 +428,7 @@
         flex-direction: row;
         justify-content: center;
         align-items: center;
-        font-size: 14px;
+        font-size: 16px;
         .drop-sub {
             border: 2px dashed;
             border-radius: 10px;

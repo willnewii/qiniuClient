@@ -19,6 +19,10 @@ export const setup = {
     setup_deleteNoAsk: 'setup_deleteNoAsk',
     setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
 
+    setup_uploadNoAsk: 'setup_uploadNoAsk',
+    setup_a_uploadNoAsk: 'setup_a_uploadNoAsk',
+
+
     setup_copyType: 'setup_copyType',
     setup_a_copyType: 'setup_a_copyType',
 
@@ -34,6 +38,9 @@ export const setup = {
 
     setup_theme: 'setup_theme',
     setup_a_theme: 'setup_a_theme',
+
+    setup_recentname: 'setup_recentname',
+    setup_a_recentname: 'setup_a_recentname',
 };
 
 export const app = {
@@ -47,6 +54,6 @@ export const app = {
     buckets_info: 'buckets_info',
     a_buckets_info: 'action_buckets_info',
 
-    datas : 'datas',
-    a_datas : 'a_datas',
+    datas: 'datas',
+    a_datas: 'a_datas',
 };

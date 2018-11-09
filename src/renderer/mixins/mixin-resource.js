@@ -7,6 +7,7 @@ export default {
         ...mapGetters({
             setup_copyType: types.setup.setup_copyType,
             setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+            setup_uploadNoAsk: types.setup.setup_uploadNoAsk,
             setup_imagestyle: types.setup.setup_imagestyle,
             setup_downloaddir: types.setup.setup_downloaddir,
             setup_deadline: types.setup.setup_deadline,

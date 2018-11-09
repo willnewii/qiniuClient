@@ -63,6 +63,7 @@
             })
         },
         created() {
+            this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.readDirectory);
             this.$electron.ipcRenderer.on(Constants.Listener.readDirectory, (event, files) => {
                 EventBus.$emit(Constants.Event.loading, {
                     show: false,
@@ -76,8 +77,15 @@
                             files[index].key = util.getPostfix(item.path);
                         }
                     });
-                    this.uploadModal.input = this.bucket.folderPath;
-                    this.handleFile(files);
+
+                    if (this.setup_uploadNoAsk) {//直接上传
+                        this.filePaths = files;
+                        this.uploadModal.type = Constants.UploadType.UPLOAD;
+                        this.preUploadFile();
+                    } else {
+                        this.uploadModal.input = this.bucket.folderPath;
+                        this.handleFile(files);
+                    }
                 } else {
                     this.$Message.info('未检测到文件');
                 }
@@ -104,12 +112,9 @@
                         show: true,
                         message: `文件将会被上传至 ${this.bucket.name} 存储桶下的: ${this.bucket.folderPath }/`,
                     });
-                    /*this.showMessage({
-                        message: '我已经感受到你传来的文件啦 😎'
-                    });*/
                     setTimeout(() => {
                         this.messageFlag = false;
-                    }, 2000);
+                    }, 1000);
                 }
             };
 
