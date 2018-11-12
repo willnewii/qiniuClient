@@ -81,6 +81,8 @@ export default {
 
                 this.bucket.downloads = results.downloads;
                 this.baseDir = results.baseDir;
+                this.status_total = this.bucket.downloads.length;
+                this.status_count = 0;
                 this.resourceDownload();
             } else {
                 this.syncFinish();
@@ -178,7 +180,9 @@ export default {
 
             if (this.finishCount === 3) {
                 this.finishCount = 0;
-                this.$Message.info('同步完成');
+                util.notification({
+                    body: '同步完成'
+                });
             }
         },
         resourceDownload() {
@@ -187,6 +191,7 @@ export default {
 
                 this.status_count += 1;
                 EventBus.$emit(Constants.Event.statusview, {
+                    show: true,
                     message: `文件下载中(${this.status_count}/${this.status_total})...0%`,
                 });
 

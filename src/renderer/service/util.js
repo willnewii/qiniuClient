@@ -1,4 +1,5 @@
 import * as Constants from '../service/constants';
+import pkg from '../../../package';
 import dayjs from 'dayjs';
 
 const mime = require('mime-types');
@@ -202,7 +203,7 @@ export function loadTheme(name) {
  * @param option
  */
 export function notification(option = {}) {
-    new Notification(option.title, Object.assign({
+    new Notification(option.title || pkg.cnname, Object.assign({
         silent: true
     }, option));
 }

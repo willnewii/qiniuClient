@@ -150,8 +150,6 @@
             this.checkVersion();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
-                console.trace();
-                console.log(option);
                 this.status = Object.assign(this.status, option);
             });
             EventBus.$on(Constants.Event.dropview, (option) => {
