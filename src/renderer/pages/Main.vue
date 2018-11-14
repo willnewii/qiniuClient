@@ -1,15 +1,21 @@
 <template>
     <div class="layout">
+        <!--<v-contextmenu ref="bucketMenu" @contextmenu="handleBucketMenu">
+            <v-contextmenu-item @click="handleBucketMenuClick(0)">同步</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleBucketMenuClick(1)">批量导出URL</v-contextmenu-item>
+        </v-contextmenu>-->
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
                     <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
-                <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
+                <Menu width="auto" v-if="buckets && buckets.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
+                        <Menu-item v-for="(item,index) of buckets" :key="index" :name="item"
+                                   :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
                                       :type="privatebucket.indexOf(item) !==  -1 ? 'md-lock' : 'md-folder'"></Icon>
@@ -36,7 +42,7 @@
                 </div>
             </i-col>
             <i-col :span="menuSpace.right">
-                <router-view :bucketName="bucketName"></router-view>
+                <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
         <!-- cos选择框-->
@@ -123,7 +129,8 @@
                 drop: {
                     show: false,
                     message: ''
-                }
+                },
+                // contextBucketMenuIndex: 0
             };
         },
         computed: {
@@ -297,6 +304,21 @@
                         break;
                 }
             },
+            /*handleBucketMenu(ref) {
+                this.contextBucketMenuIndex = ref.data.attrs.index;
+            },
+            handleBucketMenuClick(action) {
+                switch (action) {
+                    case 0://同步操作
+                        if(this.$refs['bucketPage']){
+                            this.$refs['bucketPage'].showSyncFolder();
+                        }
+                        break;
+                    case 1://批量导出
+                        console.log(this.$refs['bucketPage']);
+                        break;
+                }
+            },*/
         }
     };
 </script>

@@ -115,7 +115,6 @@ function upload(params, callback) {
 
     let config = new qiniu.conf.Config();
 
-    let resumeUploader = new qiniu.resume_up.ResumeUploader(config);
     let putExtra = new qiniu.resume_up.PutExtra();
     putExtra.progressCallback = (uploadBytes, totalBytes) => {
         if (params.progressCallback) {
@@ -123,7 +122,7 @@ function upload(params, callback) {
         }
     };
 
-    resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
+    new qiniu.resume_up.ResumeUploader(config).putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }

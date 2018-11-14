@@ -80,5 +80,6 @@ export const Listener = {
     setBrand: 'setBrand',
     preview: 'preview',
     syncDirectory: 'syncDirectory',
-    darkMode: 'darkMode'
+    darkMode: 'darkMode',
+    exportUrl: 'exportUrl'
 };

@@ -176,6 +176,7 @@
     import * as types from '../vuex/mutation-types';
 
     import {Constants, util, EventBus, mixins, brand} from '../service/index';
+    import dayjs from 'dayjs';
 
     export default {
         name: 'bucketPage',
@@ -338,6 +339,17 @@
                     files,
                     type,
                     mergeType: this.model_merge.mode,
+                });
+            },
+            exportURL() {//导出URL
+                let urls = [];
+                this.bucket.files.forEach((item) => {
+                    urls.push(this.$refs['resource-filter'].getResoureUrl(item));
+                });
+
+                this.$electron.ipcRenderer.send(Constants.Listener.exportUrl, {
+                    name: `${this.$storage.name}-${this.bucket.name}-${dayjs().format('YYYYMMDDHHmmss')}.txt`,
+                    urls,
                 });
             }
         }

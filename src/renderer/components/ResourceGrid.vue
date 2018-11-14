@@ -110,6 +110,8 @@
         data() {
             return {
                 files: [],
+                //图片文件列表,方便显示多图
+                images: [],
                 //缓存当前路径
                 cacheName: '',
                 //是否在多选状态
@@ -219,7 +221,12 @@
                     if (file._directory) {
                         this.bucket.folderPath = file._path;
                     } else {
-                        this.show(file);
+                        if (util.isSupportImage(file.mimeType)) {
+                            this.showImage(file, this.images);
+                        } else {
+                            this.show(file);
+                        }
+
                     }
                 }
             },
@@ -266,6 +273,7 @@
                 let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
+                let images = [];
                 let resultCount = 0;
 
                 (option.source || this.bucket.files).forEach((file) => {
@@ -288,6 +296,7 @@
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
                             if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
+                                images.push(file);
                                 file._icon = 'md-image';
                             } else if (file.mimeType.indexOf('audio') === 0) {
                                 file._icon = 'md-musical-notes';
@@ -313,6 +322,7 @@
                 });
 
                 files = files.sort(util.sequence);
+                images = images.sort(util.sequence);
                 if (folderPath !== '') {
                     let lastIndex = folderPath.lastIndexOf('/');
                     files.unshift({
@@ -336,6 +346,7 @@
                 // files.length = parseInt(files.length / 2);
                 this.files = [];
                 this.$nextTick(function () {
+                    this.images = Object.freeze(images);
                     this.files = Object.freeze(files);
                     option.callback && option.callback({searchCount: resultCount});
                 });
@@ -354,6 +365,7 @@
 
     .layout-content {
         margin: 0 15px 15px 15px;
+        overflow-x: hidden;
         overflow-y: scroll;
         background: $bg-resource;
         flex-grow: 1;
@@ -461,5 +473,8 @@
             }
         }
 
+        .viewer {
+            z-index: 999;
+        }
     }
 </style>

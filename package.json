@@ -11,7 +11,7 @@
         "build": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder",
         "build:mac": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --mac",
         "build:win32": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --win --ia32",
-        "build:dir": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --dir",
+        "build:dir": "cross-env ENV_DLL=true node --max_old_space_size=4096 .electron-vue/build.js && electron-builder --dir",
         "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
         "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
         "build:dll": "cross-env NODE_ENV=production ANALYZER=false webpack --config .electron-vue/webpack.renderer.dll.config.js",

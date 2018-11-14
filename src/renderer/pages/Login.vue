@@ -12,7 +12,7 @@
 <template>
     <div class="layout">
         <Tabs type="card" @on-click="onTabClick">
-            <TabPane v-for="(item,index) in brands" :name="item.key" :label="item.name">
+            <TabPane v-for="(item,index) in brands" :key="item.key" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
                     <Form-item label="ACCESS_KEY" prop="access_key">

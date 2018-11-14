@@ -135,7 +135,16 @@ export function formatDate(time) {
 }
 
 /**
- * 文件排序
+ * 根据mimeType,判断是否是浏览器支持的图片格式
+ * @param mimeType
+ * @returns {boolean}
+ */
+export function isSupportImage(mimeType) {
+    return /image\/(png|img|jpe?g|svg|gif)/.test(mimeType.toLowerCase());
+}
+
+/**
+ * 文件排序 文件夹>文件
  * @param file1
  * @param file2
  * @returns {*}

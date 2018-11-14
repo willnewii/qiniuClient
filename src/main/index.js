@@ -4,6 +4,7 @@ import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} fro
 import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
+const fs = require('fs-extra');
 const {download} = require('electron-dl');
 
 import pkg from '../../package';
@@ -145,6 +146,13 @@ const registerIPC = function () {
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
         event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+    });
+
+    ipcMain.on(Constants.Listener.exportUrl, function (event, arg) {
+        let filePath = path.join(app.getPath('downloads'), pkg.name, arg.name);
+        let content = arg.urls.join('\n');
+        fs.writeFileSync(filePath, content);
+        shell.showItemInFolder(filePath);
     });
 };
 

@@ -31,6 +31,7 @@ function clean() {
 }
 
 function build() {
+    let starTime = new Date().getTime();
     greeting();
 
     del.sync(['dist/electron/*', '!.gitkeep']);
@@ -47,6 +48,7 @@ function build() {
         process.stdout.write('\x1B[2J\x1B[0f');
         console.log(`\n\n${results}`);
         console.log(`${okayLog}take it away ${chalk.yellow('`electron-builder`')}\n`);
+        console.log(chalk.bgGreen.white(` build time: ${(new Date().getTime() - starTime)} `));
         process.exit();
     });
 

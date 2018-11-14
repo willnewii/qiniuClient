@@ -33,6 +33,8 @@ let rendererConfig = {
             'vue-lazyload',
             'vue-electron',
             'iview',
+            'v-viewer',
+            'vue-virtual-scroll-list',
             'v-contextmenu/src/directive',
             'v-contextmenu/src/index',
             'electron-json-storage',
