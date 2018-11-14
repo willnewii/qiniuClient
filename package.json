@@ -58,6 +58,7 @@
         "multispinner": "^0.2.1",
         "node-loader": "^0.6.0",
         "node-sass": "^4.9.4",
+        "qingstor-sdk": "^2.2.16",
         "qiniu": "^7.2.1",
         "qs": "^6.5.2",
         "sass-loader": "^7.1.0",

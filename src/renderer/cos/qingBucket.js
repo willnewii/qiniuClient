@@ -12,7 +12,6 @@ class Bucket extends baseBucket {
     reset() {
         super.reset();
 
-        //腾讯COS字段
         this.location = '';
     }
 
@@ -27,13 +26,12 @@ class Bucket extends baseBucket {
         this.vm = vm;
 
         this.vm.buckets_info.forEach((item) => {
-            if (item.Name === this.name) {
-                this.location = item.Location;
+            if (item.name === this.name) {
+                this.location = item.location;
             }
         });
 
         if (this.location) {
-            // this.getDirs();
             this.getResources();
         }
         /*this.checkPrivate();
@@ -79,9 +77,7 @@ class Bucket extends baseBucket {
 
     getResources(keyword) {
         let params = {
-            Bucket: this.name,
-            Region: this.location,
-            MaxKeys: this.limit,
+            limit: this.limit,
         };
 
         if (keyword) {
@@ -89,26 +85,27 @@ class Bucket extends baseBucket {
         }
 
         if (this.marker) {
-            params.Marker = this.marker;
+            params.marker = this.marker;
         }
 
-        this.cos.getBucket(params, (err, data) => {
-            if (err) {
-                console.log(err);
-            } else {
-                if (!this.marker) {
-                    this.files = [];
-                }
-                let files = [];
-                data.Contents.forEach((item) => {
-                    if (parseInt(item.Size) !== 0) {
-                        files.push(util.convertMeta(item, 1));
-                    }
-                });
+        this.cos.Bucket(this.name, this.location).listObjects(function (err, data) {
+            console.log(data.statusCode);
+            console.log(data);
 
-                data.items = files;
-                this.appendResources(data, keyword);
+            data.marker = data.next_marker;
+
+            if (!this.marker) {
+                this.files = [];
             }
+            let files = [];
+            data.keys.forEach((item) => {
+                if (parseInt(item.Size) !== 0) {
+                    files.push(util.convertMeta(item, 2));
+                }
+            });
+
+            data.items = files;
+            this.appendResources(data, keyword);
         });
     }
 

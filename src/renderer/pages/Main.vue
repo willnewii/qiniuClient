@@ -185,8 +185,8 @@
                 });
             },
             selectCOS(item) {
-                this.cos_name = item.name + "COS客户端";
-                document.getElementById("title") && (document.getElementById("title").innerText = item.name + "COS客户端");
+                this.cos_name = item.name + 'COS';
+                document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos_key = item.key;
                 this.$storage.setName(item.key);
                 this.$storage.initCOS((result) => {
@@ -200,24 +200,13 @@
             },
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
+                    console.log(data);
                     if (error) {
                         this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
                     } else {
-                        switch (this.$storage.name) {
-                            case brand.qiniu.key:
-                                this[types.app.a_buckets](data);
-                                break;
-                            case brand.tencent.key:
-                                let buckets = [];
-                                data.forEach((value) => {
-                                    buckets.push(value.Name);
-                                });
-
-                                this[types.app.a_buckets](buckets);
-                                this[types.app.a_buckets_info](data);
-                                break;
-                        }
+                        this[types.app.a_buckets](data.names);
+                        this[types.app.a_buckets_info](data.datas);
 
                         if (this.setup_recentname && this.buckets.indexOf(this.setup_recentname) !== -1) {
                             this.onMenuSelect(this.buckets[this.buckets.indexOf(this.setup_recentname)]);

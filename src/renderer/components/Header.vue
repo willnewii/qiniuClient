@@ -121,11 +121,7 @@
         },
         computed: {
             placeholder() {
-                if (this.bucket.getCurrentDir()) {
-                    return '搜索' + this.bucket.getCurrentDir() + '目录下文件';
-                } else {
-                    return '搜索';
-                }
+                return '搜索';
             },
         },
         watch: {
