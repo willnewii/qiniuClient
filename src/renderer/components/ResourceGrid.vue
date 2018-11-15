@@ -238,7 +238,7 @@
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
                         return `${this.bucket.generateUrl(file.key)}${temp}`;
-                    case brand.tencent.key:
+                    default:
                         return this.bucket.generateUrl(file.key);
                 }
             },

@@ -112,8 +112,6 @@ export function quickSort(arr, key) {
 }
 
 export function formatFileSize(size) {
-    if (!size)
-        return '';
     if (size >= Math.pow(1024, 4)) {
         return (size / Math.pow(1024, 4)).toFixed(2) + ' TB';
     } else if (size >= Math.pow(1024, 3)) {
@@ -179,16 +177,17 @@ export function convertMeta(item, platformType = 0) {
             item.key = item.Key;
             item.fsize = parseInt(item.Size);
             item.putTime = new Date(item.LastModified).getTime();
-            item.mimeType = mime.lookup(item.key);
+            item.mimeType = mime.lookup(item.key) || '';
             item.ETag = item.etag;
             break;
         case 2:
-            item.ETag = item.etag;
             item.fsize = parseInt(item.size);
-            item.putTime = new Date(item.modified).getTime();
-            item.mimeType = item.mime_type;
+            item.putTime = new Date(item.modified * 1000).getTime();
+            item.mimeType = mime.lookup(item.key) || '';
+            item.ETag = item.etag;
             break;
     }
+
     return item;
 }
 

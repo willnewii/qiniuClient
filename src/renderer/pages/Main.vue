@@ -11,18 +11,18 @@
                     <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
                     <span>{{menuState ? cos_name : ''}}</span>
                 </i-button>
-                <Menu width="auto" v-if="buckets && buckets.length > 0"
+                <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets" :key="index" :name="item"
+                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name"
                                    :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="privatebucket.indexOf(item) !==  -1 ? 'md-lock' : 'md-folder'"></Icon>
-                                <span class="layout-text">{{item}}</span>
+                                      :type="(privatebucket.indexOf(item.name) !==  -1 || item.isprivate) ? 'md-lock' : 'md-folder'"></Icon>
+                                <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
-                                <span class="layout-icon">{{item.substring(0,1)}}</span>
+                                <span class="layout-icon">{{item.name.substring(0,1)}}</span>
                             </template>
                         </Menu-item>
                     </Menu-group>
@@ -135,7 +135,7 @@
         },
         computed: {
             ...mapGetters({
-                buckets: types.app.buckets,
+                buckets_info: types.app.buckets_info,
                 privatebucket: types.setup.setup_privatebucket,
                 setup_recentname: types.setup.setup_recentname,
             }),
@@ -168,7 +168,6 @@
         },
         methods: {
             ...mapActions([
-                types.app.a_buckets,
                 types.app.a_buckets_info,
                 types.setup.setup_a_recentname,
             ]),
@@ -200,19 +199,21 @@
             },
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
-                    console.log(data);
+                    console.log(error, data);
                     if (error) {
                         this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
                     } else {
-                        this[types.app.a_buckets](data.names);
-                        this[types.app.a_buckets_info](data.datas);
+                        let defaultIndex = 0;
 
-                        if (this.setup_recentname && this.buckets.indexOf(this.setup_recentname) !== -1) {
-                            this.onMenuSelect(this.buckets[this.buckets.indexOf(this.setup_recentname)]);
-                        } else {
-                            this.onMenuSelect(this.buckets[0]);
-                        }
+                        data.datas.forEach((item, index) => {
+                            data.datas[index].isprivate = false;
+                            if (this.setup_recentname === item.name) {
+                                defaultIndex = index;
+                            }
+                        });
+                        this[types.app.a_buckets_info](data.datas);
+                        this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
                     }
                 });
             },

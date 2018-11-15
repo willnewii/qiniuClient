@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const klaw = require('klaw-sync');
 const qetag = require('./util/qetag');
+import brand from '../renderer/cos/brand';
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
@@ -69,12 +70,12 @@ export function convertPath(path) {
 export const getEtag = function (filePath, platformType, callback = null) {
     return new Promise(function (resolve, reject) {
         switch (platformType) {
-            case 0:
+            case brand.qiniu.key:
                 qetag(filePath, (hash) => {
                     resolve(hash);
                 });
                 break;
-            case 1:
+            default:
                 getFileMd5(filePath, (error, hash) => {
                     resolve(hash);
                 });
@@ -95,7 +96,7 @@ const getFileMd5 = function (filepath, callback) {
     });
     readStream.on('end', function () {
         let hash = md5.digest('hex');
-        callback(null, hash);
+        callback(null, `"${hash}"`);
     });
 };
 

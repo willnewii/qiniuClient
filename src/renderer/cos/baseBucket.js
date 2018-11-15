@@ -13,6 +13,7 @@ class baseBucket {
 
     reset() {
         this.name = '';
+        this.location = '';
         //是否是私有空间
         this.isprivate = false;
 
@@ -56,6 +57,12 @@ class baseBucket {
         });
     }
 
+    /**
+     * 根据marker状态判断是否继续请求
+     * 请将data数据统一转换: items | marker
+     * @param data
+     * @param keyword
+     */
     appendResources(data, keyword) {
         this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
         this.marker = data.marker ? data.marker : '';

@@ -26,7 +26,7 @@ export default {
             //同步文件时,缓存文件父路径
             baseDir: '',
             //上传,下载,删除任务完成数
-            finishCount: 0
+            finishCount: -1,
         };
     },
     created: function () {
@@ -70,6 +70,7 @@ export default {
         });
 
         this.$electron.ipcRenderer.on(Constants.Listener.syncDirectory, (event, results) => {
+            this.finishCount = 0;
             //  下载任务
             if (results.downloads && results.downloads.length > 0) {
                 this.status_total = this.bucket.downloads.length;
@@ -181,13 +182,14 @@ export default {
             });
         },
         syncFinish() {
-            this.finishCount++;
-
-            if (this.finishCount === 3) {
-                this.finishCount = 0;
-                util.notification({
-                    body: '同步完成'
-                });
+            if (this.finishCount >= 0) {
+                ++this.finishCount;
+                if (this.finishCount === 3) {
+                    this.finishCount = -1;
+                    util.notification({
+                        body: '同步完成'
+                    });
+                }
             }
         },
         resourceDownload() {
@@ -261,11 +263,10 @@ export default {
          */
         removes() {
             this.bucket.removeFile(this.bucket.selection, (ret) => {
-                if (ret.error) {
+                if (ret && ret.error) {
                     this.$Message.error('移除失败：' + ret.error);
                 } else {
                     this.$Message.info('文件移除成功');
-                    console.log(this);
                     this.$emit('on-update', null, 'remove');
                 }
                 this.bucket.selection = [];

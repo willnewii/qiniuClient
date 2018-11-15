@@ -43,7 +43,7 @@
                          <Option :value="brands.tencent.key">{{ brands.tencent.name }}</Option>
                      </Select>-->
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
-                        <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
+                        <Option v-for="item in buckets_info" :value="item" :key="item">{{ item.name }}</Option>
                     </Select>
                     /
                     <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>
@@ -93,8 +93,8 @@
             <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
             <br>
             <CheckboxGroup v-model="privates" @on-change="privatesChange">
-                <Checkbox v-for="item,index in buckets" :key="index" :label="item">
-                    <span>{{item}}</span>
+                <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">
+                    <span>{{item.name}}</span>
                 </Checkbox>
             </CheckboxGroup>
             <Row class="row-line">
@@ -142,7 +142,7 @@
         },
         computed: {
             ...mapGetters({
-                buckets: types.app.buckets,
+                buckets_info: types.app.buckets_info,
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
                 setup_uploadNoAsk: types.setup.setup_uploadNoAsk,

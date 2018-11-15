@@ -1,15 +1,15 @@
 const {QingStor, Config} = require('qingstor-sdk');
 
-import brand from "./brand";
 import QingBucket from "./qingBucket";
 
 let cos = null;
-
+let qinKey = null;
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
 function init(param) {
     cos = new QingStor(new Config(param.access_key, param.secret_key));
+    qinKey = param;
 }
 
 function getBuckets(callback) {
@@ -20,11 +20,7 @@ function getBuckets(callback) {
             error.message = data.message;
             callback && callback(error);
         } else {
-            let names = [];
-            data.buckets.forEach((item) => {
-                names.push(item.name);
-            });
-            callback && callback(null, {names, datas: data.buckets});
+            callback && callback(null, {datas: data.buckets});
         }
     });
 }
@@ -90,8 +86,16 @@ function remove(params, items, callback) {
     });
 }
 
+function generateUrl(domain, key, deadline) {
+    key = key.trim();
+    if (deadline) {
+    } else {
+        return PROTOCOL + domain + '/' + encodeURI(key);
+    }
+}
+
 function generateBucket(name) {
     return new QingBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, remove, rename};
+export {init, getBuckets, generateBucket, generateUrl, remove, rename, PROTOCOL};

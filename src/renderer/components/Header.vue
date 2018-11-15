@@ -114,9 +114,9 @@
                 isMac: process.platform === 'darwin',
                 isWin: process.platform === 'win32',
                 //目前只有七牛支持Url直接上传
-                isSupportUrlUpload: this.$storage.name === brand.qiniu.key,
+                isSupportUrlUpload: [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name),
                 //目前只有七牛支持Domain选择
-                isSupportDomain: this.$storage.name === brand.qiniu.key,
+                isSupportDomain: [brand.qiniu.key].indexOf(this.$storage.name),
             };
         },
         computed: {

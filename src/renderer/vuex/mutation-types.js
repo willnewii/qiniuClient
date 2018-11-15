@@ -47,10 +47,7 @@ export const app = {
     name: 'name',
     a_name: 'name',
 
-    buckets: 'buckets',
-    a_buckets: 'action_buckets',
-
-    //存储buckets 其他信息
+    //存储buckets 信息
     buckets_info: 'buckets_info',
     a_buckets_info: 'action_buckets_info',
 

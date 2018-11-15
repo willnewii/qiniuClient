@@ -172,7 +172,7 @@
     import ResourceGrid from "@/components/ResourceGrid.vue";
     import ResourceFilter from "@/components/ResourceFilter";
 
-    import {mapGetters} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
     import {Constants, util, EventBus, mixins, brand} from '../service/index';
@@ -239,6 +239,9 @@
             }
         },
         methods: {
+            ...mapActions([
+                types.app.a_buckets_info,
+            ]),
             /**
              * 初始化空间信息
              */
@@ -324,20 +327,10 @@
                     files[index].url = this.$refs['resource-filter'].getResoureUrl(item);
                 });
 
-                let type = 0;
-                switch (this.$storage.name) {
-                    case brand.qiniu.key:
-                        type = 0;
-                        break;
-                    case brand.tencent.key:
-                        type = 1;
-                        break;
-                }
-
                 this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
                     properties: ['openDirectory'],
                     files,
-                    type,
+                    type: this.$storage.name,
                     mergeType: this.model_merge.mode,
                 });
             },

@@ -21,11 +21,7 @@ function getBuckets(callback) {
             error.message = err.error.Message;
             callback(error);
         } else {
-            let names = [];
-            data.Buckets.forEach((item) => {
-                names.push(item.Name);
-            });
-            callback && callback(null, {names, datas: data.Buckets});
+            callback && callback(null, {datas: data.Buckets});
         }
     });
 }

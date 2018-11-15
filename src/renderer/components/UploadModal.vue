@@ -80,6 +80,7 @@
 
                     if (this.setup_uploadNoAsk) {//直接上传
                         this.filePaths = files;
+                        this.uploadModal.input = this.bucket.folderPath;
                         this.uploadModal.type = Constants.UploadType.UPLOAD;
                         this.preUploadFile();
                     } else {
@@ -140,7 +141,7 @@
         },
         methods: {
             uploadAction(index) {
-                this.uploadModal.prepend = this.bucket.getCurrentDir();
+                //this.uploadModal.prepend = this.bucket.getCurrentDir();
                 switch (index) {
                     case 0://调用文件选取对话框
                         this.filePaths = [];

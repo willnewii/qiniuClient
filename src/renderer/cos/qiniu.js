@@ -31,7 +31,11 @@ function getBuckets(callback) {
     let request = new Request();
     request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
-        callback(null, {names: result.data});
+        let datas = [];
+        for (let name of result.data) {
+            datas.push({name});
+        }
+        callback(null, {datas});
     }).catch((error) => {
         callback(error);
     });
