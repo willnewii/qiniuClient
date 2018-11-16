@@ -1,3 +1,5 @@
+import * as types from "@/vuex/mutation-types";
+
 const fs = require('fs');
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
@@ -33,12 +35,23 @@ class Bucket extends baseBucket {
         });
 
         if (this.location) {
-            // this.getDirs();
-            this.getResources();
+            this.getACL();
         }
-        /*this.checkPrivate();
-        this.getDomains();
-        */
+    }
+
+    /**
+     * 获取Bucket访问权限状态
+     */
+    getACL() {
+        let param = {
+            Bucket: this.name,
+            Region: this.location,
+        };
+
+        this.cos.getBucketAcl(param, (err, data) => {
+            this.setPrivate(data.ACL === 'private');
+            this.getResources();
+        });
     }
 
     createFile(_param, type, callback) {

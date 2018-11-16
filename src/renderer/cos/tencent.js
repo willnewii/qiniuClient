@@ -21,6 +21,9 @@ function getBuckets(callback) {
             error.message = err.error.Message;
             callback(error);
         } else {
+            data.Buckets.forEach((item, index) => {
+                data.Buckets[index].name = item.Name;
+            });
             callback && callback(null, {datas: data.Buckets});
         }
     });

@@ -51,6 +51,7 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
         if (fs.existsSync(filePath)) {
             let tag = await util.getEtag(filePath, platformType);
             if (tag !== file.ETag) {
+                logger.info(`${tag}--${file.ETag}`);
                 if (fs.statSync(filePath).mtimeMs > file.putTime) {
                     logger.info('[上传]:本地文件变更,更新云文件', filePath);
                     uploads.push({path: filePath, dir: localDir});

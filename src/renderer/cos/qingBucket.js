@@ -7,7 +7,6 @@ import * as qing from './qing';
 
 const mime = require('mime-types');
 import * as types from '../vuex/mutation-types';
-import * as qiniu from "@/cos/qiniu";
 
 class Bucket extends baseBucket {
 
@@ -43,15 +42,7 @@ class Bucket extends baseBucket {
                     }
                 }
             }
-            this.isprivate = flag;
-            let array = this.vm.buckets_info.concat();
-            // TODO: VUEX 值更新问题
-            array.forEach((item, index) => {
-                if (item.name === this.name) {
-                    array[index].isprivate = flag;
-                }
-            });
-            this.vm[types.app.a_buckets_info](array);
+            this.setPrivate(flag);
             this.getResources();
         });
     }
@@ -71,7 +62,6 @@ class Bucket extends baseBucket {
             };
         }
         this.bucket.putObject(_param.key, params, function (err, data) {
-            console.log(err, data);
             callback(err, {key: _param.key});
         });
     }

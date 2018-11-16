@@ -1,4 +1,5 @@
 import {Constants, EventBus, util} from '../service/index';
+import * as types from "@/vuex/mutation-types";
 
 class baseBucket {
 
@@ -47,6 +48,21 @@ class baseBucket {
         this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
+    }
+
+    setPrivate(isPrivate) {
+        this.isprivate = isPrivate;
+
+        if (this.vm) {
+            let array = this.vm.buckets_info.concat();
+            // TODO: VUEX 值更新问题
+            array.forEach((item, index) => {
+                if (item.name === this.name) {
+                    array[index].isprivate = this.isprivate;
+                }
+            });
+            this.vm[types.app.a_buckets_info](array);
+        }
     }
 
     getResources() {

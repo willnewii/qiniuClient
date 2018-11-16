@@ -33,8 +33,8 @@
                     v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
-            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0"
-                   placeholder="请填入空间域名" v-show="isSupportDomain"/>
+            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
+                   placeholder="请填入空间域名"/>
         </div>
 
         <template v-if="bucket.name">
@@ -114,9 +114,9 @@
                 isMac: process.platform === 'darwin',
                 isWin: process.platform === 'win32',
                 //目前只有七牛支持Url直接上传
-                isSupportUrlUpload: [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name),
+                isSupportUrlUpload: [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1,
                 //目前只有七牛支持Domain选择
-                isSupportDomain: [brand.qiniu.key].indexOf(this.$storage.name),
+                isSupportDomain: [brand.qiniu.key].indexOf(this.$storage.name) !== -1,
             };
         },
         computed: {

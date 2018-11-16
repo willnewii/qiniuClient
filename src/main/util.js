@@ -1,3 +1,5 @@
+import pkg from "../../package";
+
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
@@ -6,6 +8,7 @@ const fs = require('fs');
 const klaw = require('klaw-sync');
 const qetag = require('./util/qetag');
 import brand from '../renderer/cos/brand';
+import {Notification} from "electron";
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
@@ -107,4 +110,13 @@ const getFileMd5 = function (filepath, callback) {
  */
 const isDirectory = function (path) {
     return fs.statSync(path).isDirectory();
+};
+
+export const notification = function (option) {
+    option.title = option.title || pkg.cnname;
+    option.body = option.message;
+    option.silent = true;
+    // option.subtitle = 'subtitle';
+    // option.body = 'body';
+    new Notification(option).show();
 };

@@ -178,7 +178,6 @@ export function convertMeta(item, platformType = 0) {
             item.fsize = parseInt(item.Size);
             item.putTime = new Date(item.LastModified).getTime();
             item.mimeType = mime.lookup(item.key) || '';
-            item.ETag = item.etag;
             break;
         case 2:
             item.fsize = parseInt(item.size);

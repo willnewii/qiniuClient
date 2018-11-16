@@ -153,6 +153,9 @@ const registerIPC = function () {
         let content = arg.urls.join('\n');
         fs.writeFileSync(filePath, content);
         shell.showItemInFolder(filePath);
+        util.notification({
+            message: 'URL 导出完成'
+        });
     });
 };
 

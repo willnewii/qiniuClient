@@ -54,6 +54,12 @@
             flex-shrink: 0;
         }
     }
+
+    .file-list {
+        margin-top: 10px;
+        overflow: scroll;
+        max-height: 300px;
+    }
 </style>
 <style lang="scss">
     @import '../style/params';
@@ -143,9 +149,12 @@
 
         <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
                @on-ok="callRemove" @on-cancel="cleanSelection">
-            <template>
-                <p v-for="file in bucket.selection">{{file.key}}</p>
-            </template>
+            <div class="file-list">
+                <template>
+                    <p v-for="file in bucket.selection">{{file.key}}</p>
+                </template>
+            </div>
+
         </Modal>
 
         <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
