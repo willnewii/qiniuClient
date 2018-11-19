@@ -51,9 +51,9 @@
             <div class="choice-cos">
                 <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">
-                        <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
-                        <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
-                        <span class="name">{{item.name}}</span>
+                        <Icon class="iconfont" :class="`icon-${item.key} ${item.login ? 'logined' : ''} `"
+                              size="32"></Icon>
+                        <span class="name" :class="`${item.login ? 'logined' : ''} `">{{item.name}}</span>
                     </div>
                 </Card>
             </div>
@@ -172,11 +172,9 @@
                 types.setup.setup_a_recentname,
             ]),
             initCOS() {
-                this.$storage.getCOS((cos) => {
-                    if (cos.length === 0) {
+                this.$storage.getCOS(({cos, _cos}) => {
+                    if (_cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (cos.length === 1) {
-                        this.selectCOS(cos[0]);
                     } else {
                         this.cos = cos;
                         this.cosChoiceModel = true;
@@ -199,7 +197,6 @@
             },
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
-                    console.log(error, data);
                     if (error) {
                         this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
                         this.$router.push({path: Constants.PageName.login});
@@ -238,29 +235,9 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS((cos) => {
-                            if (cos.length === 0) {
-                                this.$router.push({path: Constants.PageName.login});
-                            } else if (cos.length === 1) {
-                                this.$Modal.confirm({
-                                    title: '切换账号',
-                                    render: (h) => {
-                                        return h('div', {
-                                            style: {
-                                                'padding-top': '10px'
-                                            }
-                                        }, [
-                                            '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
-                                        ]);
-                                    },
-                                    onOk: () => {
-                                        this.$router.push({path: Constants.PageName.login});
-                                    }
-                                });
-                            } else {
-                                this.cos = cos;
-                                this.cosChoiceModel = true;
-                            }
+                        this.$storage.getCOS(({cos}) => {
+                            this.cos = cos;
+                            this.cosChoiceModel = true;
                         });
                         break;
                     case Constants.Key.app_logout:
@@ -402,6 +379,12 @@
             .name {
                 font-size: 13px;
                 margin-top: 5px;
+            }
+            .logined {
+                color: $primary;
+            }
+            .unlogin {
+                color: #CCCCCC;
             }
         }
     }

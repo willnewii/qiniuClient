@@ -26,7 +26,6 @@ export default class CloudObjectStorage {
     }
 
     getBuckets(callback) {
-        console.log('name:' + this.name);
         this.cos.getBuckets(callback);
     }
 
@@ -37,11 +36,12 @@ export default class CloudObjectStorage {
         for (let i = 0; i < cos.length; i++) {
             let data = await storagePromise.get(cos[i].key + '_key');
             if (data && data.access_key && data.secret_key) {
+                cos[i].login = true;
                 _cos.push(cos[i]);
             }
         }
 
-        callback(_cos);
+        callback({cos, _cos});
     }
 
     /**
