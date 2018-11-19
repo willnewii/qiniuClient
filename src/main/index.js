@@ -15,6 +15,8 @@ import * as diffFolder from './util/diffFolder';
 
 let mainWindow, aboutWindow;
 
+const DEFAULT_PATH = path.join(app.getPath('downloads'), pkg.name);
+
 app.on('ready', initApp);
 
 app.on('window-all-closed', () => {
@@ -86,7 +88,7 @@ const registerIPC = function () {
             }
         };
         if (!option.directory) {
-            option.directory = path.join(app.getPath('downloads'), pkg.name);
+            option.directory = DEFAULT_PATH;
         }
         if (option.folder) {
             option.directory = path.join(option.directory, option.folder);
@@ -148,8 +150,10 @@ const registerIPC = function () {
         event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
     });
 
+    //导出URL链接
     ipcMain.on(Constants.Listener.exportUrl, function (event, arg) {
-        let filePath = path.join(app.getPath('downloads'), pkg.name, arg.name);
+        fs.ensureDirSync(DEFAULT_PATH);
+        let filePath = path.join(DEFAULT_PATH, arg.name);
         let content = arg.urls.join('\n');
         fs.writeFileSync(filePath, content);
         shell.showItemInFolder(filePath);

@@ -43,7 +43,8 @@
                          <Option :value="brands.tencent.key">{{ brands.tencent.name }}</Option>
                      </Select>-->
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
-                        <Option v-for="item in buckets_info" :value="item" :key="item">{{ item.name }}</Option>
+                        <Option v-for="item in buckets_info" :value="item.name" :key="item.name">{{ item.name }}
+                        </Option>
                     </Select>
                     /
                     <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>

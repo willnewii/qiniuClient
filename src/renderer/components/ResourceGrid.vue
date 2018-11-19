@@ -83,7 +83,7 @@
             <Input v-model="changeFileNameDialog.input"/>
         </Modal>
 
-        <viewer :options="options" :images="previewImages" class="viewer" ref="viewer" @inited="inited">
+        <viewer :options="options" :images="previewImages" ref="viewer" @inited="inited" style="display: none">
             <img class="image-wrapper" v-for="src in previewImages" :key="src"
                  :src="src" :data-source="src" :alt="src.split('?image=').pop()">
         </viewer>
@@ -239,7 +239,7 @@
                     case brand.qiniu.key:
                         return `${this.bucket.generateUrl(file.key)}${temp}`;
                     default:
-                        return this.bucket.generateUrl(file.key);
+                        return this.bucket.generateUrl(file.key, this.setup_deadline);
                 }
             },
             getFilebyGrid() {
@@ -295,7 +295,7 @@
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
-                            if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
+                            if (util.isSupportImage(file.mimeType.toLowerCase())) {
                                 images.push(file);
                                 file._icon = 'md-image';
                             } else if (file.mimeType.indexOf('audio') === 0) {
@@ -471,10 +471,6 @@
                 color: white;
                 background-color: $primary !important;
             }
-        }
-
-        .viewer {
-            z-index: 999;
         }
     }
 </style>

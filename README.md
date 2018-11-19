@@ -1,6 +1,6 @@
-# qiniuClient v0.2.1
+# COSClient v0.2.2
 ![](http://blog-res.mayday5.me/niu_128.png?imageView2/1/w/30/h/30/q/75|imageslim)
-> 七牛存储文件管理客户端.跟七牛云官网后台相比,增加了按目录显示,删除,修改等操作.支持URL上传,文件夹上传。腾讯COS也顺手支持了一下
+> 云存储文件管理客户端。支持七牛云、腾讯云、青云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
 
 ## 效果图
 【多选 按住 mac:command win:ctrl】
@@ -10,6 +10,12 @@
 ![qiniuClient-1.0.0截图2.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-10-24%20%E4%B8%8B%E5%8D%885.05.42.png)
 
 ## 更新说明
+2018.11.19
+***
+- 支持资源URL批量导出
+- 应用内直接浏览图片
+- 新增支持**青云**对象存储
+
 2018.11.06
 ***
 - 支持同步功能啦 [规则说明](https://github.com/willnewii/qiniuClient/wiki/bucket%E5%90%8C%E6%AD%A5)

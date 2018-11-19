@@ -1,8 +1,8 @@
 {
     "name": "qiniuclient",
     "cnname": "COS管理客户端",
-    "version": "0.2.1",
-    "description": "七牛COS管理客户端",
+    "version": "0.2.2",
+    "description": "云存储文件管理客户端。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
     "main": "./dist/electron/main.js",

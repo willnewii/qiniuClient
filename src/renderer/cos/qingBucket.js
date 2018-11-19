@@ -124,7 +124,7 @@ class Bucket extends baseBucket {
      */
     generateUrl(key, deadline) {
         if (this.isprivate) {
-            return this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + deadline).operation.uri;
+            return this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
         } else {
             return qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, (this.isprivate ? deadline : null));
         }

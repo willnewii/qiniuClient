@@ -126,17 +126,20 @@ export default {
         show(file) {
         },
         showImage(file, images) {
+            this.previewImages = [];
             if (images && images.length > 0) {
                 images.forEach((item) => {
                     this.previewImages.push(this.getResoureUrl(item));
                 });
-            }
 
-            this.$nextTick(() => {
                 this.$nextTick(() => {
-                    this.$viewer.view(images.indexOf(file));
+                    this.$nextTick(() => {
+                        this.$nextTick(() => {
+                            this.$viewer.view(images.indexOf(file));
+                        });
+                    });
                 });
-            });
+            }
         },
         copy(file, copyType) {
             let url = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file));
