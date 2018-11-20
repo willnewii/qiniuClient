@@ -1,6 +1,6 @@
-# COSClient v0.2.2
+# 云存储管理客户端 v0.2.2
 ![](http://blog-res.mayday5.me/niu_128.png?imageView2/1/w/30/h/30/q/75|imageslim)
-> 云存储文件管理客户端。支持七牛云、腾讯云、青云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
+> 云存储管理客户端。支持七牛云、腾讯云、青云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
 
 ## 效果图
 【目前已支持 七牛云、腾讯云、青云】
@@ -46,7 +46,7 @@ old
 - 私有空间操作([说明](https://github.com/willnewii/qiniuClient/wiki/%E4%B8%83%E7%89%9B%E7%A7%81%E6%9C%89%E7%A9%BA%E9%97%B4%E5%92%8C%E6%8E%88%E6%9D%83%E7%A9%BA%E9%97%B4%E5%A4%84%E7%90%86)）
 
 ## 下载
-- [mac v0.2.2](http://blog-res.mayday5.me/file/COS%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.2-mac.dmg)
+- [mac v0.2.2](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.2-mac.dmg)
 - [win v0.2.0](http://blog-res.mayday5.me/file/COS%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.0-win_2.exe)
 
 ## Build Setup
