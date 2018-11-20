@@ -177,21 +177,20 @@
 </template>
 <script>
     import Header from '@/components/Header';
-    import ResourceTable from '@/components/ResourceTable.vue';
+    //import ResourceTable from '@/components/ResourceTable.vue';
     import ResourceGrid from "@/components/ResourceGrid.vue";
     import ResourceFilter from "@/components/ResourceFilter";
 
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
-    import {Constants, util, EventBus, mixins, brand} from '../service/index';
+    import {Constants, util, EventBus, mixins} from '../service/index';
     import dayjs from 'dayjs';
 
     export default {
         name: 'bucketPage',
         components: {
-            ResourceFilter,
-            Header, ResourceGrid, ResourceTable
+            Header, ResourceGrid, ResourceFilter,
         },
         mixins: [mixins.base],
         props: {
@@ -249,7 +248,7 @@
         },
         methods: {
             ...mapActions([
-                types.app.a_buckets_info,
+                types.app.a_update_buckets_info,
             ]),
             /**
              * 初始化空间信息

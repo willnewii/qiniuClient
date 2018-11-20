@@ -25,11 +25,16 @@
                         <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
                         <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
                     </Form-item>
-                    <div v-if="item.key === brands[0].key" style="margin-left: 150px">＊如何获取密钥信息:登录<a
-                            @click="openBrowser('https://portal.qiniu.com/user/key')">{{item.name}}</a>->个人面板->密钥管理
-                    </div>
-                    <div v-else-if="item.key === brands[1].key" style="margin-left: 150px">＊如何获取密钥信息:登录<a
-                            @click="openBrowser('https://console.cloud.tencent.com/cos5')">{{item.name}}</a>->密钥管理
+                    <div style="margin-left: 150px">＊如何获取密钥信息:登录
+                        <template v-if="item.key === brands[0].key">
+                            <a @click="openBrowser('https://portal.qiniu.com/user/key')">{{item.name}}</a>->个人面板->密钥管理
+                        </template>
+                        <template v-else-if="item.key === brands[1].key">
+                            <a @click="openBrowser('https://console.cloud.tencent.com/cos5')">{{item.name}}</a>->密钥管理
+                        </template>
+                        <template v-else-if="item.key === brands[2].key">
+                            <a @click="openBrowser('https://console.qingcloud.com/')">{{item.name}}</a>->头像->API密钥
+                        </template>
                     </div>
                 </Form>
             </TabPane>
@@ -37,7 +42,7 @@
     </div>
 </template>
 <script>
-    import {Constants, mixins} from '../service';
+    import {Constants, mixins, util} from '../service';
     import brand from '@/cos/brand';
 
     export default {
@@ -83,10 +88,14 @@
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
                     if (error) {
-                        this.$Notice.error({
+                        util.notification({
+                            title: this.selectBrand.name,
+                            body: error.message
+                        });
+                        /*this.$Notice.error({
                             title: this.selectBrand.name,
                             desc: error.message
-                        });
+                        });*/
                     } else {
                         this.$storage.saveCosKey({
                             access_key: access_key,

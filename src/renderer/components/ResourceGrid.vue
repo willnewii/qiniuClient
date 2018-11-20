@@ -395,6 +395,7 @@
                     min-height: $imageWidth;
                     min-width: $imageWidth;
                     padding: 10px;
+                    object-fit: cover;
                 }
                 .file {
                     height: $imageWidth;

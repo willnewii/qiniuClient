@@ -16,6 +16,13 @@ export default {
         [types.app.buckets_info](state, value) {
             state.app.buckets_info = value;
         },
+        [types.app.a_update_buckets_info](state, value) {
+            state.app.buckets_info.forEach((item, index) => {
+                if (item.name === value.name) {
+                    state.app.buckets_info[index].permission = value.permission;
+                }
+            });
+        },
         [types.app.name](state, value) {
             state.app.name = value;
         },
@@ -26,6 +33,9 @@ export default {
     actions: {
         [types.app.a_buckets_info](context, value) {
             context.commit(types.app.buckets_info, value);
+        },
+        [types.app.a_update_buckets_info](context, value) {
+            context.commit(types.app.a_update_buckets_info, value);
         },
         [types.app.a_name](context, value) {
             context.commit(types.app.name, value);

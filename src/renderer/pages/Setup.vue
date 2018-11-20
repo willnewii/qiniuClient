@@ -75,39 +75,40 @@
 
         </div>
 
-        <div class="item">
-            预览图片样式：
-            <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
-            <br>
-            <Row class="row-line">
-                <Col span="12">
-                    <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
-                </Col>
-                <Col span="11" offset="1">
-                    <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
-                </Col>
-            </Row>
-        </div>
-
-        <div class="item">
-            私有空间：
-            <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
-            <br>
-            <CheckboxGroup v-model="privates" @on-change="privatesChange">
-                <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">
-                    <span>{{item.name}}</span>
-                </Checkbox>
-            </CheckboxGroup>
-            <Row class="row-line">
-                <Col span="12">
-                    <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
-                           style="width: 20%; margin-right: 10px"/>分钟
-                </Col>
-                <Col span="11" offset="1">
-                    <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
-                </Col>
-            </Row>
-        </div>
+        <template v-if="brands.qiniu.key === $storage.name">
+            <div class="item">
+                预览图片样式：
+                <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
+                <br>
+                <Row class="row-line">
+                    <Col span="12">
+                        <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
+                    </Col>
+                    <Col span="11" offset="1">
+                        <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
+                    </Col>
+                </Row>
+            </div>
+            <div class="item">
+                私有空间：
+                <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
+                <br>
+                <CheckboxGroup v-model="privates" @on-change="privatesChange">
+                    <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">
+                        <span>{{item.name}}</span>
+                    </Checkbox>
+                </CheckboxGroup>
+                <Row class="row-line">
+                    <Col span="12">
+                        <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
+                               style="width: 20%; margin-right: 10px"/>分钟
+                    </Col>
+                    <Col span="11" offset="1">
+                        <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
+                    </Col>
+                </Row>
+            </div>
+        </template>
         <div class="item">
             主题：
             <br>
@@ -181,6 +182,7 @@
         },
         methods: {
             ...mapActions([
+                types.app.a_update_buckets_info,
                 types.setup.setup_a_copyType,
                 types.setup.setup_a_deleteNoAsk,
                 types.setup.setup_a_uploadNoAsk,
@@ -205,6 +207,10 @@
                 this[types.setup.setup_a_copyType](model);
             },
             privatesChange: function (privatebucket) {
+                this.buckets_info.forEach((item) => {
+                    let permission = privatebucket.indexOf(item.name) !== -1 ? 1 : 0;
+                    this[types.app.a_update_buckets_info]({name: this.name, permission: permission});
+                });
                 this[types.setup.setup_a_privatebucket](privatebucket);
             },
             themesChange(item) {

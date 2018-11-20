@@ -8,8 +8,8 @@
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon class="icon iconfont" :class="'icon-' + cos_key" size="20"></Icon>
-                    <span>{{menuState ? cos_name : ''}}</span>
+                    <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
+                    <span>{{menuState ? cos.name + 'COS' : ''}}</span>
                 </i-button>
                 <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
@@ -18,7 +18,7 @@
                                    :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="(privatebucket.indexOf(item.name) !==  -1 || item.isprivate) ? 'md-lock' : 'md-folder'"></Icon>
+                                      :type="item.permission === 1 ? 'md-lock' : 'md-folder'"></Icon>
                                 <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
@@ -46,19 +46,23 @@
             </i-col>
         </Row>
         <!-- cos选择框-->
-        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
-               :mask-closable="false">
+        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
+               :mask-closable="true">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">
-                        <Icon class="iconfont" :class="`icon-${item.key} ${item.login ? 'logined' : ''} `"
-                              size="32"></Icon>
-                        <span class="name" :class="`${item.login ? 'logined' : ''} `">{{item.name}}</span>
+                        <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
+                        <span class="name">{{item.name}}</span>
+                    </div>
+                </Card>
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 3">
+                    <div class="choice-view" @click="selectCOS()">
+                        <Icon type="md-add-circle" size="32"></Icon>
+                        <span class="name">登陆其它</span>
                     </div>
                 </Card>
             </div>
             <div slot="footer"></div>
-            <Icon></Icon>
         </Modal>
         <!-- 数据加载框-->
         <Spin size="large" fix v-if="loading.show">
@@ -83,16 +87,14 @@
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
 
-    import {Constants, mixins, EventBus} from '../service/index';
-    import brand from "@/cos/brand";
+    import {Constants, mixins, EventBus, util} from '../service/index';
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
-                cos: [],
-                cos_key: '',
-                cos_name: '',
+                coss: [],//已登录的cos列表
+                cos: {name: ''},
                 cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
@@ -175,16 +177,22 @@
                 this.$storage.getCOS(({cos, _cos}) => {
                     if (_cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
+                    } else if (_cos.length === 1) {
+                        this.selectCOS(_cos[0]);
                     } else {
-                        this.cos = cos;
+                        this.coss = _cos;
                         this.cosChoiceModel = true;
                     }
                 });
             },
             selectCOS(item) {
-                this.cos_name = item.name + 'COS';
+                if (item === undefined) {
+                    this.$router.push({path: Constants.PageName.login});
+                    return;
+                }
+
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
-                this.cos_key = item.key;
+                this.cos = item;
                 this.$storage.setName(item.key);
                 this.$storage.initCOS((result) => {
                     this.cosChoiceModel = false;
@@ -198,13 +206,15 @@
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
-                        this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
+                        util.notification({
+                            body: `获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`
+                        });
                         this.$router.push({path: Constants.PageName.login});
                     } else {
                         let defaultIndex = 0;
 
                         data.datas.forEach((item, index) => {
-                            data.datas[index].isprivate = false;
+                            data.datas[index].permission = 0;
                             if (this.setup_recentname === item.name) {
                                 defaultIndex = index;
                             }
@@ -235,8 +245,8 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS(({cos}) => {
-                            this.cos = cos;
+                        this.$storage.getCOS(({_cos}) => {
+                            this.coss = _cos;
                             this.cosChoiceModel = true;
                         });
                         break;
@@ -379,12 +389,6 @@
             .name {
                 font-size: 13px;
                 margin-top: 5px;
-            }
-            .logined {
-                color: $primary;
-            }
-            .unlogin {
-                color: #CCCCCC;
             }
         }
     }

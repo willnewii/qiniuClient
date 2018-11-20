@@ -15,8 +15,8 @@ class baseBucket {
     reset() {
         this.name = '';
         this.location = '';
-        //是否是私有空间
-        this.isprivate = false;
+        //操作权限 0：正常 1：私有
+        this.permission = 0;
 
         //当前bucket 的可用域名列表
         this.domains = [];
@@ -50,18 +50,10 @@ class baseBucket {
         this.withoutDelimiterFiles = [];
     }
 
-    setPrivate(isPrivate) {
-        this.isprivate = isPrivate;
-
+    setPermission(permission) {
+        this.permission = permission;
         if (this.vm) {
-            let array = this.vm.buckets_info.concat();
-            // TODO: VUEX 值更新问题
-            array.forEach((item, index) => {
-                if (item.name === this.name) {
-                    array[index].isprivate = this.isprivate;
-                }
-            });
-            this.vm[types.app.a_buckets_info](array);
+            this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
         }
     }
 

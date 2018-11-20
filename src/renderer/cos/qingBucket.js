@@ -6,7 +6,6 @@ import baseBucket from './baseBucket';
 import * as qing from './qing';
 
 const mime = require('mime-types');
-import * as types from '../vuex/mutation-types';
 
 class Bucket extends baseBucket {
 
@@ -42,7 +41,7 @@ class Bucket extends baseBucket {
                     }
                 }
             }
-            this.setPrivate(flag);
+            this.setPermission(flag ? 1 : 0);
             this.getResources();
         });
     }
@@ -123,10 +122,10 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        if (this.isprivate) {
+        if (this.permission === 1) {
             return this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
         } else {
-            return qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, (this.isprivate ? deadline : null));
+            return qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
         }
     }
 }

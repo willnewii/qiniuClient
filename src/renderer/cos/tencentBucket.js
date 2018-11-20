@@ -4,6 +4,7 @@ const fs = require('fs');
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
+import * as qing from "@/cos/qing";
 
 class Bucket extends baseBucket {
 
@@ -49,7 +50,7 @@ class Bucket extends baseBucket {
         };
 
         this.cos.getBucketAcl(param, (err, data) => {
-            this.setPrivate(data.ACL === 'private');
+            this.setPermission(data.ACL === 'private' ? 1 : 0);
             this.getResources();
         });
     }
@@ -136,12 +137,12 @@ class Bucket extends baseBucket {
         let params = {
             Bucket: this.name,
             Region: this.location,
-            Key: key
+            Key: key,
+            Expires: deadline,
+            Sign: this.permission === 1 //是否需要签名
         };
 
-        return this.cos.getObjectUrl(params, (err, data) => {
-            //console.log(err || data);
-        });
+        return this.cos.getObjectUrl(params);
     }
 }
 
