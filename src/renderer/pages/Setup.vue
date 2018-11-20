@@ -209,7 +209,7 @@
             privatesChange: function (privatebucket) {
                 this.buckets_info.forEach((item) => {
                     let permission = privatebucket.indexOf(item.name) !== -1 ? 1 : 0;
-                    this[types.app.a_update_buckets_info]({name: this.name, permission: permission});
+                    this[types.app.a_update_buckets_info]({name: item.name, permission: permission});
                 });
                 this[types.setup.setup_a_privatebucket](privatebucket);
             },
