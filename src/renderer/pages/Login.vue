@@ -51,8 +51,8 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    access_key: 'JEFPUPBERLDDROQXLPQQ',
-                    secret_key: 'l9QgCbAh6er00f0AgEjDj2V7NyEqvxha8GtMibSP',
+                    access_key: '',
+                    secret_key: '',
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
