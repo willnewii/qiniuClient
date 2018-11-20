@@ -1,4 +1,4 @@
-import {Constants, util, EventBus} from "@/service/index";
+import {Constants, util, EventBus, brand} from "@/service/index";
 
 export default {
     data() {
@@ -70,13 +70,14 @@ export default {
         },
         handleFolderMenuClick(action) {
             let path = this.files[this.contextFolderMenuIndex]._path;
+            let files = [];
 
             switch (action) {
                 case 0://删除操作
                     this.resourceRemove(this.getFilebyPath(path));
                     break;
                 case 1://目录详情
-                    let files = this.getFilebyPath(path);
+                    files = this.getFilebyPath(path);
                     let size = 0;
                     files.forEach((item) => {
                         size += item.fsize;
@@ -108,7 +109,7 @@ export default {
                 case 1:
                     this.folderInfoDialog.show = true;
                     this.folderInfoDialog.title = `${util.getPostfix(file.key)}简介`;
-                    this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}`;
+                    this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}\nETag：${file.ETag}`;
                     break;
                 case 2:
                     this.copy(file, Constants.CopyType.URL);
@@ -125,6 +126,8 @@ export default {
                 case 5://多选
                     this.selectFile(this.contextFileMenuIndex);
                     break;
+                case 6://下载
+                    this.handleDownload(file);
             }
         },
     }

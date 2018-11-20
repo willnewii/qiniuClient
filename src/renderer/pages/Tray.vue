@@ -69,7 +69,7 @@
                 domains: [],
                 files: [],
                 logs: [],
-                current: 1,
+                current: 0,
                 config: {}
             };
         },
@@ -125,56 +125,61 @@
                 ipc.send(Constants.Listener.updateTrayTitle, title);
             },
             sendNotify() {
-                ipc.send(Constants.Listener.showNotifier, {
+                /*ipc.send(Constants.Listener.showNotifier, {
                     title: '上传完成',
-                    message: '上传完成',
                     icon: 'notify-success.png'
-                });
+                });*/
             },
             doUploadFile() {
-                if (this.current > this.files.length) {
+                if (this.current === this.files.length) {
                     this.updateStatus('');
-                    this.current = 1;
+                    this.current = 0;
                     this.sendNotify();
                 } else {
-                    this.uploadFile(this.files[this.current - 1]);
+                    this.uploadFile(this.files[this.current]);
                 }
             },
-            uploadFile(item) {
-                this.updateStatus(`${this.current}/${this.files.length}`);
+            uploadFile(file) {
+                this.updateStatus(`${this.current + 1}/${this.files.length}`);
                 let key = '';
-                key = (this.config.bucket_dir ? this.config.bucket_dir + '/' : '') + util.getFileNameWithFolder(item);
+                key = (this.config.bucket_dir ? this.config.bucket_dir + '/' : '') + util.getFileNameWithFolder(file);
                 let log = {
-                    path: item.path,
+                    path: file.path,
                     key
                 };
                 try {
                     this.$storage.cos.upload({
                         bucket: this.config.bucket_name,
                         key,
-                        path: item.path,
+                        path: file.path,
                         progressCallback: (progress) => {
                             if (progress !== 100) {
-                                this.updateStatus(`(${progress}%)${this.current}/${this.files.length}`);
+                                this.updateStatus(`(${progress}%)${this.current + 1}/${this.files.length}`);
                             }
                         }
                     }, (err, ret) => {
-                        this.handleResult(log, err);
+                        this.handleResult(err, log);
                     });
                 } catch (err) {
-                    this.handleResult(log, err);
+                    this.handleResult(err, log);
                 }
             },
-            handleResult(log, err) {
+            handleResult(err, log) {
+                console.log(log);
                 if (!err) {//ret.key
                     log.code = 0;
+                    ipc.send(Constants.Listener.showNotifier, {
+                        title: '上传成功',
+                        message: log.path,
+                        image: log.path
+                    });
                 } else {
                     log.code = err.status;
                     log.error = err.error;
                 }
 
                 this.logs.unshift(log);
-                this.current = this.current + 1;
+                this.current++;
                 this.doUploadFile();
             },
             show(key) {

@@ -15,7 +15,6 @@ export default {
                 default:
                     this.$Message.info(option.message);
             }
-
         },
         doRequset(url, param, success, fail) {
             this._request('get', ...arguments);

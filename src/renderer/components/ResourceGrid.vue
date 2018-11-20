@@ -19,6 +19,10 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(2)">复制链接</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(3)">复制链接(Markdown)</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(6)">下载</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
@@ -29,19 +33,13 @@
                     <div class="item" @click="clickItem(file,files.indexOf(file))"
                          v-contextmenu="file._contextmenu" :index="files.indexOf(file)">
                         <template v-if="file._directory">
-                            <div class="file">
-                                <Icon :type="file._icon" size="50"></Icon>
-                            </div>
+                            <Icon class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file._name}}</span>
                         </template>
                         <template v-else>
-                            <img v-if="/image\/(png|img|jpe?g)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="'http://' + bucket.domain + '/' + file.key + '?' + setup_imagestyle"/>
-                            <img v-else-if="/image\/(svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="'http://' + bucket.domain + '/' + file.key"/>
-                            <div v-else class="file">
-                                <Icon :type="file._icon" size="50"></Icon>
-                            </div>
+                            <img v-if="/image\/(png|img|jpe?g|svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
+                                 v-lazy="getUrlbyMimeType(file)"/>
+                            <Icon v-else class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file.key | getfileNameByUrl}}</span>
                             <div class="btn">
                                 <Button shape="circle" size="small" icon="md-download"
@@ -84,16 +82,20 @@
         <Modal v-model="changeFileNameDialog.show" title="重命名" @on-ok="changeFileName">
             <Input v-model="changeFileNameDialog.input"/>
         </Modal>
+
+        <viewer :options="options" :images="previewImages" ref="viewer" @inited="inited" style="display: none">
+            <img class="image-wrapper" v-for="src in previewImages" :key="src"
+                 :src="src" :data-source="src" :alt="src.split('?image=').pop()">
+        </viewer>
     </div>
 </template>
 <script>
     import {resource, base, contextmenu} from '../mixins/index';
-    import ResourceList from "@/components/ResourceList";
-    import {EventBus, Constants, util,} from "@/service/index";
+    import {EventBus, Constants, util, brand} from "@/service/index";
 
     export default {
         name: 'ResourceGrid',
-        components: {ResourceList},
+        components: {},
         mixins: [resource, base, contextmenu],
         props: {
             type: {
@@ -108,6 +110,8 @@
         data() {
             return {
                 files: [],
+                //图片文件列表,方便显示多图
+                images: [],
                 //缓存当前路径
                 cacheName: '',
                 //是否在多选状态
@@ -118,7 +122,24 @@
                 //virtual-list
                 remain0: 0,
                 remain1: 0,
-                step: 6
+                step: 6,
+                //virtual-list
+                options: {
+                    inline: false,
+                    button: true,
+                    navbar: false,
+                    title: true,
+                    toolbar: true,
+                    tooltip: true,
+                    movable: true,
+                    zoomable: true,
+                    rotatable: true,
+                    scalable: true,
+                    transition: true,
+                    fullscreen: true,
+                    keyboard: true,
+                    url: 'data-source'
+                },
             };
         },
         watch: {
@@ -137,45 +158,63 @@
                 }
             },
             'keyWord': function () {
-                this.fileFilter((result) => {
-                    if (this.keyWord) {
-                        this.showMessage({
-                            message: `匹配到${result.searchCount}个文件`
-                        });
+                this.fileFilter({
+                    callback: (result) => {
+                        if (this.keyWord) {
+                            this.showMessage({
+                                message: `匹配到${result.searchCount}个文件`
+                            });
+                        }
                     }
                 });
             },
         },
         created() {
-           /* document.onkeydown = (event) => {
-                let e = event || window.event || arguments.callee.caller.arguments[0];
-                switch (e.keyCode) {
-                    case 91://command(mac)
-                    case 93:
-                    case 17://control(win)
-                        this.isMultiple = true;
-                        break;
-                }
-            };
-            document.onkeyup = (event) => {
-                let e = event || window.event || arguments.callee.caller.arguments[0];
-                switch (e.keyCode) {
-                    case 91://command
-                    case 93:
-                    case 17://control
-                        this.isMultiple = false;
-                        break;
-                }
-            };*/
+            /* document.onkeydown = (event) => {
+                 let e = event || window.event || arguments.callee.caller.arguments[0];
+                 switch (e.keyCode) {
+                     case 91://command(mac)
+                     case 93:
+                     case 17://control(win)
+                         this.isMultiple = true;
+                         break;
+                 }
+             };
+             document.onkeyup = (event) => {
+                 let e = event || window.event || arguments.callee.caller.arguments[0];
+                 switch (e.keyCode) {
+                     case 91://command
+                     case 93:
+                     case 17://control
+                         this.isMultiple = false;
+                         break;
+                 }
+             };
+             EventBus.$on(Constants.Event.updateFiles, (files) => {
+                 this.files = files;
+                 /*this.fileFilter({
+                     source: files,
+                     callback: (result) => {
+                         if (this.keyWord) {
+                             this.showMessage({
+                                 message: `筛选到${result.searchCount}个文件`
+                             });
+                         }
+                     }
+                 });
+             });*/
         },
         mounted() {
-            console.log(this.$refs['content'].offsetHeight/29);
+            console.log(this.$refs['content'].offsetHeight / 29);
             this.remain0 = this.$refs['content'].offsetHeight / 29;
             this.remain1 = this.$refs['content'].offsetHeight / 123;
 
             this.fileFilter();
         },
         methods: {
+            inited(viewer) {
+                this.$viewer = viewer;
+            },
             clickItem(file, index) {
                 if (this.isMultiple) {
                     this.selectFile(index);
@@ -183,8 +222,25 @@
                     if (file._directory) {
                         this.bucket.folderPath = file._path;
                     } else {
-                        this.show(file);
+                        if (util.isSupportImage(file.mimeType)) {
+                            this.showImage(file, this.images);
+                        } else {
+                            this.show(file);
+                        }
+
                     }
+                }
+            },
+            getUrlbyMimeType(file) {
+                let temp = '?' + this.setup_imagestyle;
+                if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
+                    temp = '';
+                }
+                switch (this.$storage.name) {
+                    case brand.qiniu.key:
+                        return `${this.bucket.generateUrl(file.key)}${temp}`;
+                    default:
+                        return this.bucket.generateUrl(file.key, this.setup_deadline);
                 }
             },
             getFilebyGrid() {
@@ -210,17 +266,18 @@
             },
             /**
              * 根据前缀获取当前目录结构(文件夹/文件)
-             * @param callback  回调
+             * @param option  {source , callback}
              */
-            fileFilter(callback) {
+            fileFilter(option = {}) {
                 this.selection = [];
                 this.bucket.selection = [];
                 let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
+                let images = [];
                 let resultCount = 0;
 
-                this.bucket.files.forEach((file) => {
+                (option.source || this.bucket.files).forEach((file) => {
                     let temp_key = file.key;
                     if (folderPath === '' || temp_key.indexOf(folderPath + Constants.DELIMITER) === 0) {
 
@@ -239,7 +296,8 @@
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
-                            if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
+                            if (util.isSupportImage(file.mimeType.toLowerCase())) {
+                                images.push(file);
                                 file._icon = 'md-image';
                             } else if (file.mimeType.indexOf('audio') === 0) {
                                 file._icon = 'md-musical-notes';
@@ -265,6 +323,7 @@
                 });
 
                 files = files.sort(util.sequence);
+                images = images.sort(util.sequence);
                 if (folderPath !== '') {
                     let lastIndex = folderPath.lastIndexOf('/');
                     files.unshift({
@@ -288,13 +347,14 @@
                 // files.length = parseInt(files.length / 2);
                 this.files = [];
                 this.$nextTick(function () {
+                    this.images = Object.freeze(images);
                     this.files = Object.freeze(files);
-                    callback && callback({searchCount: resultCount});
+                    option.callback && option.callback({searchCount: resultCount});
                 });
             },
             handleDownload(file) {
-                this.bucket.selection = [file];
-                this.downloadFiles();
+                this.bucket.downloads = [file];
+                this.resourceDownload();
             },
         }
     };
@@ -306,23 +366,16 @@
 
     .layout-content {
         margin: 0 15px 15px 15px;
+        overflow-x: hidden;
         overflow-y: scroll;
         background: $bg-resource;
         flex-grow: 1;
         border-radius: 4px;
 
-        .grid {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-content: flex-start;
-            padding: 10px;
-        }
-
         .grid2 {
             padding: 10px;
             box-sizing: content-box;
+            transform: translateZ(0);
             .grid2-item {
                 display: flex;
                 flex-direction: row;
@@ -343,13 +396,13 @@
                     min-height: $imageWidth;
                     min-width: $imageWidth;
                     padding: 10px;
+                    object-fit: cover;
                 }
                 .file {
                     height: $imageWidth;
                     width: $imageWidth;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    line-height: $imageWidth;
+                    text-align: center;
                 }
                 .name {
                     font-size: 12px;
@@ -379,6 +432,7 @@
         }
 
         .list {
+            transform: translateZ(0);
             height: 100%;
             .item {
                 display: flex;
@@ -389,7 +443,6 @@
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
-
                 }
                 .date {
                     text-align: right;
@@ -410,17 +463,15 @@
             }
         }
 
-        .item-select {
-            color: white;
-            background-color: $primary !important;
-        }
-
         .item {
             .name {
                 white-space: nowrap;
-                /*font-weight: bold;*/
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            &-select {
+                color: white;
+                background-color: $primary !important;
             }
         }
     }

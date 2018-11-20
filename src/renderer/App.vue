@@ -6,7 +6,7 @@
 
 <script>
     import {Constants, util} from '@/service';
-    import {mapGetters} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
     import * as types from '@/vuex/mutation-types';
 
     export default {
@@ -28,17 +28,22 @@
             /*if (process.platform !== 'darwin') {
                 document.getElementById('title').remove();
             }*/
-            this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
-                util.loadTheme(arg ? 'dark' : 'light');
-            });
 
-            if (this.setup_theme === 'auto') {
-                this.$electron.ipcRenderer.send(Constants.Listener.darkMode);
-            } else {
-                util.loadTheme(this.setup_theme);
-            }
+            this[types.setup.setup_init](() => {
+                if (this.setup_theme === 'auto') {
+                    this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
+                        util.loadTheme(arg ? 'dark' : 'light');
+                    });
+                    this.$electron.ipcRenderer.send(Constants.Listener.darkMode);
+                } else {
+                    util.loadTheme(this.setup_theme);
+                }
+            });
         },
-        mounted() {
+        methods: {
+            ...mapActions([
+                types.setup.setup_init,
+            ]),
         }
     };
 </script>

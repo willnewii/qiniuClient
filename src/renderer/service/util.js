@@ -1,5 +1,8 @@
 import * as Constants from '../service/constants';
+import pkg from '../../../package';
 import dayjs from 'dayjs';
+
+const mime = require('mime-types');
 
 /**
  * Created by zhangweiwei on 2017/4/13.
@@ -109,8 +112,6 @@ export function quickSort(arr, key) {
 }
 
 export function formatFileSize(size) {
-    if (!size)
-        return '';
     if (size >= Math.pow(1024, 4)) {
         return (size / Math.pow(1024, 4)).toFixed(2) + ' TB';
     } else if (size >= Math.pow(1024, 3)) {
@@ -132,7 +133,16 @@ export function formatDate(time) {
 }
 
 /**
- * 文件排序
+ * 根据mimeType,判断是否是浏览器支持的图片格式
+ * @param mimeType
+ * @returns {boolean}
+ */
+export function isSupportImage(mimeType) {
+    return /image\/(png|img|jpe?g|svg|gif)/.test(mimeType.toLowerCase());
+}
+
+/**
+ * 文件排序 文件夹>文件
  * @param file1
  * @param file2
  * @returns {*}
@@ -151,18 +161,37 @@ export function sequence(file1, file2) {
     }
 }
 
+/**
+ * 转换个平台Object数据信息至统一格式
+ * @param item
+ * @param platformType 0: qiniu 1:tencent
+ * @returns {{key: *, fsize: number, putTime: number, mimeType: string},ETag:String}
+ */
+export function convertMeta(item, platformType = 0) {
+    switch (platformType) {
+        case 0:
+            item.putTime = item.putTime / 10000;
+            item.ETag = item.hash;
+            break;
+        case 1:
+            item.key = item.Key;
+            item.fsize = parseInt(item.Size);
+            item.putTime = new Date(item.LastModified).getTime();
+            item.mimeType = mime.lookup(item.key) || '';
+            break;
+        case 2:
+            item.fsize = parseInt(item.size);
+            item.putTime = new Date(item.modified * 1000).getTime();
+            item.mimeType = mime.lookup(item.key) || '';
+            item.ETag = item.etag;
+            break;
+    }
 
-export function wrapperFile(item, type) {
-    return {
-        key: item.Key,
-        fsize: parseInt(item.Size),
-        putTime: new Date(item.LastModified).getTime(),
-        mimeType: ''
-    };
+    return item;
 }
 
 /**
- * 开发模式直接修改字段
+ * 开发模式请直接修改params.scss
  * @param name
  */
 export function loadTheme(name) {
@@ -180,5 +209,14 @@ export function loadTheme(name) {
         }
         head.appendChild(style);
     }
+}
 
+/**
+ * notification api
+ * @param option
+ */
+export function notification(option = {}) {
+    new Notification(option.title || pkg.cnname, Object.assign({
+        silent: true
+    }, option));
 }

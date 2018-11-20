@@ -1,30 +1,26 @@
-import cosUtil from 'cos-nodejs-sdk-v5/sdk/util';
+const {QingStor, Config} = require('qingstor-sdk');
 
-cosUtil.isBrowser = false;
-import tencent from 'cos-nodejs-sdk-v5';
-import TencentBucket from "@/cos/tencentBucket";
+import QingBucket from "./qingBucket";
 
 let cos = null;
+let qinKey = null;
+//独立于各COS的配置
+const PROTOCOL = 'http://';
 
 function init(param) {
-    cos = new tencent({
-        SecretId: param.access_key,
-        SecretKey: param.secret_key,
-    });
+    cos = new QingStor(new Config(param.access_key, param.secret_key));
+    qinKey = param;
 }
 
 function getBuckets(callback) {
-    cos.getService(function (err, data) {
+    cos.listBuckets().then((data) => {
         let error = null;
-        if (err) {
+        if (data.statusCode !== 200) {
             error = {};
-            error.message = err.error.Message;
-            callback(error);
+            error.message = data.message;
+            callback && callback(error);
         } else {
-            data.Buckets.forEach((item, index) => {
-                data.Buckets[index].name = item.Name;
-            });
-            callback && callback(null, {datas: data.Buckets});
+            callback && callback(null, {datas: data.buckets});
         }
     });
 }
@@ -90,8 +86,16 @@ function remove(params, items, callback) {
     });
 }
 
-function generateBucket(name) {
-    return new TencentBucket(name, cos);
+function generateUrl(domain, key, deadline) {
+    key = key.trim();
+    if (deadline) {
+    } else {
+        return PROTOCOL + domain + '/' + encodeURI(key);
+    }
 }
 
-export {init, getBuckets, generateBucket, remove, rename};
+function generateBucket(name) {
+    return new QingBucket(name, cos);
+}
+
+export {init, getBuckets, generateBucket, generateUrl, remove, rename, PROTOCOL};

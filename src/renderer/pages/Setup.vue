@@ -15,9 +15,14 @@
 <template>
     <div>
         <div class="item">
-            直接删除,不需要确认：
+            直接删除,不显示确认框：
             <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
+        <div class="item">
+            直接上传,不显示确认框：
+            <i-switch :value="setup_uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch>
+        </div>
+
         <div class="item">
             如果文件已存在,是否覆盖上传：
             <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
@@ -38,7 +43,8 @@
                          <Option :value="brands.tencent.key">{{ brands.tencent.name }}</Option>
                      </Select>-->
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
-                        <Option v-for="item in buckets" :value="item" :key="item">{{ item }}</Option>
+                        <Option v-for="item in buckets_info" :value="item.name" :key="item.name">{{ item.name }}
+                        </Option>
                     </Select>
                     /
                     <Input v-model="bucketdir" size="small" style="width:66%" placeholder="路径"/>
@@ -69,39 +75,40 @@
 
         </div>
 
-        <div class="item">
-            预览图片样式：
-            <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
-            <br>
-            <Row class="row-line">
-                <Col span="12">
-                    <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
-                </Col>
-                <Col span="11" offset="1">
-                    <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
-                </Col>
-            </Row>
-        </div>
-
-        <div class="item">
-            私有空间：
-            <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
-            <br>
-            <CheckboxGroup v-model="privates" @on-change="privatesChange">
-                <Checkbox v-for="item,index in buckets" :key="index" :label="item">
-                    <span>{{item}}</span>
-                </Checkbox>
-            </CheckboxGroup>
-            <Row class="row-line">
-                <Col span="12">
-                    <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
-                           style="width: 20%; margin-right: 10px"/>分钟
-                </Col>
-                <Col span="11" offset="1">
-                    <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
-                </Col>
-            </Row>
-        </div>
+        <template v-if="brands.qiniu.key === $storage.name">
+            <div class="item">
+                预览图片样式：
+                <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
+                <br>
+                <Row class="row-line">
+                    <Col span="12">
+                        <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
+                    </Col>
+                    <Col span="11" offset="1">
+                        <Button @click="saveImagestyle" size="small" class="save-btn">保存</Button>
+                    </Col>
+                </Row>
+            </div>
+            <div class="item">
+                私有空间：
+                <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
+                <br>
+                <CheckboxGroup v-model="privates" @on-change="privatesChange">
+                    <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">
+                        <span>{{item.name}}</span>
+                    </Checkbox>
+                </CheckboxGroup>
+                <Row class="row-line">
+                    <Col span="12">
+                        <Input v-model="deadline" size="small" placeholder="过期时间,单位分钟"
+                               style="width: 20%; margin-right: 10px"/>分钟
+                    </Col>
+                    <Col span="11" offset="1">
+                        <Button @click="saveDeadline" size="small" class="save-btn">保存</Button>
+                    </Col>
+                </Row>
+            </div>
+        </template>
         <div class="item">
             主题：
             <br>
@@ -137,9 +144,10 @@
         },
         computed: {
             ...mapGetters({
-                buckets: types.app.buckets,
+                buckets_info: types.app.buckets_info,
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                setup_uploadNoAsk: types.setup.setup_uploadNoAsk,
                 setup_isOverwrite: types.setup.setup_isOverwrite,
                 setup_brand: types.setup.setup_brand,
                 setup_bucket_name: types.setup.setup_bucket_name,
@@ -162,8 +170,6 @@
             this.theme = this.setup_theme;
             this.deadline = this.setup_deadline / 60;
 
-            console.log(this.brand);
-
             this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
@@ -176,8 +182,10 @@
         },
         methods: {
             ...mapActions([
+                types.app.a_update_buckets_info,
                 types.setup.setup_a_copyType,
                 types.setup.setup_a_deleteNoAsk,
+                types.setup.setup_a_uploadNoAsk,
                 types.setup.setup_a_savedir,
                 types.setup.setup_a_imagestyle,
                 types.setup.setup_a_downloaddir,
@@ -189,6 +197,9 @@
             deleteNoAskChange: function (state) {
                 this[types.setup.setup_a_deleteNoAsk](state);
             },
+            uploadNoAskChange: function (state) {
+                this[types.setup.setup_a_uploadNoAsk](state);
+            },
             isOverwriteChange: function (state) {
                 this[types.setup.setup_a_isOverwrite](state);
             },
@@ -196,6 +207,10 @@
                 this[types.setup.setup_a_copyType](model);
             },
             privatesChange: function (privatebucket) {
+                this.buckets_info.forEach((item) => {
+                    let permission = privatebucket.indexOf(item.name) !== -1 ? 1 : 0;
+                    this[types.app.a_update_buckets_info]({name: this.name, permission: permission});
+                });
                 this[types.setup.setup_a_privatebucket](privatebucket);
             },
             themesChange(item) {

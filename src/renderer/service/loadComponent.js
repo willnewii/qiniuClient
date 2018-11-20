@@ -7,15 +7,20 @@ import iView from 'iview';
 import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
+import Viewer from "v-viewer/src/component.vue";
 
 import 'v-contextmenu/dist/index.css';
 import 'iview/dist/styles/iview.css';
+import 'viewerjs/dist/viewer.css';
+
 
 Vue.use(Electron);
 Vue.use(VueLazyload, {
     throttleWait: 800,
 });
 Vue.component('virtual-list', VirtualScrollList);
+Vue.component('Viewer', Viewer);
+
 
 menuDirective.inserted = function (el, binding, vnode) {
     if (!binding.value)

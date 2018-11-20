@@ -27,23 +27,23 @@
     </div>
 </template>
 <script>
-    import {Constants, mixins} from '../service';
+    import {Constants, mixins, util} from '../service';
     import brand from '@/cos/brand';
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
-                cos_key: brand.qiniu.key,
+                selectBrand: brand.qiniu,
                 formItem: {
-                    access_key: '',
-                    secret_key: '',
+                    access_key: 'JEFPUPBERLDDROQXLPQQ',
+                    secret_key: 'l9QgCbAh6er00f0AgEjDj2V7NyEqvxha8GtMibSP',
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
                 },
-                brands: [brand.qiniu, brand.tencent]
+                brands: [brand.qiniu, brand.tencent, brand.qingstor]
             };
         },
         computed: {},
@@ -63,15 +63,20 @@
                 this.$refs[name].resetFields();
             },
             validateKey(access_key, secret_key) {
-                this.$storage.setName(this.cos_key);
+                this.$storage.setName(this.selectBrand.key);
                 this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
+
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
                     if (error) {
-                        this.$Notice.error({
-                            title: '啊哦~',
-                            desc: error.message
+                        util.notification({
+                            title: this.selectBrand.name,
+                            body: error.message
                         });
+                        /*this.$Notice.error({
+                            title: this.selectBrand.name,
+                            desc: error.message
+                        });*/
                     } else {
                         this.$storage.saveCosKey({
                             access_key: access_key,

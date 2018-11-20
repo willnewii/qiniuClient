@@ -41,7 +41,9 @@ export const Event = {
     remove: 'remove',
     download: 'download',
     statusview: 'statusview',
-    loading: 'loading'
+    dropview: 'dropview',
+    loading: 'loading',
+    updateFiles: 'updateFiles'
 };
 
 export const CopyType = {
@@ -52,6 +54,17 @@ export const CopyType = {
 export const UploadType = {
     UPLOAD: 'upload',
     FETCH: 'fetch'
+};
+
+/**
+ * 以本地为基准,云对应不上的文件会被删除
+ * 以云为基准,本地对应不上的文件会被删除
+ * @type {{normal: number, baseCloud: number, baseLocal: number}}
+ */
+export const mergeType = {
+    normal: 0,
+    coverCloud: 1,
+    coverLocal: 2
 };
 
 export const Listener = {
@@ -66,5 +79,7 @@ export const Listener = {
     readDirectory: 'read-directory',
     setBrand: 'setBrand',
     preview: 'preview',
-    darkMode: 'darkMode'
+    syncDirectory: 'syncDirectory',
+    darkMode: 'darkMode',
+    exportUrl: 'exportUrl'
 };

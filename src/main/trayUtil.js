@@ -1,10 +1,10 @@
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
-import {BrowserWindow, Tray, ipcMain, clipboard} from 'electron';
-import notifier from 'node-notifier';
+import {BrowserWindow, Tray, ipcMain, clipboard, Notification} from 'electron';
 import * as util from './util';
 import * as Constants from '../renderer/service/constants';
+import pkg from '../../package';
 
 let icon_brand = 'tray_qiniu.png';
 const icon_tray = util.isWin() ? 'win_tray.png' : icon_brand;
@@ -37,13 +37,15 @@ export const createTray = function (_mainWindowId) {
     });
 
     ipcMain.on(Constants.Listener.showNotifier, function (event, option) {
-        if (option.icon) {
-            option.icon = util.getIconPath(option.icon);
-        }
+        // option.icon = util.getIconPath(option.icon || 'icon.png');
+        option.icon = option.image;
+        option.title = option.title || pkg.cnname;
+        option.body = option.message;
 
-        notifier.notify(option, (err, response) => {
-            event.sender.send('log', err);
-        });
+        option.silent = true;
+        // option.subtitle = 'subtitle';
+        // option.body = 'body';
+        new Notification(option).show();
     });
 
     return mTray;

@@ -3,7 +3,6 @@
 process.env.BABEL_ENV = 'main';
 
 const path = require('path');
-const {dependencies} = require('../package.json');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -14,7 +13,7 @@ let mainConfig = {
         main: path.join(__dirname, '../src/main/index.js')
     },
     externals: [
-        ...Object.keys(dependencies || {})
+        'node-notifier'
     ],
     module: {
         rules: [

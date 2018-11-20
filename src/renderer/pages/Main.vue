@@ -1,23 +1,28 @@
 <template>
     <div class="layout">
+        <!--<v-contextmenu ref="bucketMenu" @contextmenu="handleBucketMenu">
+            <v-contextmenu-item @click="handleBucketMenuClick(0)">同步</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleBucketMenuClick(1)">批量导出URL</v-contextmenu-item>
+        </v-contextmenu>-->
         <Row type="flex">
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <!--<Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>-->
                     {{menuState ? cos_name : ''}}
                 </i-button>
-                <!--light dark-->
-                <Menu ref='menu' width="auto" v-if="buckets && buckets.length > 0"
+                <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets" :key="index" :name="item">
+                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name"
+                                   :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="privatebucket.indexOf(item) !==  -1 ? 'md-lock' : 'md-folder'"></Icon>
-                                <span class="layout-text">{{item}}</span>
+                                      :type="item.permission === 1 ? 'md-lock' : 'md-folder'"></Icon>
+                                <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
-                                <span class="layout-icon">{{item.substring(0,1)}}</span>
+                                <span class="layout-icon">{{item.name.substring(0,1)}}</span>
                             </template>
                         </Menu-item>
                     </Menu-group>
@@ -36,34 +41,44 @@
                     </Poptip>
                 </div>
             </i-col>
-            <i-col :span="menuSpace.right" class="layout-menu-right">
-                <router-view :bucketName="bucketName"></router-view>
+            <i-col :span="menuSpace.right">
+                <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
             </i-col>
         </Row>
-        <Spin size="large" fix v-if="loading.show">
-            <div>
-
-            </div>
-            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
-            <span>{{loading.message}}</span>
-        </Spin>
-        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="false"
-               :mask-closable="false">
+        <!-- cos选择框-->
+        <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
+               :mask-closable="true">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in cos" :key="item.key">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">
-                        <!--<span class="icon iconfont" :class="'icon-' + item.key"> </span>-->
-                        <Icon class="iconfont" :class="'icon-' + item.key" size="32"></Icon>
+                        <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
+                    </div>
+                </Card>
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 3">
+                    <div class="choice-view" @click="selectCOS()">
+                        <Icon type="md-add-circle" size="32"></Icon>
+                        <span class="name">登陆其它</span>
                     </div>
                 </Card>
             </div>
             <div slot="footer"></div>
-            <Icon></Icon>
         </Modal>
+        <!-- 数据加载框-->
+        <Spin size="large" fix v-if="loading.show">
+            <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
+            <span>{{loading.message}}</span>
+        </Spin>
+        <!-- 上传/下载进度提示框-->
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
             <div>{{status.path}}</div>
+        </div>
+        <!-- 文件拖拽提示框-->
+        <div class="drop-view" v-if="drop.show">
+            <div class="drop-sub">
+                <span>{{drop.message}}</span>
+            </div>
         </div>
     </div>
 </template>
@@ -72,16 +87,14 @@
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
 
-    import {Constants, mixins, EventBus} from '../service/index';
-    import brand from "@/cos/brand";
+    import {Constants, mixins, EventBus, util} from '../service/index';
 
     export default {
         mixins: [mixins.base],
         data() {
             return {
-                cos: [],
-                cos_key: '',
-                cos_name: '',
+                coss: [],//已登录的cos列表
+                cos: {name: ''},
                 cosChoiceModel: false,
                 bucketName: '',
                 menuState: true,
@@ -109,14 +122,20 @@
                 loading: {
                     show: false,
                     message: '',
-                    flag: '' //可以用作计时的标记
-                }
+                    flag: '' //可以用作统计计时的标记
+                },
+                drop: {
+                    show: false,
+                    message: ''
+                },
+                // contextBucketMenuIndex: 0
             };
         },
         computed: {
             ...mapGetters({
-                buckets: types.app.buckets,
+                buckets_info: types.app.buckets_info,
                 privatebucket: types.setup.setup_privatebucket,
+                setup_recentname: types.setup.setup_recentname,
             }),
             menuSpace() {
                 return {
@@ -140,24 +159,26 @@
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
             });
+            EventBus.$on(Constants.Event.dropview, (option) => {
+                this.drop = Object.assign(this.drop, option);
+            });
             EventBus.$on(Constants.Event.loading, (option) => {
-                this.loading = option;
+                this.loading = Object.assign(this.loading, option);
             });
         },
         methods: {
             ...mapActions([
-                types.app.a_buckets,
                 types.app.a_buckets_info,
-                types.setup.setup_init,
+                types.setup.setup_a_recentname,
             ]),
             initCOS() {
-                this.$storage.getCOS((cos) => {
-                    if (cos.length === 0) {
+                this.$storage.getCOS(({cos, _cos}) => {
+                    if (_cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (cos.length === 1) {
-                        this.selectCOS(cos[0]);
+                    } else if (_cos.length === 1) {
+                        this.selectCOS(_cos[0]);
                     } else {
-                        this.cos = cos;
+                        this.coss = _cos;
                         this.cosChoiceModel = true;
                     }
                 });
@@ -179,25 +200,21 @@
             getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
-                        this.$Message.info(`获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`);
+                        util.notification({
+                            body: `获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`
+                        });
                         this.$router.push({path: Constants.PageName.login});
                     } else {
-                        switch (this.$storage.name) {
-                            case brand.qiniu.key:
-                                this[types.app.a_buckets](data);
-                                break;
-                            case brand.tencent.key:
-                                let buckets = [];
-                                data.forEach((value) => {
-                                    buckets.push(value.Name);
-                                });
+                        let defaultIndex = 0;
 
-                                this[types.app.a_buckets](buckets);
-                                this[types.app.a_buckets_info](data);
-                                break;
-                        }
-
-                        this.onMenuSelect(this.buckets[0]);
+                        data.datas.forEach((item, index) => {
+                            data.datas[index].permission = 0;
+                            if (this.setup_recentname === item.name) {
+                                defaultIndex = index;
+                            }
+                        });
+                        this[types.app.a_buckets_info](data.datas);
+                        this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
                     }
                 });
             },
@@ -218,32 +235,13 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
+                        this.setup_a_recentname(name);
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS((cos) => {
-                            if (cos.length === 0) {
-                                this.$router.push({path: Constants.PageName.login});
-                            } else if (cos.length === 1) {
-                                this.$Modal.confirm({
-                                    title: '切换账号',
-                                    render: (h) => {
-                                        return h('div', {
-                                            style: {
-                                                'padding-top': '10px'
-                                            }
-                                        }, [
-                                            '切换COS,当前COS Key 信息不会被清除.可选择登录其他COS服务.'
-                                        ]);
-                                    },
-                                    onOk: () => {
-                                        this.$router.push({path: Constants.PageName.login});
-                                    }
-                                });
-                            } else {
-                                this.cos = cos;
-                                this.cosChoiceModel = true;
-                            }
+                        this.$storage.getCOS(({_cos}) => {
+                            this.coss = _cos;
+                            this.cosChoiceModel = true;
                         });
                         break;
                     case Constants.Key.app_logout:
@@ -277,6 +275,21 @@
                         break;
                 }
             },
+            /*handleBucketMenu(ref) {
+                this.contextBucketMenuIndex = ref.data.attrs.index;
+            },
+            handleBucketMenuClick(action) {
+                switch (action) {
+                    case 0://同步操作
+                        if(this.$refs['bucketPage']){
+                            this.$refs['bucketPage'].showSyncFolder();
+                        }
+                        break;
+                    case 1://批量导出
+                        console.log(this.$refs['bucketPage']);
+                        break;
+                }
+            },*/
         }
     };
 </script>
@@ -294,12 +307,11 @@
             color: $menu-color;
             display: flex;
             flex-direction: column;
-            /*border-radius: 4px;*/
             border-bottom-right-radius: 4px;
             padding-top: 20px;
-            -webkit-app-region: drag;
             z-index: 1;
             box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
+            -webkit-app-region: drag;
 
             .navicon_btn {
                 font-weight: bold;
@@ -358,9 +370,6 @@
                 }
             }
         }
-
-        .layout-menu-right {
-        }
     }
 
     .choice-cos {
@@ -395,7 +404,32 @@
 
     .status-view-none {
         opacity: 0;
-        transition: opacity 2s;
+        transition: opacity .5s;
+    }
+
+    .drop-view {
+        position: fixed;
+        background-color: rgba(0, 0, 0, 0.1);
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        .drop-sub {
+            border: 2px dashed;
+            border-radius: 10px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
     }
 </style>
 <style lang="scss">

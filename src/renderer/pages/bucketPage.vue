@@ -54,6 +54,12 @@
             flex-shrink: 0;
         }
     }
+
+    .file-list {
+        margin-top: 10px;
+        overflow: scroll;
+        max-height: 300px;
+    }
 </style>
 <style lang="scss">
     @import '../style/params';
@@ -95,12 +101,18 @@
             </div>
 
             <div class="header-button-view">
-                <Button size="small" @click="query()" icon="md-funnel"
+                <Button size="small" @click="showFilter" icon="md-funnel"
                         style="margin-right: 10px;background: #FFFFFF;">
                 </Button>
-                <Button size="small" @click="cancleSelec()"
+
+                <Button size="small" @click="cleanSelection()"
                         style="margin-right: 10px;"
                         v-if="bucket.selection.length > 0">取消
+                </Button>
+
+                <Button size="small" @click="allSelection()"
+                        style="margin-right: 10px;"
+                        v-if="bucket.selection.length > 0">全选
                 </Button>
 
                 <Button size="small" @click="downloads()" icon="md-download"
@@ -128,45 +140,57 @@
 
         <!--<resource-table v-if="showType === 0" :bucket="bucket"
                         @on-update="onFilesUpdate"></resource-table>-->
-        <!--<resource-grid v-else-if="showType === 1" :bucket="bucket"
-                       @on-update="onFilesUpdate"></resource-grid>-->
-        <resource-grid :bucket="bucket" :type="showType" key="1"
+        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"
                        @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
+
+        <resource-filter ref="resource-filter" :bucket="bucket"
+                         @on-update="onFilesUpdate"></resource-filter>
+        <!--grid filter 同时引用了mixin-resource on-update 触发父对象不一致 -->
+
         <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
-               @on-ok="callRemove" @on-cancel="cancelModal">
-            <template>
-                <p v-for="file in bucket.selection">{{file.key}}</p>
-            </template>
+               @on-ok="callRemove" @on-cancel="cleanSelection">
+            <div class="file-list">
+                <template>
+                    <p v-for="file in bucket.selection">{{file.key}}</p>
+                </template>
+            </div>
+
         </Modal>
-        <!-- 筛选文件-->
-        <Modal v-model="model_Query.show" title="请选择你要筛选的范围" @on-ok="filter">
-            <span>按文件大小：</span>
-            {{tipFormatSize(model_Query.fileSize[0])}} ~ {{tipFormatSize(model_Query.fileSize[1])}}
-            <Slider v-model="model_Query.fileSize" range :min='0' :max="model_Query.sizeArray.length -1"
-                    show-tip="never"></Slider>
-            <span>按文件日期：</span>
-            {{tipFormatDate(model_Query.fileDate[0])}} ~ {{tipFormatDate(model_Query.fileDate[1])}}
-            <Slider v-model="model_Query.fileDate" range :min="0" :max="model_Query.dateArray.length -1"
-                    show-tip="never"></Slider>
+
+        <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
+               @on-ok="syncFolder">
+            <template>
+                <RadioGroup v-model="model_merge.mode" vertical>
+                    <Radio :label="0">
+                        <span>合并</span>
+                    </Radio>
+                    <Radio :label="1">
+                        <span>覆盖云盘(以本地文件为基准,云盘未对应的文件会被删除)</span>
+                    </Radio>
+                    <Radio :label="2">
+                        <span>覆盖本地(以云盘文件为基准,本地未对应的文件会被删除)</span>
+                    </Radio>
+                </RadioGroup>
+            </template>
         </Modal>
     </div>
 </template>
 <script>
-    import Directory from '../components/Directory';
-    import Header from '../components/Header';
-    import ResourceTable from '../components/ResourceTable.vue';
-    import ResourceGrid from "../components/ResourceGrid.vue";
+    import Header from '@/components/Header';
+    //import ResourceTable from '@/components/ResourceTable.vue';
+    import ResourceGrid from "@/components/ResourceGrid.vue";
+    import ResourceFilter from "@/components/ResourceFilter";
 
-    import {mapGetters} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
     import {Constants, util, EventBus, mixins} from '../service/index';
+    import dayjs from 'dayjs';
 
     export default {
         name: 'bucketPage',
         components: {
-            Header, Directory,
-            ResourceGrid, ResourceTable
+            Header, ResourceGrid, ResourceFilter,
         },
         mixins: [mixins.base],
         props: {
@@ -182,12 +206,10 @@
                 folderPath: null,
                 folderKeyWord: null,
                 model_DeleteAsk: false,
-                model_Query: {
+                model_query_show: false,
+                model_merge: {
                     show: false,
-                    fileSize: [0, 0],
-                    sizeArray: [],
-                    fileDate: [0, 0],
-                    dateArray: []
+                    mode: 0
                 }
             };
         },
@@ -225,6 +247,9 @@
             }
         },
         methods: {
+            ...mapActions([
+                types.app.a_update_buckets_info,
+            ]),
             /**
              * 初始化空间信息
              */
@@ -246,7 +271,7 @@
                 this.folderKeyWord = search;
             },
             /**
-             * 根据配置,是否弹出确认框
+             * 根据配置,是否弹出删除确认框
              */
             askRemove() {
                 if (this.setup_deleteNoAsk) {
@@ -258,55 +283,16 @@
             callRemove() {
                 EventBus.$emit(Constants.Event.removes);
             },
-            cancelModal() {
+            //取消选择
+            cleanSelection() {
                 this.bucket.selection = [];
             },
-            query() {
-                this.model_Query.show = true;
-
-                this.model_Query.sizeArray = [].concat(this.bucket.files);
-                this.model_Query.dateArray = [].concat(this.bucket.files);
-
-                this.model_Query.sizeArray = util.quickSort(this.model_Query.sizeArray, 'fsize');
-                this.model_Query.dateArray = util.quickSort(this.model_Query.dateArray, 'putTime');
-
-                this.model_Query.fileSize = [0, this.bucket.files.length - 1];
-                this.model_Query.fileDate = [0, this.bucket.files.length - 1];
-            },
-            filter() {
-                let result = [];
-
-                let sizeMin = this.model_Query.sizeArray[this.model_Query.fileSize[0]].fsize;
-                let sizeMax = this.model_Query.sizeArray[this.model_Query.fileSize[1]].fsize;
-
-                let dateMin = this.model_Query.dateArray[this.model_Query.fileDate[0]].putTime;
-                let dateMax = this.model_Query.dateArray[this.model_Query.fileDate[1]].putTime;
-
-                this.model_Query.sizeArray.forEach((item) => {
-                    if (item.fsize >= sizeMin && item.fsize <= sizeMax && item.putTime >= dateMin && item.putTime <= dateMax) {
-                        result.push(item);
-                    }
-                });
-
-                this.bucket.currentDir = '__filter__';
-                this.bucket.files = result;
-            },
-            tipFormatSize(value) {
-                if (this.model_Query.sizeArray && this.model_Query.sizeArray.length > 0) {
-                    return util.formatFileSize(this.model_Query.sizeArray[value].fsize);
-                } else {
-                    return '';
+            //全部选择
+            allSelection() {
+                this.$refs['resource-grid'].selection = [];
+                for (let i = 0; i < this.$refs['resource-grid'].files.length; i++) {
+                    this.$refs['resource-grid'].selectFile(i);
                 }
-            },
-            tipFormatDate(value) {
-                if (this.model_Query.dateArray && this.model_Query.dateArray.length > 0) {
-                    return util.formatDate(this.model_Query.dateArray[value].putTime);
-                } else {
-                    return '';
-                }
-            },
-            cancleSelec() {
-                this.bucket.selection = [];
             },
             downloads() {
                 EventBus.$emit(Constants.Event.download);
@@ -325,6 +311,7 @@
              * @param action 触发的动作,upload/remove
              */
             onFilesUpdate(ret, action) {
+                console.log(ret, action);
                 this.getResources();
             },
             changeFolderPath(index) {
@@ -335,6 +322,37 @@
                 let arrays = this.bucket.folderPath.split('/');
                 this.bucket.folderPath = arrays.slice(0, index + 1).join('/');
             },
+            showFilter() {
+                this.$refs['resource-filter'].toggle();
+            },
+            showSyncFolder() {
+                this.model_merge.show = true;
+                this.model_merge.mode = 0;
+            },
+            syncFolder() {
+                let files = this.bucket.files;
+                files.forEach((item, index) => {
+                    files[index].url = this.$refs['resource-filter'].getResoureUrl(item);
+                });
+
+                this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
+                    properties: ['openDirectory'],
+                    files,
+                    type: this.$storage.name,
+                    mergeType: this.model_merge.mode,
+                });
+            },
+            exportURL() {//导出URL
+                let urls = [];
+                this.bucket.files.forEach((item) => {
+                    urls.push(this.$refs['resource-filter'].getResoureUrl(item));
+                });
+
+                this.$electron.ipcRenderer.send(Constants.Listener.exportUrl, {
+                    name: `${this.$storage.name}-${this.bucket.name}-${dayjs().format('YYYYMMDDHHmmss')}.txt`,
+                    urls,
+                });
+            }
         }
 
     };

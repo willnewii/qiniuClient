@@ -12,6 +12,7 @@ const Multispinner = require('multispinner');
 
 const mainConfig = require('./webpack.main.config');
 const rendererConfig = require('./webpack.renderer.config');
+const rendererThemeConfig = require('./webpack.renderer.theme.config');
 const webConfig = require('./webpack.web.config');
 
 const doneLog = chalk.bgGreen.white(' DONE ') + ' ';
@@ -30,11 +31,12 @@ function clean() {
 }
 
 function build() {
+    let starTime = new Date().getTime();
     greeting();
 
     del.sync(['dist/electron/*', '!.gitkeep']);
 
-    const tasks = ['main', 'renderer'];
+    const tasks = ['main', 'renderer-theme', 'renderer'];
     const m = new Multispinner(tasks, {
         preText: 'building',
         postText: 'process'
@@ -46,6 +48,7 @@ function build() {
         process.stdout.write('\x1B[2J\x1B[0f');
         console.log(`\n\n${results}`);
         console.log(`${okayLog}take it away ${chalk.yellow('`electron-builder`')}\n`);
+        console.log(chalk.bgGreen.white(` build time: ${(new Date().getTime() - starTime)} `));
         process.exit();
     });
 
@@ -59,11 +62,22 @@ function build() {
         process.exit(1);
     });
 
-    pack(rendererConfig).then(result => {
+    pack(rendererThemeConfig).then(result => {
         results += result + '\n\n';
-        m.success('renderer');
+        m.success('renderer-theme');
+
+        pack(rendererConfig).then(result => {
+            results += result + '\n\n';
+            m.success('renderer');
+        }).catch(err => {
+            m.error('renderer');
+            console.log(`\n  ${errorLog}failed to build renderer process`);
+            console.error(`\n${err}\n`);
+            process.exit(1);
+        });
+
     }).catch(err => {
-        m.error('renderer');
+        m.error('renderer-theme');
         console.log(`\n  ${errorLog}failed to build renderer process`);
         console.error(`\n${err}\n`);
         process.exit(1);

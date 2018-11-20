@@ -12,17 +12,19 @@ export default {
     state: {
         setup: {
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
-            isOverwrite: true,                                     //上传时是否直接覆盖文件
-            copyType: 'url',
-            brand: '',
+            uploadNoAsk: true,                                      //文件上传时是否弹出对话框
+            isOverwrite: true,                                      //上传时是否直接覆盖文件
+            copyType: 'url',                                        //默认复制类型
+            brand: '',                                              //托盘上传的 服务商/bucket/自定义路径
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
             imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
             downloaddir: '',                                        //设置文件的下载路径
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
-            privatedeadline: 3600,                                  //默认1小时
-            theme: 'auto'
+            expiresTime: 3600,                                      //私有空间,过期时间默认1小时
+            theme: 'auto',
+            recentname: ''                                          //最近使用的bucketname
         }
     },
     mutations: {
@@ -35,7 +37,7 @@ export default {
             setAppSetup(state.setup);
         },
         [types.setup.setup_deadline](state, value) {
-            state.setup.privatedeadline = value;
+            state.setup.expiresTime = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_downloaddir](state, value) {
@@ -44,6 +46,10 @@ export default {
         },
         [types.setup.setup_deleteNoAsk](state, value) {
             state.setup.deleteNoAsk = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.setup_uploadNoAsk](state, value) {
+            state.setup.uploadNoAsk = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_copyType](state, value) {
@@ -72,6 +78,10 @@ export default {
             state.setup.theme = value;
             setAppSetup(state.setup);
         },
+        [types.setup.setup_recentname](state, value) {
+            state.setup.recentname = value;
+            setAppSetup(state.setup);
+        },
         [types.setup.setup_init](state, value) {
             state.setup = value;
         },
@@ -92,6 +102,9 @@ export default {
         [types.setup.setup_a_deleteNoAsk](context, json) {
             context.commit(types.setup.setup_deleteNoAsk, json);
         },
+        [types.setup.setup_a_uploadNoAsk](context, json) {
+            context.commit(types.setup.setup_uploadNoAsk, json);
+        },
         [types.setup.setup_a_downloaddir](context, json) {
             context.commit(types.setup.setup_downloaddir, json);
         },
@@ -107,6 +120,9 @@ export default {
         [types.setup.setup_a_theme](context, value) {
             context.commit(types.setup.setup_theme, value);
         },
+        [types.setup.setup_a_recentname](context, value) {
+            context.commit(types.setup.setup_recentname, value);
+        },
         async [types.setup.setup_init](context, callback) {
             let app = await storagePromise.get(Constants.Key.configuration);
             if (!util.isEmptyObject(app)) {
@@ -120,7 +136,7 @@ export default {
             return ('isOverwrite' in state.setup) ? state.setup.isOverwrite : true;
         },
         [types.setup.setup_deadline](state) {
-            return ('privatedeadline' in state.setup) ? state.setup.privatedeadline : 3600;
+            return ('expiresTime' in state.setup) ? state.setup.expiresTime : 3600;
         },
         [types.setup.setup_privatebucket](state) {
             return ('privatebucket' in state.setup) ? state.setup.privatebucket : [];
@@ -133,6 +149,9 @@ export default {
         },
         [types.setup.setup_deleteNoAsk](state) {
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;
+        },
+        [types.setup.setup_uploadNoAsk](state) {
+            return ('uploadNoAsk' in state.setup) ? state.setup.uploadNoAsk : false;
         },
         [types.setup.setup_copyType](state) {
             return ('copyType' in state.setup) ? state.setup.copyType : 'url';
@@ -151,6 +170,9 @@ export default {
         },
         [types.setup.setup_theme](state) {
             return ('theme' in state.setup) ? state.setup.theme : 'auto';
+        },
+        [types.setup.setup_recentname](state) {
+            return ('recentname' in state.setup) ? state.setup.recentname : '';
         }
     }
 };

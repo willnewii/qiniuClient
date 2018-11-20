@@ -1,8 +1,6 @@
-import {Constants, EventBus} from '../service/index';
+import {Constants, EventBus, util} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
-
-let tempFiles = [];
 
 class Bucket extends baseBucket {
 
@@ -24,16 +22,8 @@ class Bucket extends baseBucket {
     bindPage(vm) {
         this.vm = vm;
 
-        this.checkPrivate();
-
+        this.getACL();
         this.getDomains();
-
-        EventBus.$emit(Constants.Event.loading, {
-            show: true,
-            message: '数据加载中,请稍后',
-            flag: 'getResources'
-        });
-        console.time('getResources');
         this.getResources();
     }
 
@@ -48,9 +38,10 @@ class Bucket extends baseBucket {
     /**
      * 检测是否属于私密空间
      */
-    checkPrivate() {
+    getACL() {
         let privateBuckets = this.vm.privatebucket;
-        this.isprivate = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1);
+        let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
+        this.setPermission(permission);
     }
 
     /**
@@ -80,12 +71,13 @@ class Bucket extends baseBucket {
     }
 
     getResources(keyword) {
+        super.getResources();
         //重置多选数组
         this.selection = [];
 
         let param = {
             bucket: this.name,
-            limit: 1000
+            limit: this.limit
         };
 
         if (keyword) {
@@ -98,23 +90,12 @@ class Bucket extends baseBucket {
 
         qiniu.list(param, (respErr, respBody, respInfo) => {
             let data = respInfo.data;
+
             data.items.forEach((item, index) => {
-                data.items[index].putTime = item.putTime / 10000;
+                data.items[index] = util.convertMeta(item, 0);
             });
 
-            tempFiles = this.marker ? tempFiles.concat(data.items) : data.items;
-            this.marker = data.marker ? data.marker : '';
-
-            if (this.marker) {
-                this.getResources(keyword);
-            } else {
-                EventBus.$emit(Constants.Event.loading, {
-                    show: false,
-                    flag: 'getResources'
-                });
-                this.files = Object.freeze(tempFiles);
-                tempFiles = [];
-            }
+            this.appendResources(data, keyword);
         });
     }
 
@@ -150,7 +131,7 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
+        return qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null));
     }
 
     /**
