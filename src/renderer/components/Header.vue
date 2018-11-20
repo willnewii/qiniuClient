@@ -33,54 +33,61 @@
                     v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
-            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0"
+            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
                    placeholder="请填入空间域名"/>
         </div>
 
-        <div v-if="isMac" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(0)" v-if="bucket.name">
-                <Tooltip content="文件、文件夹上传(支持多选)" placement="bottom">
-                    <Icon type="md-cloud-upload" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
+        <template v-if="bucket.name">
+            <div v-if="isMac" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+                <i-button class="button" type="text" @click="actionBtn(0)">
+                    <Tooltip content="文件、文件夹上传(支持多选)" placement="bottom">
+                        <Icon type="md-cloud-upload" size="24"/>
+                    </Tooltip>
+                </i-button>
+            </div>
 
-        <div v-if="isWin">
-            <i-button class="button" type="text" @click="actionBtn(3)" v-if="bucket.name">
-                <Tooltip content="文件上传(支持多选)" placement="bottom">
-                    <Icon type="md-document" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
+            <div v-if="isWin">
+                <i-button class="button" type="text" @click="actionBtn(3)">
+                    <Tooltip content="文件上传(支持多选)" placement="bottom">
+                        <Icon type="md-document" size="24"/>
+                    </Tooltip>
+                </i-button>
+                <i-button class="button" type="text" @click="actionBtn(4)">
+                    <Tooltip content="文件夹上传(支持多选)" placement="bottom">
+                        <Icon type="md-folder" size="24"></Icon>
+                    </Tooltip>
+                </i-button>
+            </div>
 
-        <div v-if="isWin">
-            <i-button class="button" type="text" @click="actionBtn(4)" v-if="bucket.name">
-                <Tooltip content="文件夹上传(支持多选)" placement="bottom">
-                    <Icon type="md-folder" size="24"></Icon>
-                </Tooltip>
-            </i-button>
-        </div>
+            <div v-if="isSupportUrlUpload" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+                <i-button class="button" type="text" @click="actionBtn(1)">
+                    <Tooltip content="通过url直接上传文件" placement="bottom">
+                        <Icon type="md-link" size="24"/>
+                    </Tooltip>
+                </i-button>
+            </div>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(1)" v-if="bucket.name">
-                <Tooltip content="通过url直接上传文件" placement="bottom">
-                    <Icon type="md-link" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
-
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(5)" v-if="bucket.name">
-                <Tooltip :content="`刷新bucket：${bucket.name}`" placement="bottom">
-                    <Icon type="md-refresh" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
+            <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+                <i-button class="button" type="text" @click="actionBtn(5)">
+                    <Tooltip :content="`刷新bucket：${bucket.name}`" placement="bottom">
+                        <Icon type="md-refresh" size="24"/>
+                    </Tooltip>
+                </i-button>
+            </div>
+        </template>
 
         <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
             <i-button class="button" type="text" @click="actionBtn(6)" v-if="bucket.name">
                 <Tooltip :content="`同步bucket：${bucket.name}`" placement="bottom">
                     <Icon type="md-sync" size="24"/>
+                </Tooltip>
+            </i-button>
+        </div>
+
+        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <i-button class="button" type="text" @click="actionBtn(7)" v-if="bucket.name">
+                <Tooltip :content="`批量导出bucket：${bucket.name} URL`" placement="bottom">
+                    <Icon type="md-code-download" size="24"/>
                 </Tooltip>
             </i-button>
         </div>
@@ -96,6 +103,7 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import UploadModal from "./UploadModal";
+    import brand from "@/cos/brand";
 
     export default {
         components: {UploadModal},
@@ -105,15 +113,15 @@
                 search: '',
                 isMac: process.platform === 'darwin',
                 isWin: process.platform === 'win32',
+                //目前只有七牛支持Url直接上传
+                isSupportUrlUpload: [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1,
+                //目前只有七牛支持Domain选择
+                isSupportDomain: [brand.qiniu.key].indexOf(this.$storage.name) !== -1,
             };
         },
         computed: {
             placeholder() {
-                if (this.bucket.getCurrentDir()) {
-                    return '搜索' + this.bucket.getCurrentDir() + '目录下文件';
-                } else {
-                    return '搜索';
-                }
+                return '搜索';
             },
         },
         watch: {
@@ -171,6 +179,9 @@
                         break;
                     case 6:// 同步当前bucket
                         this.$parent.showSyncFolder();
+                        break;
+                    case 7://
+                        this.$parent.exportURL();
                         break;
                 }
             }

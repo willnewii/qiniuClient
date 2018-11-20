@@ -54,6 +54,12 @@
             flex-shrink: 0;
         }
     }
+
+    .file-list {
+        margin-top: 10px;
+        overflow: scroll;
+        max-height: 300px;
+    }
 </style>
 <style lang="scss">
     @import '../style/params';
@@ -143,9 +149,12 @@
 
         <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
                @on-ok="callRemove" @on-cancel="cleanSelection">
-            <template>
-                <p v-for="file in bucket.selection">{{file.key}}</p>
-            </template>
+            <div class="file-list">
+                <template>
+                    <p v-for="file in bucket.selection">{{file.key}}</p>
+                </template>
+            </div>
+
         </Modal>
 
         <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
@@ -168,20 +177,20 @@
 </template>
 <script>
     import Header from '@/components/Header';
-    import ResourceTable from '@/components/ResourceTable.vue';
+    //import ResourceTable from '@/components/ResourceTable.vue';
     import ResourceGrid from "@/components/ResourceGrid.vue";
     import ResourceFilter from "@/components/ResourceFilter";
 
-    import {mapGetters} from 'vuex';
+    import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
 
-    import {Constants, util, EventBus, mixins, brand} from '../service/index';
+    import {Constants, util, EventBus, mixins} from '../service/index';
+    import dayjs from 'dayjs';
 
     export default {
         name: 'bucketPage',
         components: {
-            ResourceFilter,
-            Header, ResourceGrid, ResourceTable
+            Header, ResourceGrid, ResourceFilter,
         },
         mixins: [mixins.base],
         props: {
@@ -238,6 +247,9 @@
             }
         },
         methods: {
+            ...mapActions([
+                types.app.a_update_buckets_info,
+            ]),
             /**
              * 初始化空间信息
              */
@@ -323,21 +335,22 @@
                     files[index].url = this.$refs['resource-filter'].getResoureUrl(item);
                 });
 
-                let type = 0;
-                switch (this.$storage.name) {
-                    case brand.qiniu.key:
-                        type = 0;
-                        break;
-                    case brand.tencent.key:
-                        type = 1;
-                        break;
-                }
-
                 this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
                     properties: ['openDirectory'],
                     files,
-                    type,
+                    type: this.$storage.name,
                     mergeType: this.model_merge.mode,
+                });
+            },
+            exportURL() {//导出URL
+                let urls = [];
+                this.bucket.files.forEach((item) => {
+                    urls.push(this.$refs['resource-filter'].getResoureUrl(item));
+                });
+
+                this.$electron.ipcRenderer.send(Constants.Listener.exportUrl, {
+                    name: `${this.$storage.name}-${this.bucket.name}-${dayjs().format('YYYYMMDDHHmmss')}.txt`,
+                    urls,
                 });
             }
         }

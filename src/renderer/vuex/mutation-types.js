@@ -19,6 +19,10 @@ export const setup = {
     setup_deleteNoAsk: 'setup_deleteNoAsk',
     setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
 
+    setup_uploadNoAsk: 'setup_uploadNoAsk',
+    setup_a_uploadNoAsk: 'setup_a_uploadNoAsk',
+
+
     setup_copyType: 'setup_copyType',
     setup_a_copyType: 'setup_a_copyType',
 
@@ -34,19 +38,21 @@ export const setup = {
 
     setup_theme: 'setup_theme',
     setup_a_theme: 'setup_a_theme',
+
+    setup_recentname: 'setup_recentname',
+    setup_a_recentname: 'setup_a_recentname',
 };
 
 export const app = {
     name: 'name',
     a_name: 'name',
 
-    buckets: 'buckets',
-    a_buckets: 'action_buckets',
-
-    //存储buckets 其他信息
+    //存储buckets 信息
     buckets_info: 'buckets_info',
     a_buckets_info: 'action_buckets_info',
+    //更新
+    a_update_buckets_info: 'a_update_buckets_info',
 
-    datas : 'datas',
-    a_datas : 'a_datas',
+    datas: 'datas',
+    a_datas: 'a_datas',
 };

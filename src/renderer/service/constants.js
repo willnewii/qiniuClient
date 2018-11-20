@@ -41,6 +41,7 @@ export const Event = {
     remove: 'remove',
     download: 'download',
     statusview: 'statusview',
+    dropview: 'dropview',
     loading: 'loading',
     updateFiles: 'updateFiles'
 };
@@ -79,5 +80,6 @@ export const Listener = {
     setBrand: 'setBrand',
     preview: 'preview',
     syncDirectory: 'syncDirectory',
-    darkMode: 'darkMode'
+    darkMode: 'darkMode',
+    exportUrl: 'exportUrl'
 };

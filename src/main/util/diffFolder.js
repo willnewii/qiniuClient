@@ -6,17 +6,18 @@ const log4js = require('log4js');
 const util = require('../util.js');
 
 import * as Constants from '../../renderer/service/constants';
+import brand from '../../renderer/cos/brand';
 
 
 /**
  *
  * @param localDir       local指定目录
  * @param cloudFiles    待匹配的云存储文件列表
- * @param platformType  platformType
+ * @param platformType  platformType    平台名称
  * @param mergeType     mergeType   0：普通 1：以云为基准,本地对应不上的文件会被删除 2：以本地为基准,云对应不上的文件会被删除
  * @returns {Promise<{uploads: Array, downloads: Array}>}
  */
-export async function diff(localDir, cloudFiles = [], platformType = 0, mergeType = 0) {
+export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu.key, mergeType = 0) {
     log4js.configure({
         appenders: {
             node: {
@@ -50,6 +51,7 @@ export async function diff(localDir, cloudFiles = [], platformType = 0, mergeTyp
         if (fs.existsSync(filePath)) {
             let tag = await util.getEtag(filePath, platformType);
             if (tag !== file.ETag) {
+                logger.info(`${tag}--${file.ETag}`);
                 if (fs.statSync(filePath).mtimeMs > file.putTime) {
                     logger.info('[上传]:本地文件变更,更新云文件', filePath);
                     uploads.push({path: filePath, dir: localDir});
@@ -74,7 +76,7 @@ export async function diff(localDir, cloudFiles = [], platformType = 0, mergeTyp
     let files = klaw(localDir, {
         nodir: true,
         filter: function (item) {
-            return !/\.(DS_Store|log|delete)$/.test(item.path);
+            return !/\.(log|delete)$/.test(item.path);
         }
     });
     for (let file of files) {

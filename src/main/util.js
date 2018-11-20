@@ -1,3 +1,5 @@
+import pkg from "../../package";
+
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
@@ -5,6 +7,8 @@ const path = require('path');
 const fs = require('fs');
 const klaw = require('klaw-sync');
 const qetag = require('./util/qetag');
+import brand from '../renderer/cos/brand';
+import {Notification} from "electron";
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
@@ -69,12 +73,12 @@ export function convertPath(path) {
 export const getEtag = function (filePath, platformType, callback = null) {
     return new Promise(function (resolve, reject) {
         switch (platformType) {
-            case 0:
+            case brand.qiniu.key:
                 qetag(filePath, (hash) => {
                     resolve(hash);
                 });
                 break;
-            case 1:
+            default:
                 getFileMd5(filePath, (error, hash) => {
                     resolve(hash);
                 });
@@ -95,7 +99,7 @@ const getFileMd5 = function (filepath, callback) {
     });
     readStream.on('end', function () {
         let hash = md5.digest('hex');
-        callback(null, hash);
+        callback(null, `"${hash}"`);
     });
 };
 
@@ -106,4 +110,13 @@ const getFileMd5 = function (filepath, callback) {
  */
 const isDirectory = function (path) {
     return fs.statSync(path).isDirectory();
+};
+
+export const notification = function (option) {
+    option.title = option.title || pkg.cnname;
+    option.body = option.message;
+    option.silent = true;
+    // option.subtitle = 'subtitle';
+    // option.body = 'body';
+    new Notification(option).show();
 };

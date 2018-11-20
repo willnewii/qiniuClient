@@ -31,7 +31,11 @@ function getBuckets(callback) {
     let request = new Request();
     request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
-        callback(null, result.data);
+        let datas = [];
+        for (let name of result.data) {
+            datas.push({name});
+        }
+        callback(null, {datas});
     }).catch((error) => {
         callback(error);
     });
@@ -115,7 +119,6 @@ function upload(params, callback) {
 
     let config = new qiniu.conf.Config();
 
-    let resumeUploader = new qiniu.resume_up.ResumeUploader(config);
     let putExtra = new qiniu.resume_up.PutExtra();
     putExtra.progressCallback = (uploadBytes, totalBytes) => {
         if (params.progressCallback) {
@@ -123,7 +126,7 @@ function upload(params, callback) {
         }
     };
 
-    resumeUploader.putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
+    new qiniu.resume_up.ResumeUploader(config).putFile(uploadToken, params.key, params.path, putExtra, function (respErr, respBody, respInfo) {
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }

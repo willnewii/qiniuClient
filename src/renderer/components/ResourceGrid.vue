@@ -7,6 +7,8 @@
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFolderMenuClick(4)">全选</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(0)"><span style="color: red;width: 300px">删除</span>
             </v-contextmenu-item>
         </v-contextmenu>
@@ -16,6 +18,8 @@
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(7)">全选</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(2)">复制链接</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
@@ -82,6 +86,11 @@
         <Modal v-model="changeFileNameDialog.show" title="重命名" @on-ok="changeFileName">
             <Input v-model="changeFileNameDialog.input"/>
         </Modal>
+
+        <viewer :options="options" :images="previewImages" ref="viewer" @inited="inited" style="display: none">
+            <img class="image-wrapper" v-for="src in previewImages" :key="src"
+                 :src="src" :data-source="src" :alt="src.split('?image=').pop()">
+        </viewer>
     </div>
 </template>
 <script>
@@ -105,6 +114,8 @@
         data() {
             return {
                 files: [],
+                //图片文件列表,方便显示多图
+                images: [],
                 //缓存当前路径
                 cacheName: '',
                 //是否在多选状态
@@ -115,7 +126,24 @@
                 //virtual-list
                 remain0: 0,
                 remain1: 0,
-                step: 6
+                step: 6,
+                //virtual-list
+                options: {
+                    inline: false,
+                    button: true,
+                    navbar: false,
+                    title: true,
+                    toolbar: true,
+                    tooltip: true,
+                    movable: true,
+                    zoomable: true,
+                    rotatable: true,
+                    scalable: true,
+                    transition: true,
+                    fullscreen: true,
+                    keyboard: true,
+                    url: 'data-source'
+                },
             };
         },
         watch: {
@@ -168,16 +196,6 @@
             };
             EventBus.$on(Constants.Event.updateFiles, (files) => {
                 this.files = files;
-                /*this.fileFilter({
-                    source: files,
-                    callback: (result) => {
-                        if (this.keyWord) {
-                            this.showMessage({
-                                message: `筛选到${result.searchCount}个文件`
-                            });
-                        }
-                    }
-                });*/
             });
         },
         mounted() {
@@ -187,6 +205,9 @@
             this.fileFilter();
         },
         methods: {
+            inited(viewer) {
+                this.$viewer = viewer;
+            },
             clickItem(file, index) {
                 if (this.isMultiple) {
                     this.selectFile(index);
@@ -194,7 +215,12 @@
                     if (file._directory) {
                         this.bucket.folderPath = file._path;
                     } else {
-                        this.show(file);
+                        if (util.isSupportImage(file.mimeType)) {
+                            this.showImage(file, this.images);
+                        } else {
+                            this.show(file);
+                        }
+
                     }
                 }
             },
@@ -206,8 +232,8 @@
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
                         return `${this.bucket.generateUrl(file.key)}${temp}`;
-                    case brand.tencent.key:
-                        return this.bucket.generateUrl(file.key);
+                    default:
+                        return this.bucket.generateUrl(file.key, this.setup_deadline);
                 }
             },
             getFilebyGrid() {
@@ -241,6 +267,7 @@
                 let folderPath = this.bucket.folderPath;
                 let _dirs = [];
                 let files = [];
+                let images = [];
                 let resultCount = 0;
 
                 (option.source || this.bucket.files).forEach((file) => {
@@ -262,7 +289,8 @@
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
-                            if (/image\/(png|img|jpe?g){1}/.test(file.mimeType.toLowerCase())) {
+                            if (util.isSupportImage(file.mimeType.toLowerCase())) {
+                                images.push(file);
                                 file._icon = 'md-image';
                             } else if (file.mimeType.indexOf('audio') === 0) {
                                 file._icon = 'md-musical-notes';
@@ -288,6 +316,7 @@
                 });
 
                 files = files.sort(util.sequence);
+                images = images.sort(util.sequence);
                 if (folderPath !== '') {
                     let lastIndex = folderPath.lastIndexOf('/');
                     files.unshift({
@@ -311,6 +340,7 @@
                 // files.length = parseInt(files.length / 2);
                 this.files = [];
                 this.$nextTick(function () {
+                    this.images = Object.freeze(images);
                     this.files = Object.freeze(files);
                     option.callback && option.callback({searchCount: resultCount});
                 });
@@ -329,6 +359,7 @@
 
     .layout-content {
         margin: 0 15px 15px 15px;
+        overflow-x: hidden;
         overflow-y: scroll;
         background: $bg-resource;
         flex-grow: 1;
@@ -337,6 +368,7 @@
         .grid2 {
             padding: 10px;
             box-sizing: content-box;
+            transform: translateZ(0);
             .grid2-item {
                 display: flex;
                 flex-direction: row;
@@ -357,6 +389,7 @@
                     min-height: $imageWidth;
                     min-width: $imageWidth;
                     padding: 10px;
+                    object-fit: cover;
                 }
                 .file {
                     height: $imageWidth;
@@ -392,6 +425,7 @@
         }
 
         .list {
+            transform: translateZ(0);
             height: 100%;
             .item {
                 display: flex;
@@ -433,6 +467,5 @@
                 background-color: $primary !important;
             }
         }
-
     }
 </style>

@@ -3,7 +3,6 @@
 process.env.BABEL_ENV = 'main';
 
 const path = require('path');
-const {dependencies} = require('../package.json');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 

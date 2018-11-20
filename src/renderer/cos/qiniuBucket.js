@@ -22,10 +22,8 @@ class Bucket extends baseBucket {
     bindPage(vm) {
         this.vm = vm;
 
-        this.checkPrivate();
-
+        this.getACL();
         this.getDomains();
-
         this.getResources();
     }
 
@@ -40,9 +38,10 @@ class Bucket extends baseBucket {
     /**
      * 检测是否属于私密空间
      */
-    checkPrivate() {
+    getACL() {
         let privateBuckets = this.vm.privatebucket;
-        this.isprivate = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1);
+        let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
+        this.setPermission(permission);
     }
 
     /**
@@ -132,7 +131,7 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return qiniu.generateUrl(this.domain, key, (this.isprivate ? deadline : null));
+        return qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null));
     }
 
     /**

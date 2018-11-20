@@ -1,17 +1,36 @@
 {
-  "comments": false,
-  "sourceMaps": true,
-  "retainLines": true,
-  "env": {
-    "main": {
-      "presets": ["env"]
+    "comments": false,
+    "sourceMaps": true,
+    "retainLines": true,
+    "env": {
+        "main": {
+            "presets": [
+                "env",
+                {
+                    "modules": false,
+                    "targets": {
+                        "node": 7
+                    }
+                }
+            ]
+        },
+        "renderer": {
+            "presets": [
+                [
+                    "env",
+                    {
+                        "modules": false,
+                        "targets": {
+                            "electron": "3.0.4"
+                        }
+                    }
+                ],
+                "stage-0"
+            ]
+        }
     },
-    "renderer": {
-      "presets": [
-        ["env", { "modules": false }],
-        "stage-0"
-      ]
-    }
-  },
-  "plugins": ["transform-runtime","syntax-dynamic-import","transform-object-rest-spread"]
+    "plugins": [
+        "transform-runtime",
+        "transform-object-rest-spread"
+    ]
 }

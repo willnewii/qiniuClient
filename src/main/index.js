@@ -4,6 +4,7 @@ import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} fro
 import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
+const fs = require('fs-extra');
 const {download} = require('electron-dl');
 
 import pkg from '../../package';
@@ -13,6 +14,8 @@ import * as Constants from '../renderer/service/constants';
 import * as diffFolder from './util/diffFolder';
 
 let mainWindow, aboutWindow;
+
+const DEFAULT_PATH = path.join(app.getPath('downloads'), pkg.name);
 
 app.on('ready', initApp);
 
@@ -85,7 +88,7 @@ const registerIPC = function () {
             }
         };
         if (!option.directory) {
-            option.directory = path.join(app.getPath('downloads'), pkg.name);
+            option.directory = DEFAULT_PATH;
         }
         if (option.folder) {
             option.directory = path.join(option.directory, option.folder);
@@ -145,6 +148,18 @@ const registerIPC = function () {
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
         event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+    });
+
+    //导出URL链接
+    ipcMain.on(Constants.Listener.exportUrl, function (event, arg) {
+        fs.ensureDirSync(DEFAULT_PATH);
+        let filePath = path.join(DEFAULT_PATH, arg.name);
+        let content = arg.urls.join('\n');
+        fs.writeFileSync(filePath, content);
+        shell.showItemInFolder(filePath);
+        util.notification({
+            message: 'URL 导出完成'
+        });
     });
 };
 

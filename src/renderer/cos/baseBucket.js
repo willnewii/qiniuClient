@@ -1,4 +1,5 @@
 import {Constants, EventBus, util} from '../service/index';
+import * as types from "@/vuex/mutation-types";
 
 class baseBucket {
 
@@ -13,8 +14,9 @@ class baseBucket {
 
     reset() {
         this.name = '';
-        //是否是私有空间
-        this.isprivate = false;
+        this.location = '';
+        //操作权限 0：正常 1：私有
+        this.permission = 0;
 
         //当前bucket 的可用域名列表
         this.domains = [];
@@ -48,6 +50,13 @@ class baseBucket {
         this.withoutDelimiterFiles = [];
     }
 
+    setPermission(permission) {
+        this.permission = permission;
+        if (this.vm) {
+            this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
+        }
+    }
+
     getResources() {
         EventBus.$emit(Constants.Event.loading, {
             show: true,
@@ -56,6 +65,12 @@ class baseBucket {
         });
     }
 
+    /**
+     * 根据marker状态判断是否继续请求
+     * 请将data数据统一转换: items | marker
+     * @param data
+     * @param keyword
+     */
     appendResources(data, keyword) {
         this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
         this.marker = data.marker ? data.marker : '';
