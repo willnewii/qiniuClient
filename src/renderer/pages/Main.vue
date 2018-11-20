@@ -9,7 +9,7 @@
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
-                    <span>{{menuState ? cos.name + 'COS' : ''}}</span>
+                    <span>{{menuState ? cos.name + '云存储' : ''}}</span>
                 </i-button>
                 <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
