@@ -21,6 +21,7 @@
     },
     "dependencies": {},
     "devDependencies": {
+        "ali-oss": "^6.0.1",
         "animate.css": "^3.7.0",
         "axios": "^0.16.2",
         "babel-core": "^6.25.0",

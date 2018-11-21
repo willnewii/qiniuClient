@@ -21,6 +21,11 @@
                     <Form-item label="SECRET_KEY" prop="secret_key">
                         <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
                     </Form-item>
+                    <!-- 阿里云使用字段 测试:使用其他值也可
+                    <Form-item  label="REGION" prop="region">
+                        <Input v-model="formItem.region" placeholder="请填入你的OSS所在的区域"/>
+                    </Form-item>
+                    -->
                     <Form-item>
                         <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
                         <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
@@ -51,18 +56,23 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    access_key: '',
-                    secret_key: '',
+                    access_key: 'LTAI8t9Mjerl7PD5',
+                    secret_key: '4zeBOV1mVUFZnAGjJmTNTqPE7Zl1xu',
+                    region: ''
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
-                    secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
+                    secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
+                    region: [{required: false, message: 'region不能为空', trigger: 'blur'}]
                 },
-                brands: [brand.qiniu, brand.tencent, brand.qingstor]
+                brands: []
             };
         },
         computed: {},
         created: function () {
+            Object.keys(brand).forEach((item) => {
+                this.brands.push(brand[item]);
+            });
         },
         methods: {
             onTabClick(index) {
@@ -72,7 +82,7 @@
             handleSubmit(key) {
                 this.$refs[key][0].validate((valid) => {
                     if (valid) {
-                        this.validateKey(this.formItem.access_key, this.formItem.secret_key);
+                        this.validateKey(this.formItem);
                     } else {
                         console.log('表单不能提交');
                     }
@@ -81,9 +91,9 @@
             handleReset(key) {
                 this.$refs[key][0].resetFields();
             },
-            validateKey(access_key, secret_key) {
+            validateKey(form) {
                 this.$storage.setName(this.selectBrand.key);
-                this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
+                this.$storage.cos.init({access_key: form.access_key, secret_key: form.secret_key, region: form.region});
 
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
@@ -92,14 +102,11 @@
                             title: this.selectBrand.name,
                             body: error.message
                         });
-                        /*this.$Notice.error({
-                            title: this.selectBrand.name,
-                            desc: error.message
-                        });*/
                     } else {
                         this.$storage.saveCosKey({
-                            access_key: access_key,
-                            secret_key: secret_key
+                            access_key: form.access_key,
+                            secret_key: form.secret_key,
+                            region: form.region
                         }, () => {
                             this.$router.push({name: Constants.PageName.main});
                         });

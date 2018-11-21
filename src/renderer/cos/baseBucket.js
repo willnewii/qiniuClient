@@ -50,6 +50,10 @@ class baseBucket {
         this.withoutDelimiterFiles = [];
     }
 
+    /**
+     * 0: 正常 1：私有
+     * @param permission
+     */
     setPermission(permission) {
         this.permission = permission;
         if (this.vm) {
