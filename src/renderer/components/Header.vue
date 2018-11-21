@@ -46,7 +46,7 @@
                 </i-button>
             </div>
 
-            <div v-if="isWin">
+            <div v-if="isWin" style="display: flex;">
                 <i-button class="button" type="text" @click="actionBtn(3)">
                     <Tooltip content="文件上传(支持多选)" placement="bottom">
                         <Icon type="md-document" size="24"/>
