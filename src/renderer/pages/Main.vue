@@ -47,7 +47,7 @@
         </Row>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
-               :mask-closable="true">
+               :mask-closable="false">
             <div class="choice-cos">
                 <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
                     <div class="choice-view" @click="selectCOS(item)">

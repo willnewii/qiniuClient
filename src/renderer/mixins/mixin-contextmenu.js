@@ -1,4 +1,4 @@
-import {Constants, util, EventBus, brand} from "@/service/index";
+import {Constants, util, EventBus} from "@/service/index";
 
 export default {
     data() {
@@ -94,6 +94,9 @@ export default {
                 case 3://多选
                     this.selectFile(this.contextFolderMenuIndex);
                     break;
+                case 4://全选
+                    this.$parent.allSelection();
+                    break;
             }
         },
         handleFileMenu(ref) {
@@ -123,11 +126,15 @@ export default {
                     // this.changeFileNameDialog.input = file.key;
                     this.changeFileNameDialog.file = file;
                     break;
-                case 5://多选
+                case 5://选择当前文件
                     this.selectFile(this.contextFileMenuIndex);
                     break;
                 case 6://下载
                     this.handleDownload(file);
+                    break;
+                case 7://全选
+                    this.$parent.allSelection();
+                    break;
             }
         },
     }

@@ -142,8 +142,8 @@ export default {
             }
         },
         copy(file, copyType) {
-            let url = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file));
-            this.$electron.clipboard.writeText(url);
+            let text = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file), file);
+            this.$electron.clipboard.writeText(text);
             this.$Message.info('文件路径以复制到剪贴板');
         },
         syncUpload() {

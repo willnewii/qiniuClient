@@ -76,7 +76,7 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
     let files = klaw(localDir, {
         nodir: true,
         filter: function (item) {
-            return !/\.(DS_Store|log|delete)$/.test(item.path);
+            return !/\.(log|delete)$/.test(item.path);
         }
     });
     for (let file of files) {

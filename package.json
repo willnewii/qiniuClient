@@ -1,7 +1,7 @@
 {
     "name": "fastcache",
     "cnname": "速网云存储客户端",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "description": "速网云存储客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",

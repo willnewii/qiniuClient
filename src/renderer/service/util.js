@@ -20,12 +20,16 @@ export function isEmptyObject(e) {
     return !0;
 }
 
-export function getClipboardText(type, url) {
+export function getClipboardText(type, url, file) {
     switch (type) {
         case Constants.CopyType.URL:
             return url;
         case Constants.CopyType.MARKDOWN:
-            return `![${getPostfix(url)}](${url})`;
+            if (isSupportImage(file.mimeType)) {
+                return `![${getPostfix(file.key)}](${url})`;
+            } else {
+                return `[${getPostfix(file.key)}](${url})`;
+            }
         default:
             return url;
     }
