@@ -9,7 +9,7 @@
             <i-col :span="menuSpace.left" class="layout-menu-left">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <!--<Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>-->
-                    {{menuState ? cos_name : ''}}
+                    {{menuState ? cos.name : ''}}
                 </i-button>
                 <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
                       @on-select="onMenuSelect" :active-name="bucketName">
