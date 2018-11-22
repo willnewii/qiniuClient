@@ -101,6 +101,7 @@ function fetch(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error, 'status': respBody.status};
         }
+        console.log(params, respErr, respBody);
         callback(respErr, respBody);
     });
 }

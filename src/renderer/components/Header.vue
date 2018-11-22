@@ -46,7 +46,7 @@
                 </i-button>
             </div>
 
-            <div v-if="isWin">
+            <div v-if="isWin" style="display: flex;">
                 <i-button class="button" type="text" @click="actionBtn(3)">
                     <Tooltip content="文件上传(支持多选)" placement="bottom">
                         <Icon type="md-document" size="24"/>
@@ -113,10 +113,9 @@
                 search: '',
                 isMac: process.platform === 'darwin',
                 isWin: process.platform === 'win32',
-                //目前只有七牛支持Url直接上传
-                isSupportUrlUpload: [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1,
-                //目前只有七牛支持Domain选择
-                isSupportDomain: [brand.qiniu.key].indexOf(this.$storage.name) !== -1,
+                isSupportUrlUpload: false,
+                isSupportDomain: false,
+
             };
         },
         computed: {
@@ -132,6 +131,11 @@
                     this[types.setup.setup_a_customedomain](obj);
                 }
             },
+            'bucket.name': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
+                if (val) {
+                    this.updateSupport();
+                }
+            },
         },
         props: {
             bucket: {
@@ -139,11 +143,16 @@
             },
         },
         created() {
+            this.updateSupport();
         },
         methods: {
             ...mapActions([
                 types.setup.setup_a_customedomain,
             ]),
+            updateSupport() {
+                this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1;
+                this.isSupportDomain = [brand.qiniu.key].indexOf(this.$storage.name) !== -1;
+            },
             clearSearch() {
                 this.search = '';
                 this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);

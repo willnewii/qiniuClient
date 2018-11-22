@@ -36,24 +36,29 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    access_key: '',
-                    secret_key: '',
+                    access_key: 'LTAI8t9Mjerl7PD5',
+                    secret_key: '4zeBOV1mVUFZnAGjJmTNTqPE7Zl1xu',
+                    region: ''
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
-                    secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}]
+                    secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
+                    region: [{required: false, message: 'region不能为空', trigger: 'blur'}]
                 },
-                brands: [brand.qiniu, brand.tencent, brand.qingstor]
+                brands: []
             };
         },
         computed: {},
         created: function () {
+            Object.keys(brand).forEach((item) => {
+                this.brands.push(brand[item]);
+            });
         },
         methods: {
             handleSubmit(name) {
                 this.$refs[name].validate((valid) => {
                     if (valid) {
-                        this.validateKey(this.formItem.access_key, this.formItem.secret_key);
+                        this.validateKey(this.formItem);
                     } else {
                         console.log('表单不能提交');
                     }
@@ -62,9 +67,9 @@
             handleReset(name) {
                 this.$refs[name].resetFields();
             },
-            validateKey(access_key, secret_key) {
+            validateKey(form) {
                 this.$storage.setName(this.selectBrand.key);
-                this.$storage.cos.init({access_key: access_key, secret_key: secret_key});
+                this.$storage.cos.init({access_key: form.access_key, secret_key: form.secret_key, region: form.region});
 
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
@@ -73,14 +78,11 @@
                             title: this.selectBrand.name,
                             body: error.message
                         });
-                        /*this.$Notice.error({
-                            title: this.selectBrand.name,
-                            desc: error.message
-                        });*/
                     } else {
                         this.$storage.saveCosKey({
-                            access_key: access_key,
-                            secret_key: secret_key
+                            access_key: form.access_key,
+                            secret_key: form.secret_key,
+                            region: form.region
                         }, () => {
                             this.$router.push({name: Constants.PageName.main});
                         });

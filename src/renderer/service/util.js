@@ -168,7 +168,7 @@ export function sequence(file1, file2) {
 /**
  * 转换个平台Object数据信息至统一格式
  * @param item
- * @param platformType 0: qiniu 1:tencent
+ * @param platformType 0:qiniu 1:tencent 2:qing 3:ali
  * @returns {{key: *, fsize: number, putTime: number, mimeType: string},ETag:String}
  */
 export function convertMeta(item, platformType = 0) {
@@ -187,6 +187,13 @@ export function convertMeta(item, platformType = 0) {
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.modified * 1000).getTime();
             item.mimeType = mime.lookup(item.key) || '';
+            item.ETag = item.etag;
+            break;
+        case 3:
+            item.key = item.name;
+            item.fsize = parseInt(item.size);
+            item.putTime = new Date(item.lastModified).getTime();
+            item.mimeType = mime.lookup(item.name) || '';
             item.ETag = item.etag;
             break;
     }

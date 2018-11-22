@@ -11,5 +11,9 @@ export default {
         key: 'Qingstor',
         name: '青云',
         location: ['gd2', 'pek3a', 'sh1a']
+    },
+    aliyun: {
+        key: 'aliyun',
+        name: '阿里云',
     }
 };

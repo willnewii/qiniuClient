@@ -222,6 +222,7 @@
                     this.selectFile(index);
                 } else {
                     if (file._directory) {
+                        console.log(file._path);
                         this.bucket.folderPath = file._path;
                     } else {
                         if (util.isSupportImage(file.mimeType)) {
@@ -234,15 +235,24 @@
                 }
             },
             getUrlbyMimeType(file) {
-                let temp = '?' + this.setup_imagestyle;
+                let imageStyle = this.setup_imagestyle;
                 if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
-                    temp = '';
+                    imageStyle = '';
                 }
+
+                let url = this.bucket.generateUrl(file.key, this.setup_deadline);
+
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
-                        return `${this.bucket.generateUrl(file.key)}${temp}`;
+                        return `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${imageStyle}`;
+                    case brand.aliyun.key:
+                        if (imageStyle) {
+                            imageStyle = 'x-oss-process=image/format,jpg/auto-orient,1/quality,q_30';
+                        }
+                        // 加载图片样式会报签名错误
+                        return `${url}${url.indexOf('?') !== -1 ? '' : '?' + imageStyle}`;
                     default:
-                        return this.bucket.generateUrl(file.key, this.setup_deadline);
+                        return url;
                 }
             },
             getFilebyGrid() {
