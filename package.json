@@ -85,7 +85,7 @@
     "build": {
         "productName": "速网云存储客户端",
         "appId": "com.github.willnewii.fastcache",
-        "asar": false,
+        "asar": true,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
         "electronDownload": {},
