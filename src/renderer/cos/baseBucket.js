@@ -43,7 +43,6 @@ class baseBucket {
         //旧设计,Table 中使用,稍后会弃用
         this.dirs = [];
         this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
         //当前选择dir
         this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
@@ -89,6 +88,15 @@ class baseBucket {
             this.files = Object.freeze(this.tempFiles);
             this.tempFiles = [];
         }
+    }
+
+    /**
+     * 根据子类url,统一做处理
+     * @param url
+     */
+    generateUrl(url) {
+        console.log(url);
+        return url;
     }
 }
 

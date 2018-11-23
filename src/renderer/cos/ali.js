@@ -3,7 +3,6 @@ import AliBucket from "./aliBucket";
 
 
 let cos = null;
-let qinKey = null;
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
@@ -23,15 +22,10 @@ function getBuckets(callback) {
 }
 
 function generateUrl(domain, key, deadline) {
-    key = key.trim();
-    if (deadline) {
-    } else {
-        return PROTOCOL + domain + '/' + encodeURI(key);
-    }
 }
 
 function generateBucket(name) {
     return new AliBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, generateUrl, PROTOCOL};
+export {init, getBuckets, generateBucket, generateUrl};

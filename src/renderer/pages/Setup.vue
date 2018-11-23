@@ -53,9 +53,8 @@
                     <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-
             <div v-if="setup_bucket_name">提示：文件将会被上传至
-                {{brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir + '/' : ''}}
+                {{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir + '/' : ''}}
                 目录下
             </div>
         </div>

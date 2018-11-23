@@ -91,8 +91,7 @@
                 </Tooltip>
             </i-button>
         </div>
-
-        <Input class="input-search" v-model="search" :placeholder="placeholder" icon="ios-close-outline"
+        <Input class="input-search" v-model="search" :placeholder="placeholder" icon="md-close-circle"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
 
@@ -154,8 +153,10 @@
                 this.isSupportDomain = [brand.qiniu.key].indexOf(this.$storage.name) !== -1;
             },
             clearSearch() {
-                this.search = '';
-                this.$emit('on-search', this.bucket.getCurrentDir(), this.search, event);
+                if (this.search != '') {
+                    this.search = '';
+                    this.$emit('on-search', this.search, event);
+                }
             },
             toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];

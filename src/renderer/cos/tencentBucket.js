@@ -1,22 +1,12 @@
-import * as types from "@/vuex/mutation-types";
-
 const fs = require('fs');
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
-import * as qing from "@/cos/qing";
 
 class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
-    }
-
-    reset() {
-        super.reset();
-
-        //腾讯COS字段
-        this.location = '';
     }
 
     /**
@@ -142,7 +132,7 @@ class Bucket extends baseBucket {
             Sign: this.permission === 1 //是否需要签名
         };
 
-        return this.cos.getObjectUrl(params);
+        return super.generateUrl(this.cos.getObjectUrl(params));
     }
 }
 

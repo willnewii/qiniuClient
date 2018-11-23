@@ -1,15 +1,13 @@
 import {Constants, EventBus, util} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
+import Request from "@/api/API";
+import {_httpAuthorization} from "../cos/qiniu";
 
 class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
-    }
-
-    reset() {
-        super.reset();
     }
 
     /**
@@ -28,14 +26,6 @@ class Bucket extends baseBucket {
     }
 
     /**
-     * 返回当前目录，[全部,其他]都返回''
-     * @returns {*}
-     */
-    getCurrentDir() {
-        return this.currentDir === Constants.Key.withoutDelimiter ? '' : this.currentDir;
-    }
-
-    /**
      * 检测是否属于私密空间
      */
     getACL() {
@@ -50,11 +40,12 @@ class Bucket extends baseBucket {
      * 如果domains为空,查询customeDomains
      */
     getDomains() {
-        this.vm.doRequset(qiniu.methods.domains, {tbl: this.name}, (response) => {
-            if (!response)
-                return;
+        let request = new Request();
+        let url = `${qiniu.methods.domains}?tbl=${this.name}`;
 
-            let domains = response.data;
+        request.setAuthorization(_httpAuthorization(url));
+        request.get(url).then((result) => {
+            let domains = result.data;
             let customeDomains = this.vm.customeDomains;
             if (domains && domains.length > 0) {
                 this.domains = domains;
@@ -67,6 +58,8 @@ class Bucket extends baseBucket {
                     this.domain = '';
                 }
             }
+        }).catch((error) => {
+            console.log(error);
         });
     }
 
@@ -131,51 +124,8 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null));
-    }
-
-    /**
-     *  已弃用
-     * 返回目录数组,忽略前两个手动添加的'全部'，'其它'
-     * @returns {T[]}
-     */
-    getDirArray() {
-        return this.dirs.slice(2);
-    }
-
-    /**
-     *  已弃用
-     * 获取该bucket下的目录
-     * @param marker 上一次列举返回的位置标记，作为本次列举的起点标记
-     */
-    getDirs(marker) {//获取目录
-        let param = {
-            bucket: this.name,
-            delimiter: qiniu.DELIMITER,
-            limit: 1000
-        };
-        if (marker) {
-            data.marker = marker;
-        }
-
-        this.vm.doRequset(qiniu.methods.resources, param, (response) => {
-            if (!response)
-                return;
-
-            let data = response.data;
-            if (data.commonPrefixes) {
-                this.dirs = this.dirs.concat(data.commonPrefixes);
-            }
-
-            if (data.items) {//不包含公共前缀的文件列表,会出现其他文件夹列表
-                data.items.forEach((item, index) => {
-                    data.items[index].putTime = item.putTime / 10000;
-                });
-                this.withoutDelimiterFiles = this.withoutDelimiterFiles.concat(data.items);
-            }
-
-            response.data.marker && this.getDirs(response.data.marker);
-        });
+        let url = qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null));
+        return super.generateUrl(url);
     }
 
     /**
@@ -187,22 +137,6 @@ class Bucket extends baseBucket {
     search(dir, search = '') {
         this.marker = '';
         this.getResources(dir + search);
-    }
-
-    /**
-     * 已弃用
-     * 设置当前目录
-     * @param dir
-     */
-    setCurrentDir(dir) {
-        this.currentDir = dir;
-        this.marker = '';
-
-        if (dir === Constants.Key.withoutDelimiter) {
-            this.files = this.withoutDelimiterFiles;
-        } else {
-            this.search(this.currentDir);
-        }
     }
 }
 

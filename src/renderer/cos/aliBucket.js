@@ -105,13 +105,15 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
+        let url;
         if (this.permission === 1) {
-            return this.cos.signatureUrl(key, {
+            url = this.cos.signatureUrl(key, {
                 expires: parseInt(deadline)
             });
         } else {
-            return this.cos.generateObjectUrl(key);
+            url = this.cos.generateObjectUrl(key);
         }
+        return super.generateUrl(url);
     }
 }
 
