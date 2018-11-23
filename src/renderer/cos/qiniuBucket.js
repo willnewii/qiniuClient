@@ -45,7 +45,7 @@ class Bucket extends baseBucket {
 
         request.setAuthorization(_httpAuthorization(url));
         request.get(url).then((result) => {
-            let domains = result.data;
+            let domains = JSON.parse(result.data);
             let customeDomains = this.vm.customeDomains;
             if (domains && domains.length > 0) {
                 this.domains = domains;
@@ -117,14 +117,14 @@ class Bucket extends baseBucket {
     }
 
     /**
-     * 返回资源真实链接
+     * 返回资源真实链接,无域名时,返回空链接.
      * @param index
      * @param key
      * @param deadline  私有模式,文件有效期
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let url = qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null));
+        let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
         return super.generateUrl(url);
     }
 

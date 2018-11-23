@@ -41,8 +41,7 @@
                             <span class="name">{{file._name}}</span>
                         </template>
                         <template v-else>
-                            <img v-if="/image\/(png|img|jpe?g|svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="getUrlbyMimeType(file)"/>
+                            <img v-if="file._icon==='md-image' && file.imgObj.src" class="image" v-lazy="file.imgObj"/>
                             <Icon v-else class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file.key | getfileNameByUrl}}</span>
                             <div class="btn">
@@ -225,26 +224,32 @@
                     }
                 }
             },
-            getUrlbyMimeType(file) {
+            getImgUrlwithStyle(file) {
                 let imageStyle = this.setup_imagestyle;
                 if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
                     imageStyle = '';
                 }
 
                 let url = this.bucket.generateUrl(file.key, this.setup_deadline);
-
+                let imageSrc = '';
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
-                        return `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${imageStyle}`;
+                        imageSrc = url ? `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${imageStyle}` : '';
+                        break;
                     case brand.aliyun.key:
                         if (imageStyle) {
                             imageStyle = 'x-oss-process=image/format,jpg/auto-orient,1/quality,q_30';
                         }
                         // 加载图片样式会报签名错误
-                        return `${url}${url.indexOf('?') !== -1 ? '' : '?' + imageStyle}`;
+                        imageSrc = `${url}${url.indexOf('?') !== -1 ? '' : '?' + imageStyle}`;
+                        break;
                     default:
-                        return url;
+                        imageSrc = url;
                 }
+                return {
+                    src: imageSrc,
+                    error: require('../assets/img/md-image.svg')
+                };
             },
             getFilebyGrid() {
                 let array = [];
@@ -300,8 +305,9 @@
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
                             if (util.isSupportImage(file.mimeType.toLowerCase())) {
-                                images.push(file);
+                                file.imgObj = this.getImgUrlwithStyle(file);
                                 file._icon = 'md-image';
+                                images.push(file);
                             } else if (file.mimeType.indexOf('audio') === 0) {
                                 file._icon = 'md-musical-notes';
                             } else {
