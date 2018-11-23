@@ -196,6 +196,13 @@ export function convertMeta(item, platformType = 0) {
             item.mimeType = mime.lookup(item.name) || '';
             item.ETag = item.etag;
             break;
+        case 4:
+            item.key = item.name;
+            item.fsize = parseInt(item.size);
+            item.putTime = new Date(item.time).getTime();
+            item.mimeType = mime.lookup(item.name) || '';
+            item.ETag = item.etag;
+            break;
     }
 
     return item;

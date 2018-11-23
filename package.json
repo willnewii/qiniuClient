@@ -64,6 +64,7 @@
         "qs": "^6.5.2",
         "sass-loader": "^7.1.0",
         "style-loader": "^0.18.2",
+        "upyun": "^3.3.5",
         "url-loader": "^0.5.9",
         "v-contextmenu": "^2.8.0",
         "v-viewer": "^1.2.1",

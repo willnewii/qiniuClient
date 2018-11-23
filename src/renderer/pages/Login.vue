@@ -15,17 +15,26 @@
             <TabPane v-for="(item,index) in brands" :key="index" :name="index+''" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
-                    <Form-item label="ACCESS_KEY" prop="access_key">
-                        <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
-                    </Form-item>
-                    <Form-item label="SECRET_KEY" prop="secret_key">
-                        <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
-                    </Form-item>
-                    <!-- 阿里云使用字段 测试:使用其他值也可
-                    <Form-item  label="REGION" prop="region">
-                        <Input v-model="formItem.region" placeholder="请填入你的OSS所在的区域"/>
-                    </Form-item>
-                    -->
+
+                    <template v-if="item.key !== brands[4].key">
+                        <Form-item label="ACCESS_KEY" prop="access_key">
+                            <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
+                        </Form-item>
+                        <Form-item label="SECRET_KEY" prop="secret_key">
+                            <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
+                        </Form-item>
+                    </template>
+                    <template v-else>
+                        <Form-item label="服务名称" prop="service_name">
+                            <Input v-model="formItem.service_name" placeholder="请填入服务名称"/>
+                        </Form-item>
+                        <Form-item label="操作员名" prop="access_key">
+                            <Input v-model="formItem.access_key" placeholder="请填入操作员名"/>
+                        </Form-item>
+                        <Form-item label="操作员密码" prop="secret_key">
+                            <Input v-model="formItem.secret_key" placeholder="请填入操作员密码"/>
+                        </Form-item>
+                    </template>
                     <Form-item>
                         <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
                         <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
@@ -41,7 +50,8 @@
                             <a @click="openBrowser('https://console.qingcloud.com/')">{{item.name}}</a>->头像->API密钥
                         </template>
                         <template v-else-if="item.key === brands[3].key">
-                            <a @click="openBrowser('https://https://oss.console.aliyun.com/')">{{item.name}}</a>->Access Key
+                            <a @click="openBrowser('https://https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
+                            Key
                         </template>
                     </div>
                 </Form>
@@ -59,14 +69,16 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    access_key: 'LTAI8t9Mjerl7PD5',
-                    secret_key: '4zeBOV1mVUFZnAGjJmTNTqPE7Zl1xu',
+                    service_name: 'will-test-upyun',
+                    access_key: 'test001',
+                    secret_key: 'aaaaaaaa',
                     region: ''
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
-                    region: [{required: false, message: 'region不能为空', trigger: 'blur'}]
+                    region: [{required: false, message: 'region不能为空', trigger: 'blur'}],
+                    service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
                 },
                 brands: []
             };
@@ -83,6 +95,9 @@
                 this.handleReset(this.selectBrand.key);
             },
             handleSubmit(key) {
+                if (key !== this.brands[4].key) {
+                    this.formItem.service_name = '-';
+                }
                 this.$refs[key][0].validate((valid) => {
                     if (valid) {
                         this.validateKey(this.formItem);
@@ -96,7 +111,12 @@
             },
             validateKey(form) {
                 this.$storage.setName(this.selectBrand.key);
-                this.$storage.cos.init({access_key: form.access_key, secret_key: form.secret_key, region: form.region});
+                this.$storage.cos.init({
+                    access_key: form.access_key,
+                    secret_key: form.secret_key,
+                    region: form.region,
+                    service_name: form.service_name
+                });
 
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
@@ -109,7 +129,8 @@
                         this.$storage.saveCosKey({
                             access_key: form.access_key,
                             secret_key: form.secret_key,
-                            region: form.region
+                            region: form.region,
+                            service_name: form.service_name
                         }, () => {
                             this.$router.push({name: Constants.PageName.main});
                         });

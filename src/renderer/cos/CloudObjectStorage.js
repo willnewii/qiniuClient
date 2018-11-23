@@ -3,6 +3,7 @@ import * as qiniu from '../cos/qiniu';
 import * as tencent from '../cos/tencent';
 import * as qing from '../cos/qing';
 import * as ali from '../cos/ali';
+import * as upyun from '../cos/upyun';
 import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
@@ -25,6 +26,9 @@ export default class CloudObjectStorage {
                 break;
             case brand.aliyun.key:
                 this.cos = ali;
+                break;
+            case brand.upyun.key:
+                this.cos = upyun;
                 break;
         }
     }
@@ -58,7 +62,7 @@ export default class CloudObjectStorage {
     async initCOS(callback) {
         let data = await storagePromise.get(this.name + '_key');
         if (data && data.access_key && data.secret_key) {
-            this.cos.init({access_key: data.access_key, secret_key: data.secret_key});
+            this.cos.init({access_key: data.access_key, secret_key: data.secret_key, service_name: data.service_name});
             callback && callback(true);
         } else {
             callback && callback(false);
@@ -71,11 +75,7 @@ export default class CloudObjectStorage {
      * @param callback
      */
     async saveCosKey(param, callback) {
-        let params = {
-            access_key: param.access_key,
-            secret_key: param.secret_key
-        };
-        await storagePromise.set(this.name + '_key', params);
+        await storagePromise.set(this.name + '_key', param);
         callback && callback();
     }
 

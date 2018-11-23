@@ -15,5 +15,9 @@ export default {
     aliyun: {
         key: 'aliyun',
         name: '阿里云',
+    },
+    upyun: {
+        key: 'upyun',
+        name: '又拍云',
     }
 };
