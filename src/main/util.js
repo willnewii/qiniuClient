@@ -113,7 +113,7 @@ const isDirectory = function (path) {
 };
 
 export const notification = function (option) {
-    option.title = option.title || pkg.cnname;
+    option.title = pkg.cnname;
     option.body = option.message;
     option.silent = true;
     // option.subtitle = 'subtitle';

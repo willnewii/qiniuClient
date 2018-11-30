@@ -227,7 +227,7 @@ export function loadTheme(name) {
  * @param option
  */
 export function notification(option = {}) {
-    new Notification(option.title || pkg.cnname, Object.assign({
+    new Notification(pkg.cnname, Object.assign({
         silent: true
     }, option));
 }

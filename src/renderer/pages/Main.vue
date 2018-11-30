@@ -152,7 +152,7 @@
         created: function () {
             this.initCOS();
 
-            this[types.setup.setup_init]();
+            // this[types.setup.setup_init]();
 
             //this.checkVersion();
 
