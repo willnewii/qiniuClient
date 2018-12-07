@@ -1,4 +1,4 @@
-const fs = require('fs');
+
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
@@ -27,6 +27,7 @@ class Bucket extends baseBucket {
 
         if (this.location) {
             this.getACL();
+            this.getDomains();
         }
     }
 
@@ -43,6 +44,20 @@ class Bucket extends baseBucket {
             this.setPermission(data.ACL === 'private' ? 1 : 0);
             this.getResources();
         });
+    }
+
+    /**
+     * 设置domains
+     * 如果正常读取domains,默认匹配最后一个(目前clouddn.com域名在最前,正好最后可以匹配自定义域名)
+     * 如果domains为空,查询customeDomains
+     * 如果设置了自定义域名,https 默认设置为false
+     */
+    getDomains() {
+        let customeDomains = this.vm.customeDomains;
+        if (customeDomains && customeDomains[this.name]) {
+            this.domain = customeDomains[this.name];
+            this.https = false ;
+        }
     }
 
     createFile(_param, type, callback) {
@@ -132,7 +147,14 @@ class Bucket extends baseBucket {
             Sign: this.permission === 1 //是否需要签名
         };
 
-        return super.generateUrl(this.cos.getObjectUrl(params));
+        let url = this.cos.getObjectUrl(params);
+
+        if (this.domain) {
+            let obj = new URL(url);
+            url = url.replace(obj.origin, this.domain);
+        }
+
+        return super.generateUrl(url);
     }
 }
 

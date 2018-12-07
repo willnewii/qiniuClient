@@ -38,6 +38,7 @@ class Bucket extends baseBucket {
      * 设置domains
      * 如果正常读取domains,默认匹配最后一个(目前clouddn.com域名在最前,正好最后可以匹配自定义域名)
      * 如果domains为空,查询customeDomains
+     * 如果设置了自定义域名,https 默认设置为false
      */
     getDomains() {
         let request = new Request();
@@ -54,6 +55,7 @@ class Bucket extends baseBucket {
             } else {
                 if (customeDomains && customeDomains[this.name]) {
                     this.domain = customeDomains[this.name];
+                    this.https = false ;
                 } else {
                     this.domain = '';
                 }

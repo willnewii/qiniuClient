@@ -1,31 +1,3 @@
-<style lang="scss" scoped>
-    @import "../style/params";
-
-    .layout-header {
-        background: $bg-header;
-        box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        padding-top: 10px;
-        padding-right: 15px;
-        -webkit-app-region: drag;
-
-        .full {
-            flex-grow: 1;
-            margin-left: 16px;
-        }
-
-        .input-search {
-            width: 165px;
-            margin: 8px 0;
-        }
-
-        .button {
-            color: $fontColor;
-        }
-    }
-</style>
 <template>
     <div class="layout-header">
         <div class="full">
@@ -34,7 +6,7 @@
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
             <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
-                   placeholder="请填入空间域名"/>
+                   :placeholder="domainPlaceholder" @on-blur="saveDomain" placeholder="自定义域名" error="链接不合法"/>
         </div>
 
         <template v-if="bucket.name">
@@ -91,7 +63,7 @@
                 </Tooltip>
             </i-button>
         </div>
-        <Input class="input-search" v-model="search" :placeholder="placeholder" icon="md-close-circle"
+        <Input class="input-search" v-model="search" placeholder="搜索" icon="md-close-circle"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
 
@@ -118,21 +90,17 @@
             };
         },
         computed: {
-            placeholder() {
-                return '搜索';
-            },
-        },
-        watch: {
-            'bucket.domain': function (val) {//在domains为空时,保存 bucket.domain
-                if (this.bucket && this.bucket.domains.length === 0 && val) {
-                    let obj = {};
-                    obj[this.bucket.name] = val;
-                    this[types.setup.setup_a_customedomain](obj);
-                }
-            },
-            'bucket.name': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
-                if (val) {
-                    this.updateSupport();
+            ...mapGetters({
+                customedomain: types.setup.setup_customedomain,
+            }),
+            domainPlaceholder() {
+                switch (this.$storage.name) {
+                    case brand.qiniu.key:
+                        return '请填入空间域名';
+                    case brand.upyun.key:
+                        return '请填入又拍云的加速域名';
+                    default:
+                        return '';
                 }
             },
         },
@@ -141,8 +109,23 @@
                 type: Object
             },
         },
+        watch: {
+            'bucket.name': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
+                if (val) {
+                    this.updateSupport();
+                }
+            },
+        },
         created() {
             this.updateSupport();
+        },
+        mounted() {
+            if (this.$storage.name === brand.upyun.key && !this.bucket.domain) {
+                this.$Message.warning({
+                    content: '请先设置又拍云的加速域名.您可以在又拍云控制台查看您的加速域名',
+                    duration: 8
+                });
+            }
         },
         methods: {
             ...mapActions([
@@ -150,10 +133,33 @@
             ]),
             updateSupport() {
                 this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1;
-                this.isSupportDomain = [brand.qiniu.key].indexOf(this.$storage.name) !== -1;
+                this.isSupportDomain = [brand.qiniu.key, brand.tencent.key, brand.upyun.key].indexOf(this.$storage.name) !== -1;
+            },
+            saveDomain() {
+                let val = this.bucket.domain;
+
+                if (val.length === 0) {//腾讯云有默认链接
+                    let obj = {};
+                    obj[this.bucket.name] = '';
+                    this[types.setup.setup_a_customedomain](obj);
+                    return;
+                }
+
+                try {
+                    let url = new URL(val);
+                    if (this.bucket && this.bucket.domains.length === 0 && val) {
+                        let obj = {};
+                        obj[this.bucket.name] = url.origin;
+                        this.bucket.domain = url.origin;
+                        this[types.setup.setup_a_customedomain](obj);
+                        this.$Message.success('自定义域名保存成功,请刷新页面');
+                    }
+                } catch (err) {
+                    this.$Message.error('自定义域名不合法');
+                }
             },
             clearSearch() {
-                if (this.search != '') {
+                if (this.search !== '') {
                     this.search = '';
                     this.$emit('on-search', this.search, event);
                 }
@@ -198,3 +204,31 @@
         }
     };
 </script>
+<style lang="scss" scoped>
+    @import "../style/params";
+
+    .layout-header {
+        background: $bg-header;
+        box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding-top: 10px;
+        padding-right: 15px;
+        -webkit-app-region: drag;
+
+        .full {
+            flex-grow: 1;
+            margin-left: 16px;
+        }
+
+        .input-search {
+            width: 165px;
+            margin: 8px 0;
+        }
+
+        .button {
+            color: $fontColor;
+        }
+    }
+</style>

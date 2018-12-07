@@ -11,6 +11,7 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
+            https: false,                                            //是否支持Https
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
             uploadNoAsk: true,                                      //文件上传时是否弹出对话框
             isOverwrite: true,                                      //上传时是否直接覆盖文件
@@ -42,6 +43,11 @@ export default {
         },
         [types.setup.setup_downloaddir](state, value) {
             state.setup.downloaddir = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.setup_https](state, value) {
+            console.log(value);
+            state.setup.https = value;
             setAppSetup(state.setup);
         },
         [types.setup.setup_deleteNoAsk](state, value) {
@@ -99,6 +105,9 @@ export default {
         [types.setup.setup_a_imagestyle](context, value) {
             context.commit(types.setup.setup_imagestyle, value);
         },
+        [types.setup.setup_a_https](context, json) {
+            context.commit(types.setup.setup_https, json);
+        },
         [types.setup.setup_a_deleteNoAsk](context, json) {
             context.commit(types.setup.setup_deleteNoAsk, json);
         },
@@ -146,6 +155,9 @@ export default {
         },
         [types.setup.setup_imagestyle](state) {
             return ('imagestyle' in state.setup) ? state.setup.imagestyle : 'imageView2/1/w/100/h/100/format/webp/q/10';
+        },
+        [types.setup.setup_https](state) {
+            return ('https' in state.setup) ? state.setup.https : false;
         },
         [types.setup.setup_deleteNoAsk](state) {
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;

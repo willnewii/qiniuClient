@@ -34,7 +34,10 @@ export default class CloudObjectStorage {
     }
 
     getBuckets(callback) {
-        this.cos.getBuckets(callback);
+        this.cos.getBuckets((error, result) => {
+            console.log(result);
+            callback && callback(error, result);
+        });
     }
 
     async getCOS(callback) {

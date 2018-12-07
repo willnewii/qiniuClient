@@ -12,7 +12,17 @@ class Bucket extends baseBucket {
     bindPage(vm) {
         this.vm = vm;
 
+        this.getDomains();
         this.getResources();
+    }
+
+    getDomains() {
+        let customeDomains = this.vm.customeDomains;
+        if (customeDomains && customeDomains[this.name]) {
+            this.domains = [customeDomains[this.name]];
+            this.domain = customeDomains[this.name];
+            this.https = false;
+        }
     }
 
     createFile(_param, type, callback) {
@@ -41,7 +51,7 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword) {
+    getResources(keyword, path = '/') {
         //delimiter
         let params = {
             'limit': this.limit,
@@ -55,7 +65,7 @@ class Bucket extends baseBucket {
             params.iter = this.marker;
         }
 
-        this.cos.listDir('/', params).then((data) => {
+        this.cos.listDir(path, params).then((data) => {
             if (!this.marker) {
                 this.files = [];
             }
@@ -82,7 +92,21 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        return "";
+        if (this.domain) {
+            let domain = this.domain;
+
+            if (!/^https?:\/\//.test(domain)) {
+                domain = 'http://' + domain;
+            }
+
+            if (domain.lastIndexOf('/') === domain.length - 1) {
+                return domain + key;
+            } else {
+                return domain + "/" + key;
+            }
+        } else {
+            return '';
+        }
     }
 }
 

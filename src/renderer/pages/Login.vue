@@ -53,6 +53,10 @@
                             <a @click="openBrowser('https://https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
                             Key
                         </template>
+                        <template v-else-if="item.key === brands[4].key">
+                            <a @click="openBrowser('https://console.upyun.com/dashboard/')">{{item.name}}</a>->Access
+                            Key
+                        </template>
                     </div>
                 </Form>
             </TabPane>
@@ -69,9 +73,9 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    service_name: 'will-test-upyun',
-                    access_key: 'test001',
-                    secret_key: 'aaaaaaaa',
+                    service_name: '',
+                    access_key: '',
+                    secret_key: '',
                     region: ''
                 },
                 ruleItem: {
@@ -135,7 +139,6 @@
                             this.$router.push({name: Constants.PageName.main});
                         });
                     }
-                    console.log(error);
                 });
             },
             openBrowser(url) {

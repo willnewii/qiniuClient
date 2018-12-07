@@ -39,6 +39,7 @@ class baseBucket {
         //上传列表
         this.uploads = [];
 
+        this.https = false;
 
         //旧设计,Table 中使用,稍后会弃用
         this.dirs = [];
@@ -58,6 +59,8 @@ class baseBucket {
         if (this.vm) {
             this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
         }
+
+        this.https = this.vm[types.setup.setup_https];
     }
 
     getResources() {
@@ -85,6 +88,7 @@ class baseBucket {
                 show: false,
                 flag: 'getResources'
             });
+
             this.files = Object.freeze(this.tempFiles);
             this.tempFiles = [];
         }
@@ -95,6 +99,10 @@ class baseBucket {
      * @param url
      */
     generateUrl(url) {
+        if (this.https && url.startsWith('http://')) {
+            return url.replace('http://', 'https://');
+        }
+
         console.log(url);
         return url;
     }

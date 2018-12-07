@@ -10,10 +10,8 @@ qiniu.conf.SECRET_KEY = '';
 const PROTOCOL = 'http://';
 
 const methods = {
-    //空间列表
-    buckets: 'https://rs.qbox.me/buckets',
-    //空间对应的域名列表(授权空间域名返回为空)
-    domains: 'https://api.qiniu.com/v6/domain/list',
+    buckets: 'https://rs.qbox.me/buckets',//空间列表
+    domains: 'https://api.qiniu.com/v6/domain/list',//空间对应的域名列表(授权空间域名返回为空)
 };
 
 function init(param) {
@@ -64,9 +62,9 @@ function generateUrl(domain, key, deadline) {
         let config = new qiniu.conf.Config();
         let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
         deadline = parseInt(Date.now() / 1000) + deadline;
-        return bucketManager.privateDownloadUrl(PROTOCOL + domain, key, deadline);
+        return bucketManager.privateDownloadUrl(domain, key, deadline);
     } else {
-        return PROTOCOL + domain + '/' + encodeURI(key);
+        return domain + '/' + encodeURI(key);
     }
 }
 
