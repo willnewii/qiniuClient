@@ -16,6 +16,9 @@ export const setup = {
     setup_downloaddir: 'setup_downloaddir',
     setup_a_downloaddir: 'setup_a_downloaddir',
 
+    setup_https: 'setup_https',
+    setup_a_https: 'setup_a_https',
+
     setup_deleteNoAsk: 'setup_deleteNoAsk',
     setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
 

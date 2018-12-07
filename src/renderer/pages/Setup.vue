@@ -15,6 +15,10 @@
 <template>
     <div>
         <div class="item">
+            支持Https:
+            <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
+        </div>
+        <div class="item">
             直接删除,不显示确认框：
             <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
@@ -53,9 +57,9 @@
                     <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-
             <div v-if="setup_bucket_name">提示：文件将会被上传至
-                {{brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir + '/' : ''}}
+                {{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
+                '/' : ''}}
                 目录下
             </div>
         </div>
@@ -147,6 +151,7 @@
                 buckets_info: types.app.buckets_info,
                 setup_copyType: types.setup.setup_copyType,
                 setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
+                setup_https: types.setup.setup_https,
                 setup_uploadNoAsk: types.setup.setup_uploadNoAsk,
                 setup_isOverwrite: types.setup.setup_isOverwrite,
                 setup_brand: types.setup.setup_brand,
@@ -184,6 +189,7 @@
             ...mapActions([
                 types.app.a_update_buckets_info,
                 types.setup.setup_a_copyType,
+                types.setup.setup_a_https,
                 types.setup.setup_a_deleteNoAsk,
                 types.setup.setup_a_uploadNoAsk,
                 types.setup.setup_a_savedir,
@@ -194,6 +200,9 @@
                 types.setup.setup_a_isOverwrite,
                 types.setup.setup_a_theme,
             ]),
+            httpsChange: function (state) {
+                this[types.setup.setup_a_https](state);
+            },
             deleteNoAskChange: function (state) {
                 this[types.setup.setup_a_deleteNoAsk](state);
             },

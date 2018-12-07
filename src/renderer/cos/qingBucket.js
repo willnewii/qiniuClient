@@ -122,11 +122,13 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
+        let url;
         if (this.permission === 1) {
-            return this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
+            url = this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
         } else {
-            return qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
+            url = qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
         }
+        return super.generateUrl(url);
     }
 }
 

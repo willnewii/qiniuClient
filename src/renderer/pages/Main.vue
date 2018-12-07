@@ -55,7 +55,7 @@
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 3">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 4">
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
@@ -154,9 +154,8 @@
          * 检查是否有新版本
          */
         created: function () {
-            this.initCOS();
-
             this.checkVersion();
+            this.initCOS();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
@@ -221,6 +220,8 @@
                         });
                         this[types.app.a_buckets_info](data.datas);
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
+
+                        //登录成功,登录检测
                     }
                 });
             },
@@ -304,6 +305,7 @@
 
     .layout {
         height: 100%;
+
         .ivu-row-flex {
             height: 100%;
         }
@@ -324,9 +326,11 @@
                 text-align: left;
                 padding-left: 22px;
                 color: $menu-color;
+
                 &:hover {
                     color: $primary;
                 }
+
                 & > span {
                     display: flex;
                     flex-direction: row;
@@ -341,10 +345,12 @@
 
             .ivu-menu-vertical {
                 flex-grow: 1;
+
                 .ivu-menu-item {
                     padding: 8px 24px;
                     display: flex;
                     align-items: center;
+
                     .layout-text {
                         margin-left: 0;
                         line-height: 25px;
@@ -352,6 +358,7 @@
                         text-overflow: ellipsis;
                         overflow: hidden;
                     }
+
                     .layout-icon {
                         margin-left: 0;
                         line-height: 25px;
@@ -371,6 +378,7 @@
                     color: #ff3605;
                     cursor: pointer;
                 }
+
                 &-new-info {
                     color: #555;
                 }
@@ -382,10 +390,12 @@
         display: flex;
         flex-direction: row;
         justify-content: space-around;
+
         .choice-view {
             text-align: center;
             display: flex;
             flex-direction: column;
+
             .name {
                 font-size: 13px;
                 margin-top: 5px;
@@ -426,6 +436,7 @@
         justify-content: center;
         align-items: center;
         font-size: 16px;
+
         .drop-sub {
             border: 2px dashed;
             border-radius: 10px;
@@ -446,6 +457,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+
             & > span {
                 margin-left: 6px;
             }

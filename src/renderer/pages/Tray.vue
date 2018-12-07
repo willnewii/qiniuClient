@@ -89,9 +89,12 @@
                         ipc.send(Constants.Listener.setBrand, {
                             key: app.brand
                         });
-                        this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
-                            this.domains = response.data;
-                        });
+
+                        if (this.$storage.cos.methods) {//七牛需要加载域名列表
+                            this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
+                                this.domains = response.data;
+                            });
+                        }
                     } else {
                         console.log('key 注册失败');
                     }
@@ -121,20 +124,12 @@
                 types.setup.setup_init,
             ]),
             updateStatus(title) {
-                console.log('title:', title);
                 ipc.send(Constants.Listener.updateTrayTitle, title);
-            },
-            sendNotify() {
-                /*ipc.send(Constants.Listener.showNotifier, {
-                    title: '上传完成',
-                    icon: 'notify-success.png'
-                });*/
             },
             doUploadFile() {
                 if (this.current === this.files.length) {
                     this.updateStatus('');
                     this.current = 0;
-                    this.sendNotify();
                 } else {
                     this.uploadFile(this.files[this.current]);
                 }

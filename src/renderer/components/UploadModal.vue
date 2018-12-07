@@ -12,10 +12,6 @@
                    icon="trash-b" @on-click="uploadModal.path = '';filePaths=[]"/>
 
             <div class="modal-input">
-                <!--<Select v-model="uploadModal.prepend" style="width: 100px">
-                    <Option value="">无</Option>
-                    <Option v-for="item of bucket.getDirArray()" :key="item" :value="item">{{item}}</Option>
-                </Select>-->
                 <Input v-model="uploadModal.input"/>
             </div>
 

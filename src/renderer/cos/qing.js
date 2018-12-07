@@ -25,67 +25,6 @@ function getBuckets(callback) {
     });
 }
 
-/**
- * 批量修改文件名
- * @param bucket    名称
- * @param items     需要处理的文件
- * @param replace   需要处理的文件
- * @param callback
- */
-function rename(params, items, callback) {
-    if (!Array.isArray(items)) {
-        items = [items];
-    }
-
-    let files = [];
-
-    let changeName = function (item) {
-        params.Key = item._key;
-        params.CopySource = params.Bucket + '.cos.' + params.Region + '.myqcloud.com/' + encodeURIComponent(item.key).replace(/%2F/g, '/');
-
-        cos.sliceCopyFile(params, (error, data) => {
-            console.log(error, data);
-            if (!error) {
-                files.push(item);
-            }
-            index++;
-            if (index !== items.length) {
-                changeName(items[index]);
-            } else {
-                remove(params, files, callback);
-            }
-        });
-    };
-
-
-    let index = 0;
-    changeName(items[index]);
-}
-
-/**
- * 批量删除文件
- * @param params    bucket信息
- * @param items     需要处理的文件
- * @param callback
- */
-function remove(params, items, callback) {
-    if (!Array.isArray(items)) {
-        items = [items];
-    }
-    params.Objects = [];
-    items.forEach((item) => {
-        params.Objects.push({Key: item.key});
-    });
-
-    cos.deleteMultipleObject(params, function (err, data) {
-        if (err) {
-            console.log(err);
-        } else {
-            callback && callback(data);
-        }
-    });
-}
-
 function generateUrl(domain, key, deadline) {
     key = key.trim();
     if (deadline) {
@@ -98,4 +37,4 @@ function generateBucket(name) {
     return new QingBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, generateUrl, remove, rename, PROTOCOL};
+export {init, getBuckets, generateBucket, generateUrl};

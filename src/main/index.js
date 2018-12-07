@@ -32,6 +32,9 @@ app.on('activate', () => {
 });
 
 function initApp() {
+    //win10 ,不设置没有通知显示
+    app.setAppUserModelId(pkg.build.appId);
+
     //注册菜单
     const menu = Menu.buildFromTemplate(getMenuData());
     Menu.setApplicationMenu(menu);

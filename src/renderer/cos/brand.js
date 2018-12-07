@@ -8,8 +8,16 @@ export default {
         name: '腾讯云'
     },
     qingstor: {
-        key: 'Qingstor',
+        key: 'qingstor',
         name: '青云',
         location: ['gd2', 'pek3a', 'sh1a']
+    },
+    aliyun: {
+        key: 'aliyun',
+        name: '阿里云',
+    },
+    upyun: {
+        key: 'upyun',
+        name: '又拍云',
     }
 };

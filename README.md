@@ -13,6 +13,12 @@
 ![qiniuClient-1.0.0截图2.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-10-24%20%E4%B8%8B%E5%8D%885.05.42.png)
 
 ## 更新说明
+2018.12.07
+***
+- 腾讯云支持自定义域名
+- 设置页面添加https开关
+- 新增支持**阿里云**对象存储
+- fix:windwos 不显示通知
 2018.11.19
 ***
 - 支持资源URL批量导出
@@ -46,7 +52,7 @@ old
 - 私有空间操作([说明](https://github.com/willnewii/qiniuClient/wiki/%E4%B8%83%E7%89%9B%E7%A7%81%E6%9C%89%E7%A9%BA%E9%97%B4%E5%92%8C%E6%8E%88%E6%9D%83%E7%A9%BA%E9%97%B4%E5%A4%84%E7%90%86)）
 
 ## 下载
-- [mac v0.2.2](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.2-mac.dmg)
+- [mac v0.2.2](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.2-1207-mac.dmg)
 - [win v0.2.0](http://blog-res.mayday5.me/file/COS%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.0-win_2.exe)
 
 ## Build Setup

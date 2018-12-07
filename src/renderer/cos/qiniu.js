@@ -6,18 +6,12 @@ import Request from '../api/API';
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
-//默认文件的分隔符
-const DELIMITER = '/';
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
 const methods = {
-    //空间列表
-    buckets: 'https://rs.qbox.me/buckets',
-    //空间对应的域名列表(授权空间域名返回为空)
-    domains: 'https://api.qiniu.com/v6/domain/list',
-    //获取目录(是通过公共前缀模拟出的效果)
-    resources: 'https://rsf.qbox.me/list',
+    buckets: 'https://rs.qbox.me/buckets',//空间列表
+    domains: 'https://api.qiniu.com/v6/domain/list',//空间对应的域名列表(授权空间域名返回为空)
 };
 
 function init(param) {
@@ -32,7 +26,7 @@ function getBuckets(callback) {
     request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
         let datas = [];
-        for (let name of result.data) {
+        for (let name of JSON.parse(result.data)) {
             datas.push({name});
         }
         callback(null, {datas});
@@ -68,9 +62,9 @@ function generateUrl(domain, key, deadline) {
         let config = new qiniu.conf.Config();
         let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
         deadline = parseInt(Date.now() / 1000) + deadline;
-        return bucketManager.privateDownloadUrl(PROTOCOL + domain, key, deadline);
+        return bucketManager.privateDownloadUrl(domain, key, deadline);
     } else {
-        return PROTOCOL + domain + '/' + encodeURI(key);
+        return domain + '/' + encodeURI(key);
     }
 }
 
@@ -101,6 +95,7 @@ function fetch(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error, 'status': respBody.status};
         }
+        console.log(params, respErr, respBody);
         callback(respErr, respBody);
     });
 }
@@ -207,4 +202,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, rename, upload, fetch, methods, DELIMITER};
+export {init, getBuckets, generateBucket, generateUrl, _httpAuthorization, list, remove, rename, upload, fetch, methods};

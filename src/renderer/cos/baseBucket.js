@@ -39,22 +39,28 @@ class baseBucket {
         //上传列表
         this.uploads = [];
 
+        this.https = false;
 
         //旧设计,Table 中使用,稍后会弃用
         this.dirs = [];
         this.dirs.push('');//全部
-        this.dirs.push(Constants.Key.withoutDelimiter);//其它
         //当前选择dir
         this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
         this.withoutDelimiterFiles = [];
     }
 
+    /**
+     * 0: 正常 1：私有
+     * @param permission
+     */
     setPermission(permission) {
         this.permission = permission;
         if (this.vm) {
             this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
         }
+
+        this.https = this.vm[types.setup.setup_https];
     }
 
     getResources() {
@@ -82,9 +88,23 @@ class baseBucket {
                 show: false,
                 flag: 'getResources'
             });
+
             this.files = Object.freeze(this.tempFiles);
             this.tempFiles = [];
         }
+    }
+
+    /**
+     * 根据子类url,统一做处理
+     * @param url
+     */
+    generateUrl(url) {
+        if (this.https && url.startsWith('http://')) {
+            return url.replace('http://', 'https://');
+        }
+
+        console.log(url);
+        return url;
     }
 }
 

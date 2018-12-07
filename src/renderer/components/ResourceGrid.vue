@@ -41,8 +41,7 @@
                             <span class="name">{{file._name}}</span>
                         </template>
                         <template v-else>
-                            <img v-if="/image\/(png|img|jpe?g|svg|gif)/.test(file.mimeType.toLowerCase())" class="image"
-                                 v-lazy="getUrlbyMimeType(file)"/>
+                            <img v-if="file._icon==='md-image' && file.imgObj.src" class="image" v-lazy="file.imgObj"/>
                             <Icon v-else class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file.key | getfileNameByUrl}}</span>
                             <div class="btn">
@@ -154,6 +153,8 @@
                 this.fileFilter();
             },
             'bucket.folderPath': function (newValue) {
+                //又拍 特别处理
+                // this.bucket.getResources(null, this.bucket.folderPath);
                 this.fileFilter();
             },
             'bucket.selection': function (newValue) {
@@ -213,6 +214,7 @@
                     this.selectFile(index);
                 } else {
                     if (file._directory) {
+                        console.log(file._path);
                         this.bucket.folderPath = file._path;
                     } else {
                         if (util.isSupportImage(file.mimeType)) {
@@ -224,17 +226,32 @@
                     }
                 }
             },
-            getUrlbyMimeType(file) {
-                let temp = '?' + this.setup_imagestyle;
+            getImgUrlwithStyle(file) {
+                let imageStyle = this.setup_imagestyle;
                 if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
-                    temp = '';
+                    imageStyle = '';
                 }
+
+                let url = this.bucket.generateUrl(file.key, this.setup_deadline);
+                let imageSrc = '';
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
-                        return `${this.bucket.generateUrl(file.key)}${temp}`;
+                        imageSrc = url ? `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${imageStyle}` : '';
+                        break;
+                    case brand.aliyun.key:
+                        if (imageStyle) {
+                            imageStyle = 'x-oss-process=image/format,jpg/auto-orient,1/quality,q_30';
+                        }
+                        // 加载图片样式会报签名错误
+                        imageSrc = `${url}${url.indexOf('?') !== -1 ? '' : '?' + imageStyle}`;
+                        break;
                     default:
-                        return this.bucket.generateUrl(file.key, this.setup_deadline);
+                        imageSrc = url;
                 }
+                return {
+                    src: imageSrc,
+                    error: require('../assets/img/md-image.svg')
+                };
             },
             getFilebyGrid() {
                 let array = [];
@@ -283,15 +300,27 @@
                         }
 
                         //去除前缀然后再split
-                        if (folderPath.length > 0) {
+                        if (file.type === 'F') {//又拍云文件夹类型判断
+                            files.push({
+                                key: file.key,
+                                _name: file.key,
+                                _path: (folderPath ? folderPath + Constants.DELIMITER : '') + file.key,
+                                _directory: true,
+                                _icon: 'md-folder',
+                                _contextmenu: 'folderMenu'
+                            });
+                            return;
+                        } else if (folderPath.length > 0) {
                             temp_key = temp_key.replace(folderPath + Constants.DELIMITER, '');
                         }
+
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
                             if (util.isSupportImage(file.mimeType.toLowerCase())) {
-                                images.push(file);
+                                file.imgObj = this.getImgUrlwithStyle(file);
                                 file._icon = 'md-image';
+                                images.push(file);
                             } else if (file.mimeType.indexOf('audio') === 0) {
                                 file._icon = 'md-musical-notes';
                             } else {
@@ -369,6 +398,7 @@
             padding: 10px;
             box-sizing: content-box;
             transform: translateZ(0);
+
             .grid2-item {
                 display: flex;
                 flex-direction: row;
@@ -379,10 +409,12 @@
             height: 113px;
             width: 113px;
             margin: 5px;
+
             .item {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+
                 .image {
                     height: $imageWidth;
                     width: $imageWidth;
@@ -391,18 +423,21 @@
                     padding: 10px;
                     object-fit: cover;
                 }
+
                 .file {
                     height: $imageWidth;
                     width: $imageWidth;
                     line-height: $imageWidth;
                     text-align: center;
                 }
+
                 .name {
                     font-size: 12px;
                     max-width: $imageWidth;
                     margin-top: 5px;
                     text-align: center;
                 }
+
                 .btn {
                     opacity: 0;
                     display: flex;
@@ -415,6 +450,7 @@
                     border-radius: 4px;
                     transition: all .2s;
                 }
+
                 &:hover {
                     .btn {
                         opacity: 1;
@@ -427,30 +463,36 @@
         .list {
             transform: translateZ(0);
             height: 100%;
+
             .item {
                 display: flex;
                 flex-direction: row;
                 padding: 5px 10px 5px 10px;
                 align-items: center;
                 border-bottom: 1px solid $bg-item-selected;
+
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
                 }
+
                 .date {
                     text-align: right;
                     flex-shrink: 0;
                     margin-left: 10px;
                 }
+
                 .size {
                     width: 100px;
                     text-align: right;
                     flex-shrink: 0;
                 }
+
                 &:nth-child(2n) {
                     background-color: $bg-item-selected;
                 }
             }
+
             .item-even {
                 background-color: $bg-item-selected;
             }
@@ -462,6 +504,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
+
             &-select {
                 color: white;
                 background-color: $primary !important;

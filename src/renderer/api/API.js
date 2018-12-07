@@ -30,12 +30,6 @@ class API {
     _request(url, type, param) {
         this.view && this.view.$Loading.start();
 
-        let regStr = /^http.*(qiniu.com|qbox.me)/g;
-        if (regStr.test(url) && this.view) {
-            if (this.view.$storage.cos._httpAuthorization)
-                config.headers.Authorization = this.view.$storage.cos._httpAuthorization(url);
-        }
-
         config.method = type;
 
         let request;

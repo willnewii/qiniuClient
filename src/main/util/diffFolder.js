@@ -80,14 +80,14 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
         }
     });
     for (let file of files) {
-        let _path = file.path.replace(localDir + '/', '');
+        let _path = util.convertPath(file.path).replace(util.convertPath(localDir) + '/', '');
         if (keys.indexOf(_path) === -1) {
             if (mergeType === Constants.mergeType.coverLocal) {
                 logger.info('[删除]:本地文件未对应云盘文件', file.path);
                 fs.moveSync(file.path, file.path + '.delete');
             } else {
                 logger.info('[上传]:云文件不存在', file.path);
-                uploads.push({path: file.path, dir: localDir});
+                uploads.push({path: util.convertPath(file.path), dir: util.convertPath(localDir)});
             }
         }
     }

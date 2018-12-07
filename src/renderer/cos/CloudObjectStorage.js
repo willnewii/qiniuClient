@@ -2,6 +2,8 @@ import * as storagePromise from '../service/storagePromise';
 import * as qiniu from '../cos/qiniu';
 import * as tencent from '../cos/tencent';
 import * as qing from '../cos/qing';
+import * as ali from '../cos/ali';
+import * as upyun from '../cos/upyun';
 import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
@@ -22,15 +24,27 @@ export default class CloudObjectStorage {
             case brand.qingstor.key:
                 this.cos = qing;
                 break;
+            case brand.aliyun.key:
+                this.cos = ali;
+                break;
+            case brand.upyun.key:
+                this.cos = upyun;
+                break;
         }
     }
 
     getBuckets(callback) {
-        this.cos.getBuckets(callback);
+        this.cos.getBuckets((error, result) => {
+            console.log(result);
+            callback && callback(error, result);
+        });
     }
 
     async getCOS(callback) {
-        let cos = [brand.qiniu, brand.tencent, brand.qingstor];
+        let cos = [];
+        Object.keys(brand).forEach((item) => {
+            cos.push(brand[item]);
+        });
         let _cos = [];
 
         for (let i = 0; i < cos.length; i++) {
@@ -51,7 +65,7 @@ export default class CloudObjectStorage {
     async initCOS(callback) {
         let data = await storagePromise.get(this.name + '_key');
         if (data && data.access_key && data.secret_key) {
-            this.cos.init({access_key: data.access_key, secret_key: data.secret_key});
+            this.cos.init({access_key: data.access_key, secret_key: data.secret_key, service_name: data.service_name});
             callback && callback(true);
         } else {
             callback && callback(false);
@@ -64,11 +78,7 @@ export default class CloudObjectStorage {
      * @param callback
      */
     async saveCosKey(param, callback) {
-        let params = {
-            access_key: param.access_key,
-            secret_key: param.secret_key
-        };
-        await storagePromise.set(this.name + '_key', params);
+        await storagePromise.set(this.name + '_key', param);
         callback && callback();
     }
 
