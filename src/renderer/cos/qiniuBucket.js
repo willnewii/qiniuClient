@@ -51,11 +51,11 @@ class Bucket extends baseBucket {
             if (domains && domains.length > 0) {
                 this.domains = domains;
                 //默认选择最后一个域名
-                this.domain = this.domains[this.domains.length - 1];
+                this.domain = 'http://' + this.domains[this.domains.length - 1];
             } else {
                 if (customeDomains && customeDomains[this.name]) {
                     this.domain = customeDomains[this.name];
-                    this.https = false ;
+                    this.https = false;
                 } else {
                     this.domain = '';
                 }

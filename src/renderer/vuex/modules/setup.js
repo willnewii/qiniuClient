@@ -46,7 +46,6 @@ export default {
             setAppSetup(state.setup);
         },
         [types.setup.setup_https](state, value) {
-            console.log(value);
             state.setup.https = value;
             setAppSetup(state.setup);
         },

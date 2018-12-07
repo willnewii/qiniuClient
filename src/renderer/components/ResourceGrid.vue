@@ -153,6 +153,8 @@
                 this.fileFilter();
             },
             'bucket.folderPath': function (newValue) {
+                //又拍 特别处理
+                // this.bucket.getResources(null, this.bucket.folderPath);
                 this.fileFilter();
             },
             'bucket.selection': function (newValue) {
@@ -298,9 +300,20 @@
                         }
 
                         //去除前缀然后再split
-                        if (folderPath.length > 0) {
+                        if (file.type === 'F') {//又拍云文件夹类型判断
+                            files.push({
+                                key: file.key,
+                                _name: file.key,
+                                _path: (folderPath ? folderPath + Constants.DELIMITER : '') + file.key,
+                                _directory: true,
+                                _icon: 'md-folder',
+                                _contextmenu: 'folderMenu'
+                            });
+                            return;
+                        } else if (folderPath.length > 0) {
                             temp_key = temp_key.replace(folderPath + Constants.DELIMITER, '');
                         }
+
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {
@@ -385,6 +398,7 @@
             padding: 10px;
             box-sizing: content-box;
             transform: translateZ(0);
+
             .grid2-item {
                 display: flex;
                 flex-direction: row;
@@ -395,10 +409,12 @@
             height: 113px;
             width: 113px;
             margin: 5px;
+
             .item {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+
                 .image {
                     height: $imageWidth;
                     width: $imageWidth;
@@ -407,18 +423,21 @@
                     padding: 10px;
                     object-fit: cover;
                 }
+
                 .file {
                     height: $imageWidth;
                     width: $imageWidth;
                     line-height: $imageWidth;
                     text-align: center;
                 }
+
                 .name {
                     font-size: 12px;
                     max-width: $imageWidth;
                     margin-top: 5px;
                     text-align: center;
                 }
+
                 .btn {
                     opacity: 0;
                     display: flex;
@@ -431,6 +450,7 @@
                     border-radius: 4px;
                     transition: all .2s;
                 }
+
                 &:hover {
                     .btn {
                         opacity: 1;
@@ -443,30 +463,36 @@
         .list {
             transform: translateZ(0);
             height: 100%;
+
             .item {
                 display: flex;
                 flex-direction: row;
                 padding: 5px 10px 5px 10px;
                 align-items: center;
                 border-bottom: 1px solid $bg-item-selected;
+
                 .name {
                     flex-grow: 1;
                     margin-left: 5px;
                 }
+
                 .date {
                     text-align: right;
                     flex-shrink: 0;
                     margin-left: 10px;
                 }
+
                 .size {
                     width: 100px;
                     text-align: right;
                     flex-shrink: 0;
                 }
+
                 &:nth-child(2n) {
                     background-color: $bg-item-selected;
                 }
             }
+
             .item-even {
                 background-color: $bg-item-selected;
             }
@@ -478,6 +504,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
+
             &-select {
                 color: white;
                 background-color: $primary !important;
