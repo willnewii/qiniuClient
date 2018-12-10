@@ -99,11 +99,16 @@ class baseBucket {
      * @param url
      */
     generateUrl(url) {
+
+        //默认添加http
+        if (!/^https?:\/\//.test(url)) {
+            url = 'http://' + url;
+        }
+
         if (this.https && url.startsWith('http://')) {
             return url.replace('http://', 'https://');
         }
 
-        console.log(url);
         return url;
     }
 }
