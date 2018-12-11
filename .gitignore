@@ -12,3 +12,5 @@ node_modules/
 .idea
 static/styles-dark.css
 static/dll/*
+!static/dll/libs*.*
+!static/dll/cos*.*

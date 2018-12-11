@@ -4,6 +4,7 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const utils = require('../.electron-vue/utils');
+const config = require('../.electron-vue/config');
 const webpack = require('webpack');
 
 const MinifyPlugin = require("babel-minify-webpack-plugin");
@@ -23,28 +24,7 @@ const commonExtract = new ExtractTextPlugin('[name].css');
  */
 let rendererConfig = {
     devtool: '#cheap-module-eval-source-map',
-    entry: {
-        core: [
-            'vue',
-            'vue-router',
-            'vuex',
-            'axios',
-            'qs',
-            'vue-lazyload',
-            'vue-electron',
-            'iview',
-            'v-viewer',
-            'vue-virtual-scroll-list',
-            'v-contextmenu/src/directive',
-            'v-contextmenu/src/index',
-            'electron-json-storage',
-            'dayjs',
-            'qiniu',
-            'cos-nodejs-sdk-v5',
-            'v-contextmenu/dist/index.css',
-            'iview/dist/styles/iview.css'
-        ]
-    },
+    entry: {},
     module: {
         rules: [
             {
@@ -118,7 +98,7 @@ let rendererConfig = {
             name: '[name]_library',
             context: __dirname // 执行的上下文环境，对之后DllReferencePlugin有用
         }),
-        new CleanWebpackPlugin([path.join(__dirname, '../static/dll/*.*')], {root: path.join(__dirname, '../')}),
+        // new CleanWebpackPlugin([path.join(__dirname, '../static/dll/*.*')], {root: path.join(__dirname, '../')}),
     ],
     output: {
         filename: '[name].js',
@@ -168,5 +148,7 @@ if (process.env.NODE_ENV === 'production') {
         );
     }
 }
+
+rendererConfig.entry[process.env.DLL_NAME] = config.dll[process.env.DLL_NAME];
 
 module.exports = rendererConfig;
