@@ -1,4 +1,4 @@
-const upyun = require('upyun/index').default;
+import upyun from 'upyun'
 import upyunBucket from "./upyunBucket";
 
 

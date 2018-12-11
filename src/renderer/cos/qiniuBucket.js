@@ -49,9 +49,13 @@ class Bucket extends baseBucket {
             let domains = JSON.parse(result.data);
             let customeDomains = this.vm.customeDomains;
             if (domains && domains.length > 0) {
+
+                for (let i = 0; i < domains.length; i++) {
+                    domains[i] = domains[i];
+                }
                 this.domains = domains;
                 //默认选择最后一个域名
-                this.domain = 'http://' + this.domains[this.domains.length - 1];
+                this.domain = this.domains[this.domains.length - 1];
             } else {
                 if (customeDomains && customeDomains[this.name]) {
                     this.domain = customeDomains[this.name];

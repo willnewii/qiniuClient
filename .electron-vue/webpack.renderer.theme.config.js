@@ -83,12 +83,18 @@ let rendererConfig = {
     target: 'electron-renderer'
 };
 
-let jsonPath = path.join(__dirname, '..', 'static/dll/core-mainfest.json');
-if (process.env.ENV_DLL && fs.existsSync(jsonPath)) {
+let jsonPath = path.join(__dirname, '..', 'static/dll/libs-mainfest.json');
+let json2Path = path.join(__dirname, '..', 'static/dll/cos-mainfest.json');
+if (process.env.ENV_DLL === 'true' && fs.existsSync(jsonPath) && fs.existsSync(json2Path)) {
     console.log('build with DllReferencePlugin');
     rendererConfig.plugins.push(new webpack.DllReferencePlugin({
         context: __dirname,
-        manifest: require('../static/dll/core-mainfest.json') // 指向这个json
+        manifest: require('../static/dll/libs-mainfest.json')
+    }));
+
+    rendererConfig.plugins.push(new webpack.DllReferencePlugin({
+        context: __dirname,
+        manifest: require('../static/dll/cos-mainfest.json')
     }));
 } else {
     console.log('build without DllReferencePlugin');

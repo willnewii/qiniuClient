@@ -8,6 +8,7 @@ export default {
         app: {
             name: '',               //cos name
             buckets_info: [],       //bucket对象列表
+            //计划中...
             datas: [],              //TODO: 上传/下载日志列表
         }
 

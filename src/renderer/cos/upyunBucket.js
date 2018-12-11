@@ -100,9 +100,9 @@ class Bucket extends baseBucket {
             }
 
             if (domain.lastIndexOf('/') === domain.length - 1) {
-                return domain + key;
+                return super.generateUrl(domain + key);
             } else {
-                return domain + "/" + key;
+                return super.generateUrl(domain + "/" + key);
             }
         } else {
             return '';
