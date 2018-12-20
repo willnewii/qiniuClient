@@ -1,6 +1,7 @@
 # 云存储管理客户端 v0.2.3
-![](http://blog-res.mayday5.me/niu_128.png?imageView2/1/w/30/h/30/q/75|imageslim)
-> 云存储管理客户端。支持七牛云、腾讯云、青云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
+
+![](http://blog-res.mayday5.me/file/icon.png?imageView2/1/w/50/h/50/q/75|imageslim)
+> 云存储管理客户端。支持七牛云、腾讯云、青云、阿里云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
 
 ## 效果图
 【目前已支持 七牛云、腾讯云、青云、阿里云】
@@ -76,7 +77,6 @@ npm run build:win32
 - [vue-virtual-scroll-list](https://github.com/tangbc/vue-virtual-scroll-list)
 
 ## 参考资料
-- [图标来源：懒人图库](http://www.lanrentuku.com/vector/animal/lansexinxianniunaibiaoqian-shiliang.html)
 - [electron 文档](https://github.com/electron/electron/tree/master/docs-translations/zh-CN)
 - [electron-vue 文档](https://simulatedgreg.gitbooks.io/electron-vue/cn/)
 - [七牛API](https://developer.qiniu.com/kodo/api/1731/api-overview)
