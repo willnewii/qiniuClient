@@ -96,15 +96,15 @@ class Bucket extends baseBucket {
         tencent.rename(params, items, callback);
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
         let params = {
             Bucket: this.name,
             Region: this.location,
             MaxKeys: this.limit,
         };
 
-        if (keyword) {
-            params.Prefix = keyword;
+        if (option.keyword) {
+            params.Prefix = option.keyword;
         }
 
         if (this.marker) {
@@ -126,7 +126,7 @@ class Bucket extends baseBucket {
                 });
 
                 data.items = files;
-                this.appendResources(data, keyword);
+                this.appendResources(data, option);
             }
         });
     }

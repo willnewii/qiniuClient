@@ -51,21 +51,22 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword, path = '/') {
+    getResources(option = {}) {
+        option.path = option.path || '/';
         //delimiter
         let params = {
             'limit': this.limit,
         };
 
-        if (keyword) {
-            params.prefix = keyword;
+        if (option.keyword) {
+            params.prefix = option.keyword;
         }
 
         if (this.marker) {
             params.iter = this.marker;
         }
 
-        this.cos.listDir(path, params).then((data) => {
+        this.cos.listDir(option.path, params).then((data) => {
             if (!this.marker) {
                 this.files = [];
             }
@@ -78,7 +79,7 @@ class Bucket extends baseBucket {
 
             data.items = files;
             data.marker = (files.length > 0) ? data.next : '';
-            this.appendResources(data, keyword);
+            this.appendResources(data, option);
         }).catch((error) => {
             console.dir(error);
         });

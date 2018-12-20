@@ -8,6 +8,7 @@ class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
+        this.paging = false;
     }
 
     /**
@@ -69,7 +70,7 @@ class Bucket extends baseBucket {
         });
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
         super.getResources();
         //重置多选数组
         this.selection = [];
@@ -79,22 +80,42 @@ class Bucket extends baseBucket {
             limit: this.limit
         };
 
-        if (keyword) {
-            param.prefix = keyword;
+        if (option.keyword) {
+            param.prefix = option.keyword;
+        }
+
+        if (this.paging) {
+            param.delimiter = '/';
+            param.prefix && (param.prefix += '/');
         }
 
         if (this.marker) {
             param.marker = this.marker;
         }
-
+        console.log(param);
         qiniu.list(param, (respErr, respBody, respInfo) => {
-            let data = respInfo.data;
+            if (respErr) {
+                console.error(respErr);
+                return;
+            }
 
+            let data = respInfo.data;
+            console.log(data);
             data.items.forEach((item, index) => {
                 data.items[index] = util.convertMeta(item, 0);
             });
 
-            this.appendResources(data, keyword);
+            //commonPrefixes 文件夹
+            data.commonPrefixes && data.commonPrefixes.forEach((item, index) => {
+                let key = item.substring(0, item.length - 1);
+                data.items.push({
+                    key: key,
+                    type: Constants.FileType.folder,
+                    fsize: 0,
+                });
+            });
+
+            this.appendResources(data, option);
         });
     }
 
@@ -132,17 +153,6 @@ class Bucket extends baseBucket {
     generateUrl(key, deadline) {
         let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
         return super.generateUrl(url);
-    }
-
-    /**
-     *  已弃用
-     *  搜索操作
-     *  dir：目录
-     *  search：关键字
-     */
-    search(dir, search = '') {
-        this.marker = '';
-        this.getResources(dir + search);
     }
 }
 

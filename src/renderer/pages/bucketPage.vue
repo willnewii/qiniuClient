@@ -14,40 +14,49 @@
         align-items: center;
         padding: 15px;
         flex-shrink: 0;
+
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
             overflow-x: scroll;
             margin-right: 10px;
+
             .ivu-breadcrumb {
                 display: flex;
                 flex-direction: row;
                 color: $fontColor;
+
                 .bread-sub {
                     flex-shrink: 0;
+
                     .ivu-breadcrumb-item-separator {
                         color: $fontColor;
                     }
                 }
             }
         }
+
         .header-info-view {
             display: flex;
             flex-direction: row;
             align-items: center;
             flex-shrink: 0;
             margin-right: 10px;
+
             .icon {
                 font-size: 14px;
             }
+
             .count {
                 margin-right: 5px;
                 padding-left: 5px;
             }
+
             .size {
                 padding-left: 5px;
             }
         }
+
         .header-button-view {
             display: flex;
             flex-direction: row;
@@ -261,8 +270,8 @@
             /**
              * 获取指定前缀文件列表
              */
-            getResources(keyword) {
-                this.bucket.getResources(keyword);
+            getResources(option) {
+                this.bucket.getResources(option);
             },
             /**
              *  dir：目录

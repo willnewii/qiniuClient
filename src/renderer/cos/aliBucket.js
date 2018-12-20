@@ -66,14 +66,14 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
         //delimiter
         let params = {
             'max-keys': this.limit,
         };
 
-        if (keyword) {
-            params.prefix = keyword;
+        if (option.keyword) {
+            params.prefix = option.keyword;
         }
 
         if (this.marker) {
@@ -93,7 +93,7 @@ class Bucket extends baseBucket {
 
             data.items = files;
             data.marker = data.nextMarker;
-            this.appendResources(data, keyword);
+            this.appendResources(data, option);
         });
     }
 

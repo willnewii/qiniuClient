@@ -1,6 +1,8 @@
 import {Constants, EventBus, util} from '../service/index';
 import * as types from "@/vuex/mutation-types";
 
+const PAGING = 5000;
+
 class baseBucket {
 
     constructor(name, cos) {
@@ -9,6 +11,7 @@ class baseBucket {
         name && (this.name = name);
         this.cos = cos;
 
+        //单次请求加载条数
         this.limit = 1000;
     }
 
@@ -40,14 +43,16 @@ class baseBucket {
         this.uploads = [];
 
         this.https = false;
+        //分页加载
+        this.paging = false;
 
         //旧设计,Table 中使用,稍后会弃用
-        this.dirs = [];
+        /*this.dirs = [];
         this.dirs.push('');//全部
         //当前选择dir
         this.currentDir = '';
         //其他文件列表(不含有请求时delimiter的文件列表)
-        this.withoutDelimiterFiles = [];
+        this.withoutDelimiterFiles = [];*/
     }
 
     /**
@@ -75,14 +80,24 @@ class baseBucket {
      * 根据marker状态判断是否继续请求
      * 请将data数据统一转换: items | marker
      * @param data
-     * @param keyword
+     * @param option
      */
-    appendResources(data, keyword) {
+    appendResources(data, option) {
         this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
         this.marker = data.marker ? data.marker : '';
 
-        if (this.marker) {
-            this.getResources(keyword);
+
+        //开启分页模式&文件数大于阀值&还有文件
+        if (this.paging && this.tempFiles.length >= PAGING && this.marker) {
+            EventBus.$emit(Constants.Event.loading, {
+                show: false,
+                flag: 'getResources'
+            });
+
+            this.files = this.files.concat(Object.freeze(this.tempFiles));
+            this.tempFiles = [];
+        } else if (this.marker) {
+            this.getResources(option);
         } else {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
