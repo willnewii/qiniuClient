@@ -91,7 +91,7 @@
         },
         computed: {
             ...mapGetters({
-                customedomain: types.setup.setup_customedomain,
+                customedomain: types.setup.customedomain,
             }),
             domainPlaceholder() {
                 switch (this.$storage.name) {
@@ -129,7 +129,7 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_a_customedomain,
+                types.setup.a_customedomain,
             ]),
             updateSupport() {
                 this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1;
@@ -141,7 +141,7 @@
                 if (val.length === 0) {//腾讯云有默认链接
                     let obj = {};
                     obj[this.bucket.name] = '';
-                    this[types.setup.setup_a_customedomain](obj);
+                    this[types.setup.a_customedomain](obj);
                     return;
                 }
 
@@ -151,7 +151,7 @@
                         let obj = {};
                         obj[this.bucket.name] = url.origin;
                         this.bucket.domain = url.origin;
-                        this[types.setup.setup_a_customedomain](obj);
+                        this[types.setup.a_customedomain](obj);
                         this.$Message.success('自定义域名保存成功,请刷新页面');
                     }
                 } catch (err) {

@@ -55,7 +55,7 @@
         },
         computed: {
             ...mapGetters({
-                setup_isOverwrite: types.setup.setup_isOverwrite,
+                setup_isOverwrite: types.setup.isOverwrite,
             })
         },
         created() {

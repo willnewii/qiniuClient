@@ -15,7 +15,7 @@
         },
         computed: {
             ...mapGetters({
-                setup_theme: types.setup.setup_theme,
+                setup_theme: types.setup.theme,
             }),
             appHeight() {
                 if (document.getElementById('title'))
@@ -29,7 +29,7 @@
                 document.getElementById('title').remove();
             }*/
 
-            this[types.setup.setup_init](() => {
+            this[types.setup.init](() => {
                 if (this.setup_theme === 'auto') {
                     this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
                         util.loadTheme(arg ? 'dark' : 'light');
@@ -42,7 +42,7 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_init,
+                types.setup.init,
             ]),
         }
     };

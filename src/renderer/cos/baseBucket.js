@@ -65,7 +65,7 @@ class baseBucket {
             this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
         }
 
-        this.https = this.vm[types.setup.setup_https];
+        this.https = this.vm[types.setup.https];
     }
 
     getResources() {

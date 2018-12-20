@@ -138,8 +138,8 @@
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.setup_privatebucket,
-                setup_recentname: types.setup.setup_recentname,
+                privatebucket: types.setup.privatebucket,
+                setup_recentname: types.setup.recentname,
             }),
             menuSpace() {
                 return {
@@ -170,7 +170,7 @@
         methods: {
             ...mapActions([
                 types.app.a_buckets_info,
-                types.setup.setup_a_recentname,
+                types.setup.a_recentname,
             ]),
             initCOS() {
                 this.$storage.getCOS(({cos, _cos}) => {
@@ -242,7 +242,7 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
-                        this.setup_a_recentname(name);
+                        this[types.setup.a_recentname](name);
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:

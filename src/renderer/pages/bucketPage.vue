@@ -225,10 +225,10 @@
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.setup_privatebucket,
-                setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
-                setup_https: types.setup.setup_https,
-                customeDomains: types.setup.setup_customedomain
+                privatebucket: types.setup.privatebucket,
+                setup_deleteNoAsk: types.setup.deleteNoAsk,
+                setup_https: types.setup.https,
+                customeDomains: types.setup.customedomain
             }),
             totalSize() {
                 let totalSzie = 0;
