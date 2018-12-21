@@ -48,21 +48,20 @@
             </div>
         </template>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(6)" v-if="bucket.name">
-                <Tooltip :content="`同步bucket：${bucket.name}`" placement="bottom">
-                    <Icon type="md-sync" size="24"/>
-                </Tooltip>
+        <Dropdown @on-click="clickMore">
+            <i-button class="button" type="text" v-if="bucket.name">
+                <Icon type="md-more" size="24"/>
             </i-button>
-        </div>
+            <DropdownMenu slot="list">
+                <DropdownItem name="7" @click="actionBtn(7)">
+                    {{`批量导出资源URL`}}
+                </DropdownItem>
+                <DropdownItem name="6" @click="actionBtn(6)">
+                    同步bucket
+                </DropdownItem>
+            </DropdownMenu>
+        </Dropdown>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(7)" v-if="bucket.name">
-                <Tooltip :content="`批量导出bucket：${bucket.name} URL`" placement="bottom">
-                    <Icon type="md-code-download" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
         <Input class="input-search" v-model="search" placeholder="搜索" icon="md-close-circle"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
@@ -200,6 +199,9 @@
                         this.$parent.exportURL();
                         break;
                 }
+            },
+            clickMore(name) {
+                this.actionBtn(name);
             }
         }
     };

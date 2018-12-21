@@ -92,7 +92,7 @@ class Bucket extends baseBucket {
         if (this.marker) {
             param.marker = this.marker;
         }
-        console.log(param);
+
         qiniu.list(param, (respErr, respBody, respInfo) => {
             if (respErr) {
                 console.error(respErr);
@@ -100,7 +100,6 @@ class Bucket extends baseBucket {
             }
 
             let data = respInfo.data;
-            console.log(data);
             data.items.forEach((item, index) => {
                 data.items[index] = util.convertMeta(item, 0);
             });

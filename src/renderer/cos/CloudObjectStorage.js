@@ -35,7 +35,7 @@ export default class CloudObjectStorage {
 
     getBuckets(callback) {
         this.cos.getBuckets((error, result) => {
-            console.log(result);
+            console.log("获取存储桶===>", result);
             callback && callback(error, result);
         });
     }
