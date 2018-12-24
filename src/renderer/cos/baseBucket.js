@@ -1,7 +1,7 @@
 import {Constants, EventBus, util} from '../service/index';
 import * as types from "@/vuex/mutation-types";
 
-const PAGING = 5000;
+const PAGING = 10000;
 
 class baseBucket {
 
@@ -16,6 +16,7 @@ class baseBucket {
     }
 
     reset() {
+        this.brand = '';    //服务商
         this.name = '';
         this.location = '';
         //操作权限 0：正常 1：私有
@@ -45,14 +46,6 @@ class baseBucket {
         this.https = false;
         //分页加载
         this.paging = false;
-
-        //旧设计,Table 中使用,稍后会弃用
-        /*this.dirs = [];
-        this.dirs.push('');//全部
-        //当前选择dir
-        this.currentDir = '';
-        //其他文件列表(不含有请求时delimiter的文件列表)
-        this.withoutDelimiterFiles = [];*/
     }
 
     /**
@@ -86,8 +79,7 @@ class baseBucket {
         this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
         this.marker = data.marker ? data.marker : '';
 
-
-        //开启分页模式&文件数大于阀值&还有文件
+        //开启分页模式&文件数大于阀值&marker不为空
         if (this.paging && this.tempFiles.length >= PAGING && this.marker) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,

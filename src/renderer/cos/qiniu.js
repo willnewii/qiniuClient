@@ -10,7 +10,7 @@ qiniu.conf.SECRET_KEY = '';
 const PROTOCOL = 'http://';
 
 const methods = {
-    buckets: 'https://rs.qbox.me/buckets',//空间列表
+    buckets: 'https://rs.qbox.me/buckets',          //空间列表
     domains: 'https://api.qiniu.com/v6/domain/list',//空间对应的域名列表(授权空间域名返回为空)
 };
 

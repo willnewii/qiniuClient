@@ -37,13 +37,8 @@
         <h4 class="title">托盘设置<span class="title-tips" v-if="setup_bucket_name">(文件将会被上传至{{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
                 '/' : ''}}目录下)</span></h4>
         <div class="item">
-            <!--<span class="item-title">托盘上传位置</span>-->
             <Row class="row-line">
                 <Col span="12">
-                    <!-- <Select v-model="brand" size="small" style="width:20%" placeholder="服务商">
-                         <Option :value="brands.qiniu.key">{{ brands.qiniu.name }}</Option>
-                         <Option :value="brands.tencent.key">{{ brands.tencent.name }}</Option>
-                     </Select>-->
                     <Select v-model="bucketname" size="small" style="width:30%" placeholder="空间名称">
                         <Option v-for="item in buckets_info" :value="item.name" :key="item.name">{{ item.name }}
                         </Option>

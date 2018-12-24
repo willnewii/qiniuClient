@@ -3,11 +3,13 @@ import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
 import Request from "@/api/API";
 import {_httpAuthorization} from "../cos/qiniu";
+import brand from "../cos/brand";
 
 class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
+        this.brand = brand.qiniu.key;
         this.paging = false;
     }
 
@@ -103,7 +105,6 @@ class Bucket extends baseBucket {
             data.items.forEach((item, index) => {
                 data.items[index] = util.convertMeta(item, 0);
             });
-
             //commonPrefixes 文件夹
             data.commonPrefixes && data.commonPrefixes.forEach((item, index) => {
                 let key = item.substring(0, item.length - 1);
