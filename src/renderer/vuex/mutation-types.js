@@ -1,49 +1,49 @@
 export const setup = {
-    setup_init: 'setup_init',
+    init: 'init',
 
-    setup_deadline: 'setup_deadline',
-    setup_a_deadline: 'setup_a_deadline',
+    deadline: 'deadline',
+    a_deadline: 'a_deadline',
 
-    setup_isOverwrite: 'setup_isOverwrite',
-    setup_a_isOverwrite: 'setup_a_isOverwrite',
+    isOverwrite: 'isOverwrite',
+    a_isOverwrite: 'a_isOverwrite',
 
-    setup_privatebucket: 'setup_privatebucket',
-    setup_a_privatebucket: 'setup_a_privatebucket',
+    privatebucket: 'privatebucket',
+    a_privatebucket: 'a_privatebucket',
 
-    setup_imagestyle: 'setup_imagestyle',
-    setup_a_imagestyle: 'setup_a_imagestyle',
+    imagestyle: 'imagestyle',
+    a_imagestyle: 'a_imagestyle',
 
-    setup_downloaddir: 'setup_downloaddir',
-    setup_a_downloaddir: 'setup_a_downloaddir',
+    downloaddir: 'downloaddir',
+    a_downloaddir: 'a_downloaddir',
 
-    setup_https: 'setup_https',
-    setup_a_https: 'setup_a_https',
+    https: 'https',
+    a_https: 'a_https',
 
-    setup_deleteNoAsk: 'setup_deleteNoAsk',
-    setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
+    deleteNoAsk: 'deleteNoAsk',
+    a_deleteNoAsk: 'a_deleteNoAsk',
 
-    setup_uploadNoAsk: 'setup_uploadNoAsk',
-    setup_a_uploadNoAsk: 'setup_a_uploadNoAsk',
+    uploadNoAsk: 'uploadNoAsk',
+    a_uploadNoAsk: 'a_uploadNoAsk',
 
 
-    setup_copyType: 'setup_copyType',
-    setup_a_copyType: 'setup_a_copyType',
+    copyType: 'copyType',
+    a_copyType: 'a_copyType',
 
-    setup_savedir: 'setup_savedir',
-    setup_a_savedir: 'setup_a_savedir',
+    savedir: 'savedir',
+    a_savedir: 'a_savedir',
 
-    setup_brand: 'setup_brand',
-    setup_bucket_name: 'setup_bucket_name',
-    setup_bucket_dir: 'setup_bucket_dir',
+    brand: 'brand',
+    bucket_name: 'bucket_name',
+    bucket_dir: 'bucket_dir',
 
-    setup_customedomain: 'setup_customedomain',
-    setup_a_customedomain: 'setup_a_customedomain',
+    customedomain: 'customedomain',
+    a_customedomain: 'a_customedomain',
 
-    setup_theme: 'setup_theme',
-    setup_a_theme: 'setup_a_theme',
+    theme: 'theme',
+    a_theme: 'a_theme',
 
-    setup_recentname: 'setup_recentname',
-    setup_a_recentname: 'setup_a_recentname',
+    recentname: 'recentname',
+    a_recentname: 'a_recentname',
 };
 
 export const app = {

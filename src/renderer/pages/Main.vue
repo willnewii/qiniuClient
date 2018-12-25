@@ -55,7 +55,7 @@
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 4">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 5">
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
@@ -69,6 +69,17 @@
             <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
             <span>{{loading.message}}</span>
         </Spin>
+        <!-- 分页加载提示框-->
+        <Modal v-model="paging.show" class-name="vertical-center-modal"
+               ok-text="开启" :closable="true" :mask-closable="false">
+            <div class="paging-view">
+                <p>当前bucket数据量过大,加载时间过久.是否开启分页加载? </p>
+
+                <p class="client-link"
+                   @click="openBrowser('https://github.com/willnewii/qiniuClient/wiki/%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F')">
+                    数据加载方式区别</p>
+            </div>
+        </Modal>
         <!-- 上传/下载进度提示框-->
         <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
             <div>{{status.message}}</div>
@@ -128,6 +139,9 @@
                     message: '',
                     flag: '' //可以用作统计计时的标记
                 },
+                paging: {
+                    show: false,
+                },
                 drop: {
                     show: false,
                     message: ''
@@ -138,8 +152,8 @@
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.setup_privatebucket,
-                setup_recentname: types.setup.setup_recentname,
+                privatebucket: types.setup.privatebucket,
+                setup_recentname: types.setup.recentname,
             }),
             menuSpace() {
                 return {
@@ -165,12 +179,17 @@
             });
             EventBus.$on(Constants.Event.loading, (option) => {
                 this.loading = Object.assign(this.loading, option);
+                if (this.loading.show) {
+                    console.time(option.flag);
+                } else {
+                    console.timeEnd(option.flag);
+                }
             });
         },
         methods: {
             ...mapActions([
                 types.app.a_buckets_info,
-                types.setup.setup_a_recentname,
+                types.setup.a_recentname,
             ]),
             initCOS() {
                 this.$storage.getCOS(({cos, _cos}) => {
@@ -242,7 +261,7 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
-                        this.setup_a_recentname(name);
+                        this[types.setup.a_recentname](name);
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
@@ -384,6 +403,13 @@
                 }
             }
         }
+    }
+
+    .paging-view {
+        //display: flex;
+        //flex-direction: row;
+        //justify-content: space-around;
+        font-size: 14px;
     }
 
     .choice-cos {

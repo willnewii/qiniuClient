@@ -48,21 +48,20 @@
             </div>
         </template>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(6)" v-if="bucket.name">
-                <Tooltip :content="`同步bucket：${bucket.name}`" placement="bottom">
-                    <Icon type="md-sync" size="24"/>
-                </Tooltip>
+        <Dropdown @on-click="clickMore">
+            <i-button class="button" type="text" v-if="bucket.name">
+                <Icon type="md-more" size="24"/>
             </i-button>
-        </div>
+            <DropdownMenu slot="list">
+                <DropdownItem name="7" @click="actionBtn(7)">
+                    {{`批量导出资源URL`}}
+                </DropdownItem>
+                <DropdownItem name="6" @click="actionBtn(6)">
+                    同步bucket
+                </DropdownItem>
+            </DropdownMenu>
+        </Dropdown>
 
-        <div @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
-            <i-button class="button" type="text" @click="actionBtn(7)" v-if="bucket.name">
-                <Tooltip :content="`批量导出bucket：${bucket.name} URL`" placement="bottom">
-                    <Icon type="md-code-download" size="24"/>
-                </Tooltip>
-            </i-button>
-        </div>
         <Input class="input-search" v-model="search" placeholder="搜索" icon="md-close-circle"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
@@ -91,7 +90,7 @@
         },
         computed: {
             ...mapGetters({
-                customedomain: types.setup.setup_customedomain,
+                customedomain: types.setup.customedomain,
             }),
             domainPlaceholder() {
                 switch (this.$storage.name) {
@@ -129,7 +128,7 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_a_customedomain,
+                types.setup.a_customedomain,
             ]),
             updateSupport() {
                 this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1;
@@ -141,7 +140,7 @@
                 if (val.length === 0) {//腾讯云有默认链接
                     let obj = {};
                     obj[this.bucket.name] = '';
-                    this[types.setup.setup_a_customedomain](obj);
+                    this[types.setup.a_customedomain](obj);
                     return;
                 }
 
@@ -151,7 +150,7 @@
                         let obj = {};
                         obj[this.bucket.name] = url.origin;
                         this.bucket.domain = url.origin;
-                        this[types.setup.setup_a_customedomain](obj);
+                        this[types.setup.a_customedomain](obj);
                         this.$Message.success('自定义域名保存成功,请刷新页面');
                     }
                 } catch (err) {
@@ -200,6 +199,9 @@
                         this.$parent.exportURL();
                         break;
                 }
+            },
+            clickMore(name) {
+                this.actionBtn(name);
             }
         }
     };

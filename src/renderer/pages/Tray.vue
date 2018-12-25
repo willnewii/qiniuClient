@@ -75,7 +75,7 @@
         },
         computed: {
             ...mapGetters({
-                bucket_name: types.setup.setup_bucket_name
+                bucket_name: types.setup.bucket_name
             })
         },
         async created() {
@@ -121,7 +121,7 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_init,
+                types.setup.init,
             ]),
             updateStatus(title) {
                 ipc.send(Constants.Listener.updateTrayTitle, title);

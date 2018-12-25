@@ -214,7 +214,12 @@
                     this.selectFile(index);
                 } else {
                     if (file._directory) {
-                        console.log(file._path);
+                        if (this.bucket.paging) {//切换目录模式,需要重置marker
+                            this.bucket.marker = null;
+                            this.bucket.getResources({
+                                keyword: file._path
+                            });
+                        }
                         this.bucket.folderPath = file._path;
                     } else {
                         if (util.isSupportImage(file.mimeType)) {
@@ -299,21 +304,25 @@
                             }
                         }
 
-                        //去除前缀然后再split
-                        if (file.type === 'F') {//又拍云文件夹类型判断
-                            files.push({
-                                key: file.key,
-                                _name: file.key,
-                                _path: (folderPath ? folderPath + Constants.DELIMITER : '') + file.key,
+                        if (file.type === Constants.FileType.folder) {//又拍云文件夹类型判断 && 七牛也用次参数来判断文件夹
+                            let temp = {
+                                key: temp_key.replace(folderPath + Constants.DELIMITER, ''),
+                                _name: temp_key.replace(folderPath + Constants.DELIMITER, ''),
+                                _path: file.key,
                                 _directory: true,
                                 _icon: 'md-folder',
                                 _contextmenu: 'folderMenu'
-                            });
+                            };
+                            console.log(temp);
+                            if (this.$storage.name === brand.qiniu.key) {
+                                temp._name = temp_key.replace(folderPath + Constants.DELIMITER, '');
+                                temp._path = file.key;
+                            }
+                            files.push(temp);
                             return;
-                        } else if (folderPath.length > 0) {
+                        } else if (folderPath.length > 0) {//去除前缀然后再split
                             temp_key = temp_key.replace(folderPath + Constants.DELIMITER, '');
                         }
-
                         let temps = temp_key.split(Constants.DELIMITER);
                         //根据分隔符切分,如果 length ===1 ,则为文件,否则为下级目录
                         if (temps.length === 1) {

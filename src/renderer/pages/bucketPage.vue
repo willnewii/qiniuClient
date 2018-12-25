@@ -14,40 +14,49 @@
         align-items: center;
         padding: 15px;
         flex-shrink: 0;
+
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
             overflow-x: scroll;
             margin-right: 10px;
+
             .ivu-breadcrumb {
                 display: flex;
                 flex-direction: row;
                 color: $fontColor;
+
                 .bread-sub {
                     flex-shrink: 0;
+
                     .ivu-breadcrumb-item-separator {
                         color: $fontColor;
                     }
                 }
             }
         }
+
         .header-info-view {
             display: flex;
             flex-direction: row;
             align-items: center;
             flex-shrink: 0;
             margin-right: 10px;
+
             .icon {
                 font-size: 14px;
             }
+
             .count {
                 margin-right: 5px;
                 padding-left: 5px;
             }
+
             .size {
                 padding-left: 5px;
             }
         }
+
         .header-button-view {
             display: flex;
             flex-direction: row;
@@ -95,7 +104,7 @@
 
             <div class="header-info-view">
                 <span class="icon iconfont icon-wenjian"></span>
-                <span class="count">共{{bucket.files.length}}个 文件</span>
+                <span class="count">共{{totalCount}}个 文件</span>
                 <span class="icon iconfont icon-fuwuqi"></span>
                 <span class="size">共{{totalSize}} 存储量</span>
             </div>
@@ -133,7 +142,7 @@
                             icon="md-folder"></Button>
                 </Button-group>
                 <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
-                    <Button @click="getResources()" icon="ios-arrow-forward"></Button>
+                    <Button @click="getResources({keyword:bucket.folderPath})" icon="ios-arrow-forward"></Button>
                 </Button-group>
             </div>
         </div>
@@ -216,19 +225,32 @@
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.setup_privatebucket,
-                setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
-                setup_https: types.setup.setup_https,
-                customeDomains: types.setup.setup_customedomain
+                privatebucket: types.setup.privatebucket,
+                setup_deleteNoAsk: types.setup.deleteNoAsk,
+                setup_https: types.setup.https,
+                customeDomains: types.setup.customedomain
             }),
             totalSize() {
                 let totalSzie = 0;
-                if (this.bucket && this.bucket.files) {
+
+                if (this.bucket.space) {
+                    totalSzie = this.bucket.space;
+                } else if (this.bucket && this.bucket.files) {
                     this.bucket.files.forEach((item) => {
                         totalSzie += item.fsize;
                     });
                 }
                 return util.formatFileSize(totalSzie);
+            },
+            totalCount() {
+                let totalCount = 0;
+
+                if (this.bucket.count) {
+                    totalCount = this.bucket.count;
+                } else if (this.bucket && this.bucket.files) {
+                    totalCount = this.bucket.files.length;
+                }
+                return totalCount;
             }
         },
         watch: {
@@ -261,8 +283,8 @@
             /**
              * 获取指定前缀文件列表
              */
-            getResources(keyword) {
-                this.bucket.getResources(keyword);
+            getResources(option) {
+                this.bucket.getResources(option);
             },
             /**
              *  dir：目录

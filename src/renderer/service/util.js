@@ -20,6 +20,15 @@ export function isEmptyObject(e) {
     return !0;
 }
 
+export function deepCopy(source) {
+    let result = {};
+    for (let key in source) {
+        result[key] = typeof source[key] === 'object' ? deepCopy(source[key]) : source[key];
+    }
+    return result;
+}
+
+
 export function getClipboardText(type, url, file) {
     switch (type) {
         case Constants.CopyType.URL:
@@ -197,7 +206,7 @@ export function convertMeta(item, platformType = 0) {
             item.ETag = item.etag;
             break;
         case 4:
-            item.key = item.name;
+            item.key = (item.remotePath && item.remotePath !== '/') ? item.remotePath + '/' + item.name : item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.time).getTime();
             item.mimeType = mime.lookup(item.name) || '';

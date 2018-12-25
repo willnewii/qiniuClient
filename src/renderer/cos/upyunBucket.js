@@ -12,6 +12,7 @@ class Bucket extends baseBucket {
     bindPage(vm) {
         this.vm = vm;
 
+        this.paging = true;
         this.getDomains();
         this.getResources();
     }
@@ -51,34 +52,31 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword, path = '/') {
-        //delimiter
+    getResources(option = {}) {
+        super.getResources();
         let params = {
             'limit': this.limit,
         };
-
-        if (keyword) {
-            params.prefix = keyword;
-        }
 
         if (this.marker) {
             params.iter = this.marker;
         }
 
-        this.cos.listDir(path, params).then((data) => {
+        this.cos.listDir(option.keyword || '/', params).then((data) => {
             if (!this.marker) {
                 this.files = [];
             }
             let files = [];
             data.files.forEach((item) => {
                 if (parseInt(item.Size) !== 0) {
+                    item.remotePath = option.keyword;
                     files.push(util.convertMeta(item, 4));
                 }
             });
 
             data.items = files;
             data.marker = (files.length > 0) ? data.next : '';
-            this.appendResources(data, keyword);
+            this.appendResources(data, option);
         }).catch((error) => {
             console.dir(error);
         });
