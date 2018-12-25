@@ -60,7 +60,7 @@ old
 
 ## 下载
 - [云存储管理客户端-0.3.0-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.3.0-mac.dmg)
-- [云存储管理客户端-0.2.3-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.2.3-win.exe)
+- [云存储管理客户端-0.3.0-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.3.0-win.exe)
 
 ## Build Setup
 ``` bash
