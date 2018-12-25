@@ -1,7 +1,8 @@
 import {Constants, EventBus, util} from '../service/index';
 import * as types from "@/vuex/mutation-types";
 
-const PAGING = 10000;
+//由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
+let tempCount = 0;
 
 class baseBucket {
 
@@ -16,7 +17,9 @@ class baseBucket {
     }
 
     reset() {
-        this.brand = '';    //服务商
+        this.brand = '';                //服务商
+        this.space = '';                //空间容量
+        this.count = '';               //文件个数
         this.name = '';
         this.location = '';
         //操作权限 0：正常 1：私有
@@ -62,11 +65,16 @@ class baseBucket {
     }
 
     getResources() {
+        let txt = '数据加载中,请稍后';
+        if (this.paging) {
+            txt += '  分页加载';
+        }
         EventBus.$emit(Constants.Event.loading, {
             show: true,
-            message: '数据加载中,请稍后',
+            message: txt,
             flag: 'getResources'
         });
+        tempCount++;
     }
 
     /**
@@ -80,7 +88,9 @@ class baseBucket {
         this.marker = data.marker ? data.marker : '';
 
         //开启分页模式&文件数大于阀值&marker不为空
-        if (this.paging && this.tempFiles.length >= PAGING && this.marker) {
+        console.log(this.paging, this.tempFiles.length);
+        // if (this.paging && this.tempFiles.length >= Constants.PAGESIZE && this.marker) {
+        if (this.paging && tempCount >= 5 && this.marker) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
                 flag: 'getResources'
@@ -88,6 +98,7 @@ class baseBucket {
 
             this.files = this.files.concat(Object.freeze(this.tempFiles));
             this.tempFiles = [];
+            tempCount = 0;
         } else if (this.marker) {
             this.getResources(option);
         } else {

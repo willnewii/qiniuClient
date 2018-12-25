@@ -104,7 +104,7 @@
 
             <div class="header-info-view">
                 <span class="icon iconfont icon-wenjian"></span>
-                <span class="count">共{{bucket.files.length}}个 文件</span>
+                <span class="count">共{{totalCount}}个 文件</span>
                 <span class="icon iconfont icon-fuwuqi"></span>
                 <span class="size">共{{totalSize}} 存储量</span>
             </div>
@@ -142,7 +142,7 @@
                             icon="md-folder"></Button>
                 </Button-group>
                 <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
-                    <Button @click="getResources()" icon="ios-arrow-forward"></Button>
+                    <Button @click="getResources({keyword:bucket.folderPath})" icon="ios-arrow-forward"></Button>
                 </Button-group>
             </div>
         </div>
@@ -232,12 +232,25 @@
             }),
             totalSize() {
                 let totalSzie = 0;
-                if (this.bucket && this.bucket.files) {
+
+                if (this.bucket.space) {
+                    totalSzie = this.bucket.space;
+                } else if (this.bucket && this.bucket.files) {
                     this.bucket.files.forEach((item) => {
                         totalSzie += item.fsize;
                     });
                 }
                 return util.formatFileSize(totalSzie);
+            },
+            totalCount() {
+                let totalCount = 0;
+
+                if (this.bucket.count) {
+                    totalCount = this.bucket.count;
+                } else if (this.bucket && this.bucket.files) {
+                    totalCount = this.bucket.files.length;
+                }
+                return totalCount;
             }
         },
         watch: {

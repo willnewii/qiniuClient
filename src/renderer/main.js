@@ -47,8 +47,9 @@ Vue.filter('formatFileSize', function (value) {
 
 //拦截器
 axios.interceptors.response.use((response) => {
-    return response;
+    return JSON.parse(response.data);
 }, (error) => {
+    console.log(error);
     if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
     }

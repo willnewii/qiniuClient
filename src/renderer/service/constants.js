@@ -48,6 +48,8 @@ export const FileType = {
     folder: 'F',
 };
 
+export const PAGESIZE = 5000;
+
 /**
  * 以本地为基准,云对应不上的文件会被删除
  * 以云为基准,本地对应不上的文件会被删除
