@@ -4,7 +4,7 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const fs = require('fs');
-const {dependencies} = require('../package.json');
+const pkg = require('../package.json');
 const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
@@ -14,8 +14,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
-const appExtract = new ExtractTextPlugin('./static/styles.css');
+const commonExtract = new ExtractTextPlugin('static/commonStyle.css');
+const appExtract = new ExtractTextPlugin('static/styles.css');
 
 /**
  * List of node_modules to include in webpack bundle
@@ -120,6 +120,7 @@ let rendererConfig = {
     ],
     output: {
         filename: '[name].js',
+        publicPath: pkg.cdnPath,
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, '../dist/electron')
     },

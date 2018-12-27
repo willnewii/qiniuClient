@@ -72,6 +72,11 @@ npm run dev
 # 构建对应你的平台的安装包
 npm run build:mac
 npm run build:win32
+
+# 字段说明
+package,添加了一个cdnPath字段.你可以将资源上传至该路径下.这样可以实现简单的renderer资源的动态更新.默认为空读取本地.
+- renderer.js
+- style.css
 ```
 
 ## Technologies
