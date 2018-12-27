@@ -50,6 +50,7 @@ axios.interceptors.response.use((response) => {
     return JSON.parse(response.data);
 }, (error) => {
     console.log(error);
+    console.log(error.response);
     if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
     }

@@ -27,7 +27,6 @@ function init(param) {
 function getBuckets(callback) {
     let error = null;
     let request = new Request();
-    request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
         let datas = [];
         for (let name of result) {

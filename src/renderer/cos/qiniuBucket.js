@@ -2,7 +2,6 @@ import {Constants, util} from '../service/index';
 import * as qiniu from '../cos/qiniu';
 import baseBucket from './baseBucket';
 import Request from "@/api/API";
-import {_httpAuthorization} from "../cos/qiniu";
 import brand from "../cos/brand";
 import dayjs from 'dayjs';
 
@@ -55,10 +54,7 @@ class Bucket extends baseBucket {
      */
     getDomains() {
         let request = new Request();
-        let url = `${qiniu.methods.domains}?tbl=${this.name}`;
-
-        request.setAuthorization(_httpAuthorization(url));
-        request.get(url).then((result) => {
+        request.get(qiniu.methods.domains, {tbl: this.name}).then((result) => {
             let domains = result;
             let customeDomains = this.vm.customeDomains;
             if (domains && domains.length > 0) {
@@ -97,19 +93,15 @@ class Bucket extends baseBucket {
 
         let request1 = new Request();
         let url1 = `${qiniu.methods.count}${param}`;
-        request1.setAuthorization(_httpAuthorization(url1));
 
         let request2 = new Request();
         let url2 = `${qiniu.methods.count_line}${param}`;
-        request2.setAuthorization(_httpAuthorization(url2));
 
         let request3 = new Request();
         let url3 = `${qiniu.methods.space}${param}`;
-        request3.setAuthorization(_httpAuthorization(url3));
 
         let request4 = new Request();
         let url4 = `${qiniu.methods.space_line}${param}`;
-        request4.setAuthorization(_httpAuthorization(url4));
 
         Promise.all([request1.get(url1), request2.get(url2), request3.get(url3), request4.get(url4)]).then((result) => {
             console.log(result[2].datas[0], result[3].datas[0]);
@@ -152,7 +144,6 @@ class Bucket extends baseBucket {
             }
 
             let data = respInfo.data;
-            console.log(data);
             data.items.forEach((item, index) => {
                 data.items[index] = util.convertMeta(item, 0);
             });
