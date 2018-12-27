@@ -230,9 +230,9 @@ export function loadTheme(name) {
         style.setAttribute("type", "text/css");
 
         if (name === 'dark') {
-            style.setAttribute("href", './static/styles-dark.css');
+            style.setAttribute("href", pkg.cdnPath + 'static/styles-dark.css');
         } else {
-            style.setAttribute("href", './static/styles.css');
+            style.setAttribute("href", pkg.cdnPath + 'static/styles.css');
         }
         head.appendChild(style);
     }

@@ -51,7 +51,7 @@
                             <a @click="openBrowser('https://console.qingcloud.com/')">{{item.name}}</a>->头像->API密钥
                         </template>
                         <template v-else-if="item.key === brands[3].key">
-                            <a @click="openBrowser('https://https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
+                            <a @click="openBrowser('https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
                             Key
                         </template>
                         <template v-else-if="item.key === brands[4].key">
