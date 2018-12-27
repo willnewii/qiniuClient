@@ -7,17 +7,20 @@
     .list {
         height: 260px;
         overflow: scroll;
+
         .item {
             display: flex;
             flex-direction: row;
             align-items: flex-end;
             padding: 10px;
             border-bottom: 1px #CCC solid;
+
             .image {
                 width: 50px;
                 height: 50px;
                 margin-right: 10px;
             }
+
             .btn {
                 margin-right: 5px;
             }
@@ -57,7 +60,7 @@
     import * as types from '../vuex/mutation-types';
     import {util, Constants, storagePromise, mixins} from '../service';
     import storage from 'electron-json-storage';
-    import brand from "@/cos/brand";
+    import Request from "@/api/API";
 
     let ipc;
 
@@ -82,6 +85,7 @@
             ipc = this.$electron.ipcRenderer;
 
             let app = await storagePromise.get(Constants.Key.configuration);
+            console.log(app);
             if (app && app.brand && app.bucket_name) {
                 this.$storage.setName(app.brand);
                 this.$storage.initCOS((result) => {
@@ -91,8 +95,10 @@
                         });
 
                         if (this.$storage.cos.methods) {//七牛需要加载域名列表
-                            this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
-                                this.domains = response.data;
+                            let request = new Request();
+                            let url = `${this.$storage.cos.methods.domains}?tbl=${app.bucket_name}`;
+                            request.get(url).then((result) => {
+                                this.domains = result;
                             });
                         }
                     } else {

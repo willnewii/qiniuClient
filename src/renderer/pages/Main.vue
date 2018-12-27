@@ -245,8 +245,7 @@
                 });
             },
             checkVersion() {
-                this.doRequset(Constants.URL.releases, null, (response) => {
-                    let result = response.data;
+                this.doRequset(Constants.URL.releases, null, (result) => {
                     if (result.tag_name > pkg.version) {
                         this.version.url = result.html_url;
                         this.version.version = result.tag_name;
