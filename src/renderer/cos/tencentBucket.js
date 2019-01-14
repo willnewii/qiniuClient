@@ -1,3 +1,4 @@
+const fs = require('fs');
 
 import {util} from '../service/index';
 import baseBucket from './baseBucket';

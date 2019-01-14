@@ -357,8 +357,12 @@
             }
 
             .buckets-menu {
-                overflow-y: scroll;
+                overflow-y: hidden;
                 max-height: 400px;
+
+                &:hover {
+                    overflow-y: scroll;
+                }
             }
 
             .ivu-menu-vertical {

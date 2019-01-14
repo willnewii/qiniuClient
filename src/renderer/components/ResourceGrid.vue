@@ -397,8 +397,7 @@
 
     .layout-content {
         margin: 0 15px 15px 15px;
-        overflow-x: hidden;
-        overflow-y: scroll;
+        overflow: hidden;
         background: $bg-resource;
         flex-grow: 1;
         border-radius: 4px;

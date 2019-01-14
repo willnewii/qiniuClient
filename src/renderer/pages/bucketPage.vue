@@ -18,7 +18,7 @@
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
-            overflow-x: scroll;
+            overflow-x: hidden;
             margin-right: 10px;
 
             .ivu-breadcrumb {
@@ -33,6 +33,10 @@
                         color: $fontColor;
                     }
                 }
+            }
+
+            &:hover {
+                overflow-x: scroll;
             }
         }
 
