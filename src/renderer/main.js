@@ -58,6 +58,9 @@ axios.interceptors.response.use((response) => {
 });
 
 import App from './App';
+import ParseImageService from "./service/parseImageService";
+
+new ParseImageService();
 
 new Vue({
     el: '#app',
