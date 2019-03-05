@@ -12,16 +12,16 @@ const savePath = electron.remote.app.getPath("userData");
 
 const WRITE_PATH = path.resolve(savePath, "pasteFiles");
 
-export default class ParseImageService {
+export default class PasteImageService {
   constructor() {
     this.init();
   }
 
   init() {
-    document.addEventListener("paste", this.handlerParse);
+    document.addEventListener("paste", this.handlerParse.bind(this));
   }
 
-  handlerParse = async event => {
+  async handlerParse(event) {
     const fileList = Array.from(event.clipboardData.items)
       .map(o => {
         if (!/image\/.*/.test(o.type)) {
@@ -39,7 +39,7 @@ export default class ParseImageService {
     electron.ipcRenderer.send(Constants.Listener.readDirectory, {
       files: filePaths
     });
-  };
+  }
 
   async writeFile(file) {
     if (!fs.existsSync(WRITE_PATH)) {
