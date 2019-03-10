@@ -237,6 +237,8 @@
                         icon: this.bucket.generateUrl(ret.key, this.setup_deadline),
                         body: ret.key,
                     });
+                    
+                    this.copy(ret)
                 } else {
                     util.notification({
                         title: '上传失败',
