@@ -111,6 +111,10 @@ class Bucket extends baseBucket {
             });
         }).catch((error) => {
             console.log(error);
+            callback && callback({
+                count: 0,
+                space: 0
+            });
         });
     }
 
