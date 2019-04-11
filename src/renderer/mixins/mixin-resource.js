@@ -124,6 +124,7 @@ export default {
             return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
         show(file) {
+            this.$Message.info('不支持预览的文件格式');
         },
         showImage(file, images) {
             this.previewImages = [];
