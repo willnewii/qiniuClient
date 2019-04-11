@@ -117,11 +117,10 @@
                 images: [],
                 //缓存当前路径
                 cacheName: '',
-                //是否在多选状态
-                isMultiple: false,
+                //点击时间戳，判断是否为双击
+                itemClickTime: 0,
                 //多选数组
                 selection: [],
-
                 //virtual-list
                 remain0: 0,
                 remain1: 0,
@@ -175,26 +174,6 @@
             },
         },
         created() {
-            document.onkeydown = (event) => {
-                let e = event || window.event || arguments.callee.caller.arguments[0];
-                switch (e.keyCode) {
-                    case 91://command(mac)
-                    case 93:
-                    case 17://control(win)
-                        this.isMultiple = true;
-                        break;
-                }
-            };
-            document.onkeyup = (event) => {
-                let e = event || window.event || arguments.callee.caller.arguments[0];
-                switch (e.keyCode) {
-                    case 91://command
-                    case 93:
-                    case 17://control
-                        this.isMultiple = false;
-                        break;
-                }
-            };
             EventBus.$on(Constants.Event.updateFiles, (files) => {
                 this.files = files;
             });
@@ -210,9 +189,12 @@
                 this.$viewer = viewer;
             },
             clickItem(file, index) {
-                if (this.isMultiple) {
-                    this.selectFile(index);
-                } else {
+                let time = new Date().getTime();
+                const CLICKTIME = 300;
+
+                if ((time - this.itemClickTime) < CLICKTIME) {
+                    this.itemClickTime = 0;
+
                     if (file._directory) {
                         if (this.bucket.paging) {//切换目录模式,需要重置marker
                             this.bucket.marker = null;
@@ -227,8 +209,19 @@
                         } else {
                             this.show(file);
                         }
-
                     }
+                } else {
+                    if (this.itemClickTime === 0) {
+                        setTimeout(() => {
+                            if (this.itemClickTime !== 0) {
+                                this.selectFile(index);
+                            }
+                            this.itemClickTime = 0;
+                        }, CLICKTIME);
+                    } else {
+                        console.log('nothing');
+                    }
+                    this.itemClickTime = time;
                 }
             },
             getImgUrlwithStyle(file) {
