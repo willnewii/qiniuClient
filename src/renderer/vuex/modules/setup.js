@@ -11,7 +11,8 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
-            https: false,                                            //是否支持Https
+            paging: true,                                           //是否开启分页
+            https: false,                                           //是否支持Https
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
             uploadNoAsk: true,                                      //文件上传时是否弹出对话框
             isOverwrite: true,                                      //上传时是否直接覆盖文件
@@ -43,6 +44,10 @@ export default {
         },
         [types.setup.downloaddir](state, value) {
             state.setup.downloaddir = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.paging](state, value) {
+            state.setup.paging = value;
             setAppSetup(state.setup);
         },
         [types.setup.https](state, value) {
@@ -104,6 +109,9 @@ export default {
         [types.setup.a_imagestyle](context, value) {
             context.commit(types.setup.imagestyle, value);
         },
+        [types.setup.a_paging](context, json) {
+            context.commit(types.setup.paging, json);
+        },
         [types.setup.a_https](context, json) {
             context.commit(types.setup.https, json);
         },
@@ -157,6 +165,9 @@ export default {
         },
         [types.setup.https](state) {
             return ('https' in state.setup) ? state.setup.https : false;
+        },
+        [types.setup.paging](state) {
+            return ('paging' in state.setup) ? state.setup.paging : true;
         },
         [types.setup.deleteNoAsk](state) {
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;
