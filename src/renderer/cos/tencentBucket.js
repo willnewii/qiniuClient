@@ -98,6 +98,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
+        super.getResources();
         let params = {
             Bucket: this.name,
             Region: this.location,
