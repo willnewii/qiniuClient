@@ -45,7 +45,7 @@ class baseBucket {
         this.downloads = [];
         //上传列表
         this.uploads = [];
-
+        //在generateUrl 返回https
         this.https = false;
         //分页加载
         this.paging = false;
@@ -88,7 +88,7 @@ class baseBucket {
         this.marker = data.marker ? data.marker : '';
 
         //开启分页模式&文件数大于阀值&marker不为空
-        console.log(this.paging, this.tempFiles.length);
+        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length}`);
         // if (this.paging && this.tempFiles.length >= Constants.PAGESIZE && this.marker) {
         if (this.paging && tempCount >= 5 && this.marker) {
             EventBus.$emit(Constants.Event.loading, {

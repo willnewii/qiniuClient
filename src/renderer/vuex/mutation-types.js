@@ -19,6 +19,9 @@ export const setup = {
     https: 'https',
     a_https: 'a_https',
 
+    paging: 'paging',
+    a_paging: 'a_paging',
+
     deleteNoAsk: 'deleteNoAsk',
     a_deleteNoAsk: 'a_deleteNoAsk',
 
