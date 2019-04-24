@@ -258,9 +258,9 @@ const getMenuData = function () {
             label: '帮助',
             submenu: [
                 {
-                    label: 'github',
+                    label: 'wiki',
                     click() {
-                        shell.openExternal('https://github.com/willnewii/qiniuClient');
+                        shell.openExternal('https://github.com/willnewii/qiniuClient/wiki');
                     }
                 },
                 {

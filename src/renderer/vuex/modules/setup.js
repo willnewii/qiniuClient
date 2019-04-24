@@ -4,6 +4,8 @@
 import {util, storagePromise, Constants} from '@/service';
 import * as types from '@/vuex/mutation-types';
 
+const defaultImageStyle = '?imageView2/1/w/100/h/100/format/webp/q/10';
+
 function setAppSetup(app) {
     storagePromise.set(Constants.Key.configuration, app);
 }
@@ -21,7 +23,7 @@ export default {
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
-            imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
+            imagestyle: defaultImageStyle,                          //Grid时,提供了图片预览,可以设置的预览图片的压缩方式
             downloaddir: '',                                        //设置文件的下载路径
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
             expiresTime: 3600,                                      //私有空间,过期时间默认1小时
@@ -161,7 +163,7 @@ export default {
             return ('downloaddir' in state.setup) ? state.setup.downloaddir : '';
         },
         [types.setup.imagestyle](state) {
-            return ('imagestyle' in state.setup) ? state.setup.imagestyle : 'imageView2/1/w/100/h/100/format/webp/q/10';
+            return ('imagestyle' in state.setup) ? state.setup.imagestyle : defaultImageStyle;
         },
         [types.setup.https](state) {
             return ('https' in state.setup) ? state.setup.https : false;

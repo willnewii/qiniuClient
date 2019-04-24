@@ -1,5 +1,4 @@
-# 云存储管理客户端 v0.3.0
-
+# 云存储管理客户端 v0.3.2
 ![](http://blog-res.mayday5.me/file/icon.png?imageView2/1/w/80/h/80/q/75|imageslim) 女朋友给做的新图标😜
 > 云存储管理客户端。支持七牛云、腾讯云、青云、阿里云、又拍云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
 
@@ -14,6 +13,16 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
+2019.04.17
+***
+- 新增上传成功后,自动复制链接到剪切板 感谢[xiaobebe](https://github.com/xiaobebe)
+- 新增分页模式开关
+- 新增加载提示框添加进度显示(七牛云)
+- change：修改操作逻辑.单击为选中，双击为下一级或图片预览
+- fix：七牛新建存储空间获取count、space数据异常
+- fix：腾讯COS上传失败
+- fix: 开启原图保护图片不显示
+
 2018.12.25
 ***
 - 🎄圣诞快乐~
@@ -78,6 +87,9 @@ package,添加了一个cdnPath字段.你可以将资源上传至该路径下.这
 - renderer.js
 - style.css
 ```
+
+### issue
+- 阿里云上传回调异常
 
 ## Technologies
 - [electron](https://github.com/electron/electron)
