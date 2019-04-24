@@ -194,7 +194,9 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
+        let _domain = this.https ? 'https://' : 'http://';
+
+        let url = this.domain ? qiniu.generateUrl(_domain + this.domain, key, (this.permission === 1 ? deadline : null)) : '';
         return super.generateUrl(url);
     }
 }

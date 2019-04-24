@@ -234,7 +234,11 @@
                 let imageSrc = '';
                 switch (this.$storage.name) {
                     case brand.qiniu.key:
-                        imageSrc = url ? `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${imageStyle}` : '';
+                        if (this.bucket.permission == 1) {//如果是私密空间直接显示原图
+                            imageSrc = url;
+                        } else {
+                            imageSrc = url ? `${url}${imageStyle}` : '';
+                        }
                         break;
                     case brand.aliyun.key:
                         if (imageStyle) {
