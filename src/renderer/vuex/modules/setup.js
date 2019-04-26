@@ -4,6 +4,8 @@
 import {util, storagePromise, Constants} from '@/service';
 import * as types from '@/vuex/mutation-types';
 
+const defaultImageStyle = '?imageView2/1/w/100/h/100/format/webp/q/10';
+
 function setAppSetup(app) {
     storagePromise.set(Constants.Key.configuration, app);
 }
@@ -11,7 +13,8 @@ function setAppSetup(app) {
 export default {
     state: {
         setup: {
-            https: false,                                            //是否支持Https
+            paging: true,                                           //是否开启分页
+            https: false,                                           //是否支持Https
             deleteNoAsk: false,                                     //文件删除前是否弹出对话框
             uploadNoAsk: true,                                      //文件上传时是否弹出对话框
             isOverwrite: true,                                      //上传时是否直接覆盖文件
@@ -20,7 +23,7 @@ export default {
             bucket_name: '',
             bucket_dir: '',
             customedomain: {},
-            imagestyle: 'imageView2/1/w/100/h/100/format/webp/q/10',//Grid时,提供了图片预览,可以设置的预览图片的压缩方式
+            imagestyle: defaultImageStyle,                          //Grid时,提供了图片预览,可以设置的预览图片的压缩方式
             downloaddir: '',                                        //设置文件的下载路径
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
             expiresTime: 3600,                                      //私有空间,过期时间默认1小时
@@ -43,6 +46,10 @@ export default {
         },
         [types.setup.downloaddir](state, value) {
             state.setup.downloaddir = value;
+            setAppSetup(state.setup);
+        },
+        [types.setup.paging](state, value) {
+            state.setup.paging = value;
             setAppSetup(state.setup);
         },
         [types.setup.https](state, value) {
@@ -104,6 +111,9 @@ export default {
         [types.setup.a_imagestyle](context, value) {
             context.commit(types.setup.imagestyle, value);
         },
+        [types.setup.a_paging](context, json) {
+            context.commit(types.setup.paging, json);
+        },
         [types.setup.a_https](context, json) {
             context.commit(types.setup.https, json);
         },
@@ -153,10 +163,13 @@ export default {
             return ('downloaddir' in state.setup) ? state.setup.downloaddir : '';
         },
         [types.setup.imagestyle](state) {
-            return ('imagestyle' in state.setup) ? state.setup.imagestyle : 'imageView2/1/w/100/h/100/format/webp/q/10';
+            return ('imagestyle' in state.setup) ? state.setup.imagestyle : defaultImageStyle;
         },
         [types.setup.https](state) {
             return ('https' in state.setup) ? state.setup.https : false;
+        },
+        [types.setup.paging](state) {
+            return ('paging' in state.setup) ? state.setup.paging : true;
         },
         [types.setup.deleteNoAsk](state) {
             return ('deleteNoAsk' in state.setup) ? state.setup.deleteNoAsk : false;

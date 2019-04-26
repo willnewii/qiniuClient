@@ -67,6 +67,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
+        super.getResources();
         //delimiter
         let params = {
             'max-keys': this.limit,

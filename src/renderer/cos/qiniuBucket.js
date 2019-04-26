@@ -18,7 +18,7 @@ class Bucket extends baseBucket {
      * 获取域名
      * 获取目录
      * 获取默认资源列表
-     * @param vm => page
+     * @param vm => bucketPage
      */
     bindPage(vm) {
         this.vm = vm;
@@ -28,8 +28,7 @@ class Bucket extends baseBucket {
             if (info) {
                 this.space = info.space;
                 this.count = info.count;
-
-                if (info.count > Constants.PAGESIZE) {
+                if (this.vm.paging && info.count > Constants.PAGESIZE) {
                     this.paging = true;
                 }
             }
@@ -90,7 +89,6 @@ class Bucket extends baseBucket {
         let day = dayjs();
         let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
 
-
         let request1 = new Request();
         let url1 = `${qiniu.methods.count}${param}`;
 
@@ -104,7 +102,6 @@ class Bucket extends baseBucket {
         let url4 = `${qiniu.methods.space_line}${param}`;
 
         Promise.all([request1.get(url1), request2.get(url2), request3.get(url3), request4.get(url4)]).then((result) => {
-            console.log(result[2].datas[0], result[3].datas[0]);
             callback && callback({
                 count: result[0].datas[0] || result[1].datas[0],
                 space: result[2].datas[0] || result[3].datas[0]
@@ -197,7 +194,9 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
+        let _domain = this.https ? 'https://' : 'http://';
+
+        let url = this.domain ? qiniu.generateUrl(_domain + this.domain, key, (this.permission === 1 ? deadline : null)) : '';
         return super.generateUrl(url);
     }
 }

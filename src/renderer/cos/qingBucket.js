@@ -85,6 +85,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
+        super.getResources();
         let params = {
             limit: this.limit,
         };

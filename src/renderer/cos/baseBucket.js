@@ -2,7 +2,8 @@ import {Constants, EventBus, util} from '../service/index';
 import * as types from "@/vuex/mutation-types";
 
 //由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
-let tempCount = 0;
+const MAXCOUNT = 5;
+let loadCount = 0;
 
 class baseBucket {
 
@@ -45,7 +46,7 @@ class baseBucket {
         this.downloads = [];
         //上传列表
         this.uploads = [];
-
+        //在generateUrl 返回https
         this.https = false;
         //分页加载
         this.paging = false;
@@ -64,8 +65,17 @@ class baseBucket {
         this.https = this.vm[types.setup.https];
     }
 
+    /**
+     * 此方法目前只有七牛云使用
+     */
     getResources() {
         let txt = '数据加载中,请稍后';
+
+        if (this.count !== '') {
+            txt += `(${parseFloat(this.tempFiles.length / this.count * 100).toFixed(2)}%)`;
+        }
+
+        console.log(this.tempFiles.length, this.count, txt);
         if (this.paging) {
             txt += '  分页加载';
         }
@@ -74,7 +84,7 @@ class baseBucket {
             message: txt,
             flag: 'getResources'
         });
-        tempCount++;
+        loadCount++;
     }
 
     /**
@@ -88,9 +98,8 @@ class baseBucket {
         this.marker = data.marker ? data.marker : '';
 
         //开启分页模式&文件数大于阀值&marker不为空
-        console.log(this.paging, this.tempFiles.length);
-        // if (this.paging && this.tempFiles.length >= Constants.PAGESIZE && this.marker) {
-        if (this.paging && tempCount >= 5 && this.marker) {
+        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length}`);
+        if (this.paging && loadCount >= MAXCOUNT && this.marker) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
                 flag: 'getResources'
@@ -98,7 +107,7 @@ class baseBucket {
 
             this.files = this.files.concat(Object.freeze(this.tempFiles));
             this.tempFiles = [];
-            tempCount = 0;
+            loadCount = 0;
         } else if (this.marker) {
             this.getResources(option);
         } else {

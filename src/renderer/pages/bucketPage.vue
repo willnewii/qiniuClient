@@ -230,6 +230,7 @@
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
                 privatebucket: types.setup.privatebucket,
+                paging: types.setup.paging,
                 setup_deleteNoAsk: types.setup.deleteNoAsk,
                 setup_https: types.setup.https,
                 customeDomains: types.setup.customedomain

@@ -6,6 +6,11 @@
             <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
         </div>
         <div class="item">
+            <span class="item-title">开启分页</span>
+            <i-switch :value="setup_paging" size="small" @on-change="pagingChange"></i-switch>
+            <Button @click="openBrowser(2)" size="small">关于数据加载方式</Button>
+        </div>
+        <div class="item">
             <span class="item-title">直接删除,不显示确认框</span>
             <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
         </div>
@@ -131,6 +136,7 @@
                 setup_copyType: types.setup.copyType,
                 setup_deleteNoAsk: types.setup.deleteNoAsk,
                 setup_https: types.setup.https,
+                setup_paging: types.setup.paging,
                 setup_uploadNoAsk: types.setup.uploadNoAsk,
                 setup_isOverwrite: types.setup.isOverwrite,
                 setup_brand: types.setup.brand,
@@ -169,6 +175,7 @@
                 types.app.a_update_buckets_info,
                 types.setup.a_copyType,
                 types.setup.a_https,
+                types.setup.a_paging,
                 types.setup.a_deleteNoAsk,
                 types.setup.a_uploadNoAsk,
                 types.setup.a_savedir,
@@ -179,6 +186,9 @@
                 types.setup.a_isOverwrite,
                 types.setup.a_theme,
             ]),
+            pagingChange: function (state) {
+                this[types.setup.a_paging](state);
+            },
             httpsChange: function (state) {
                 this[types.setup.a_https](state);
             },
@@ -244,6 +254,9 @@
                         break;
                     case 1://私有资源下载
                         url = 'https://developer.qiniu.com/kodo/manual/1656/download-private';
+                        break;
+                    case 2://数据加载方式
+                        url = 'https://github.com/willnewii/qiniuClient/wiki/%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F';
                         break;
                 }
                 this.$electron.shell.openExternal(url);
