@@ -88,7 +88,7 @@
         <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <div class="header-dir-view">
+            <div class="header-dir-view horizontal">
                 <Breadcrumb separator=">">
                     <div class="bread-sub" @click="changeFolderPath(-1)">
                         <BreadcrumbItem>

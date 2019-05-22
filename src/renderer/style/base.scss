@@ -42,21 +42,33 @@ body {
 }
 
 @if ($platform != 'darwin') {
-  //自定义scrollbar 效果不好
-  ::-webkit-scrollbar {
-    width: 6px;
-    background-color: #F5F5F5;
-  }
 
-  /*定义滚动条轨道 内阴影+圆角*/
-  ::-webkit-scrollbar-track {
-    //border-radius: 3px;
-    background-color: #F5F5F5;
-  }
+}
 
-  /*定义滑块 内阴影+圆角*/
-  ::-webkit-scrollbar-thumb {
-    //border-radius: 3px;
-    background-color: #A9A5A5;
-  }
+//自定义scrollbar 效果不好
+::-webkit-scrollbar {
+  width: 2px;
+  background-color: #F5F5F5;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  //border-radius: 3px;
+  background-color: #F5F5F5;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  //border-radius: 3px;
+  height: 2px;
+  background-color: #C1C1C1;
+}
+
+//横向滑块设置
+.horizontal::-webkit-scrollbar {
+  height: 2px;
+}
+
+.horizontal::-webkit-scrollbar-thumb {
+  width: 2px;
 }
