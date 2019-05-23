@@ -1,24 +1,17 @@
 <template>
     <div class="layout">
-        <!--<v-contextmenu ref="bucketMenu" @contextmenu="handleBucketMenu">
-            <v-contextmenu-item @click="handleBucketMenuClick(0)">同步</v-contextmenu-item>
-            <v-contextmenu-item divider></v-contextmenu-item>
-            <v-contextmenu-item @click="handleBucketMenuClick(1)">批量导出URL</v-contextmenu-item>
-        </v-contextmenu>-->
-        <Row type="flex">
-            <i-col :span="menuSpace.left" class="layout-menu-left">
+        <div class="content">
+            <div class="layout-menu">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
                     <span>{{menuState ? cos.name + '云存储' : ''}}</span>
                 </i-button>
-                <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
-                      @on-select="onMenuSelect" :active-name="bucketName">
+                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name"
-                                   :index="index">
+                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name" :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="item.permission === 1 ? 'md-lock' : 'md-folder'"></Icon>
+                                      :type="item.permission === 1 ? 'md-lock' : (bucketName === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
                                 <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
@@ -40,11 +33,11 @@
                         <span class="version-new" @click="openBrowser(version.url)">有新版啦~</span>
                     </Poptip>
                 </div>
-            </i-col>
-            <i-col :span="menuSpace.right">
+            </div>
+            <div class="layout-content">
                 <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
-            </i-col>
-        </Row>
+            </div>
+        </div>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
                :mask-closable="false">
@@ -108,7 +101,7 @@
                 cos: {name: ''},
                 cosChoiceModel: false,
                 bucketName: '',
-                menuState: true,
+                menuState: true,            //menu是否折叠
                 appVersion: pkg.version,
                 version: {
                     github: Constants.URL.github,
@@ -155,12 +148,6 @@
                 privatebucket: types.setup.privatebucket,
                 setup_recentname: types.setup.recentname,
             }),
-            menuSpace() {
-                return {
-                    left: this.menuState ? 5 : 2,
-                    right: this.menuState ? 19 : 22
-                };
-            }
         },
         /**
          * 初始化COSkey
@@ -260,6 +247,9 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
+                        this.$nextTick(() => {
+                            this.$refs['menu'] && this.$refs['menu'].updateActiveName(name);
+                        });
                         this[types.setup.a_recentname](name);
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
@@ -300,21 +290,6 @@
                         break;
                 }
             },
-            /*handleBucketMenu(ref) {
-                this.contextBucketMenuIndex = ref.data.attrs.index;
-            },
-            handleBucketMenuClick(action) {
-                switch (action) {
-                    case 0://同步操作
-                        if(this.$refs['bucketPage']){
-                            this.$refs['bucketPage'].showSyncFolder();
-                        }
-                        break;
-                    case 1://批量导出
-                        console.log(this.$refs['bucketPage']);
-                        break;
-                }
-            },*/
         }
     };
 </script>
@@ -324,88 +299,72 @@
     .layout {
         height: 100%;
 
-        .ivu-row-flex {
+        .content {
             height: 100%;
-        }
-
-        .layout-menu-left {
-            background: $menu-bg;
-            color: $menu-color;
             display: flex;
-            flex-direction: column;
-            border-bottom-right-radius: 4px;
-            padding-top: 20px;
-            z-index: 1;
-            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
-            -webkit-app-region: drag;
+            flex-direction: row;
 
-            .navicon_btn {
-                font-weight: bold;
-                text-align: left;
-                padding-left: 22px;
+            .layout-menu {
+                background: $menu-bg;
                 color: $menu-color;
+                display: flex;
+                flex-direction: column;
+                border-bottom-right-radius: 4px;
+                padding-top: 20px;
+                z-index: 1;
+                box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
+                -webkit-app-region: drag;
+                max-width: 180px;
 
-                &:hover {
-                    color: $primary;
+                .navicon_btn {
+                    font-weight: bold;
+                    text-align: left;
+                    padding-left: 22px;
+                    color: $menu-color;
+
+                    &:hover {
+                        color: $primary;
+                    }
+
+                    & > span {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
                 }
 
-                & > span {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                .buckets-menu {
+                    overflow-y: auto;
+                    max-height: 400px;
+
+                    /*
+                    overflow-y: auto;
+
+                    &:hover {//鼠标放上去的时候才显示滚动条.但是由于滚动条的显示与消失,会产生页面的抖动
+                        overflow-y: scroll;
+                    }*/
+                }
+
+                .version {
+                    padding: 10px 20px;
+                    /*color: #c5c5c5;*/
+                    &-new {
+                        color: #ff3605;
+                        cursor: pointer;
+                    }
+
+                    &-new-info {
+                        color: #555;
+                    }
                 }
             }
 
-            .buckets-menu {
-                overflow-y: hidden;
-                max-height: 400px;
-
-                &:hover {
-                    overflow-y: scroll;
-                }
-            }
-
-            .ivu-menu-vertical {
+            .layout-content {
                 flex-grow: 1;
-
-                .ivu-menu-item {
-                    padding: 8px 24px;
-                    display: flex;
-                    align-items: center;
-
-                    .layout-text {
-                        margin-left: 0;
-                        line-height: 25px;
-                        white-space: nowrap;
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                    }
-
-                    .layout-icon {
-                        margin-left: 0;
-                        line-height: 25px;
-                        background: rgba(255, 255, 255, .7);
-                        width: 25px;
-                        color: $fontColor;
-                        text-align: center;
-                        text-transform: capitalize;
-                    }
-                }
-            }
-
-            .version {
-                padding: 10px 20px;
-                /*color: #c5c5c5;*/
-                &-new {
-                    color: #ff3605;
-                    cursor: pointer;
-                }
-
-                &-new-info {
-                    color: #555;
-                }
+                overflow-x: auto;
             }
         }
+
     }
 
     .paging-view {

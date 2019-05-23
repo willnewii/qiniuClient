@@ -5,6 +5,40 @@ body {
   color: $fontColor;
 }
 
+.ivu-menu-vertical {
+  flex-grow: 1;
+
+  .ivu-menu-item {
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+
+    .layout-text {
+      margin-left: 0;
+      line-height: 25px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .layout-icon {
+      margin-left: 0;
+      line-height: 25px;
+      background: rgba(255, 255, 255, .7);
+      width: 25px;
+      color: $fontColor;
+      text-align: center;
+      text-transform: capitalize;
+    }
+  }
+}
+
+.ivu-breadcrumb-item-link {
+  > .ivu-icon {
+    line-height: 1.5;
+  }
+}
+
 //表格 多选 图标边距修改
 .ivu-table-cell {
   .ivu-checkbox-wrapper {
@@ -17,7 +51,7 @@ body {
 }
 
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
-  width: 4px !important;
+  width: 2px !important;
 }
 
 .spin-icon-load {
