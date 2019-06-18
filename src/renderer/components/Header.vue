@@ -53,11 +53,15 @@
                 <Icon type="md-more" size="24"/>
             </i-button>
             <DropdownMenu slot="list">
-                <DropdownItem name="7" @click="actionBtn(7)">
-                    {{`批量导出资源URL`}}
+                <DropdownItem name="7">
+                    <div @click="actionBtn(7)">
+                        {{`批量导出资源URL`}}
+                    </div>
                 </DropdownItem>
-                <DropdownItem name="6" @click="actionBtn(6)">
-                    同步bucket
+                <DropdownItem name="6">
+                    <div @click="actionBtn(6)">
+                        同步bucket
+                    </div>
                 </DropdownItem>
             </DropdownMenu>
         </Dropdown>
