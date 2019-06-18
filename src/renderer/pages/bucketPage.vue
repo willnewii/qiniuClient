@@ -18,7 +18,7 @@
         .header-dir-view {
             flex-grow: 1;
             flex-shrink: 1;
-            overflow-x: hidden;
+            overflow-x: auto;
             margin-right: 10px;
 
             .ivu-breadcrumb {
@@ -35,9 +35,9 @@
                 }
             }
 
-            &:hover {
+            /*&:hover {
                 overflow-x: scroll;
-            }
+            }*/
         }
 
         .header-info-view {
@@ -88,7 +88,7 @@
         <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
 
         <div class="dir-layout">
-            <div class="header-dir-view">
+            <div class="header-dir-view horizontal">
                 <Breadcrumb separator=">">
                     <div class="bread-sub" @click="changeFolderPath(-1)">
                         <BreadcrumbItem>

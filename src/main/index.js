@@ -56,7 +56,7 @@ function createMainWindow() {
         title: pkg.cnname,
         titleBarStyle: 'hidden',
         webPreferences: {
-            webSecurity: false
+            webSecurity: false,
         }
     });
 
@@ -65,6 +65,14 @@ function createMainWindow() {
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
+    /*try {
+        mainWindow.webContents.debugger.attach('1.3');
+    } catch (err) {
+        console.log('Debugger attach failed : ', err);
+    }
+    console.log("debugger.isAttached():" + mainWindow.webContents.debugger.isAttached());*/
+
 }
 
 /**

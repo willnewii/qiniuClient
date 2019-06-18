@@ -124,7 +124,7 @@
                 //virtual-list
                 remain0: 0,
                 remain1: 0,
-                step: 6,
+                step: 6,    //每行加载数
                 //virtual-list
                 options: {
                     inline: false,
@@ -179,10 +179,16 @@
             });
         },
         mounted() {
+            this.fileFilter();
+
             this.remain0 = this.$refs['content'].offsetHeight / 29;
             this.remain1 = this.$refs['content'].offsetHeight / 123;
 
-            this.fileFilter();
+            this.step = parseInt(this.$refs['content'].offsetWidth / 123);
+
+            window.onresize = () => {
+                this.step = parseInt(this.$refs['content'].offsetWidth / 123);
+            };
         },
         methods: {
             inited(viewer) {
