@@ -151,7 +151,7 @@ export function formatDate(time) {
  * @returns {boolean}
  */
 export function isSupportImage(mimeType) {
-    return /image\/(png|img|jpe?g|svg|gif)/.test(mimeType.toLowerCase());
+    return /image\/(png|img|jpe?g|svg|gif|webp)/.test(mimeType.toLowerCase());
 }
 
 /**
