@@ -57,6 +57,7 @@ function createMainWindow() {
         titleBarStyle: 'hidden',
         webPreferences: {
             webSecurity: false,
+            nodeIntegration: true
         }
     });
 
@@ -295,7 +296,8 @@ const getMenuData = function () {
                     title: '关于',
                     webPreferences: {
                         webSecurity: false,
-                        backgroundThrottling: false
+                        backgroundThrottling: false,
+                        nodeIntegration: true
                     }
                 });
                 aboutWindow.loadURL(util.mainURL + '#/about');

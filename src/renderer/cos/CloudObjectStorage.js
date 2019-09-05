@@ -7,14 +7,14 @@ import * as upyun from '../cos/upyun';
 import brand from '../cos/brand';
 
 const storage = require('electron-json-storage');
+const KEY_COS = 'cos_keys';
 
 export default class CloudObjectStorage {
     constructor() {
     }
 
-    setName(name) {
-        this.name = name;
-        switch (name) {
+    setBrand(brandName) {
+        switch (brandName) {
             case brand.qiniu.key:
                 this.cos = qiniu;
                 break;
@@ -31,6 +31,21 @@ export default class CloudObjectStorage {
                 this.cos = upyun;
                 break;
         }
+        this.brandName = brandName;
+    }
+
+    /**
+     * 初始化当前cos ,只做了非空验证
+     * @param callback
+     */
+    async initCOS(data, callback) {
+        if (data && data.access_key && data.secret_key) {
+            this.info = data;
+            this.cos.init(data);
+            callback && callback(true);
+        } else {
+            callback && callback(false);
+        }
     }
 
     getBuckets(callback) {
@@ -40,36 +55,24 @@ export default class CloudObjectStorage {
         });
     }
 
-    async getCOS(callback) {
-        let cos = [];
-        Object.keys(brand).forEach((item) => {
-            cos.push(brand[item]);
-        });
-        let _cos = [];
-
-        for (let i = 0; i < cos.length; i++) {
-            let data = await storagePromise.get(cos[i].key + '_key');
-            if (data && data.access_key && data.secret_key) {
-                cos[i].login = true;
-                _cos.push(cos[i]);
-            }
-        }
-
-        callback({cos, _cos});
-    }
-
     /**
-     * 初始化当前cos ,只做了非空验证
+     * 获取已有key的cos列表
      * @param callback
+     * @returns {Promise<void>}
      */
-    async initCOS(callback) {
-        let data = await storagePromise.get(this.name + '_key');
-        if (data && data.access_key && data.secret_key) {
-            this.cos.init({access_key: data.access_key, secret_key: data.secret_key, service_name: data.service_name});
-            callback && callback(true);
-        } else {
-            callback && callback(false);
+    async getCOS(callback) {
+        let cos_keys = await storagePromise.get(KEY_COS);
+        if (Object.keys(cos_keys).length === 0) {
+            cos_keys = [];
+            for (let item of Object.keys(brand)) {
+                let data = await storagePromise.get(brand[item].key + '_key');
+                if (data && data.access_key && data.secret_key) {
+                    cos_keys.push(Object.assign(data, brand[item]));
+                }
+            }
+            await storagePromise.set(KEY_COS, cos_keys);
         }
+        callback({cos: cos_keys});
     }
 
     /**
@@ -78,7 +81,14 @@ export default class CloudObjectStorage {
      * @param callback
      */
     async saveCosKey(param, callback) {
-        await storagePromise.set(this.name + '_key', param);
+        let cos_keys = await storagePromise.get(KEY_COS);
+        if (Object.keys(cos_keys).length === 0) {
+            cos_keys = [];
+            cos_keys.push(param);
+        } else {
+            cos_keys.push(param);
+        }
+        await storagePromise.set(KEY_COS, cos_keys);
         callback && callback();
     }
 
@@ -86,11 +96,15 @@ export default class CloudObjectStorage {
      * 删除当前cos key信息
      * @param callback
      */
-    cleanCosKey(callback) {
-        storage.remove(this.name + '_key', (error, data) => {
-            if (!error) {
-                callback && callback();
+    async cleanCosKey(callback) {
+        let cos_keys = await storagePromise.get(KEY_COS);
+
+        cos_keys.forEach((item, index) => {
+            if (item.access_key === this.info.access_key) {
+                cos_keys.splice(index);
             }
         });
+        await storagePromise.set(KEY_COS, cos_keys);
+        callback && callback();
     }
 }

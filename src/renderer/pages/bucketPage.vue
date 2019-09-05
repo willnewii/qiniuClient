@@ -70,8 +70,10 @@
 
     .file-list {
         margin-top: 10px;
-        overflow: scroll;
         max-height: 300px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        word-break: break-all;
     }
 </style>
 <style lang="scss">

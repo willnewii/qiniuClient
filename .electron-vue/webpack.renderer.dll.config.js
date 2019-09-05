@@ -10,7 +10,6 @@ const webpack = require('webpack');
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 const srcPath = path.join(__dirname, '../static/dll/');
 const commonExtract = new ExtractTextPlugin('[name].css');
@@ -98,7 +97,6 @@ let rendererConfig = {
             name: '[name]_library',
             context: __dirname // 执行的上下文环境，对之后DllReferencePlugin有用
         }),
-        // new CleanWebpackPlugin([path.join(__dirname, '../static/dll/*.*')], {root: path.join(__dirname, '../')}),
     ],
     output: {
         filename: '[name].js',

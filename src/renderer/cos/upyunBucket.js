@@ -1,4 +1,5 @@
 const fs = require('fs');
+import brand from '@/cos/brand';
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 
@@ -17,6 +18,9 @@ class Bucket extends baseBucket {
         this.getResources();
     }
 
+    /**
+     * 又拍云没有获取绑定域名的api,只能手动设置
+     */
     getDomains() {
         let customeDomains = this.vm.customeDomains;
         if (customeDomains && customeDomains[this.name]) {
@@ -33,13 +37,10 @@ class Bucket extends baseBucket {
         });
     }
 
-    async removeFile(item, callback) {
-        let keys = [];
-        for (let file of item) {
-            keys.push(file.key);
+    async removeFile(items, callback) {
+        for (let file of items) {
+            await this.cos.deleteFile(file.key);
         }
-        const result = await this.cos.deleteMulti(keys);
-        console.log(result);
         callback && callback();
     }
 
@@ -70,7 +71,7 @@ class Bucket extends baseBucket {
             data.files.forEach((item) => {
                 if (parseInt(item.Size) !== 0) {
                     item.remotePath = option.keyword;
-                    files.push(util.convertMeta(item, 4));
+                    files.push(util.convertMeta(item, brand.upyun.key));
                 }
             });
 

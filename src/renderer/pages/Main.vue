@@ -4,7 +4,7 @@
             <div class="layout-menu">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
-                    <span>{{menuState ? cos.name + '云存储' : ''}}</span>
+                    <span>{{menuState ? cos.name : ''}}</span>
                 </i-button>
                 <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
@@ -40,9 +40,10 @@
         </div>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
-               :mask-closable="false">
+               :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
+                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="item in coss"
+                      :key="item.access_key">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
@@ -156,7 +157,6 @@
          */
         created: function () {
             this.checkVersion();
-            this.initCOS();
 
             EventBus.$on(Constants.Event.statusview, (option) => {
                 this.status = Object.assign(this.status, option);
@@ -172,6 +172,13 @@
                     console.timeEnd(option.flag);
                 }
             });
+
+            let cos = this.$route.params.cos;
+            if (cos) {
+                this.selectCOS(cos);
+            } else {
+                this.initCOS();
+            }
         },
         methods: {
             ...mapActions([
@@ -179,13 +186,13 @@
                 types.setup.a_recentname,
             ]),
             initCOS() {
-                this.$storage.getCOS(({cos, _cos}) => {
-                    if (_cos.length === 0) {
+                this.$storage.getCOS(({cos}) => {
+                    if (cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (_cos.length === 1) {
-                        this.selectCOS(_cos[0]);
+                    } else if (cos.length === 1) {
+                        this.selectCOS(cos[0]);
                     } else {
-                        this.coss = _cos;
+                        this.coss = cos;
                         this.cosChoiceModel = true;
                     }
                 });
@@ -198,8 +205,8 @@
 
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos = item;
-                this.$storage.setName(item.key);
-                this.$storage.initCOS((result) => {
+                this.$storage.setBrand(item.key);
+                this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
                         this.getBuckets();
@@ -254,8 +261,8 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS(({_cos}) => {
-                            this.coss = _cos;
+                        this.$storage.getCOS(({cos}) => {
+                            this.coss = cos;
                             this.cosChoiceModel = true;
                         });
                         break;

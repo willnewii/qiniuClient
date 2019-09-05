@@ -87,7 +87,7 @@
             let app = await storagePromise.get(Constants.Key.configuration);
             console.log(app);
             if (app && app.brand && app.bucket_name) {
-                this.$storage.setName(app.brand);
+                this.$storage.setBrand(app.brand);
                 this.$storage.initCOS((result) => {
                     if (result) {
                         ipc.send(Constants.Listener.setBrand, {

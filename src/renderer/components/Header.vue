@@ -1,11 +1,11 @@
 <template>
     <div class="layout-header">
         <div class="full">
-            <Select style="width:250px" v-model="bucket.domain"
+            <Select class="input no-drag" v-model="bucket.domain"
                     v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
-            <Input style="width:250px" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
+            <Input class="input no-drag" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
                    :placeholder="domainPlaceholder" @on-blur="saveDomain" placeholder="自定义域名" error="链接不合法"/>
         </div>
 
@@ -66,7 +66,7 @@
             </DropdownMenu>
         </Dropdown>
 
-        <Input class="input-search" v-model="search" placeholder="搜索" icon="md-close-circle"
+        <Input class="input-search no-drag" v-model="search" placeholder="搜索" icon="md-close-circle"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
 
@@ -226,6 +226,9 @@
         .full {
             flex-grow: 1;
             margin-left: 16px;
+            .input {
+                width: 250px;
+            }
         }
 
         .input-search {

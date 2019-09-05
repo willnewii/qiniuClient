@@ -1,4 +1,6 @@
-<style scoped>
+<style lang="scss" scoped>
+    @import "../style/params";
+
     .layout {
         padding: 20%;
     }
@@ -8,10 +10,33 @@
         text-align: center;
         padding: 10px;
     }
+
+    .item {
+        padding: 5px 10px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .name {
+            font-size: 14px;
+            margin-left: 20px;
+        }
+
+        &:nth-child(2n) {
+            background-color: $bg-item-selected;
+        }
+    }
 </style>
 <template>
-    <div class="layout">
-        <Tabs type="card" @on-click="onTabClick">
+    <div class="layout drag">
+        <Tabs class="no-drag" type="card" @on-click="onTabClick">
+            <TabPane v-show="this.cos && this.cos.length > 0" name="已登录" label="已登录">
+                <div class="item" v-for="(item,index) in this.cos" @click="openCos(item)">
+                    <span :class="`iconfont icon-${item.key}`" style="font-size: 20px"></span>
+                    <span class="name">{{item.name}}</span>
+                    <span class="name">{{item.access_key.substr(0,5)}}</span>
+                </div>
+            </TabPane>
             <TabPane v-for="(item,index) in brands" :key="index" :name="index+''"
                      :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
@@ -85,7 +110,8 @@
                     region: [{required: false, message: 'region不能为空', trigger: 'blur'}],
                     service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
                 },
-                brands: []
+                brands: [],
+                cos: []
             };
         },
         computed: {},
@@ -93,11 +119,16 @@
             Object.keys(brand).forEach((item) => {
                 this.brands.push(brand[item]);
             });
+            this.$storage.getCOS(({cos}) => {
+                this.cos = cos;
+            });
         },
         methods: {
             onTabClick(index) {
-                this.selectBrand = this.brands[index];
-                this.handleReset(this.selectBrand.key);
+                if (index !== '已登录') {
+                    this.selectBrand = this.brands[index];
+                    this.handleReset(this.selectBrand.key);
+                }
             },
             handleSubmit(key) {
                 if (key !== this.brands[4].key) {
@@ -115,7 +146,7 @@
                 this.$refs[key][0].resetFields();
             },
             validateKey(form) {
-                this.$storage.setName(this.selectBrand.key);
+                this.$storage.setBrand(this.selectBrand.key);
                 this.$storage.cos.init({
                     access_key: form.access_key,
                     secret_key: form.secret_key,
@@ -132,6 +163,8 @@
                         });
                     } else {
                         this.$storage.saveCosKey({
+                            key: this.selectBrand.key,
+                            name: this.selectBrand.name,
                             access_key: form.access_key,
                             secret_key: form.secret_key,
                             region: form.region,
@@ -141,6 +174,10 @@
                         });
                     }
                 });
+            },
+            openCos(item) {
+
+                this.$router.push({name: Constants.PageName.main, params: {cos: item}});
             },
             openBrowser(url) {
                 this.$electron.shell.openExternal(url);

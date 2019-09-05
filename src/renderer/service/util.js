@@ -1,4 +1,5 @@
 import * as Constants from '../service/constants';
+import brand from '@/cos/brand';
 import pkg from '../../../package';
 import dayjs from 'dayjs';
 
@@ -177,35 +178,35 @@ export function sequence(file1, file2) {
 /**
  * 转换个平台Object数据信息至统一格式
  * @param item
- * @param platformType 0:qiniu 1:tencent 2:qing 3:ali
+ * @param brandKey
  * @returns {{key: *, fsize: number, putTime: number, mimeType: string},ETag:String}
  */
-export function convertMeta(item, platformType = 0) {
-    switch (platformType) {
-        case 0:
+export function convertMeta(item, brandKey = 'qiniu') {
+    switch (brandKey) {
+        case brand.qiniu.key://qiniu
             item.putTime = item.putTime / 10000;
             item.ETag = item.hash;
             break;
-        case 1:
+        case brand.tencent.key:
             item.key = item.Key;
             item.fsize = parseInt(item.Size);
             item.putTime = new Date(item.LastModified).getTime();
             item.mimeType = mime.lookup(item.key) || '';
             break;
-        case 2:
+        case brand.qingstor.key:
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.modified * 1000).getTime();
             item.mimeType = mime.lookup(item.key) || '';
             item.ETag = item.etag;
             break;
-        case 3:
+        case brand.aliyun.key:
             item.key = item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.lastModified).getTime();
             item.mimeType = mime.lookup(item.name) || '';
             item.ETag = item.etag;
             break;
-        case 4:
+        case brand.upyun.key:
             item.key = (item.remotePath && item.remotePath !== '/') ? item.remotePath + '/' + item.name : item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.time).getTime();
