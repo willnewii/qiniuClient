@@ -20,7 +20,7 @@
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
-                        <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
+                        <Menu-item v-for="(item,index) of menus " :index="index" :key="item.name" :name="item.name">
                             <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
                             <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
@@ -42,8 +42,8 @@
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
                :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="item in coss"
-                      :key="item.access_key">
+                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="(item,index) in coss"
+                      :key="index">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
@@ -93,6 +93,8 @@
     import pkg from '../../../package.json';
 
     import {Constants, mixins, EventBus, util} from '../service/index';
+
+    let isCosFirst = true;
 
     export default {
         mixins: [mixins.base],
@@ -147,7 +149,7 @@
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
                 privatebucket: types.setup.privatebucket,
-                setup_recentname: types.setup.recentname,
+                recent: types.setup.recent,
             }),
         },
         /**
@@ -178,26 +180,36 @@
                 this.selectCOS(cos);
             } else {
                 this.initCOS();
-            }
+            }push
         },
         methods: {
             ...mapActions([
                 types.app.a_buckets_info,
-                types.setup.a_recentname,
+                types.setup.a_recent,
             ]),
             initCOS() {
                 this.$storage.getCOS(({cos}) => {
                     if (cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (cos.length === 1) {
-                        this.selectCOS(cos[0]);
                     } else {
-                        this.coss = cos;
-                        this.cosChoiceModel = true;
+                        let temp = null;
+                        cos.forEach((item) => {
+                            if (item.uuid === this.recent.uuid) {
+                                temp = item;
+                            }
+                        });
+                        if (temp) {
+                            this.selectCOS(temp, this.recent.bucket);
+                        } else if (cos.length === 1) {
+                            this.selectCOS(cos[0]);
+                        } else {
+                            this.coss = cos;
+                            this.cosChoiceModel = true;
+                        }
                     }
                 });
             },
-            selectCOS(item) {
+            selectCOS(item, bucketname) {
                 if (item === undefined) {
                     this.$router.push({path: Constants.PageName.login});
                     return;
@@ -209,13 +221,13 @@
                 this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
-                        this.getBuckets();
+                        this.getBuckets(bucketname);
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
-            getBuckets() {
+            getBuckets(bucketname) {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
                         util.notification({
@@ -227,13 +239,13 @@
 
                         data.datas.forEach((item, index) => {
                             data.datas[index].permission = 0;
-                            if (this.setup_recentname === item.name) {
+                            //TODO: recent
+                            if (bucketname === item.name) {
                                 defaultIndex = index;
                             }
                         });
                         this[types.app.a_buckets_info](data.datas);
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
-
                         //登录成功,登录检测
                     }
                 });
@@ -255,9 +267,17 @@
                     default:
                         this.bucketName = name;
                         this.$nextTick(() => {
-                            this.$refs['menu'] && this.$refs['menu'].updateActiveName(name);
+                            this.$refs['menu'].currentActiveName = name;
+                            this.$refs['menu'].updateActiveName();
+                            if (isCosFirst) {
+                                this.$refs['bucketPage'].initBucket(name);
+                                isCosFirst = false;
+                            }
                         });
-                        this[types.setup.a_recentname](name);
+                        this[types.setup.a_recent]({
+                            uuid: this.cos.uuid,
+                            bucket: name
+                        });
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:

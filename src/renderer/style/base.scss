@@ -82,13 +82,13 @@ body {
 //自定义scrollbar 效果不好
 ::-webkit-scrollbar {
   width: 2px;
-  background-color: #F5F5F5;
+  background-color: $bg-resource;
 }
 
 /*定义滚动条轨道 内阴影+圆角*/
 ::-webkit-scrollbar-track {
   //border-radius: 3px;
-  background-color: #F5F5F5;
+  background-color: $bg-resource;
 }
 
 /*定义滑块 内阴影+圆角*/

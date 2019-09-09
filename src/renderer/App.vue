@@ -24,12 +24,12 @@
                     return '100%';
             }
         },
-        created: function () {
+        created: async function () {
             /*if (process.platform !== 'darwin') {
                 document.getElementById('title').remove();
             }*/
 
-            this[types.setup.init](() => {
+            await this[types.setup.init](() => {
                 if (this.setup_theme === 'auto') {
                     this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
                         util.loadTheme(arg ? 'dark' : 'light');

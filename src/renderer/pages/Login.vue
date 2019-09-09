@@ -25,6 +25,10 @@
         &:nth-child(2n) {
             background-color: $bg-item-selected;
         }
+
+        &:hover {
+            background: rgba(28, 36, 56, 0.20);
+        }
     }
 </style>
 <template>
@@ -43,6 +47,9 @@
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
 
                     <template v-if="item.key !== brands[4].key">
+                        <Form-item label="别名" prop="name">
+                            <Input v-model="formItem.name" placeholder="别名"/>
+                        </Form-item>
                         <Form-item label="ACCESS_KEY" prop="access_key">
                             <Input v-model="formItem.access_key" placeholder="请填入你的ACCESS_KEY"/>
                         </Form-item>
@@ -51,6 +58,9 @@
                         </Form-item>
                     </template>
                     <template v-else>
+                        <Form-item label="别名" prop="name">
+                            <Input v-model="formItem.name" placeholder="别名"/>
+                        </Form-item>
                         <Form-item label="服务名称" prop="service_name">
                             <Input v-model="formItem.service_name" placeholder="请填入服务名称"/>
                         </Form-item>
@@ -102,7 +112,8 @@
                     service_name: '',
                     access_key: '',
                     secret_key: '',
-                    region: ''
+                    region: '',
+                    name: '',
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
@@ -144,6 +155,7 @@
             },
             handleReset(key) {
                 this.$refs[key][0].resetFields();
+                this.$refs[key][0].model.name = this.selectBrand.name;
             },
             validateKey(form) {
                 this.$storage.setBrand(this.selectBrand.key);
@@ -153,7 +165,6 @@
                     region: form.region,
                     service_name: form.service_name
                 });
-
                 //验证key&secret
                 this.$storage.getBuckets((error, result) => {
                     if (error) {
@@ -164,7 +175,7 @@
                     } else {
                         this.$storage.saveCosKey({
                             key: this.selectBrand.key,
-                            name: this.selectBrand.name,
+                            name: form.name,
                             access_key: form.access_key,
                             secret_key: form.secret_key,
                             region: form.region,
