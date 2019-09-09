@@ -199,7 +199,6 @@ export default {
             return ('theme' in state.setup) ? state.setup.theme : 'auto';
         },
         [types.setup.recent](state) {
-            console.log('recent' in state.setup);
             return ('recent' in state.setup) ? state.setup.recent : {};
         }
     }

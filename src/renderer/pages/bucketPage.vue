@@ -284,8 +284,10 @@
              * 初始化空间信息
              */
             initBucket(bucketName) {
-                this.bucket = this.$storage.cos.generateBucket(bucketName);
-                this.bucket.bindPage(this);
+                if (this.$storage.cos) {
+                    this.bucket = this.$storage.cos.generateBucket(bucketName);
+                    this.bucket.bindPage(this);
+                }
             },
             /**
              * 获取指定前缀文件列表

@@ -35,7 +35,9 @@
                 </div>
             </div>
             <div class="layout-content">
-                <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                <keep-alive>
+                    <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                </keep-alive>
             </div>
         </div>
         <!-- cos选择框-->
@@ -168,11 +170,11 @@
             });
             EventBus.$on(Constants.Event.loading, (option) => {
                 this.loading = Object.assign(this.loading, option);
-                if (this.loading.show) {
+                /*if (this.loading.show) {
                     console.time(option.flag);
                 } else {
                     console.timeEnd(option.flag);
-                }
+                }*/
             });
 
             let cos = this.$route.params.cos;
@@ -180,7 +182,7 @@
                 this.selectCOS(cos);
             } else {
                 this.initCOS();
-            }push
+            }
         },
         methods: {
             ...mapActions([
