@@ -22,6 +22,10 @@
             margin-left: 20px;
         }
 
+        .long {
+            flex-grow: 1;
+        }
+
         &:nth-child(2n) {
             background-color: $bg-item-selected;
         }
@@ -35,10 +39,10 @@
     <div class="layout drag">
         <Tabs class="no-drag" type="card" @on-click="onTabClick">
             <TabPane v-show="this.cos && this.cos.length > 0" name="已登录" label="已登录">
-                <div class="item" v-for="(item,index) in this.cos" @click="openCos(item)">
+                <div class="item" v-for="(item,index) in this.cos" @click="openCOS(item)">
                     <span :class="`iconfont icon-${item.key}`" style="font-size: 20px"></span>
-                    <span class="name">{{item.name}}</span>
-                    <span class="name">{{item.access_key.substr(0,5)}}</span>
+                    <span class="name long">{{item.name}}</span>
+                    <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)"/>
                 </div>
             </TabPane>
             <TabPane v-for="(item,index) in brands" :key="index" :name="index+''"
@@ -130,9 +134,7 @@
             Object.keys(brand).forEach((item) => {
                 this.brands.push(brand[item]);
             });
-            this.$storage.getCOS(({cos}) => {
-                this.cos = cos;
-            });
+            this.getCOS();
         },
         methods: {
             onTabClick(index) {
@@ -158,14 +160,17 @@
                 this.$refs[key][0].model.name = this.selectBrand.name;
             },
             validateKey(form) {
-                this.$storage.setBrand(this.selectBrand.key);
-                this.$storage.cos.init({
+                let item = {
+                    key: this.selectBrand.key,
+                    name: form.name,
                     access_key: form.access_key,
                     secret_key: form.secret_key,
                     region: form.region,
                     service_name: form.service_name
-                });
-                //验证key&secret
+                };
+
+                this.$storage.setBrand(this.selectBrand.key);
+                this.$storage.cos.init(item);
                 this.$storage.getBuckets((error, result) => {
                     if (error) {
                         util.notification({
@@ -173,22 +178,24 @@
                             body: error.message
                         });
                     } else {
-                        this.$storage.saveCosKey({
-                            key: this.selectBrand.key,
-                            name: form.name,
-                            access_key: form.access_key,
-                            secret_key: form.secret_key,
-                            region: form.region,
-                            service_name: form.service_name
-                        }, () => {
-                            this.$router.push({name: Constants.PageName.main});
+                        this.$storage.saveCosKey(item, () => {
+                            this.openCOS(item);
                         });
                     }
                 });
             },
-            openCos(item) {
-
+            openCOS(item) {
                 this.$router.push({name: Constants.PageName.main, params: {cos: item}});
+            },
+            removeCOS(item) {
+                this.$storage.cleanCosKey(item, () => {
+                    this.getCOS();
+                });
+            },
+            getCOS() {
+                this.$storage.getCOS(({cos}) => {
+                    this.cos = cos;
+                });
             },
             openBrowser(url) {
                 this.$electron.shell.openExternal(url);

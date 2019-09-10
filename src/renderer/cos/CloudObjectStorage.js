@@ -1,4 +1,5 @@
 import * as storagePromise from '../service/storagePromise';
+
 const uuid = require('uuid/v1');
 
 import * as qiniu from '../cos/qiniu';
@@ -14,11 +15,17 @@ const KEY_COS = 'cos_keys';
 export default class CloudObjectStorage {
     constructor() {
         //存储选择的cos信息
-        this.info = null ;
+        this.info = null;
+
+        Object.defineProperty(this, "name", {
+            get: function () {
+                return this.info.name;
+            },
+        });
     }
 
-    setBrand(brandName) {
-        switch (brandName) {
+    setBrand(key) {
+        switch (key) {
             case brand.qiniu.key:
                 this.cos = qiniu;
                 break;
@@ -35,7 +42,6 @@ export default class CloudObjectStorage {
                 this.cos = upyun;
                 break;
         }
-        this.brandName = brandName;
     }
 
     /**
@@ -82,17 +88,17 @@ export default class CloudObjectStorage {
 
     /**
      * 保存当前cos key信息
-     * @param param
+     * @param item
      * @param callback
      */
-    async saveCosKey(param, callback) {
-        param.uuid = uuid();
+    async saveCosKey(item, callback) {
+        item.uuid = uuid();
         let cos_keys = await storagePromise.get(KEY_COS);
         if (Object.keys(cos_keys).length === 0) {
             cos_keys = [];
-            cos_keys.push(param);
+            cos_keys.push(item);
         } else {
-            cos_keys.push(param);
+            cos_keys.push(item);
         }
         await storagePromise.set(KEY_COS, cos_keys);
         callback && callback();
@@ -100,13 +106,14 @@ export default class CloudObjectStorage {
 
     /**
      * 删除当前cos key信息
+     * @param item
      * @param callback
      */
-    async cleanCosKey(callback) {
+    async cleanCosKey(item, callback) {
         let cos_keys = await storagePromise.get(KEY_COS);
 
-        cos_keys.forEach((item, index) => {
-            if (item.access_key === this.info.access_key) {
+        cos_keys.forEach((_item, index) => {
+            if (_item.uuid === item.uuid) {
                 cos_keys.splice(index);
             }
         });

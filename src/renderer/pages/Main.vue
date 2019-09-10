@@ -77,10 +77,7 @@
             </div>
         </Modal>
         <!-- 上传/下载进度提示框-->
-        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
-            <div>{{status.message}}</div>
-            <div>{{status.path}}</div>
-        </div>
+        <status-view></status-view>
         <!-- 文件拖拽提示框-->
         <div class="drop-view" v-if="drop.show">
             <div class="drop-sub">
@@ -93,6 +90,7 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
+    import StatusView from '@/components/StatusView';
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
@@ -100,6 +98,7 @@
 
     export default {
         mixins: [mixins.base],
+        components: {StatusView},
         data() {
             return {
                 coss: [],//已登录的cos列表
@@ -127,11 +126,6 @@
                     icon: 'md-exit',
                     title: '注销'
                 }],
-                status: {
-                    show: false,
-                    path: '',
-                    message: '',
-                },
                 loading: {
                     show: false,
                     message: '',
@@ -162,9 +156,7 @@
         created: function () {
             this.checkVersion();
 
-            EventBus.$on(Constants.Event.statusview, (option) => {
-                this.status = Object.assign(this.status, option);
-            });
+
             EventBus.$on(Constants.Event.dropview, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
@@ -308,7 +300,7 @@
                                 ]);
                             },
                             onOk: () => {
-                                this.$storage.cleanCosKey(() => {
+                                this.$storage.cleanCosKey(this.$storage.info, () => {
                                     this.$router.push({path: Constants.PageName.login});
                                 });
                             }
@@ -418,26 +410,6 @@
                 margin-top: 5px;
             }
         }
-    }
-
-    .status-view {
-        opacity: 1;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        left: 0;
-        text-align: left;
-        background-color: rgba(0, 0, 0, 0.51);
-        color: #FFFFFF;
-        padding: 10px;
-        font-size: 12px;
-        z-index: 901;
-        transition: opacity 1s;
-    }
-
-    .status-view-none {
-        opacity: 0;
-        transition: opacity .5s;
     }
 
     .drop-view {
