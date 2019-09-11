@@ -9,6 +9,7 @@ module.exports = {
             'vue-lazyload',
             'vue-electron',
             'iview',
+            'uuid',
             'v-viewer',
             'vue-virtual-scroll-list',
             'v-contextmenu/src/directive',
@@ -25,6 +26,7 @@ module.exports = {
             'qingstor-sdk',
             'ali-oss',
             'upyun',
+            'aws-sdk'
         ]
     }
 };

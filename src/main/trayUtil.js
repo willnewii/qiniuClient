@@ -64,7 +64,9 @@ const createTrayWindow = () => {
             // Prevents renderer process code from not running when window is
             // hidden
             webSecurity: false,
-            backgroundThrottling: false
+            backgroundThrottling: false,
+            devTools: false,
+            nodeIntegration: true
         }
     });
 

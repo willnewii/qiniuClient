@@ -4,7 +4,6 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const fs = require('fs');
-const {dependencies} = require('../package.json');
 const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 

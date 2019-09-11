@@ -19,9 +19,17 @@ export default class PasteImageService {
 
   init() {
     document.addEventListener("paste", this.handlerParse.bind(this));
+    this.enable = true ;
+  }
+
+  setEnable(enable = false){
+    this.enable = enable ;
   }
 
   async handlerParse(event) {
+    if (!this.enable)
+      return;
+
     const fileList = Array.from(event.clipboardData.items)
       .map(o => {
         if (!/image\/.*/.test(o.type)) {

@@ -8,6 +8,7 @@ $barPadding: 0;
 
 .ivu-loading-bar {
   top: $barPadding;
+
   .ivu-loading-bar-inner {
     height: 3px !important;
   }
@@ -35,6 +36,7 @@ $barPadding: 0;
 
 .ivu-card {
   background-color: transparent;
+
   &:hover {
     background-color: $bg-card-hover;
     box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
@@ -57,6 +59,7 @@ $barPadding: 0;
 
 .ivu-modal-content {
   user-select: text;
+
   .ivu-modal-confirm-head-title, .ivu-modal-header-inner {
     color: $fontColor;
   }

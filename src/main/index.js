@@ -1,7 +1,8 @@
 'use strict';
 
 import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
-import EAU from 'electron-asar-hot-updater';
+const storage = require('electron-json-storage');
+// import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
 const fs = require('fs-extra');
@@ -42,7 +43,7 @@ function initApp() {
     //创建主窗口
     createMainWindow();
     //托盘处理
-    util.isMac() && trayUtil.createTray(mainWindow.id);
+    // util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
 
@@ -57,13 +58,15 @@ function createMainWindow() {
         titleBarStyle: 'hidden',
         webPreferences: {
             webSecurity: false,
+            nodeIntegration: true
         }
     });
 
     mainWindow.loadURL(util.mainURL);
 
     mainWindow.on('closed', () => {
-        mainWindow = null;
+        // mainWindow = null;
+        app.quit();
     });
 
     /*try {
@@ -176,7 +179,7 @@ const registerIPC = function () {
 
 
 /**
- * 检测更新asar
+ * 检测更新asar(未调用)
  */
 function updateAsar() {
 
@@ -235,7 +238,7 @@ const getMenuData = function () {
             ]
         },
         {
-            label: '视图',
+            label: '设置',
             submenu: [
                 {
                     label: '重新加载',
@@ -245,7 +248,13 @@ const getMenuData = function () {
                         }
                     }
                 },
-                {role: 'forcereload'},
+                {
+                    label: '设置目录',
+                    click() {
+                        shell.showItemInFolder(storage.getDefaultDataPath());
+                    }
+                },
+                // {role: 'forcereload'},
                 {role: 'toggledevtools', label: '开发者工具'},
                 /*{type: 'separator'},
                 {role: 'resetzoom'},
@@ -295,7 +304,8 @@ const getMenuData = function () {
                     title: '关于',
                     webPreferences: {
                         webSecurity: false,
-                        backgroundThrottling: false
+                        backgroundThrottling: false,
+                        nodeIntegration: true
                     }
                 });
                 aboutWindow.loadURL(util.mainURL + '#/about');
@@ -322,7 +332,6 @@ const getMenuData = function () {
             ]
         });
 
-        // Window menu
         template[3].submenu = [
             {role: 'close'},
             {role: 'minimize', label: '最小化'},

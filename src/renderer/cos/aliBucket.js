@@ -1,6 +1,7 @@
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import Client from 'ali-oss/lib/client';
+import brand from '@/cos/brand';
 
 class Bucket extends baseBucket {
 
@@ -88,7 +89,7 @@ class Bucket extends baseBucket {
             let files = [];
             data.objects.forEach((item) => {
                 if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, 3));
+                    files.push(util.convertMeta(item, brand.aliyun.key));
                 }
             });
 

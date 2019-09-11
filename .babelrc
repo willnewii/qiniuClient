@@ -9,7 +9,7 @@
                 {
                     "modules": false,
                     "targets": {
-                        "node": 7
+                        "Node": "12.4.0"
                     }
                 }
             ]
@@ -21,11 +21,10 @@
                     {
                         "modules": false,
                         "targets": {
-                            "electron": "3.0.4"
+                            "Electron": "6.0.7"
                         }
                     }
-                ],
-                "stage-0"
+                ]
             ]
         }
     },

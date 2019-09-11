@@ -83,13 +83,12 @@ class Bucket extends baseBucket {
      * 尝试获取 标准或低频空间的最近一天的文件数量统计
      * @param callback
      */
-    getTotal(callback) {
-        super.getResources();
+    async getTotal(callback) {
         const formatStr = 'YYYYMMDD000000';
         let day = dayjs();
         let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
 
-        let request1 = new Request();
+       /* let request1 = new Request();
         let url1 = `${qiniu.methods.count}${param}`;
 
         let request2 = new Request();
@@ -99,9 +98,16 @@ class Bucket extends baseBucket {
         let url3 = `${qiniu.methods.space}${param}`;
 
         let request4 = new Request();
-        let url4 = `${qiniu.methods.space_line}${param}`;
+        let url4 = `${qiniu.methods.space_line}${param}`;*/
 
-        Promise.all([request1.get(url1), request2.get(url2), request3.get(url3), request4.get(url4)]).then((result) => {
+        let requests = [];
+        for (let url of [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line]) {
+            let request = new Request();
+            requests.push(request.get(`${url}${param}`));
+        }
+
+        //[request1.get(url1), request2.get(url2), request3.get(url3), request4.get(url4)]
+        Promise.all(requests).then((result) => {
             callback && callback({
                 count: result[0].datas[0] || result[1].datas[0],
                 space: result[2].datas[0] || result[3].datas[0]
@@ -146,7 +152,7 @@ class Bucket extends baseBucket {
 
             let data = respInfo.data;
             data.items.forEach((item, index) => {
-                data.items[index] = util.convertMeta(item, 0);
+                data.items[index] = util.convertMeta(item, brand.qiniu.key);
             });
             //commonPrefixes 文件夹
             data.commonPrefixes && data.commonPrefixes.forEach((item, index) => {

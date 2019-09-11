@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 import {util} from '../service/index';
+import brand from '@/cos/brand';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
 
@@ -123,7 +124,7 @@ class Bucket extends baseBucket {
                 let files = [];
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
-                        files.push(util.convertMeta(item, 1));
+                        files.push(util.convertMeta(item, brand.tencent.key));
                     }
                 });
 

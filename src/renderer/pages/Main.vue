@@ -4,7 +4,7 @@
             <div class="layout-menu">
                 <i-button type="text" class="navicon_btn" @click="toggleMenu">
                     <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
-                    <span>{{menuState ? cos.name + '云存储' : ''}}</span>
+                    <span>{{menuState ? cos.name : ''}}</span>
                 </i-button>
                 <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
@@ -20,7 +20,7 @@
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
-                        <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
+                        <Menu-item v-for="(item,index) of menus " :index="index" :key="item.name" :name="item.name">
                             <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
                             <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
@@ -35,20 +35,23 @@
                 </div>
             </div>
             <div class="layout-content">
-                <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                <keep-alive>
+                    <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                </keep-alive>
             </div>
         </div>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
-               :mask-closable="false">
+               :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
+                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="(item,index) in coss"
+                      :key="index">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 5">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px">
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
@@ -74,12 +77,9 @@
             </div>
         </Modal>
         <!-- 上传/下载进度提示框-->
-        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
-            <div>{{status.message}}</div>
-            <div>{{status.path}}</div>
-        </div>
+        <status-view></status-view>
         <!-- 文件拖拽提示框-->
-        <div class="drop-view" v-if="drop.show">
+        <div class="drop-view" v-show="drop.show">
             <div class="drop-sub">
                 <span>{{drop.message}}</span>
             </div>
@@ -90,11 +90,16 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
+    import StatusView from '@/components/StatusView';
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
+    //cos切换时强制刷新的标记位
+    let isCosFirst = false;
+
     export default {
         mixins: [mixins.base],
+        components: {StatusView},
         data() {
             return {
                 coss: [],//已登录的cos列表
@@ -122,11 +127,6 @@
                     icon: 'md-exit',
                     title: '注销'
                 }],
-                status: {
-                    show: false,
-                    path: '',
-                    message: '',
-                },
                 loading: {
                     show: false,
                     message: '',
@@ -146,7 +146,7 @@
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
                 privatebucket: types.setup.privatebucket,
-                setup_recentname: types.setup.recentname,
+                recent: types.setup.recent,
             }),
         },
         /**
@@ -156,41 +156,55 @@
          */
         created: function () {
             this.checkVersion();
-            this.initCOS();
 
-            EventBus.$on(Constants.Event.statusview, (option) => {
-                this.status = Object.assign(this.status, option);
-            });
+
             EventBus.$on(Constants.Event.dropview, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {
                 this.loading = Object.assign(this.loading, option);
-                if (this.loading.show) {
+                /*if (this.loading.show) {
                     console.time(option.flag);
                 } else {
                     console.timeEnd(option.flag);
-                }
+                }*/
             });
+
+            let cos = this.$route.params.cos;
+            if (cos) {
+                this.selectCOS(cos);
+            } else {
+                this.initCOS();
+            }
         },
         methods: {
             ...mapActions([
                 types.app.a_buckets_info,
-                types.setup.a_recentname,
+                types.setup.a_recent,
             ]),
             initCOS() {
-                this.$storage.getCOS(({cos, _cos}) => {
-                    if (_cos.length === 0) {
+                this.$storage.getCOS(({cos}) => {
+                    if (cos.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (_cos.length === 1) {
-                        this.selectCOS(_cos[0]);
                     } else {
-                        this.coss = _cos;
-                        this.cosChoiceModel = true;
+                        let temp = null;
+                        cos.forEach((item) => {
+                            if (item.uuid === this.recent.uuid) {
+                                temp = item;
+                            }
+                        });
+                        if (temp) {
+                            this.selectCOS(temp, this.recent.bucket);
+                        } else if (cos.length === 1) {
+                            this.selectCOS(cos[0]);
+                        } else {
+                            this.coss = cos;
+                            this.cosChoiceModel = true;
+                        }
                     }
                 });
             },
-            selectCOS(item) {
+            selectCOS(item, bucketname) {
                 if (item === undefined) {
                     this.$router.push({path: Constants.PageName.login});
                     return;
@@ -198,17 +212,17 @@
 
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos = item;
-                this.$storage.setName(item.key);
-                this.$storage.initCOS((result) => {
+                this.$storage.setBrand(item.key);
+                this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
-                        this.getBuckets();
+                        this.getBuckets(bucketname);
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
-            getBuckets() {
+            getBuckets(bucketname) {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
                         util.notification({
@@ -220,13 +234,12 @@
 
                         data.datas.forEach((item, index) => {
                             data.datas[index].permission = 0;
-                            if (this.setup_recentname === item.name) {
+                            if (bucketname === item.name) {
                                 defaultIndex = index;
                             }
                         });
                         this[types.app.a_buckets_info](data.datas);
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
-
                         //登录成功,登录检测
                     }
                 });
@@ -248,14 +261,22 @@
                     default:
                         this.bucketName = name;
                         this.$nextTick(() => {
-                            this.$refs['menu'] && this.$refs['menu'].updateActiveName(name);
+                            this.$refs['menu'].currentActiveName = name;
+                            this.$refs['menu'].updateActiveName();
+                            if (isCosFirst) {
+                                this.$refs['bucketPage'].initBucket(name);
+                                isCosFirst = false;
+                            }
                         });
-                        this[types.setup.a_recentname](name);
+                        this[types.setup.a_recent]({
+                            uuid: this.cos.uuid,
+                            bucket: name
+                        });
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS(({_cos}) => {
-                            this.coss = _cos;
+                        this.$storage.getCOS(({cos}) => {
+                            this.coss = cos;
                             this.cosChoiceModel = true;
                         });
                         break;
@@ -279,7 +300,7 @@
                                 ]);
                             },
                             onOk: () => {
-                                this.$storage.cleanCosKey(() => {
+                                this.$storage.cleanCosKey(this.$storage.info, () => {
                                     this.$router.push({path: Constants.PageName.login});
                                 });
                             }
@@ -389,26 +410,6 @@
                 margin-top: 5px;
             }
         }
-    }
-
-    .status-view {
-        opacity: 1;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        left: 0;
-        text-align: left;
-        background-color: rgba(0, 0, 0, 0.51);
-        color: #FFFFFF;
-        padding: 10px;
-        font-size: 12px;
-        z-index: 901;
-        transition: opacity 1s;
-    }
-
-    .status-view-none {
-        opacity: 0;
-        transition: opacity .5s;
     }
 
     .drop-view {

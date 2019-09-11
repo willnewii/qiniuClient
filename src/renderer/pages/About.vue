@@ -2,7 +2,10 @@
     <div class="about-view">
         <img class="logo" src="../assets/img/logo.jpg">
         <div class="name">{{info.cnname}}</div>
-        <div>Version. {{info.version}}</div>
+        <div>v {{info.version}}</div>
+        <div>node: {{versions.node}}</div>
+        <div>electron: {{versions.electron}}</div>
+        <div>chrome: {{versions.chrome}}</div>
     </div>
 </template>
 <script>
@@ -14,10 +17,12 @@
         data() {
             return {
                 info: pkg,
+                versions: process.versions
             };
         },
         created() {
             document.getElementById('title') && document.getElementById('title').remove();
+            console.log(process.versions);
         },
         methods: {}
     };
@@ -29,10 +34,12 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
         .logo {
             width: 100px;
             height: 100px;
         }
+
         .name {
             font-weight: bold;
             font-size: 20px;

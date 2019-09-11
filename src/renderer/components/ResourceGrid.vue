@@ -502,6 +502,9 @@
                 &:nth-child(2n) {
                     background-color: $bg-item-selected;
                 }
+                &:hover {
+                    background: rgba(28, 36, 56, 0.20);
+                }
             }
 
             .item-even {

@@ -1,4 +1,4 @@
-import {Constants, EventBus, util} from '../service/index';
+import {Constants, EventBus} from '../service/index';
 import * as types from "@/vuex/mutation-types";
 
 //由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
@@ -8,7 +8,7 @@ let loadCount = 0;
 class baseBucket {
 
     constructor(name, cos) {
-        this.reset();
+        this.init();
 
         name && (this.name = name);
         this.cos = cos;
@@ -17,7 +17,7 @@ class baseBucket {
         this.limit = 1000;
     }
 
-    reset() {
+    init() {
         this.brand = '';                //服务商
         this.space = '';                //空间容量
         this.count = '';               //文件个数

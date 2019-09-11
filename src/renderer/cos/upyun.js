@@ -1,4 +1,4 @@
-import upyun from 'upyun'
+import upyun from 'upyun';
 import upyunBucket from "./upyunBucket";
 
 
@@ -10,19 +10,21 @@ const PROTOCOL = 'http://';
 function init(param) {
     const service = new upyun.Service(param.service_name, param.access_key, param.secret_key,);
     cos = new upyun.Client(service);
-
     service_name = param.service_name;
 }
 
-function getBuckets(callback) {
-    callback && callback(null, {datas: [{name: service_name}]});
-}
-
-function generateUrl(domain, key, deadline) {
+async function getBuckets(callback) {
+    try {
+        let result = await cos.usage('/');
+        console.dir(result);
+        callback && callback(null, {datas: [{name: service_name}]});
+    } catch (e) {
+        callback && callback(e);
+    }
 }
 
 function generateBucket(name) {
     return new upyunBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, generateUrl};
+export {init, getBuckets, generateBucket};

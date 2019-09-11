@@ -28,7 +28,10 @@ export default {
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记
             expiresTime: 3600,                                      //私有空间,过期时间默认1小时
             theme: 'auto',
-            recentname: ''                                          //最近使用的bucketname
+            recent: {                                               //最近使用的bucketname
+                uuid:'',
+                bucket:''
+            }
         }
     },
     mutations: {
@@ -90,8 +93,8 @@ export default {
             state.setup.theme = value;
             setAppSetup(state.setup);
         },
-        [types.setup.recentname](state, value) {
-            state.setup.recentname = value;
+        [types.setup.recent](state, value) {
+            state.setup.recent = value;
             setAppSetup(state.setup);
         },
         [types.setup.init](state, value) {
@@ -138,8 +141,8 @@ export default {
         [types.setup.a_theme](context, value) {
             context.commit(types.setup.theme, value);
         },
-        [types.setup.a_recentname](context, value) {
-            context.commit(types.setup.recentname, value);
+        [types.setup.a_recent](context, value) {
+            context.commit(types.setup.recent, value);
         },
         async [types.setup.init](context, callback) {
             let app = await storagePromise.get(Constants.Key.configuration);
@@ -195,8 +198,8 @@ export default {
         [types.setup.theme](state) {
             return ('theme' in state.setup) ? state.setup.theme : 'auto';
         },
-        [types.setup.recentname](state) {
-            return ('recentname' in state.setup) ? state.setup.recentname : '';
+        [types.setup.recent](state) {
+            return ('recent' in state.setup) ? state.setup.recent : {};
         }
     }
 };

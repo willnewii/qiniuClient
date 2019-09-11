@@ -45,8 +45,8 @@ export const setup = {
     theme: 'theme',
     a_theme: 'a_theme',
 
-    recentname: 'recentname',
-    a_recentname: 'a_recentname',
+    recent: 'recent',
+    a_recent: 'a_recent',
 };
 
 export const app = {
