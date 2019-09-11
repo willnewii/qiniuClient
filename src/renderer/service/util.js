@@ -191,29 +191,33 @@ export function convertMeta(item, brandKey = 'qiniu') {
             item.key = item.Key;
             item.fsize = parseInt(item.Size);
             item.putTime = new Date(item.LastModified).getTime();
-            item.mimeType = mime.lookup(item.key) || '';
             break;
         case brand.qingstor.key:
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.modified * 1000).getTime();
-            item.mimeType = mime.lookup(item.key) || '';
             item.ETag = item.etag;
             break;
         case brand.aliyun.key:
             item.key = item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.lastModified).getTime();
-            item.mimeType = mime.lookup(item.name) || '';
+
             item.ETag = item.etag;
             break;
         case brand.upyun.key:
             item.key = (item.remotePath && item.remotePath !== '/') ? item.remotePath + '/' + item.name : item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.time).getTime();
-            item.mimeType = mime.lookup(item.name) || '';
             item.ETag = item.etag;
             break;
+        case brand.aws.key:
+            item.key = item.Key;
+            item.fsize = parseInt(item.Size);
+            item.putTime = new Date(item.LastModified).getTime();
+            break;
     }
+
+    item.mimeType = mime.lookup(item.key) || '';
 
     return item;
 }

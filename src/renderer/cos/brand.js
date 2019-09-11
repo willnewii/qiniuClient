@@ -19,5 +19,9 @@ export default {
     upyun: {
         key: 'upyun',
         name: '又拍云',
+    },
+    aws: {
+        key: 'aws',
+        name: '亚马逊S3',
     }
 };

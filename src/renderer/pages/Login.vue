@@ -2,13 +2,24 @@
     @import "../style/params";
 
     .layout {
-        padding: 20%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
     }
 
     .title {
         width: 100%;
         text-align: center;
         padding: 10px;
+    }
+
+    .table {
+        width: 60%;
+    }
+
+    .buttons {
+        margin-top: 50px;
     }
 
     .item {
@@ -35,22 +46,25 @@
         }
     }
 </style>
+<style>
+    .ivu-select-dropdown {
+        max-height: 100px;
+    }
+</style>
 <template>
     <div class="layout drag">
-        <Tabs class="no-drag" type="card" @on-click="onTabClick">
-            <TabPane v-show="this.cos && this.cos.length > 0" name="已登录" label="已登录">
+        <Tabs class="no-drag table" type="card" @on-click="onTabClick">
+            <TabPane :disabled="!(this.cos && this.cos.length > 0)" name="已登录" label="已登录">
                 <div class="item" v-for="(item,index) in this.cos" @click="openCOS(item)">
                     <span :class="`iconfont icon-${item.key}`" style="font-size: 20px"></span>
                     <span class="name long">{{item.name}}</span>
                     <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)"/>
                 </div>
             </TabPane>
-            <TabPane v-for="(item,index) in brands" :key="index" :name="index+''"
-                     :label="item.name">
+            <TabPane v-for="(item) in brands" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
-
-                    <template v-if="item.key !== brands[4].key">
+                    <template v-if="item.key !== brands.upyun.key">
                         <Form-item label="别名" prop="name">
                             <Input v-model="formItem.name" placeholder="别名"/>
                         </Form-item>
@@ -59,6 +73,12 @@
                         </Form-item>
                         <Form-item label="SECRET_KEY" prop="secret_key">
                             <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
+                        </Form-item>
+                        <Form-item label="区域" prop="region" v-if="item.key === brands.aws.key">
+                            <Select v-model="formItem.region">
+                                <Option v-for="item in regions" :value="item.region" :key="item.region">{{ item.name }}
+                                </Option>
+                            </Select>
                         </Form-item>
                     </template>
                     <template v-else>
@@ -76,24 +96,26 @@
                         </Form-item>
                     </template>
                     <Form-item>
-                        <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
-                        <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
+                        <div class="buttons">
+                            <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
+                            <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
+                        </div>
                     </Form-item>
                     <div style="margin-left: 150px">＊如何获取密钥信息:登录
-                        <template v-if="item.key === brands[0].key">
+                        <template v-if="item.key === brands.qiniu.key">
                             <a @click="openBrowser('https://portal.qiniu.com/user/key')">{{item.name}}</a>->个人面板->密钥管理
                         </template>
-                        <template v-else-if="item.key === brands[1].key">
+                        <template v-else-if="item.key === brands.tencent.key">
                             <a @click="openBrowser('https://console.cloud.tencent.com/cos5')">{{item.name}}</a>->密钥管理
                         </template>
-                        <template v-else-if="item.key === brands[2].key">
+                        <template v-else-if="item.key === brands.qingstor.key">
                             <a @click="openBrowser('https://console.qingcloud.com/')">{{item.name}}</a>->头像->API密钥
                         </template>
-                        <template v-else-if="item.key === brands[3].key">
+                        <template v-else-if="item.key === brands.aliyun.key">
                             <a @click="openBrowser('https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
                             Key
                         </template>
-                        <template v-else-if="item.key === brands[4].key">
+                        <template v-else-if="item.key === brands.upyun.key">
                             <a @click="openBrowser('https://console.upyun.com/dashboard/')">{{item.name}}</a>->Access
                             Key
                         </template>
@@ -106,6 +128,7 @@
 <script>
     import {Constants, mixins, util} from '../service';
     import brand from '@/cos/brand';
+    import Regions from '@/cos/Regions';
 
     export default {
         mixins: [mixins.base],
@@ -122,29 +145,30 @@
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
-                    region: [{required: false, message: 'region不能为空', trigger: 'blur'}],
+                    region: [{required: true, message: 'region不能为空', trigger: 'blur'}],
                     service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
                 },
-                brands: [],
-                cos: []
+                brands: brand,
+                cos: [],
+                regions: [],
             };
         },
         computed: {},
         created: function () {
-            Object.keys(brand).forEach((item) => {
-                this.brands.push(brand[item]);
-            });
             this.getCOS();
         },
         methods: {
-            onTabClick(index) {
-                if (index !== '已登录') {
-                    this.selectBrand = this.brands[index];
+            onTabClick(key) {
+                if (key !== '已登录') {
+                    this.selectBrand = this.brands[key];
                     this.handleReset(this.selectBrand.key);
+                }
+                if (key === this.brands.aws.key) {
+                    this.regions = Regions.s3;
                 }
             },
             handleSubmit(key) {
-                if (key !== this.brands[4].key) {
+                if (key !== brand.upyun.key) {
                     this.formItem.service_name = '-';
                 }
                 this.$refs[key][0].validate((valid) => {
@@ -158,6 +182,7 @@
             handleReset(key) {
                 this.$refs[key][0].resetFields();
                 this.$refs[key][0].model.name = this.selectBrand.name;
+                this.$refs[key][0].model.region = '';
             },
             validateKey(form) {
                 let item = {

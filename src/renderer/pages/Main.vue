@@ -79,7 +79,7 @@
         <!-- 上传/下载进度提示框-->
         <status-view></status-view>
         <!-- 文件拖拽提示框-->
-        <div class="drop-view" v-if="drop.show">
+        <div class="drop-view" v-show="drop.show">
             <div class="drop-sub">
                 <span>{{drop.message}}</span>
             </div>
@@ -94,7 +94,8 @@
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
-    let isCosFirst = true;
+    //cos切换时强制刷新的标记位
+    let isCosFirst = false;
 
     export default {
         mixins: [mixins.base],
@@ -233,7 +234,6 @@
 
                         data.datas.forEach((item, index) => {
                             data.datas[index].permission = 0;
-                            //TODO: recent
                             if (bucketname === item.name) {
                                 defaultIndex = index;
                             }

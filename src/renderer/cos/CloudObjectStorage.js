@@ -7,6 +7,7 @@ import * as tencent from '../cos/tencent';
 import * as qing from '../cos/qing';
 import * as ali from '../cos/ali';
 import * as upyun from '../cos/upyun';
+import * as aws from '../cos/aws';
 
 import brand from '../cos/brand';
 
@@ -40,6 +41,9 @@ export default class CloudObjectStorage {
                 break;
             case brand.upyun.key:
                 this.cos = upyun;
+                break;
+            case brand.aws.key:
+                this.cos = aws;
                 break;
         }
     }
