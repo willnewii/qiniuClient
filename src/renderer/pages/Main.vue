@@ -51,7 +51,7 @@
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 5">
+                <Card :bordered="false" style="flex-grow: 1;margin: 10px">
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
