@@ -1,6 +1,7 @@
 'use strict';
 
 import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
+
 const storage = require('electron-json-storage');
 // import EAU from 'electron-asar-hot-updater';
 
@@ -245,6 +246,18 @@ const getMenuData = function () {
                     click() {
                         if (mainWindow) {
                             mainWindow.loadURL(util.mainURL);
+                        }
+                    }
+                },
+                {
+                    label: '清除缓存&重新加载',
+                    click() {
+                        //
+                        if (mainWindow) {
+                            //console.log(path.join(app.getPath('userData'), 'Cache'));
+                            mainWindow.webContents.session.clearCache(function () {
+                                mainWindow.loadURL(util.mainURL);
+                            });
                         }
                     }
                 },
