@@ -53,7 +53,7 @@
 </style>
 <template>
     <div class="layout drag">
-        <Tabs class="no-drag table" type="card" @on-click="onTabClick">
+        <Tabs class="no-drag table" type="card" ref="tabs" @on-click="onTabClick">
             <TabPane :disabled="!(this.cos && this.cos.length > 0)" name="已登录" label="已登录">
                 <div class="item" v-for="(item,index) in this.cos" @click="openCOS(item)">
                     <span :class="`iconfont icon-${item.key}`" style="font-size: 20px"></span>
@@ -157,6 +157,8 @@
         created: function () {
             this.getCOS();
         },
+        mounted() {
+        },
         methods: {
             onTabClick(key) {
                 if (key !== '已登录') {
@@ -220,6 +222,9 @@
             getCOS() {
                 this.$storage.getCOS(({cos}) => {
                     this.cos = cos;
+                    if (this.cos.length === 0) {
+                        this.$refs['tabs'].activeKey = this.$refs['tabs'].getTabs()[1].name;
+                    }
                 });
             },
             openBrowser(url) {

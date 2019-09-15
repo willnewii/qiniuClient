@@ -11,6 +11,3 @@ node_modules/
 !.gitkeep
 .idea
 static/styles-dark.css
-static/dll/*
-!static/dll/libs*.*
-!static/dll/cos*.*
