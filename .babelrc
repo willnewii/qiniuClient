@@ -5,13 +5,15 @@
     "env": {
         "main": {
             "presets": [
-                "env",
-                {
-                    "modules": false,
-                    "targets": {
-                        "Node": "12.4.0"
+                [
+                    "env",
+                    {
+                        "modules": false,
+                        "targets": {
+                            "Node": "12.4.0"
+                        }
                     }
-                }
+                ]
             ]
         },
         "renderer": {

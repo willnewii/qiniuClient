@@ -48,7 +48,25 @@ let rendererConfig = {
                 }
             },
             {
-                test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf)(\?.*)?$/,
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+                use: {
+                    loader: 'url-loader',
+                    query: {
+                        limit: 10000,
+                        name: 'imgs/[name].[ext]'
+                    }
+                }
+            },
+            {
+                test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
+                loader: 'url-loader',
+                options: {
+                    limit: 10000,
+                    name: 'media/[name].[ext]'
+                }
+            },
+            {
+                test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
                 use: {
                     loader: 'url-loader',
                     query: {
