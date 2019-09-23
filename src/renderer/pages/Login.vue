@@ -61,10 +61,24 @@
                     <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)"/>
                 </div>
             </TabPane>
-            <TabPane v-for="(item) in brands" :name="item.key" :label="item.name">
+            <TabPane v-for="(item) in brands" :key="item.key" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
-                    <template v-if="item.key !== brands.upyun.key">
+                    <template v-if="item.key === brands.upyun.key">
+                        <Form-item label="别名" prop="name">
+                            <Input v-model="formItem.name" placeholder="别名"/>
+                        </Form-item>
+                        <Form-item label="服务名称" prop="service_name">
+                            <Input v-model="formItem.service_name" placeholder="请填入服务名称"/>
+                        </Form-item>
+                        <Form-item label="操作员名" prop="access_key">
+                            <Input v-model="formItem.access_key" placeholder="请填入操作员名"/>
+                        </Form-item>
+                        <Form-item label="操作员密码" prop="secret_key">
+                            <Input v-model="formItem.secret_key" placeholder="请填入操作员密码"/>
+                        </Form-item>
+                    </template>
+                    <template v-else>
                         <Form-item label="别名" prop="name">
                             <Input v-model="formItem.name" placeholder="别名"/>
                         </Form-item>
@@ -80,21 +94,11 @@
                                 </Option>
                             </Select>
                         </Form-item>
-                    </template>
-                    <template v-else>
-                        <Form-item label="别名" prop="name">
-                            <Input v-model="formItem.name" placeholder="别名"/>
-                        </Form-item>
-                        <Form-item label="服务名称" prop="service_name">
-                            <Input v-model="formItem.service_name" placeholder="请填入服务名称"/>
-                        </Form-item>
-                        <Form-item label="操作员名" prop="access_key">
-                            <Input v-model="formItem.access_key" placeholder="请填入操作员名"/>
-                        </Form-item>
-                        <Form-item label="操作员密码" prop="secret_key">
-                            <Input v-model="formItem.secret_key" placeholder="请填入操作员密码"/>
+                        <Form-item label="内网访问" prop="internal" v-if="item.key === brands.aliyun.key">
+                            <i-switch v-model="formItem.internal"/>
                         </Form-item>
                     </template>
+
                     <Form-item>
                         <div class="buttons">
                             <Button type="primary" @click="handleSubmit(item.key)">设置</Button>
@@ -136,11 +140,6 @@
             return {
                 selectBrand: brand.qiniu,
                 formItem: {
-                    service_name: '',
-                    access_key: '',
-                    secret_key: '',
-                    region: '',
-                    name: '',
                 },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
@@ -156,6 +155,7 @@
         computed: {},
         created: function () {
             this.getCOS();
+            this.handleReset();
         },
         mounted() {
         },
@@ -163,7 +163,7 @@
             onTabClick(key) {
                 if (key !== '已登录') {
                     this.selectBrand = this.brands[key];
-                    this.handleReset(this.selectBrand.key);
+                    this.handleReset();
                 }
                 if (key === this.brands.aws.key) {
                     this.regions = Regions.s3;
@@ -175,26 +175,26 @@
                 }
                 this.$refs[key][0].validate((valid) => {
                     if (valid) {
-                        this.validateKey(this.formItem);
+                        this.validateKey();
                     } else {
                         console.log('表单不能提交');
                     }
                 });
             },
-            handleReset(key) {
-                this.$refs[key][0].resetFields();
-                this.$refs[key][0].model.name = this.selectBrand.name;
-                this.$refs[key][0].model.region = '';
-            },
-            validateKey(form) {
-                let item = {
-                    key: this.selectBrand.key,
-                    name: form.name,
-                    access_key: form.access_key,
-                    secret_key: form.secret_key,
-                    region: form.region,
-                    service_name: form.service_name
+            handleReset() {
+                this.formItem = {
+                    service_name: '',
+                    access_key: '',
+                    secret_key: '',
+                    region: '',
+                    internal: false,
+                    name: this.selectBrand.name,
                 };
+            },
+            validateKey() {
+                let item = Object.assign({
+                    key: this.selectBrand.key
+                }, this.formItem);
 
                 this.$storage.setBrand(this.selectBrand.key);
                 this.$storage.cos.init(item);
