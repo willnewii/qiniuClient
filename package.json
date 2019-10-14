@@ -18,6 +18,7 @@
         "build:dll": "cross-env NODE_ENV=production ANALYZER=false DLL_NAME=libs --max_old_space_size=4096 webpack --config .electron-vue/webpack.renderer.dll.config.js",
         "build:dll-cos": "cross-env NODE_ENV=production ANALYZER=false DLL_NAME=cos --max_old_space_size=4096 webpack --config .electron-vue/webpack.renderer.dll.config.js",
         "build:darktheme": "cross-env NODE_ENV=production ENV_DLL=true webpack --config .electron-vue/webpack.renderer.theme.config.js",
+        "analyzer:main": "cross-env NODE_ENV=production ENV_DLL=true ANALYZER=true webpack --config .electron-vue/webpack.main.config.js",
         "analyzer:renderer": "cross-env NODE_ENV=production ENV_DLL=true ANALYZER=true webpack --config .electron-vue/webpack.renderer.config.js",
         "postinstall": ""
     },

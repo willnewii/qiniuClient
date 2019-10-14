@@ -5,7 +5,7 @@ process.env.BABEL_ENV = 'main';
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 let mainConfig = {
@@ -70,6 +70,12 @@ if (process.env.NODE_ENV === 'production') {
             'process.env.NODE_ENV': '"production"'
         })
     );
+
+    if (process.env.ANALYZER === 'true') {
+        mainConfig.plugins.push(
+            new BundleAnalyzerPlugin(),
+        );
+    }
 }
 
 if (process.env.NODE_ENV !== 'production') {
