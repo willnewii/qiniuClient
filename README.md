@@ -92,15 +92,35 @@ npm i
 # 运行开发模式
 npm run dev
 
+# 构建全平台的安装包, 非Windows平台构建Windows软件包需要安装wine 32位, dmg只有Mac OS才能构建成功
+npm run build:all
+
 # 构建对应你的平台的安装包
 npm run build:mac
 npm run build:win32
+npm run build:linux            # 同时构建deb, rpm, appimage
+npm run build:linux:deb        # 只构建deb
+npm run build:linux:rpm        # 只构建rpm
+npm run build:linux:appimage   # 只构建appimage
+```
+
+> **Linux已知问题**:
+>
+> 1. 不能用 `root` 身份运行
+> 1. 直接运行可能会出现错误: `2277:1015/203314.529451:FATAL:setuid_sandbox_host.cc(157)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now.`，需要执行
+>
+>     ```bash
+>     sudo sysctl kernel.unprivileged_userns_clone=1
+>     ```
+>
+>     永久生效可以添加 `kernel.unprivileged_userns_clone=1` 到 `/etc/sysctl.conf`, 然后执行 `sudo sysctl -p`
+>
+>     参考issue: https://github.com/electron/electron/issues/17972
 
 # 字段说明
 package,添加了一个cdnPath字段.你可以将资源上传至该路径下.这样可以实现简单的renderer资源的动态更新.默认为空读取本地.
 - renderer.js
 - style.css
-```
 
 ### issue
 - 阿里云上传回调异常
