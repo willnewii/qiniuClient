@@ -10,8 +10,13 @@
     "scripts": {
         "dev": "cross-env ENV_DLL=false node .electron-vue/dev-runner.js",
         "build": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder",
+        "build:all": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder -mwl",
         "build:mac": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --mac",
         "build:win32": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --win --ia32",
+        "build:linux": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux",
+        "build:linux:deb": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux deb",
+        "build:linux:rpm": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux rpm",
+        "build:linux:appimage": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux appimage",
         "build:dir": "cross-env ENV_DLL=true node --max_old_space_size=4096 .electron-vue/build.js && electron-builder --dir",
         "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
         "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
@@ -128,7 +133,8 @@
                 "rpm",
                 "AppImage"
             ],
-            "icon": "./build/icons"
+            "icon": "./build/icons",
+            "category": "Network"
         },
         "nsis": {
             "oneClick": false,
