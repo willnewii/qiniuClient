@@ -45,6 +45,9 @@ export default class CloudObjectStorage {
             case brand.aws.key:
                 this.cos = aws;
                 break;
+            case brand.minio.key:
+                this.cos = aws;
+                break;
         }
     }
 

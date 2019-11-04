@@ -48,7 +48,7 @@ class Bucket extends baseBucket {
             callback(err, {key: _param.key});
         }).on('httpUploadProgress', (progress) => {
             console.log(progress);
-            _param.progressCallback(parseInt(progress.loaded / progress.total) * 100);
+            _param.progressCallback(parseInt(progress.loaded / progress.total * 100));
         });
     }
 

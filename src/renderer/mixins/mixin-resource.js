@@ -155,6 +155,10 @@ export default {
                 isOverwrite: true,
                 uploadType: Constants.UploadType.UPLOAD,
                 progressCallback: (progress) => {
+                    console.log(progress);
+                    /*EventBus.$emit(Constants.Event.statusview, {
+                        message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
+                    });*/
                 },
                 callback: (err, ret) => {
                     if (!err) {
