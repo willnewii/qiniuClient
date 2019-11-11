@@ -1,5 +1,8 @@
 const AWS = require('aws-sdk');
+const Minio = require('minio');
+
 import AWSBucket from "./awsBucket";
+import brand from '../cos/brand';
 
 let s3;
 
@@ -19,6 +22,17 @@ function init(param) {
     }
 
     s3 = new AWS.S3(options);
+
+    if (param.key === brand.minio.key) {
+        let url = new URL(param.endpoint);
+        s3.minio = new Minio.Client({
+            endPoint: url.hostname,
+            port: parseInt(url.port),
+            useSSL: false,
+            accessKey: param.access_key,
+            secretKey: param.secret_key
+        });
+    }
 }
 
 function getBuckets(callback) {
