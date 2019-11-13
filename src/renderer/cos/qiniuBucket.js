@@ -40,9 +40,7 @@ class Bucket extends baseBucket {
      * 检测是否属于私密空间
      */
     getACL() {
-        let privateBuckets = this.vm.privatebucket;
-        let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
-        this.setPermission(permission);
+        this.getLocalPermission();
     }
 
     /**

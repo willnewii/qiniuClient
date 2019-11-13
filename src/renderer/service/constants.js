@@ -31,7 +31,8 @@ export const Event = {
     statusview: 'statusview',
     dropview: 'dropview',
     loading: 'loading',
-    updateFiles: 'updateFiles'
+    updateFiles: 'updateFiles',
+    changePrivate: 'changePrivate',
 };
 
 export const CopyType = {

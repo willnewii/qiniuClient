@@ -77,6 +77,7 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import UploadModal from "./UploadModal";
+    import {Constants, EventBus} from '../service';
     import brand from "@/cos/brand";
 
     export default {
@@ -121,6 +122,10 @@
         },
         created() {
             this.updateSupport();
+            EventBus.$on(Constants.Event.changePrivate, (data) => {
+                this.bucket.getACL();
+                this.actionBtn(5);
+            });
         },
         mounted() {
             if (this.$storage.name === brand.upyun.key && !this.bucket.domain) {
@@ -226,6 +231,7 @@
         .full {
             flex-grow: 1;
             margin-left: 16px;
+
             .input {
                 width: 250px;
             }

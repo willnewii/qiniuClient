@@ -66,6 +66,15 @@ class baseBucket {
     }
 
     /**
+     * qiniu,aws,minio 需要手动设置
+     */
+    getLocalPermission(){
+        let privateBuckets = this.vm.privatebucket;
+        let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
+        this.setPermission(permission);
+    }
+
+    /**
      * 此方法目前只有七牛云使用
      */
     getResources() {
