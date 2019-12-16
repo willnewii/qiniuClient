@@ -2,9 +2,10 @@
     <div class="layout-header">
         <div class="full">
             <Select class="input no-drag" v-model="bucket.domain"
-                    v-if="bucket.name && bucket.domains && bucket.domains.length > 0">
+                    v-if="bucket.name && bucket.domains && bucket.domains.length > 0" @on-change="onChangeDomain">
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
+            <!-- TODO:添加自定义域名功能-->
             <Input class="input no-drag" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
                    :placeholder="domainPlaceholder" @on-blur="saveDomain" placeholder="自定义域名" error="链接不合法"/>
         </div>
@@ -140,33 +141,43 @@
                 types.setup.a_customedomain,
             ]),
             updateSupport() {
-                this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.name) !== -1;
-                this.isSupportDomain = [brand.qiniu.key, brand.tencent.key, brand.upyun.key].indexOf(this.$storage.name) !== -1;
+                this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.key) !== -1;
+                this.isSupportDomain = [brand.qiniu.key, brand.tencent.key, brand.upyun.key].indexOf(this.$storage.key) !== -1;
             },
+            onChangeDomain(e) {
+                let obj = Object.create(null);
+                obj[this.bucket.name] = e;
+                this[types.setup.a_customedomain](obj);
+            },
+            /**
+             * 保存自定义域名
+             * 只保存域名host部分
+             */
             saveDomain() {
                 let val = this.bucket.domain;
 
-                if (val.length === 0) {//腾讯云有默认链接
-                    let obj = {};
+                if (val.length === 0) {
+                    let obj = Object.create(null);
                     obj[this.bucket.name] = '';
                     this[types.setup.a_customedomain](obj);
                     return;
                 }
 
                 try {
-                    let url = new URL(val);
-                    if (this.bucket && this.bucket.domains.length === 0 && val) {
-                        let obj = {};
-                        obj[this.bucket.name] = url.origin;
-                        this.bucket.domain = url.origin;
+                    if (this.bucket && val) {
+                        let obj = Object.create(null);
+                        obj[this.bucket.name] = val;
                         this[types.setup.a_customedomain](obj);
+                        this.bucket.domain = val;
                         this.$Message.success('自定义域名保存成功,请刷新页面');
                     }
                 } catch (err) {
+                    this.bucket.domain = '';
                     this.$Message.error('自定义域名不合法');
                 }
             },
             clearSearch() {
+                console.log(event);
                 if (this.search !== '') {
                     this.search = '';
                     this.$emit('on-search', this.search, event);

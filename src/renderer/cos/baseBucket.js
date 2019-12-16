@@ -68,7 +68,7 @@ class baseBucket {
     /**
      * qiniu,aws,minio 需要手动设置
      */
-    getLocalPermission(){
+    getLocalPermission() {
         let privateBuckets = this.vm.privatebucket;
         let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
         this.setPermission(permission);
@@ -138,11 +138,11 @@ class baseBucket {
 
         //默认添加http
         if (!/^https?:\/\//.test(url)) {
-            url = 'http://' + url;
-        }
-
-        if (this.https && url.startsWith('http://')) {
-            return url.replace('http://', 'https://');
+            url = `${this.https ? 'https' : 'http'}://${url}`;
+        } else {
+            if (this.https && url.startsWith('http://')) {
+                return url.replace('http://', 'https://');
+            }
         }
 
         return url;

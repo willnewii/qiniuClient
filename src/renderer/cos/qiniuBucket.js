@@ -52,23 +52,19 @@ class Bucket extends baseBucket {
     getDomains() {
         let request = new Request();
         request.get(qiniu.methods.domains, {tbl: this.name}).then((result) => {
-            let domains = result;
             let customeDomains = this.vm.customeDomains;
-            if (domains && domains.length > 0) {
+            this.domain = '';
 
-                for (let i = 0; i < domains.length; i++) {
-                    domains[i] = domains[i];
-                }
-                this.domains = domains;
+            if (result && result.length > 0) {
+                this.domains = result;
+
                 //默认选择最后一个域名
                 this.domain = this.domains[this.domains.length - 1];
-            } else {
-                if (customeDomains && customeDomains[this.name]) {
-                    this.domain = customeDomains[this.name];
-                    this.https = false;
-                } else {
-                    this.domain = '';
-                }
+            }
+
+            if (customeDomains && customeDomains[this.name]) {
+                this.domain = customeDomains[this.name];
+                this.https = false;
             }
         }).catch((error) => {
             console.log(error);
@@ -85,18 +81,6 @@ class Bucket extends baseBucket {
         const formatStr = 'YYYYMMDD000000';
         let day = dayjs();
         let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
-
-       /* let request1 = new Request();
-        let url1 = `${qiniu.methods.count}${param}`;
-
-        let request2 = new Request();
-        let url2 = `${qiniu.methods.count_line}${param}`;
-
-        let request3 = new Request();
-        let url3 = `${qiniu.methods.space}${param}`;
-
-        let request4 = new Request();
-        let url4 = `${qiniu.methods.space_line}${param}`;*/
 
         let requests = [];
         for (let url of [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line]) {
@@ -198,9 +182,7 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let _domain = this.https ? 'https://' : 'http://';
-
-        let url = this.domain ? qiniu.generateUrl(_domain + this.domain, key, (this.permission === 1 ? deadline : null)) : '';
+        let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
         return super.generateUrl(url);
     }
 }

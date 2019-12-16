@@ -8,7 +8,7 @@ module.exports = {
             'qs',
             'vue-lazyload',
             'vue-electron',
-            'iview',
+            'view-design',
             'uuid',
             'v-viewer',
             'vue-virtual-scroll-list',
@@ -18,7 +18,7 @@ module.exports = {
             'dayjs',
             'mime-types',
             'v-contextmenu/dist/index.css',
-            'iview/dist/styles/iview.css'
+            'view-design/dist/styles/iview.css'
         ],
         cos: [
             'qiniu',
