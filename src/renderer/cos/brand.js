@@ -23,5 +23,9 @@ export default {
     aws: {
         key: 'aws',
         name: '亚马逊S3',
+    },
+    minio: {
+        key: 'minio',
+        name: 'MinIO'
     }
 };

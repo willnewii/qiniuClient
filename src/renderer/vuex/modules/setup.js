@@ -22,7 +22,7 @@ export default {
             brand: '',                                              //托盘上传的 服务商/bucket/自定义路径
             bucket_name: '',
             bucket_dir: '',
-            customedomain: {},
+            customedomain: {},                                      //名称有歧义.保存最近选择的域名
             imagestyle: defaultImageStyle,                          //Grid时,提供了图片预览,可以设置的预览图片的压缩方式
             downloaddir: '',                                        //设置文件的下载路径
             privatebucket: [],                                      //七牛私有空间不能通过api获取,只能用户手动标记

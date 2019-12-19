@@ -25,17 +25,27 @@ class Bucket extends baseBucket {
 
     /**
      * 获取Bucket访问权限状态
+     * https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketAcl.html
+     * https://docs.aws.amazon.com/AmazonS3/latest/API/API_Grant.html
      */
     getACL() {
-        this.cos.getBucketAcl({Bucket: this.name}, function (err, data) {
+        this.getLocalPermission();
+        // 干不动...
+        /*this.cos.getBucketAcl({Bucket: this.name}, (err, data) => {
+            console.log(err, data);
             if (err) {
                 console.log("Error", err);
             } else if (data) {
                 console.log("Success", data.Grants);
-            }
-        });
+                this.setPermission('FULL_CONTROL' === data.Grants[0].Permission ? 0 : 1);
+                this.getResources();
 
-        this.getResources();
+                // 获取策略
+                /!*this.cos.getBucketPolicy({Bucket: this.name}, (err, data) => {
+                    console.log(err, JSON.parse(data.Policy));
+                });*!/
+            }
+        });*/
     }
 
     createFile(_param, type, callback) {
@@ -48,7 +58,7 @@ class Bucket extends baseBucket {
             callback(err, {key: _param.key});
         }).on('httpUploadProgress', (progress) => {
             console.log(progress);
-            _param.progressCallback(parseInt(progress.loaded / progress.total) * 100);
+            _param.progressCallback(parseInt(progress.loaded / progress.total * 100));
         });
     }
 
@@ -123,7 +133,12 @@ class Bucket extends baseBucket {
      */
     generateUrl(key, deadline) {
         let params = {Bucket: this.name, Key: key, Expires: deadline};
-        let url = this.cos.getSignedUrl('getObject', params);
+        let url = `${this.cos.endpoint.href}${this.name}/${key}`;
+
+        if (this.permission === 1) {
+            url = this.cos.getSignedUrl('getObject', params);
+        }
+
         return super.generateUrl(url);
     }
 }

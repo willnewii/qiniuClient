@@ -2,7 +2,7 @@
     <div class="page">
         <h4 class="title">全局设置</h4>
         <div class="item">
-            <span class="item-title">支持Https</span>
+            <span class="item-title">开启Https</span>
             <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
         </div>
         <div class="item">
@@ -86,6 +86,9 @@
                     </Col>
                 </Row>
             </div>
+        </template>
+        <template
+                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.minio.key === $storage.key">
             <div class="item">
                 私有空间：
                 <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
@@ -111,7 +114,7 @@
 
 <script>
     import {mapGetters, mapActions} from 'vuex';
-    import {Constants, util} from '../service';
+    import {Constants, util, EventBus} from '../service';
     import * as types from '../vuex/mutation-types';
     import brands from '@/cos/brand';
 
@@ -210,6 +213,7 @@
                     this[types.app.a_update_buckets_info]({name: item.name, permission: permission});
                 });
                 this[types.setup.a_privatebucket](privatebucket);
+                EventBus.$emit(Constants.Event.changePrivate, privatebucket);
             },
             themesChange(item) {
                 if (item === 'auto') {

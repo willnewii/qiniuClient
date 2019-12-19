@@ -88,6 +88,9 @@
                         <Form-item label="SECRET_KEY" prop="secret_key">
                             <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
                         </Form-item>
+                        <Form-item label="ENDPOINT" prop="endpoint" v-if="item.key === brands.minio.key">
+                            <Input v-model="formItem.endpoint" placeholder="请填入服务的endpoint"/>
+                        </Form-item>
                         <Form-item label="区域" prop="region" v-if="item.key === brands.aws.key">
                             <Select v-model="formItem.region">
                                 <Option v-for="item in regions" :value="item.region" :key="item.region">{{ item.name }}
@@ -139,8 +142,7 @@
         data() {
             return {
                 selectBrand: brand.qiniu,
-                formItem: {
-                },
+                formItem: {},
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
@@ -187,6 +189,7 @@
                     access_key: '',
                     secret_key: '',
                     region: '',
+                    endpoint: '',
                     internal: false,
                     name: this.selectBrand.name,
                 };
@@ -196,7 +199,7 @@
                     key: this.selectBrand.key
                 }, this.formItem);
 
-                this.$storage.setBrand(this.selectBrand.key);
+                this.$storage.setBrand(item.key);
                 this.$storage.cos.init(item);
                 this.$storage.getBuckets((error, result) => {
                     if (error) {

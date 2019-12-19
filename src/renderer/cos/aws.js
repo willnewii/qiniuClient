@@ -4,10 +4,21 @@ import AWSBucket from "./awsBucket";
 let s3;
 
 function init(param) {
+    let options = {apiVersion: '2006-03-01'};
+
     AWS.config = new AWS.Config({
         accessKeyId: param.access_key, secretAccessKey: param.secret_key, region: param.region
     });
-    s3 = new AWS.S3({apiVersion: '2006-03-01'});
+
+    if (param.endpoint) {
+        AWS.config.update({
+            endpoint: param.endpoint,
+            signatureVersion: 'v4',
+            s3ForcePathStyle: true,
+        });
+    }
+
+    s3 = new AWS.S3(options);
 }
 
 function getBuckets(callback) {

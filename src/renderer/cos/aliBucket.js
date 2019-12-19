@@ -32,7 +32,7 @@ class Bucket extends baseBucket {
         this.cos.getBucketInfo(this.name).then((res) => {
 
             this.cos.options.region = res.bucket.Location;
-            //TODO: 未找到api获取状态
+            //未找到api获取状态
             this.cos.options.secure = false;
             delete this.cos.options.endpoint;
             this.cos.options = Client.initOptions(this.cos.options);
@@ -87,15 +87,21 @@ class Bucket extends baseBucket {
                 this.files = [];
             }
             let files = [];
-            data.objects.forEach((item) => {
-                if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, brand.aliyun.key));
-                }
-            });
+            // TODO:空记录检测
+            if (data.objects) {
+                data.objects.forEach((item) => {
+                    if (parseInt(item.Size) !== 0) {
+                        files.push(util.convertMeta(item, brand.aliyun.key));
+                    }
+                });
+            }
 
-            data.items = files;
-            data.marker = data.nextMarker;
-            this.appendResources(data, option);
+            // data.items = files;
+            // data.marker = data.nextMarker;
+            this.appendResources({
+                items: files,
+                marker: data.nextMarker
+            }, option);
         });
     }
 

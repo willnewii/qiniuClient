@@ -16,11 +16,17 @@ const KEY_COS = 'cos_keys';
 export default class CloudObjectStorage {
     constructor() {
         //存储选择的cos信息
-        this.info = null;
+        this.info = {};
 
         Object.defineProperty(this, "name", {
             get: function () {
                 return this.info.name;
+            },
+        });
+
+        Object.defineProperty(this, "key", {
+            get: function () {
+                return this.info.key;
             },
         });
     }
@@ -43,6 +49,9 @@ export default class CloudObjectStorage {
                 this.cos = upyun;
                 break;
             case brand.aws.key:
+                this.cos = aws;
+                break;
+            case brand.minio.key:
                 this.cos = aws;
                 break;
         }

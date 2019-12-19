@@ -145,7 +145,6 @@
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.privatebucket,
                 recent: types.setup.recent,
             }),
         },
