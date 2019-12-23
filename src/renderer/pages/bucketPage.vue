@@ -192,7 +192,6 @@
 </template>
 <script>
     import Header from '@/components/Header';
-    //import ResourceTable from '@/components/ResourceTable.vue';
     import ResourceGrid from "@/components/ResourceGrid.vue";
     import ResourceFilter from "@/components/ResourceFilter";
 
@@ -217,7 +216,7 @@
         data() {
             return {
                 bucket: null,
-                showType: 1, //0:列表 1:folder
+                showType: -1, //0:列表 1:folder
                 folderPath: null,
                 folderKeyWord: null,
                 model_DeleteAsk: false,
@@ -235,6 +234,7 @@
                 paging: types.setup.paging,
                 setup_deleteNoAsk: types.setup.deleteNoAsk,
                 setup_https: types.setup.https,
+                setup_showType: types.setup.showType,
                 customeDomains: types.setup.customedomain
             }),
             totalSize() {
@@ -279,6 +279,7 @@
         methods: {
             ...mapActions([
                 types.app.a_update_buckets_info,
+                types.setup.a_showType
             ]),
             /**
              * 初始化空间信息
@@ -287,6 +288,8 @@
                 if (this.$storage.cos) {
                     this.bucket = this.$storage.cos.generateBucket(bucketName);
                     this.bucket.bindPage(this);
+
+                    this.showType = this.setup_showType ;
                 }
             },
             /**
@@ -330,12 +333,14 @@
                 EventBus.$emit(Constants.Event.download);
             },
             /**
-             * 表单模式/图片模式
+             * list/grid
              * @param type
              */
             changeShowType(type) {
                 this.bucket.selection = [];
-                this.showType = type;
+                this[types.setup.a_showType](type);
+
+                this.showType = type ;
             },
             /**
              * table数据项更新回调

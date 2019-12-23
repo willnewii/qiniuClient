@@ -2,7 +2,7 @@
     <div class="page">
         <h4 class="title">全局设置</h4>
         <div class="item">
-            <span class="item-title">支持Https</span>
+            <span class="item-title">开启Https</span>
             <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
         </div>
         <div class="item">

@@ -30,7 +30,9 @@ class Bucket extends baseBucket {
      */
     getACL() {
         this.getLocalPermission();
-        // 干不动...
+        this.getResources();
+
+        // BucketAcl 策略看不懂😂...
         /*this.cos.getBucketAcl({Bucket: this.name}, (err, data) => {
             console.log(err, data);
             if (err) {
