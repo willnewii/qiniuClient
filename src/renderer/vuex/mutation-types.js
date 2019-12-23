@@ -32,6 +32,9 @@ export const setup = {
     copyType: 'copyType',
     a_copyType: 'a_copyType',
 
+    showType: 'showType',
+    a_showType: 'a_showType',
+
     savedir: 'savedir',
     a_savedir: 'a_savedir',
 
