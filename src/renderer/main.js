@@ -16,8 +16,6 @@ import PasteImageService from "./service/pasteImageService";
 
 const pasteImageService = new PasteImageService();
 
-//import brand from "@/cos/brand";
-// Vue.prototype.$storage.setBrand(brand.qiniu);
 // Vue.config.debug = false;
 
 import routes from './routes';

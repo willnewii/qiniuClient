@@ -113,9 +113,10 @@ const registerIPC = function () {
             if (option.count === 1) {
                 shell.showItemInFolder(dl.getSavePath());
             }
-            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         }).catch(error => {
             console.error(error);
+        }).finally(() => {
+            console.log(file.path, 1);
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });

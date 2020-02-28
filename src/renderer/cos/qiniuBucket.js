@@ -28,7 +28,7 @@ class Bucket extends baseBucket {
             if (info) {
                 this.space = info.space;
                 this.count = info.count;
-                if (this.vm.paging && info.count > Constants.PAGESIZE) {
+                if (this.vm.paging && info.count > Constants.PageSize) {
                     this.paging = true;
                 }
             }
@@ -82,13 +82,10 @@ class Bucket extends baseBucket {
         let day = dayjs();
         let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
 
-        let requests = [];
-        for (let url of [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line]) {
-            let request = new Request();
-            requests.push(request.get(`${url}${param}`));
-        }
+        let requests = [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line].map((url)=>{
+            return new Request().get(`${url}${param}`)
+        });
 
-        //[request1.get(url1), request2.get(url2), request3.get(url3), request4.get(url4)]
         Promise.all(requests).then((result) => {
             callback && callback({
                 count: result[0].datas[0] || result[1].datas[0],
@@ -131,22 +128,19 @@ class Bucket extends baseBucket {
                 console.error(respErr);
                 return;
             }
-
-            let data = respInfo.data;
-            data.items.forEach((item, index) => {
-                data.items[index] = util.convertMeta(item, brand.qiniu.key);
+            respInfo.data.items.forEach((item, index) => {
+                respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key);
             });
             //commonPrefixes 文件夹
-            data.commonPrefixes && data.commonPrefixes.forEach((item, index) => {
-                let key = item.substring(0, item.length - 1);
-                data.items.push({
-                    key: key,
+            respInfo.data.commonPrefixes && respInfo.data.commonPrefixes.forEach((item) => {
+                respInfo.data.items.push({
+                    key: item.substring(0, item.length - 1),
                     type: Constants.FileType.folder,
                     fsize: 0,
                 });
             });
 
-            this.appendResources(data, option);
+            this.appendResources(respInfo.data, option);
         });
     }
 

@@ -42,10 +42,12 @@ class baseBucket {
         //当前路径
         this.folderPath = '';
 
+        // 文件队列(整合上传&下载)
+        this.fileQueue = [];
         //下载列表
-        this.downloads = [];
+        // this.downloads = [];
         //上传列表
-        this.uploads = [];
+        // this.uploads = [];
         //在generateUrl 返回https
         this.https = false;
         //分页加载
@@ -107,7 +109,7 @@ class baseBucket {
         this.marker = data.marker ? data.marker : '';
 
         //开启分页模式&文件数大于阀值&marker不为空
-        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length}`);
+        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length} marker:${this.marker}`);
         if (this.paging && loadCount >= MAXCOUNT && this.marker) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,

@@ -87,7 +87,7 @@
 </style>
 <template>
     <div class="bucketpage" v-if="bucket">
-        <Header :bucket="bucket" @on-update="onFilesUpdate" @on-search="doSearch"></Header>
+        <Header :bucket="bucket"></Header>
 
         <div class="dir-layout">
             <div class="header-dir-view horizontal">
@@ -100,9 +100,7 @@
                     <template v-if="bucket.folderPath">
                         <div class="bread-sub" v-for="(item,index) in bucket.folderPath.split('/')"
                              @click="changeFolderPath(index)">
-                            <BreadcrumbItem>
-                                {{item}}
-                            </BreadcrumbItem>
+                            <BreadcrumbItem>{{item}}</BreadcrumbItem>
                         </div>
                     </template>
                 </Breadcrumb>
@@ -153,17 +151,13 @@
             </div>
         </div>
 
-        <!--<resource-table v-if="showType === 0" :bucket="bucket"
-                        @on-update="onFilesUpdate"></resource-table>-->
-        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"
-                       @on-update="onFilesUpdate" :keyWord="folderKeyWord"></resource-grid>
+        <!--<resource-table v-if="showType === 0" :bucket="bucket" ></resource-table>-->
+        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"></resource-grid>
 
-        <resource-filter ref="resource-filter" :bucket="bucket"
-                         @on-update="onFilesUpdate"></resource-filter>
-        <!--grid filter 同时引用了mixin-resource on-update 触发父对象不一致 -->
+        <resource-filter ref="resource-filter" :bucket="bucket"></resource-filter>
 
-        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal"
-               @on-ok="callRemove" @on-cancel="cleanSelection">
+        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal" @on-ok="callRemove"
+               @on-cancel="cleanSelection">
             <div class="file-list">
                 <template>
                     <p v-for="file in bucket.selection">{{file.key}}</p>
@@ -218,7 +212,6 @@
                 bucket: null,
                 showType: -1, //0:列表 1:folder
                 folderPath: null,
-                folderKeyWord: null,
                 model_DeleteAsk: false,
                 model_query_show: false,
                 model_merge: {
@@ -235,6 +228,7 @@
                 setup_deleteNoAsk: types.setup.deleteNoAsk,
                 setup_https: types.setup.https,
                 setup_showType: types.setup.showType,
+                setup_deadline: types.setup.deadline,
                 customeDomains: types.setup.customedomain
             }),
             totalSize() {
@@ -269,11 +263,9 @@
         },
         mounted() {
             if (this.$route.query && this.$route.query.bucketName) {
-                if (!this.bucket || this.$route.query.bucketName !== this.bucket.name) {
-                    this.initBucket(this.$route.query.bucketName);
-                } else {
-                    console.log('mounted: error');
-                }
+                this.initBucket(this.$route.query.bucketName);
+            } else {
+                console.log('mounted: error');
             }
         },
         methods: {
@@ -288,8 +280,7 @@
                 if (this.$storage.cos) {
                     this.bucket = this.$storage.cos.generateBucket(bucketName);
                     this.bucket.bindPage(this);
-
-                    this.showType = this.setup_showType ;
+                    this.showType = this.setup_showType;
                 }
             },
             /**
@@ -299,24 +290,14 @@
                 this.bucket.getResources(option);
             },
             /**
-             *  dir：目录
-             *  search：关键字
-             */
-            doSearch: function (search) {
-                this.folderKeyWord = search;
-            },
-            /**
              * 根据配置,是否弹出删除确认框
              */
             askRemove() {
-                if (this.setup_deleteNoAsk) {
-                    this.callRemove();
-                } else {
-                    this.model_DeleteAsk = true;
-                }
+                this.model_DeleteAsk = true;
             },
             callRemove() {
-                EventBus.$emit(Constants.Event.removes);
+                EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.remove);
+                this.bucket.selection = [];
             },
             //取消选择
             cleanSelection() {
@@ -325,12 +306,14 @@
             //全部选择
             allSelection() {
                 this.$refs['resource-grid'].selection = [];
+                this.bucket.selection = [];
                 for (let i = 0; i < this.$refs['resource-grid'].files.length; i++) {
                     this.$refs['resource-grid'].selectFile(i);
                 }
             },
             downloads() {
-                EventBus.$emit(Constants.Event.download);
+                EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.download);
+                this.bucket.selection = [];
             },
             /**
              * list/grid
@@ -340,16 +323,7 @@
                 this.bucket.selection = [];
                 this[types.setup.a_showType](type);
 
-                this.showType = type ;
-            },
-            /**
-             * table数据项更新回调
-             * @param ret 变更的资源
-             * @param action 触发的动作,upload/remove
-             */
-            onFilesUpdate(ret, action) {
-                console.log(ret, action);
-                this.getResources();
+                this.showType = type;
             },
             changeFolderPath(index) {
                 if (index === -1) {
@@ -369,27 +343,27 @@
             syncFolder() {
                 let files = this.bucket.files;
                 files.forEach((item, index) => {
-                    files[index].url = this.$refs['resource-filter'].getResoureUrl(item);
+                    files[index].url = this.$refs['resource-grid'].getResourceUrl(item);
                 });
 
                 this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
                     properties: ['openDirectory'],
                     files,
-                    type: this.$storage.name,
+                    type: this.$storage.key,
                     mergeType: this.model_merge.mode,
                 });
             },
             exportURL() {//导出URL
                 let urls = [];
                 this.bucket.files.forEach((item) => {
-                    urls.push(this.$refs['resource-filter'].getResoureUrl(item));
+                    urls.push(this.$refs['resource-grid'].getResourceUrl(item));
                 });
 
                 this.$electron.ipcRenderer.send(Constants.Listener.exportUrl, {
                     name: `${this.$storage.name}-${this.bucket.name}-${dayjs().format('YYYYMMDDHHmmss')}.txt`,
                     urls,
                 });
-            }
+            },
         }
 
     };

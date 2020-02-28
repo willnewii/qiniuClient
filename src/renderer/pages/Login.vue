@@ -54,8 +54,8 @@
 <template>
     <div class="layout drag">
         <Tabs class="no-drag table" type="card" ref="tabs" @on-click="onTabClick">
-            <TabPane :disabled="!(this.cos && this.cos.length > 0)" name="已登录" label="已登录">
-                <div class="item" v-for="(item,index) in this.cos" @click="openCOS(item)">
+            <TabPane :disabled="!(this.coses && this.coses.length > 0)" name="已登录" label="已登录">
+                <div class="item" v-for="(item,index) in this.coses" :key="index" @click="openCOS(item)">
                     <span :class="`iconfont icon-${item.key}`" style="font-size: 20px"></span>
                     <span class="name long">{{item.name}}</span>
                     <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)"/>
@@ -142,7 +142,15 @@
         data() {
             return {
                 selectBrand: brand.qiniu,
-                formItem: {},
+                formItem: {
+                    service_name: '',
+                    access_key: '',
+                    secret_key: '',
+                    region: '',
+                    endpoint: '',
+                    internal: false,
+                    name: '',
+                },
                 ruleItem: {
                     access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
                     secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
@@ -150,7 +158,7 @@
                     service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
                 },
                 brands: brand,
-                cos: [],
+                coses: [],
                 regions: [],
             };
         },
@@ -184,24 +192,16 @@
                 });
             },
             handleReset() {
-                this.formItem = {
-                    service_name: '',
-                    access_key: '',
-                    secret_key: '',
-                    region: '',
-                    endpoint: '',
-                    internal: false,
-                    name: this.selectBrand.name,
-                };
+                this.formItem = this.$options.data().formItem;
+                this.formItem.name = this.selectBrand.name;
             },
             validateKey() {
                 let item = Object.assign({
                     key: this.selectBrand.key
                 }, this.formItem);
 
-                this.$storage.setBrand(item.key);
-                this.$storage.cos.init(item);
-                this.$storage.getBuckets((error, result) => {
+                this.$storage.initCOS(item);
+                this.$storage.getBuckets((error) => {
                     if (error) {
                         util.notification({
                             title: this.selectBrand.name,
@@ -223,9 +223,9 @@
                 });
             },
             getCOS() {
-                this.$storage.getCOS(({cos}) => {
-                    this.cos = cos;
-                    if (this.cos.length === 0) {
+                this.$storage.getBindCoses(({coses}) => {
+                    this.coses = coses;
+                    if (this.coses.length === 0) {
                         this.$refs['tabs'].activeKey = this.$refs['tabs'].getTabs()[1].name;
                     }
                 });

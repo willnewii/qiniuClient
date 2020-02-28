@@ -59,11 +59,13 @@ export default class CloudObjectStorage {
 
     /**
      * 初始化当前cos ,只做了非空验证
+     * @param data
      * @param callback
      */
-    async initCOS(data, callback) {
+    initCOS(data, callback) {
         if (data && data.access_key && data.secret_key) {
             this.info = data;
+            this.setBrand(data.key);
             this.cos.init(data);
             callback && callback(true);
         } else {
@@ -71,20 +73,29 @@ export default class CloudObjectStorage {
         }
     }
 
+    /**
+     * 用于校验COS授权是否成功
+     * @param callback
+     */
     getBuckets(callback) {
-        this.cos.getBuckets((error, result) => {
-            console.log("获取存储桶===>", result);
-            callback && callback(error, result);
-        });
+        if (this.cos) {
+            this.cos.getBuckets((error, result) => {
+                console.log("获取存储桶===>", result);
+                callback && callback(error, result);
+            });
+        } else {
+            callback && callback(new Error("cos 未初始化"));
+        }
     }
 
     /**
-     * 获取已有key的cos列表
+     * 获取已授权的cos列表
      * @param callback
      * @returns {Promise<void>}
      */
-    async getCOS(callback) {
+    async getBindCoses(callback) {
         let cos_keys = await storagePromise.get(KEY_COS);
+        // 兼容之前的配置写法
         if (Object.keys(cos_keys).length === 0) {
             cos_keys = [];
             for (let item of Object.keys(brand)) {
@@ -96,7 +107,7 @@ export default class CloudObjectStorage {
             }
             await storagePromise.set(KEY_COS, cos_keys);
         }
-        callback({cos: cos_keys});
+        callback({coses: cos_keys});
     }
 
     /**

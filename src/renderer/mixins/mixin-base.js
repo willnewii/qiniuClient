@@ -3,9 +3,6 @@ import API from '../api/API';
 let api;
 
 export default {
-    created: function () {
-        api = new API(this);
-    },
     methods: {
         showMessage(option) {
             switch (option.type) {
@@ -23,6 +20,9 @@ export default {
             this._request('post', ...arguments);
         },
         _request(method, url, param, success, fail) {
+            if (!api) {
+                api = new API(this);
+            }
             api[method](url, param).then((response) => {
                 success(response);
             }).catch((error) => {

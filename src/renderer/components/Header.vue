@@ -115,7 +115,7 @@
             },
         },
         watch: {
-            'bucket.name': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
+            'bucket.key': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
                 if (val) {
                     this.updateSupport();
                 }
@@ -177,11 +177,8 @@
                 }
             },
             clearSearch() {
-                console.log(event);
-                if (this.search !== '') {
-                    this.search = '';
-                    this.$emit('on-search', this.search, event);
-                }
+                this.search = '';
+                EventBus.$emit(Constants.Event.updateFiles);
             },
             toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
@@ -207,7 +204,7 @@
                         this.$refs['uploadModal'].uploadAction(index);
                         break;
                     case 2://搜索事件
-                        this.$emit('on-search', this.search, event);
+                        EventBus.$emit(Constants.Event.updateFiles, {keyWord: this.search, flatten: true});
                         break;
                     case 5://刷新当前bucket
                         this.$parent.getResources();

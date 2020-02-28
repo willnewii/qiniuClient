@@ -42,7 +42,7 @@
                     <div>{{item.key}}</div>
                     <div>
                         <i-button class='btn' type="primary" size="small" @click="show(item.key)">查看</i-button>
-                        <i-button class='btn' type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="copyFileUrl(item.key)">复制路径</i-button>
                         <i-button class='btn' type="primary" size="small" @click="openInFolder(item.path)">源文件
                         </i-button>
                     </div>
@@ -82,13 +82,13 @@
             })
         },
         async created() {
+            //TODO: 托盘目前逻辑有问题,需要重写
             ipc = this.$electron.ipcRenderer;
 
             let app = await storagePromise.get(Constants.Key.configuration);
             console.log(app);
             if (app && app.brand && app.bucket_name) {
-                this.$storage.setBrand(app.brand);
-                this.$storage.initCOS((result) => {
+                this.$storage.initCOS(app, (result) => {
                     if (result) {
                         ipc.send(Constants.Listener.setBrand, {
                             key: app.brand
@@ -187,7 +187,7 @@
                 let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 this.$electron.shell.openExternal(url);
             },
-            copy(key) {
+            copyFileUrl(key) {
                 let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 util.getClipboardText(this.config.copyType, url);
             },
