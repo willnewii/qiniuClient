@@ -96,7 +96,7 @@ const registerIPC = function () {
     });
 
     //下载文件
-    ipcMain.on(Constants.Listener.downloadFile, function (event, file, option) {
+    ipcMain.on(Constants.Listener.downloadFile, function (event, url, option) {
         option.onProgress = function (num) {
             if (num !== 1) {
                 event.sender.send(Constants.Listener.updateDownloadProgress, num);
@@ -109,14 +109,14 @@ const registerIPC = function () {
             option.directory = path.join(option.directory, option.folder);
         }
 
-        download(mainWindow, file, option).then(dl => {
+        download(mainWindow, url, option).then(dl => {
             if (option.count === 1) {
                 shell.showItemInFolder(dl.getSavePath());
             }
         }).catch(error => {
             console.error(error);
         }).finally(() => {
-            console.log(file.path, 1);
+            // console.log(file.path, 1);
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });

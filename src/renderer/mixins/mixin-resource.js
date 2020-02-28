@@ -55,7 +55,7 @@ export default {
         copyFileUrl(file, copyType) {
             let text = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResourceUrl(file), file);
             this.$electron.clipboard.writeText(text);
-            this.$Message.info('文件路径以复制到剪贴板');
+            this.$Message.info('文件路径已复制到剪贴板');
         },
         //TODO: 操作队列
         resourceAction(files, action) {
