@@ -137,6 +137,9 @@ class baseBucket {
      * @param url
      */
     generateUrl(url) {
+        if (!url){
+            return '' ;
+        }
 
         //默认添加http
         if (!/^https?:\/\//.test(url)) {

@@ -73,7 +73,7 @@ export default {
                     this.queueTask();
                     break;
                 case Constants.ActionType.remove:
-                    this.removes(files);
+                    this.resourceRemove(files , true);
                     break;
             }
 
@@ -93,10 +93,6 @@ export default {
                 let message = "";
                 switch (file.__action) {
                     case Constants.ActionType.download:
-                        EventBus.$emit(Constants.Event.statusview, {
-                            show: true,
-                            message: '文件下载中',
-                        });
                         message = '文件下载中';
                         this.resourceDownload(file);
                         break;
@@ -136,8 +132,6 @@ export default {
 
                 this.$Loading.finish();
                 EventBus.$emit(Constants.Event.statusview, {
-                    message: '',
-                    path: '',
                     show: false
                 });
 
@@ -168,7 +162,7 @@ export default {
                 if (err) {
                     this.$Notice.error({title: '上传失败', desc: err.error,});
                 }
-                //批量上传的时候信息会干扰
+                //批量上传的时候提示信息会干扰
                 /*else {
                     this.$Notice.success({title: '上传成功', desc: ret.key,});
                 }*/
@@ -176,7 +170,7 @@ export default {
                 this.queueTask();
             };
 
-            if (!file.key && file.path){
+            if (!file.key && file.path) {
                 file.key = util.getPrefix(file.path);
             }
 
@@ -209,33 +203,22 @@ export default {
                 EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.rename, files);
             });
         },
-        /**
-         *
-         * 删除按钮点击事件
-         * @param file
-         */
-        resourceRemove(file) {
+        resourceRemove(file, noAsk = false) {
             this.bucket.selection = Array.isArray(file) ? file : [file];
-            if (this.setup_deleteNoAsk) {
-                this.removes(this.bucket.selection);
+            if (this.setup_deleteNoAsk || noAsk) {
+                this.bucket.removeFile(this.bucket.selection, (ret) => {
+                    if (ret && ret.error) {
+                        this.$Message.error('移除失败：' + ret.error);
+                    } else {
+                        this.$Message.info('文件移除成功');
+                        EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.remove);
+                    }
+
+                });
                 this.bucket.selection = [];
             } else {
                 this.$parent.askRemove();
             }
-        },
-        /**
-         * 删除文件
-         */
-        removes(files) {
-            this.bucket.removeFile(files, (ret) => {
-                if (ret && ret.error) {
-                    this.$Message.error('移除失败：' + ret.error);
-                } else {
-                    this.$Message.info('文件移除成功');
-                    EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.remove);
-                }
-
-            });
         },
     }
 };

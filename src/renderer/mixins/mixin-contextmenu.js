@@ -21,7 +21,13 @@ export default {
     },
     methods: {
         selectFile(index) {
-            let file = this.files[index];
+            let file;
+            if (typeof index === 'object') {
+                file = index;
+                index = this.files.indexOf(file);
+            } else {
+                file = this.files[index];
+            }
 
             if (this.selection.indexOf(index) !== -1) {
                 this.selection.splice(this.selection.indexOf(index), 1);
@@ -105,7 +111,7 @@ export default {
             this.contextFileMenuIndex = ref.data.attrs.index;
         },
         handleFileMenuClick(action) {
-            let file = this.files[this.contextFileMenuIndex];
+            let file = this.contextFileMenuIndex;
 
             switch (action) {
                 case 0://删除操作
@@ -129,7 +135,7 @@ export default {
                     this.changeFileNameDialog.file = file;
                     break;
                 case 5://选择当前文件
-                    this.selectFile(this.contextFileMenuIndex);
+                    this.selectFile(file);
                     break;
                 case 6://下载
                     // this.handleDownload(file);

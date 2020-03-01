@@ -32,10 +32,10 @@
         </v-contextmenu>
         <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
             <div v-for="(items,index1) of getFileByGrid(files)" class="grid2-item" :key="index1">
-                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false"
+                <Card v-for="(file,index) of items" :key="index" class="card" :padding="0" :bordered="false"
                       v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}">
                     <div class="item" @click="clickItem(file,files.indexOf(file))"
-                         v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="files.indexOf(file)">
+                         v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="file">
                         <template v-if="file._directory">
                             <Icon class="file" :type="file._icon" size="50"></Icon>
                             <span class="name">{{file._name}}</span>
@@ -59,10 +59,10 @@
             </div>
         </virtual-list>
         <virtual-list :size="29" :remain="remain0" class="list" v-else-if="type === 0" key="0">
-            <div v-for="(file,index) of files" :key="file.key" class="item"
+            <div v-for="(file,index) of files" :key="index" class="item"
                  v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
                  @click="clickItem(file,index)"
-                 v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="index">
+                 v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="file">
                 <template v-if="file._directory">
                     <Icon :type="file._icon" size="15"></Icon>
                     <span class="name">{{file._name}}</span>
@@ -188,8 +188,6 @@
             });
 
             this.$electron.ipcRenderer.on(Constants.Listener.syncDirectory, (event, results) => {
-                // console.log(results);
-                // return ;
                 let finishCount = 0;
 
                 //  下载任务
@@ -258,6 +256,7 @@
                                 keyword: file._path
                             });
                         }
+                        console.log(file, file._path);
                         this.bucket.folderPath = file._path;
                     } else {
                         this.preview(file);
@@ -407,17 +406,8 @@
                     });
                 }
 
-                //清除view绑定的ContentMenu事件
-                ['folderMenu', 'fileMenu'].forEach((item) => {
-                    if (this.$refs[item] && this.$refs[item].references) {
-                        this.$refs[item].references.forEach((ref) => {
-                            ref.el.removeEventListener(this.$refs[item].eventType, this.$refs[item].handleReferenceContextmenu);
-                        });
-                        this.$refs[item].references = [];
-                    }
-                });
-
                 this.files = Object.freeze(files);
+
                 this.previewImages = images.map((item) => {
                     return this.getResourceUrl(item);
                 });

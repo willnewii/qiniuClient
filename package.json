@@ -48,7 +48,7 @@
         "qs": "^6.8.0",
         "upyun": "^3.3.11",
         "uuid": "^3.3.3",
-        "v-contextmenu": "^2.8.0",
+        "v-contextmenu": "^2.9.0",
         "v-viewer": "^1.4.2",
         "view-design": "^4.0.2",
         "vue": "^2.6.10",
