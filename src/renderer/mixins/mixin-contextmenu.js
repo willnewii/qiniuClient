@@ -24,11 +24,12 @@ export default {
             let file;
             if (typeof index === 'object') {
                 file = index;
-                index = this.files.indexOf(file);
+                index = this.files.indexOf(index);
             } else {
                 file = this.files[index];
             }
 
+            console.log(file, index);
             if (this.selection.indexOf(index) !== -1) {
                 this.selection.splice(this.selection.indexOf(index), 1);
 
@@ -77,7 +78,7 @@ export default {
             this.contextFolderMenuIndex = ref.data.attrs.index;
         },
         handleFolderMenuClick(action) {
-            let path = this.files[this.contextFolderMenuIndex]._path;
+            let path = this.contextFolderMenuIndex._path;
             let files = [];
 
             switch (action) {
@@ -96,8 +97,8 @@ export default {
                     break;
                 case 2://修改文件夹
                     this.changeFileNameDialog.show = true;
-                    this.changeFileNameDialog.input = this.files[this.contextFolderMenuIndex]._name;
-                    this.changeFileNameDialog.file = this.files[this.contextFolderMenuIndex];
+                    this.changeFileNameDialog.input = this.contextFolderMenuIndex._name;
+                    this.changeFileNameDialog.file = this.contextFolderMenuIndex;
                     break;
                 case 3://多选
                     this.selectFile(this.contextFolderMenuIndex);

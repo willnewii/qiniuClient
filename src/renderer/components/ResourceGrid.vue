@@ -32,7 +32,7 @@
         </v-contextmenu>
         <virtual-list :size="123" :remain="remain1" :bench="10" :debounce="500" class="grid2" v-if="type === 1" key="1">
             <div v-for="(items,index1) of getFileByGrid(files)" class="grid2-item" :key="index1">
-                <Card v-for="(file,index) of items" :key="index" class="card" :padding="0" :bordered="false"
+                <Card v-for="(file,index) of items" :key="file.key" class="card" :padding="0" :bordered="false"
                       v-bind:class="{'item-select': selection.indexOf(files.indexOf(file)) !== -1}">
                     <div class="item" @click="clickItem(file,files.indexOf(file))"
                          v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="file">
@@ -59,9 +59,8 @@
             </div>
         </virtual-list>
         <virtual-list :size="29" :remain="remain0" class="list" v-else-if="type === 0" key="0">
-            <div v-for="(file,index) of files" :key="index" class="item"
-                 v-bind:class="{'item-select': selection.indexOf(index) !== -1}"
-                 @click="clickItem(file,index)"
+            <div v-for="(file,index) of files" :key="file.key" class="item"
+                 v-bind:class="{'item-select': selection.indexOf(index) !== -1}" @click="clickItem(file,index)"
                  v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu' " :index="file">
                 <template v-if="file._directory">
                     <Icon :type="file._icon" size="15"></Icon>

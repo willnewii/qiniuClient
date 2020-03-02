@@ -82,8 +82,8 @@ class Bucket extends baseBucket {
         let day = dayjs();
         let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
 
-        let requests = [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line].map((url)=>{
-            return new Request().get(`${url}${param}`)
+        let requests = [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line].map((url) => {
+            return new Request().get(`${url}${param}`);
         });
 
         Promise.all(requests).then((result) => {
