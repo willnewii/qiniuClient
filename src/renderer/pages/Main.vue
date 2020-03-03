@@ -95,7 +95,7 @@
     import {Constants, mixins, EventBus, util} from '../service/index';
 
     export default {
-        mixins: [mixins.base],
+        mixins: [mixins.base, mixins.request],
         components: {StatusView},
         data() {
             return {

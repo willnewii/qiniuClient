@@ -20,7 +20,7 @@ class baseBucket {
     init() {
         this.brand = '';                //服务商
         this.space = '';                //空间容量
-        this.count = '';               //文件个数
+        this.count = '';                //文件个数
         this.name = '';
         this.location = '';
         //操作权限 0：正常 1：私有
@@ -44,10 +44,7 @@ class baseBucket {
 
         // 文件队列(整合上传&下载)
         this.fileQueue = [];
-        //下载列表
-        // this.downloads = [];
-        //上传列表
-        // this.uploads = [];
+
         //在generateUrl 返回https
         this.https = false;
         //分页加载
@@ -76,9 +73,6 @@ class baseBucket {
         this.setPermission(permission);
     }
 
-    /**
-     * 此方法目前只有七牛云使用
-     */
     getResources() {
         let txt = '数据加载中,请稍后';
 

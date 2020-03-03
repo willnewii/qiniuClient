@@ -160,9 +160,7 @@
             EventBus.$on(Constants.Event.updateFiles, (option = {}) => {
                 if (option.keyWord) {
                     option.callback = (result) => {
-                        this.showMessage({
-                            message: `匹配到${result.searchCount}个文件`
-                        });
+                        this.$Message.info(`匹配到${result.searchCount}个文件`);
                     };
                 }
                 this.fileFilter(option);
