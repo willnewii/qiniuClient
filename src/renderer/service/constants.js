@@ -25,13 +25,16 @@ export const URL = {
 };
 
 export const Event = {
+
     removes: 'removes',
     remove: 'remove',
     download: 'download',
     statusview: 'statusview',
     dropview: 'dropview',
     loading: 'loading',
-    updateFiles: 'updateFiles',
+    updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据
+    refreshFiles: 'refreshFiles',           //更新文件列表
+    resourceAction: 'resourceAction',       //下载/上传事件
     changePrivate: 'changePrivate',
 };
 
@@ -49,7 +52,21 @@ export const FileType = {
     folder: 'F',
 };
 
-export const PAGESIZE = 5000;
+export const ActionType = {
+    download: 'download',
+    upload: 'upload',
+    rename: 'rename',
+    remove: 'remove',
+};
+
+export const Message = {
+    download: 'download',
+    upload: 'upload',
+    rename: 'rename',
+    remove: 'remove',
+};
+
+export const PageSize = 5000;
 
 /**
  * 以本地为基准,云对应不上的文件会被删除

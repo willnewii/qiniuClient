@@ -183,7 +183,7 @@ export function sequence(file1, file2) {
  */
 export function convertMeta(item, brandKey = 'qiniu') {
     switch (brandKey) {
-        case brand.qiniu.key://qiniu
+        case brand.qiniu.key:
             item.putTime = item.putTime / 10000;
             item.ETag = item.hash;
             break;
@@ -205,7 +205,7 @@ export function convertMeta(item, brandKey = 'qiniu') {
             item.ETag = item.etag;
             break;
         case brand.upyun.key:
-            item.key = (item.remotePath && item.remotePath !== '/') ? item.remotePath + '/' + item.name : item.name;
+            item.key = (item.remotePath && item.remotePath !== Constants.DELIMITER) ? item.remotePath + Constants.DELIMITER + item.name : item.name;
             item.fsize = parseInt(item.size);
             item.putTime = new Date(item.time).getTime();
             item.ETag = item.etag;
@@ -218,6 +218,7 @@ export function convertMeta(item, brandKey = 'qiniu') {
     }
 
     item.mimeType = mime.lookup(item.key) || '';
+    item.displayName = getPostfix(item.key);
 
     return item;
 }

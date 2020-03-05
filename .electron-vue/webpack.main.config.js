@@ -12,9 +12,7 @@ let mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js')
     },
-    externals: [
-        'node-notifier'
-    ],
+    externals: ['node-notifier', 'worker_threads'],
     module: {
         rules: [
             {
@@ -54,9 +52,9 @@ let mainConfig = {
  */
 if (process.env.NODE_ENV !== 'production') {
     mainConfig.plugins.push(
-        new webpack.DefinePlugin({
-            '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-        })
+            new webpack.DefinePlugin({
+                '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+            })
     );
 }
 
@@ -65,15 +63,15 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-        new MinifyPlugin(),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-        })
+            new MinifyPlugin(),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': '"production"'
+            })
     );
 
     if (process.env.ANALYZER === 'true') {
         mainConfig.plugins.push(
-            new BundleAnalyzerPlugin(),
+                new BundleAnalyzerPlugin(),
         );
     }
 }

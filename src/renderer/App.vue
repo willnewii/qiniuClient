@@ -31,7 +31,7 @@
 
             await this[types.setup.init](() => {
                 if (this.setup_theme === 'auto') {
-                    this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
+                    this.$electron.ipcRenderer.once(Constants.Listener.darkMode, (event, arg) => {
                         util.loadTheme(arg ? 'dark' : 'light');
                     });
                     this.$electron.ipcRenderer.send(Constants.Listener.darkMode);

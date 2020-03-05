@@ -1,11 +1,13 @@
 export default {
     qiniu: {
         key: 'qiniu',
-        name: '七牛云'
+        name: '七牛云',
+        feature: ['urlUpload'],
     },
     tencent: {
         key: 'tencent',
-        name: '腾讯云'
+        name: '腾讯云',
+        feature: [],
     },
     qingstor: {
         key: 'qingstor',

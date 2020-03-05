@@ -44,7 +44,7 @@
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
                :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="(item,index) in coss"
+                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="(item,index) in coses"
                       :key="index">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
@@ -94,15 +94,12 @@
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
-    //cos切换时强制刷新的标记位
-    let isCosFirst = false;
-
     export default {
-        mixins: [mixins.base],
+        mixins: [mixins.base, mixins.request],
         components: {StatusView},
         data() {
             return {
-                coss: [],//已登录的cos列表
+                coses: [],//已登录的cos列表
                 cos: {name: ''},
                 cosChoiceModel: false,
                 bucketName: '',
@@ -149,13 +146,12 @@
             }),
         },
         /**
-         * 初始化COSkey
-         * 初始化设置项
          * 检查是否有新版本
+         * 初始化设置项
+         * 初始化COSkey
          */
         created: function () {
             this.checkVersion();
-
 
             EventBus.$on(Constants.Event.dropview, (option) => {
                 this.drop = Object.assign(this.drop, option);
@@ -182,28 +178,30 @@
                 types.setup.a_recent,
             ]),
             initCOS() {
-                this.$storage.getCOS(({cos}) => {
-                    if (cos.length === 0) {
+                this.$storage.getBindCoses(({coses}) => {
+                    if (coses.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
                     } else {
-                        let temp = null;
-                        cos.forEach((item) => {
-                            if (item.uuid === this.recent.uuid) {
-                                temp = item;
+                        let recentCOS = null;
+                        for (let i = 0; i < coses.length; i++) {
+                            if (coses[i].uuid === this.recent.uuid) {
+                                recentCOS = coses[i];
+                                break;
                             }
-                        });
-                        if (temp) {
-                            this.selectCOS(temp, this.recent.bucket);
-                        } else if (cos.length === 1) {
-                            this.selectCOS(cos[0]);
+                        }
+
+                        if (recentCOS) {
+                            this.selectCOS(recentCOS);
+                        } else if (coses.length === 1) {
+                            this.selectCOS(coses[0]);
                         } else {
-                            this.coss = cos;
+                            this.coses = coses;
                             this.cosChoiceModel = true;
                         }
                     }
                 });
             },
-            selectCOS(item, bucketname) {
+            selectCOS(item) {
                 if (item === undefined) {
                     this.$router.push({path: Constants.PageName.login});
                     return;
@@ -211,17 +209,16 @@
 
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos = item;
-                this.$storage.setBrand(item.key);
                 this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
-                        this.getBuckets(bucketname);
+                        this.getBuckets();
                     } else {
                         this.$router.push({path: Constants.PageName.login});
                     }
                 });
             },
-            getBuckets(bucketname) {
+            getBuckets() {
                 this.$storage.getBuckets((error, data) => {
                     if (error) {
                         util.notification({
@@ -232,14 +229,17 @@
                         let defaultIndex = 0;
 
                         data.datas.forEach((item, index) => {
-                            data.datas[index].permission = 0;
-                            if (bucketname === item.name) {
+                            item.permission = 0;
+                            if (this.recent.bucket === item.name) {
                                 defaultIndex = index;
                             }
                         });
                         this[types.app.a_buckets_info](data.datas);
+
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
-                        //登录成功,登录检测
+                        this.$nextTick(() => {// COS切换后,menu没有active样式,手动调用一下
+                            this.$refs['menu'].updateActiveName();
+                        });
                     }
                 });
             },
@@ -259,14 +259,6 @@
                 switch (name) {
                     default:
                         this.bucketName = name;
-                        this.$nextTick(() => {
-                            this.$refs['menu'].currentActiveName = name;
-                            this.$refs['menu'].updateActiveName();
-                            if (isCosFirst) {
-                                this.$refs['bucketPage'].initBucket(name);
-                                isCosFirst = false;
-                            }
-                        });
                         this[types.setup.a_recent]({
                             uuid: this.cos.uuid,
                             bucket: name
@@ -274,8 +266,8 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS(({cos}) => {
-                            this.coss = cos;
+                        this.$storage.getBindCoses(({coses}) => {
+                            this.coses = coses;
                             this.cosChoiceModel = true;
                         });
                         break;

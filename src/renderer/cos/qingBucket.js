@@ -1,5 +1,6 @@
 import * as Constants from "@/service/constants";
 import brand from '@/cos/brand';
+
 const fs = require('fs');
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
@@ -102,15 +103,11 @@ class Bucket extends baseBucket {
             if (!this.marker) {
                 this.files = [];
             }
-            let files = [];
-            data.keys.forEach((item) => {
-                if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, brand.qingstor.key));
-                }
-            });
 
-            data.items = files;
-            data.marker = data.next_marker;
+            data.items = data.keys.map((item) => {
+                return util.convertMeta(item, brand.qingstor.key);
+            });
+            data.marker = data.has_more ? data.next_marker : '';
             this.appendResources(data, option);
         });
     }

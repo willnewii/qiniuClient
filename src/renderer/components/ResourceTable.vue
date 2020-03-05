@@ -14,12 +14,13 @@
     </div>
 </template>
 <script>
+    /** 已经不维护这个文件啦~*/
     import {Constants, EventBus, util} from '../service/index';
-    import mixin_resource from '../mixins/mixin-resource';
+    import {resource} from '../mixins/index';
 
     export default {
         name: 'ResourceTable',
-        mixins: [mixin_resource],
+        mixins: [resource],
         data() {
             return {
                 self: this,
@@ -56,7 +57,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(item.row);
+                                            this.preview(item.row);
                                         }
                                     }
                                 }, '查看'),
@@ -69,7 +70,7 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.copy(item.row);
+                                            this.copyFileUrl(item.row);
                                         }
                                     }
                                 }, '复制'),
