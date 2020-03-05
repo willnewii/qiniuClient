@@ -186,7 +186,6 @@
 
             this.$electron.ipcRenderer.on(Constants.Listener.syncDirectory, (event, results) => {
                 let finishCount = 0;
-
                 //  下载任务
                 if (results.downloads && results.downloads.length > 0) {
                     this.baseDir = results.baseDir;
@@ -204,7 +203,7 @@
 
                 //  删除任务
                 if (results.deletes && results.deletes.length > 0) {
-                    this.resourceAction(results.uploads, Constants.ActionType.remove);
+                    this.resourceAction(results.deletes, Constants.ActionType.remove);
                 } else {
                     ++finishCount;
                 }
@@ -239,6 +238,9 @@
             inited(viewer) {
                 this.$viewer = viewer;
             },
+            /**
+             * index 当前UI中的下标
+             */
             clickItem(file, index) {
                 let time = new Date().getTime();
                 const CLICKTIME = 300;

@@ -65,6 +65,9 @@
             display: flex;
             flex-direction: row;
             flex-shrink: 0;
+            .button-margin {
+                margin-right: 10px;
+            }
         }
     }
 
@@ -114,37 +117,23 @@
             </div>
 
             <div class="header-button-view">
-                <Button size="small" @click="showFilter" icon="md-funnel"
-                        style="margin-right: 10px;background: #FFFFFF;">
-                </Button>
+                <template v-if="bucket.selection.length > 0">
+                    <Button class="button-margin" size="small" @click="cleanSelection()">取消</Button>
 
-                <Button size="small" @click="cleanSelection()"
-                        style="margin-right: 10px;"
-                        v-if="bucket.selection.length > 0">取消
-                </Button>
+                    <Button class="button-margin" size="small" @click="allSelection()">全选</Button>
 
-                <Button size="small" @click="allSelection()"
-                        style="margin-right: 10px;"
-                        v-if="bucket.selection.length > 0">全选
-                </Button>
+                    <Button class="button-margin" size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
 
-                <Button size="small" @click="downloads()" icon="md-download"
-                        style="margin-right: 10px;"
-                        v-if="bucket.selection.length > 0">下载({{bucket.selection.length}})
-                </Button>
+                    <Button class="button-margin" type="error" size="small" @click="askRemove()" icon="md-trash">删除({{bucket.selection.length}})</Button>
+                </template>
 
-                <Button type="error" size="small" @click="askRemove()" icon="md-trash"
-                        style="margin-right: 10px;"
-                        v-if="bucket.selection.length > 0">删除({{bucket.selection.length}})
-                </Button>
+                <Button class="button-margin" size="small" @click="showFilter" icon="md-funnel"></Button>
 
                 <Button-group size="small">
-                    <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)"
-                            icon="md-list"></Button>
-                    <!--<Button :type="showType === 1 ? 'primary' : 'ghost'" @click="changeShowType(1)" icon="images"></Button>-->
-                    <Button :type="showType === 1 ? 'primary' : 'default'" @click="changeShowType(1)"
-                            icon="md-folder"></Button>
+                    <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)" icon="md-list"></Button>
+                    <Button :type="showType === 1 ? 'primary' : 'default'" @click="changeShowType(1)" icon="md-folder"></Button>
                 </Button-group>
+
                 <Button-group size="small" style="margin-left: 10px;" v-if="bucket.marker">
                     <Button @click="getResources({keyword:bucket.folderPath})" icon="ios-arrow-forward"></Button>
                 </Button-group>
@@ -156,7 +145,7 @@
 
         <resource-filter ref="resource-filter" :bucket="bucket"></resource-filter>
 
-        <Modal v-model="model_DeleteAsk" title="确认删除文件？" class-name="vertical-center-modal" @on-ok="callRemove"
+        <Modal v-model="modelDeleteAsk" title="确认删除文件？" class-name="vertical-center-modal" @on-ok="callRemove"
                @on-cancel="cleanSelection">
             <div class="file-list">
                 <template>
@@ -164,23 +153,6 @@
                 </template>
             </div>
 
-        </Modal>
-
-        <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
-               @on-ok="syncFolder">
-            <template>
-                <RadioGroup v-model="model_merge.mode" vertical>
-                    <Radio :label="0">
-                        <span>合并</span>
-                    </Radio>
-                    <Radio :label="1">
-                        <span>覆盖云盘(以本地文件为基准,云盘未对应的文件会被删除)</span>
-                    </Radio>
-                    <Radio :label="2">
-                        <span>覆盖本地(以云盘文件为基准,本地未对应的文件会被删除)</span>
-                    </Radio>
-                </RadioGroup>
-            </template>
         </Modal>
     </div>
 </template>
@@ -212,12 +184,7 @@
                 bucket: null,
                 showType: -1, //0:列表 1:folder
                 folderPath: null,
-                model_DeleteAsk: false,
-                model_query_show: false,
-                model_merge: {
-                    show: false,
-                    mode: 0
-                }
+                modelDeleteAsk: false,
             };
         },
         computed: {
@@ -293,7 +260,7 @@
              * 根据配置,是否弹出删除确认框
              */
             askRemove() {
-                this.model_DeleteAsk = true;
+                this.modelDeleteAsk = true;
             },
             callRemove() {
                 EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.remove);
@@ -335,23 +302,6 @@
             },
             showFilter() {
                 this.$refs['resource-filter'].toggle();
-            },
-            showSyncFolder() {
-                this.model_merge.show = true;
-                this.model_merge.mode = 0;
-            },
-            syncFolder() {
-                let files = this.bucket.files;
-                files.forEach((item, index) => {
-                    files[index].url = this.$refs['resource-grid'].getResourceUrl(item);
-                });
-
-                this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
-                    properties: ['openDirectory'],
-                    files,
-                    type: this.$storage.key,
-                    mergeType: this.model_merge.mode,
-                });
             },
             exportURL() {//导出URL
                 let urls = [];

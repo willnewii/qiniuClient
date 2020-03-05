@@ -4,8 +4,8 @@
 -->
 <template>
     <div>
-        <Modal v-model="uploadModal.isShow" title="上传文件" @on-ok="preUploadFile"
-               @on-cancel="initModal" class-name="upload-modal">
+        <Modal v-model="uploadModal.isShow" title="上传文件" :mask-closable="false"
+               @on-ok="preUploadFile" @on-cancel="initModal" class-name="upload-modal">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
                    placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"

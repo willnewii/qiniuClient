@@ -22,7 +22,7 @@
         },
         created() {
             EventBus.$on(Constants.Event.statusview, (option) => {
-                this.status = ('show' in option && !option.show) ? this.$options.data.status : Object.assign(this.status, option);
+                this.status = ('show' in option && !option.show) ? this.$options.data().status : Object.assign(this.status, option);
             });
             this.$once('hook:beforeDestroy', function () {
                 EventBus.$off(Constants.Event.statusview);

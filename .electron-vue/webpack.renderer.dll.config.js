@@ -14,6 +14,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const srcPath = path.join(__dirname, '../static/dll/');
 const commonExtract = new ExtractTextPlugin('[name].css');
 
+const rendererConfig = require('./webpack.renderer.config');
+
 /**
  * List of node_modules to include in webpack bundle
  *
@@ -22,7 +24,7 @@ const commonExtract = new ExtractTextPlugin('[name].css');
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
 let rendererConfig = {
-    devtool: '#cheap-module-eval-source-map',
+    devtool: 'cheap-module-eval-source-map',
     entry: {},
     module: {
         rules: [

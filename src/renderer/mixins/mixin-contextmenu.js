@@ -29,7 +29,6 @@ export default {
                 file = this.files[index];
             }
 
-            console.log(file, index);
             if (this.selection.indexOf(index) !== -1) {
                 this.selection.splice(this.selection.indexOf(index), 1);
 
