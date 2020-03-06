@@ -40,9 +40,9 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
     let deletes = [];
 
     logger.info('文件夹同步 star');
-    logger.info(`同步参数:localDir:${localDir}---platformType:${platformType}---mergeType:${mergeType}`);
+    logger.info(`同步参数:localDir:${localDir}-platformType:${platformType}-mergeType:${mergeType}`);
 
-    logger.info('cloud ----> local');
+    logger.info(`cloud ----> local`);
     for (let file of cloudFiles) {
         let filePath = path.join(localDir, file.key);
         keys.push(file.key);
@@ -53,12 +53,14 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
                 logger.info(`${tag}--${file.ETag}`);
                 if (fs.statSync(filePath).mtimeMs > file.putTime) {
                     logger.info('[上传]:本地文件变更,更新云文件', filePath);
-                    uploads.push({path: filePath, dir: localDir});
+                    uploads.push({path: filePath, dir: localDir, key: filePath.replace(localDir + Constants.DELIMITER, '')});
                 } else {
                     //filePath移动至 old 文件夹
                     logger.info('[下载]:云文件变更,更新本地文件', file.key);
                     downloads.push(file);
                 }
+            } else {
+                logger.info('[不处理]', file.key);
             }
         } else {
             if (mergeType === Constants.mergeType.coverCloud) {
@@ -73,9 +75,9 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
 
     logger.info('local ----> cloud');
     let files = klaw(localDir, {
-        nodir: true,
+        nodir: true, //return only files
         filter: function (item) {
-            return !/\.(log|delete)$/.test(item.path);
+            return !/\.(log|delete|DS_Store)$/.test(item.path);
         }
     });
     for (let file of files) {
@@ -86,7 +88,10 @@ export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu
                 fs.moveSync(file.path, file.path + '.delete');
             } else {
                 logger.info('[上传]:云文件不存在', file.path);
-                uploads.push({path: util.convertPath(file.path), dir: util.convertPath(localDir)});
+                let path = util.convertPath(file.path);
+                let dir = util.convertPath(localDir);
+                let key = path.replace(dir + Constants.DELIMITER, '');
+                uploads.push({path, dir, key});
             }
         }
     }

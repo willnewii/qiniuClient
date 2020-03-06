@@ -67,10 +67,29 @@
             </DropdownMenu>
         </Dropdown>
 
-        <Input class="input-search no-drag" v-model="search" placeholder="搜索" icon="md-close-circle"
+        <Input class="input-search no-drag" v-model="search" placeholder="搜索" :icon="search.length > 0 ? 'md-close-circle' : ''"
                @on-enter="actionBtn(2)" @on-click="clearSearch"
                v-show="bucket.name"/>
 
+        <!-- 同步对话框-->
+        <Modal v-model="model_merge.show" title="请选择同步方式" class-name="vertical-center-modal"
+               @on-ok="syncFolder">
+            <template>
+                <RadioGroup v-model="model_merge.mode" vertical>
+                    <Radio :label="0">
+                        <span>合并</span>
+                    </Radio>
+                    <Radio :label="1">
+                        <span>覆盖云盘(以本地文件为基准,云盘未对应的文件会被删除)</span>
+                    </Radio>
+                    <Radio :label="2">
+                        <span>覆盖本地(以云盘文件为基准,本地未对应的文件会被删除)</span>
+                    </Radio>
+                </RadioGroup>
+            </template>
+        </Modal>
+
+        <!-- 上传对话框-->
         <upload-modal :bucket="bucket" ref="uploadModal"></upload-modal>
     </div>
 </template>
@@ -91,7 +110,10 @@
                 isWin: process.platform === 'win32',
                 isSupportUrlUpload: false,
                 isSupportDomain: false,
-
+                model_merge: {
+                    show: false,
+                    mode: 0
+                }
             };
         },
         computed: {
@@ -115,7 +137,7 @@
             },
         },
         watch: {
-            'bucket.name': function (val) {//目前监听不到this.$storage.name,暂时用bucket.name 触发
+            'bucket.key': function (val) {
                 if (val) {
                     this.updateSupport();
                 }
@@ -126,6 +148,9 @@
             EventBus.$on(Constants.Event.changePrivate, (data) => {
                 this.bucket.getACL();
                 this.actionBtn(5);
+            });
+            this.$once('hook:beforeDestroy', function () {
+                EventBus.$off(Constants.Event.changePrivate);
             });
         },
         mounted() {
@@ -177,11 +202,8 @@
                 }
             },
             clearSearch() {
-                console.log(event);
-                if (this.search !== '') {
-                    this.search = '';
-                    this.$emit('on-search', this.search, event);
-                }
+                this.search = '';
+                EventBus.$emit(Constants.Event.updateFiles);
             },
             toggleShow($event) {//鼠标移入/移出动画,没有实际用途
                 let target = $event.target.getElementsByClassName('ivu-tooltip-rel')[0];
@@ -207,18 +229,35 @@
                         this.$refs['uploadModal'].uploadAction(index);
                         break;
                     case 2://搜索事件
-                        this.$emit('on-search', this.search, event);
+                        EventBus.$emit(Constants.Event.updateFiles, {keyWord: this.search, flatten: true});
                         break;
                     case 5://刷新当前bucket
                         this.$parent.getResources();
                         break;
                     case 6:// 同步当前bucket
-                        this.$parent.showSyncFolder();
+                        this.showSyncFolder();
                         break;
                     case 7://
                         this.$parent.exportURL();
                         break;
                 }
+            },
+            showSyncFolder() {
+                this.model_merge.show = true;
+                this.model_merge.mode = 0;
+            },
+            syncFolder() {
+                let files = this.bucket.files;
+                files.forEach((item, index) => {
+                    files[index].url = this.$parent.$refs['resource-grid'].getResourceUrl(item);
+                });
+
+                this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
+                    properties: ['openDirectory'],
+                    files,
+                    type: this.$storage.key,
+                    mergeType: this.model_merge.mode,
+                });
             },
             clickMore(name) {
                 this.actionBtn(name);

@@ -20,7 +20,7 @@ class baseBucket {
     init() {
         this.brand = '';                //服务商
         this.space = '';                //空间容量
-        this.count = '';               //文件个数
+        this.count = '';                //文件个数
         this.name = '';
         this.location = '';
         //操作权限 0：正常 1：私有
@@ -42,10 +42,9 @@ class baseBucket {
         //当前路径
         this.folderPath = '';
 
-        //下载列表
-        this.downloads = [];
-        //上传列表
-        this.uploads = [];
+        // 文件队列(整合上传&下载)
+        this.fileQueue = [];
+
         //在generateUrl 返回https
         this.https = false;
         //分页加载
@@ -74,9 +73,6 @@ class baseBucket {
         this.setPermission(permission);
     }
 
-    /**
-     * 此方法目前只有七牛云使用
-     */
     getResources() {
         let txt = '数据加载中,请稍后';
 
@@ -107,7 +103,7 @@ class baseBucket {
         this.marker = data.marker ? data.marker : '';
 
         //开启分页模式&文件数大于阀值&marker不为空
-        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length}`);
+        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length} marker:${this.marker}`);
         if (this.paging && loadCount >= MAXCOUNT && this.marker) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
@@ -135,6 +131,9 @@ class baseBucket {
      * @param url
      */
     generateUrl(url) {
+        if (!url){
+            return '' ;
+        }
 
         //默认添加http
         if (!/^https?:\/\//.test(url)) {

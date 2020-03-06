@@ -2,10 +2,9 @@
     <div class="about-view">
         <img class="logo" src="../assets/img/logo.jpg">
         <div class="name">{{info.cnname}}</div>
-        <div>v {{info.version}}</div>
-        <div>node: {{versions.node}}</div>
+        <div>v{{info.version}}</div>
+        <div>{{platform}}</div>
         <div>electron: {{versions.electron}}</div>
-        <div>chrome: {{versions.chrome}}</div>
     </div>
 </template>
 <script>
@@ -17,12 +16,12 @@
         data() {
             return {
                 info: pkg,
-                versions: process.versions
+                versions: process.versions,
+                platform: process.platform
             };
         },
         created() {
             document.getElementById('title') && document.getElementById('title').remove();
-            console.log(process.versions);
         },
         methods: {}
     };

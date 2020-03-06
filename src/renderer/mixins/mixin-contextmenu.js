@@ -21,22 +21,33 @@ export default {
     },
     methods: {
         selectFile(index) {
-            if (this.selection.indexOf(index) !== -1) {
-                this.selection.splice(this.selection.indexOf(index), 1);
+            let file;
+            if (typeof index === 'object') {
+                file = index;
+                index = this.files.indexOf(index);
             } else {
-                this.selection.push(index);
+                file = this.files[index];
             }
 
-            let files = [];
-            for (const i of this.selection) {
-                let file = this.files[i];
+            if (this.selection.indexOf(index) !== -1) {
+                this.selection.splice(this.selection.indexOf(index), 1);
+
                 if (file._directory) {
-                    files = files.concat(this.getFilebyPath(file._path));
+                    this.getFileByPath(file._path).forEach((item) => {
+                        this.bucket.selection.splice(this.bucket.selection.indexOf(item), 1);
+                    });
                 } else {
-                    files = files.concat(file);
+                    this.bucket.selection.splice(this.bucket.selection.indexOf(file), 1);
+                }
+            } else {
+                this.selection.push(index);
+
+                if (file._directory) {
+                    this.bucket.selection.push(...this.getFileByPath(file._path));
+                } else {
+                    this.bucket.selection.push(file);
                 }
             }
-            this.bucket.selection = files;
         },
         changeFileName() {
             let files = [];
@@ -59,25 +70,22 @@ export default {
                     }
                 }
             }
-            EventBus.$emit(Constants.Event.loading, {
-                show: true,
-                message: '更新中...',
-            });
+
             this.resourceRename(files);
         },
         handleFolderMenu(ref) {
             this.contextFolderMenuIndex = ref.data.attrs.index;
         },
         handleFolderMenuClick(action) {
-            let path = this.files[this.contextFolderMenuIndex]._path;
+            let path = this.contextFolderMenuIndex._path;
             let files = [];
 
             switch (action) {
                 case 0://删除操作
-                    this.resourceRemove(this.getFilebyPath(path));
+                    this.resourceRemove(this.getFileByPath(path));
                     break;
                 case 1://目录详情
-                    files = this.getFilebyPath(path);
+                    files = this.getFileByPath(path);
                     let size = 0;
                     files.forEach((item) => {
                         size += item.fsize;
@@ -88,8 +96,8 @@ export default {
                     break;
                 case 2://修改文件夹
                     this.changeFileNameDialog.show = true;
-                    this.changeFileNameDialog.input = this.files[this.contextFolderMenuIndex]._name;
-                    this.changeFileNameDialog.file = this.files[this.contextFolderMenuIndex];
+                    this.changeFileNameDialog.input = this.contextFolderMenuIndex._name;
+                    this.changeFileNameDialog.file = this.contextFolderMenuIndex;
                     break;
                 case 3://多选
                     this.selectFile(this.contextFolderMenuIndex);
@@ -103,7 +111,7 @@ export default {
             this.contextFileMenuIndex = ref.data.attrs.index;
         },
         handleFileMenuClick(action) {
-            let file = this.files[this.contextFileMenuIndex];
+            let file = this.contextFileMenuIndex;
 
             switch (action) {
                 case 0://删除操作
@@ -115,10 +123,10 @@ export default {
                     this.folderInfoDialog.info = `文件路径：${file.key}\n上传时间：${util.formatDate(file.putTime)}\n大小：${util.formatFileSize(file.fsize)}\nETag：${file.ETag}`;
                     break;
                 case 2:
-                    this.copy(file, Constants.CopyType.URL);
+                    this.copyFileUrl(file, Constants.CopyType.URL);
                     break;
                 case 3:
-                    this.copy(file, Constants.CopyType.MARKDOWN);
+                    this.copyFileUrl(file, Constants.CopyType.MARKDOWN);
                     break;
                 case 4:
                     this.changeFileNameDialog.show = true;
@@ -127,10 +135,11 @@ export default {
                     this.changeFileNameDialog.file = file;
                     break;
                 case 5://选择当前文件
-                    this.selectFile(this.contextFileMenuIndex);
+                    this.selectFile(file);
                     break;
                 case 6://下载
-                    this.handleDownload(file);
+                    // this.handleDownload(file);
+                    this.resourceAction(file, Constants.ActionType.download);
                     break;
                 case 7://全选
                     this.$parent.allSelection();

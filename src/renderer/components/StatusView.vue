@@ -1,5 +1,6 @@
 <template>
     <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
+        <div v-if="status.progress > 0" :style="{width: status.progress + '%'}" class="progress"></div>
         <div>{{status.message}}</div>
         <div>{{status.path}}</div>
     </div>
@@ -15,12 +16,16 @@
                     show: false,
                     path: '',
                     message: '',
+                    progress: 0
                 },
             };
         },
         created() {
             EventBus.$on(Constants.Event.statusview, (option) => {
-                this.status = Object.assign(this.status, option);
+                this.status = ('show' in option && !option.show) ? this.$options.data().status : Object.assign(this.status, option);
+            });
+            this.$once('hook:beforeDestroy', function () {
+                EventBus.$off(Constants.Event.statusview);
             });
         },
         methods: {}
@@ -47,5 +52,14 @@
     .status-view-none {
         opacity: 0;
         transition: opacity .5s;
+    }
+
+    .progress {
+        height: 100%;
+        background-color: $primary;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
     }
 </style>
