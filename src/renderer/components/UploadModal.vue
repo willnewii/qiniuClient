@@ -96,7 +96,7 @@
             window.ondragleave = (e) => {
                 e.preventDefault();
                 if (e.screenY === e.screenX && e.screenX === 0) {
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: false,
                     });
                 }
@@ -106,7 +106,7 @@
                 e.preventDefault();
                 if (!this.messageFlag) {
                     this.messageFlag = true;
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: true,
                         message: `文件将会被上传至 ${this.bucket.name} 存储桶下的: ${this.bucket.folderPath}/`,
                     });
@@ -124,7 +124,7 @@
                         path.push(file.path);
                     });
 
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: false,
                     });
                     EventBus.$emit(Constants.Event.loading, {

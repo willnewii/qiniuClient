@@ -153,7 +153,7 @@
         created: function () {
             this.checkVersion();
 
-            EventBus.$on(Constants.Event.dropview, (option) => {
+            EventBus.$on(Constants.Event.dropView, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {

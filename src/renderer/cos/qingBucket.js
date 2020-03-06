@@ -10,6 +10,11 @@ const mime = require('mime-types');
 
 class Bucket extends baseBucket {
 
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.qingstor.key;
+    }
+
     /**
      * 获取bucket访问权限
      * 获取资源

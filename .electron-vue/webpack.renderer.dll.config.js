@@ -14,8 +14,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const srcPath = path.join(__dirname, '../static/dll/');
 const commonExtract = new ExtractTextPlugin('[name].css');
 
-const rendererConfig = require('./webpack.renderer.config');
-
 /**
  * List of node_modules to include in webpack bundle
  *

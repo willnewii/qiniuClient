@@ -6,6 +6,11 @@ const fs = require('fs');
 
 class Bucket extends baseBucket {
 
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.aws.key;
+    }
+
     /**
      * 获取bucket访问权限
      * 获取资源
