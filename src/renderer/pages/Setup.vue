@@ -88,7 +88,7 @@
             </div>
         </template>
         <template
-                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.minio.key === $storage.key">
+                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.jd.key === $storage.key || brands.minio.key === $storage.key">
             <div class="item">
                 私有空间：
                 <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>

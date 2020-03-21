@@ -1,33 +1,40 @@
-const {QingStor, Config} = require('qingstor-sdk');
+const {QingStor, Config, Signer} = require('qingstor-sdk');
 
 import QingBucket from "./qingBucket";
 
 let cos = null;
+let signer = null;
 let qinKey = null;
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
 function init(param) {
-    cos = new QingStor(new Config(param.access_key, param.secret_key));
+    cos = new QingStor(new Config({
+        access_key_id: param.access_key,
+        secret_access_key: param.secret_key,
+    }));
+    signer = new Signer(param.access_key, param.secret_key);
     qinKey = param;
 }
 
 function getBuckets(callback) {
     cos.listBuckets().then((data) => {
-        let error = null;
-        if (data.statusCode !== 200) {
-            error = {};
+        if (data.buckets) {
+            callback && callback(null, {datas: data.buckets});
+        } else {
+            let error = {};
             error.message = data.message;
             callback && callback(error);
-        } else {
-            callback && callback(null, {datas: data.buckets});
         }
     });
 }
 
-function generateUrl(domain, key, deadline) {
+function generateUrl(domain, key, deadline, request) {
     key = key.trim();
     if (deadline) {
+        const {operation} = request;
+        operation.expires = parseInt(Date.now() / 1000) + parseInt(deadline);
+        return signer.signQuery(operation).uri;
     } else {
         return PROTOCOL + domain + '/' + encodeURI(key);
     }

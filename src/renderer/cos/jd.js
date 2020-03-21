@@ -4,20 +4,17 @@ import AWSBucket from "./awsBucket";
 let s3;
 
 function init(param) {
+    console.log(param);
     let options = {apiVersion: '2006-03-01'};
 
     AWS.config = new AWS.Config({
-        accessKeyId: param.access_key, secretAccessKey: param.secret_key, region: param.region
+        accessKeyId: param.access_key,
+        secretAccessKey: param.secret_key,
+        region: param.region,
+        endpoint: `https://s3.${param.region}.jdcloud-oss.com`,
+        s3ForcePathStyle: true,
+        signatureVersion: 'v4',
     });
-
-    //minio 需要处理的
-    if (param.endpoint) {
-        AWS.config.update({
-            endpoint: param.endpoint,
-            signatureVersion: 'v4',
-            s3ForcePathStyle: true,
-        });
-    }
 
     s3 = new AWS.S3(options);
 }

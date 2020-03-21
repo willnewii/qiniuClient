@@ -91,7 +91,7 @@
                         <Form-item label="ENDPOINT" prop="endpoint" v-if="item.key === brands.minio.key">
                             <Input v-model="formItem.endpoint" placeholder="请填入服务的endpoint"/>
                         </Form-item>
-                        <Form-item label="区域" prop="region" v-if="item.key === brands.aws.key">
+                        <Form-item label="区域" prop="region" v-if="item.key === brands.aws.key || item.key === brands.jd.key">
                             <Select v-model="formItem.region">
                                 <Option v-for="item in regions" :value="item.region" :key="item.region">{{ item.name }}
                                 </Option>
@@ -177,6 +177,8 @@
                 }
                 if (key === this.brands.aws.key) {
                     this.regions = Regions.s3;
+                } else if (key === this.brands.jd.key) {
+                    this.regions = Regions.jd;
                 }
             },
             handleSubmit(key) {

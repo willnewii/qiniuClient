@@ -52,12 +52,13 @@ Vue.filter('formatFileSize', function (value) {
     return util.formatFileSize(value);
 });
 
-//拦截器
+//拦截器(会影响到青云的请求)
 axios.interceptors.response.use((response) => {
-    return typeof (response.data) === 'object' ? response.data : JSON.parse(response.data);
+    if (response.data) {
+        return typeof (response.data) === 'object' ? response.data : JSON.parse(response.data);
+    }
+    return response.data;
 }, (error) => {
-    console.log(error);
-    console.log(error.response);
     if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
     }
