@@ -62,6 +62,18 @@
     }, {
         "name": "南美洲 (圣保罗)",
         "region": "sa-east-1"
+    }],
+    "jd": [ {
+        "name": "华北-北京",
+        "region": "cn-north-1"
+    }, {
+        "name": "华东-宿迁",
+        "region": "cn-east-1"
+    }, {
+        "name": "华东-上海",
+        "region": "cn-east-2"
+    }, {
+        "name": "华南-广州",
+        "region": "cn-south-1"
     }]
-
 }

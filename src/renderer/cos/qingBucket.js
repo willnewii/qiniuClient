@@ -10,6 +10,11 @@ const mime = require('mime-types');
 
 class Bucket extends baseBucket {
 
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.qingstor.key;
+    }
+
     /**
      * 获取bucket访问权限
      * 获取资源
@@ -33,7 +38,7 @@ class Bucket extends baseBucket {
      * 获取Bucket访问权限状态
      */
     getACL() {
-        this.bucket.getACL((err, data) => {
+        this.bucket.getACL().then((data) => {
             let flag = true;
             if (data && data.acl.length > 0) {
                 for (let item of data.acl) {
@@ -61,8 +66,8 @@ class Bucket extends baseBucket {
                 'Content-Type': mime.lookup(_param.key)
             };
         }
-        this.bucket.putObject(_param.key, params, function (err, data) {
-            callback(err, {key: _param.key});
+        this.bucket.putObject(_param.key, params).then((data) => {
+            callback(null, {key: _param.key});
         });
     }
 
@@ -99,7 +104,7 @@ class Bucket extends baseBucket {
             params.marker = this.marker;
         }
 
-        this.cos.Bucket(this.name, this.location).listObjects(params, (err, data) => {
+        this.cos.Bucket(this.name, this.location).listObjects(params).then((data) => {
             if (!this.marker) {
                 this.files = [];
             }
@@ -119,10 +124,10 @@ class Bucket extends baseBucket {
      * @param deadline  私有模式,文件有效期
      * @returns {*}
      */
-    generateUrl(key, deadline) {
+    generateUrl(key, deadline = 3600) {
         let url;
         if (this.permission === 1) {
-            url = this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
+            url = qing.generateUrl(null, key, deadline, this.cos.Bucket(this.name, this.location).getObjectRequest(key));
         } else {
             url = qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
         }

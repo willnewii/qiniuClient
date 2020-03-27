@@ -57,7 +57,6 @@ export default {
             this.$electron.clipboard.writeText(text);
             this.$Message.info('文件路径已复制到剪贴板');
         },
-        //TODO: 操作队列
         resourceAction(files, action) {
             files = Array.isArray(files) ? files : [files];
 
@@ -68,12 +67,16 @@ export default {
                         item.__action = action;
                         return item;
                     }));
-                    this.status_total = this.bucket.fileQueue.length;
-                    this.status_count = 0;
-                    this.queueTask();
+                    if (!isTaskPending) {
+                        this.status_total = this.bucket.fileQueue.length;
+                        this.status_count = 0;
+                        this.queueTask();
+                    } else {
+                        this.status_total += files.length;
+                    }
                     break;
                 case Constants.ActionType.remove:
-                    this.resourceRemove(files , true);
+                    this.resourceRemove(files, true);
                     break;
             }
 
@@ -103,7 +106,7 @@ export default {
                 }
 
                 this.$Loading.start();
-                EventBus.$emit(Constants.Event.statusview, {
+                EventBus.$emit(Constants.Event.statusView, {
                     show: true,
                     message: `${message}(${++this.status_count}/${this.status_total})...`,
                 });
@@ -111,27 +114,13 @@ export default {
             } else {
                 isTaskPending = false;
                 if (lastTask && lastTask.__action === Constants.ActionType.upload) {
-                    // 上传成功后： 1.刷新列表 2.复制路径 3.通知
+                    // 上传成功后： 1.刷新列表 2.复制路径
                     EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.upload);
-                    console.log(lastTask);
                     this.copyFileUrl(lastTask);
-                    //TODO: 通知处理
-                    /*if (!err) {
-                        util.notification({
-                            title: '上传成功',
-                            icon: this.bucket.generateUrl(ret.key, this.setup_deadline),
-                            body: ret.key,
-                        });
-                    } else {
-                        util.notification({
-                            title: '上传失败',
-                            body: err.error,
-                        });
-                    }*/
                 }
 
                 this.$Loading.finish();
-                EventBus.$emit(Constants.Event.statusview, {
+                EventBus.$emit(Constants.Event.statusView, {
                     show: false
                 });
 
@@ -179,7 +168,7 @@ export default {
                 key: file.key,
                 isOverwrite: true,
                 progressCallback: (progress) => {
-                    EventBus.$emit(Constants.Event.statusview, {
+                    EventBus.$emit(Constants.Event.statusView, {
                         message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
                         progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
                     });

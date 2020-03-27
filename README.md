@@ -13,6 +13,11 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
+2020.03.27
+- 新增支持**京东云**
+- change: 上传和下载为队列调用错误
+- 点击左上角服务名称可直接修改别名
+
 2020.03.04
 - fix: 青云请求处理错误
 - fix: contextmenu 绑定事件异常
@@ -94,8 +99,8 @@ old
 - 私有空间操作([说明](https://github.com/willnewii/qiniuClient/wiki/%E4%B8%83%E7%89%9B%E7%A7%81%E6%9C%89%E7%A9%BA%E9%97%B4%E5%92%8C%E6%8E%88%E6%9D%83%E7%A9%BA%E9%97%B4%E5%A4%84%E7%90%86)）
 
 ## 下载
-- [云存储管理客户端-0.4.3-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.3-mac.dmg)
-- [云存储管理客户端-0.4.3-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.3-win.exe)
+- [云存储管理客户端-0.4.5-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.5-mac.dmg)
+- [云存储管理客户端-0.4.5-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.5-win.exe)
 
 ## Build Setup
 ``` bash

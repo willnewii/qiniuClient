@@ -2,9 +2,9 @@
     <div class="layout">
         <div class="content">
             <div class="layout-menu">
-                <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <Icon class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
-                    <span>{{menuState ? cos.name : ''}}</span>
+                <i-button type="text" class="navicon_btn">
+                    <Icon @click="toggleMenu" class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
+                    <span @click="showChangeAlias">{{menuState ? cos.name : ''}}</span>
                 </i-button>
                 <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
@@ -84,6 +84,12 @@
                 <span>{{drop.message}}</span>
             </div>
         </div>
+        <!-- 别名修改提示框-->
+        <Modal v-model="changeAliasDialog.show" class-name="vertical-center-modal"
+               ok-text="修改" :closable="true" :mask-closable="false" @on-ok="changeAlias">
+            <p>请输入你要修改的别名</p>
+            <Input class='modal-url' v-model="changeAliasDialog.name"></Input>
+        </Modal>
     </div>
 </template>
 <script>
@@ -136,6 +142,9 @@
                     show: false,
                     message: ''
                 },
+                changeAliasDialog: {
+                    show: false
+                }
                 // contextBucketMenuIndex: 0
             };
         },
@@ -153,7 +162,7 @@
         created: function () {
             this.checkVersion();
 
-            EventBus.$on(Constants.Event.dropview, (option) => {
+            EventBus.$on(Constants.Event.dropView, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {
@@ -209,6 +218,7 @@
 
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos = item;
+                this.changeAliasDialog.name = this.cos.name ;
                 this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
@@ -251,6 +261,13 @@
                         this.version.info = result.body;
                     }
                 });
+            },
+            showChangeAlias(){
+                this.changeAliasDialog.show = true;
+            },
+            changeAlias() {
+                this.cos.name = this.changeAliasDialog.name ;
+                this.$storage.updateCosKey(this.cos);
             },
             toggleMenu() {
                 this.menuState = !this.menuState;

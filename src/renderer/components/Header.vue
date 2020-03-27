@@ -121,7 +121,7 @@
                 customedomain: types.setup.customedomain,
             }),
             domainPlaceholder() {
-                switch (this.$storage.name) {
+                switch (this.$storage.key) {
                     case brand.qiniu.key:
                         return '请填入空间域名';
                     case brand.upyun.key:
@@ -144,6 +144,7 @@
             },
         },
         created() {
+            console.log(this.bucket);
             this.updateSupport();
             EventBus.$on(Constants.Event.changePrivate, (data) => {
                 this.bucket.getACL();
@@ -154,7 +155,7 @@
             });
         },
         mounted() {
-            if (this.$storage.name === brand.upyun.key && !this.bucket.domain) {
+            if (this.$storage.key === brand.upyun.key && !this.bucket.domain) {
                 this.$Message.warning({
                     content: '请先设置又拍云的加速域名.您可以在又拍云控制台查看您的加速域名',
                     duration: 8

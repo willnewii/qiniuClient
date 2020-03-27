@@ -9,7 +9,7 @@ class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
-        this.brand = brand.qiniu.key;
+        this.key = brand.qiniu.key;
         this.paging = false;
     }
 

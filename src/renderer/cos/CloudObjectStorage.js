@@ -8,6 +8,7 @@ import * as qing from '../cos/qing';
 import * as ali from '../cos/ali';
 import * as upyun from '../cos/upyun';
 import * as aws from '../cos/aws';
+import * as jd from '../cos/jd';
 
 import brand from '../cos/brand';
 
@@ -50,6 +51,9 @@ export default class CloudObjectStorage {
                 break;
             case brand.aws.key:
                 this.cos = aws;
+                break;
+            case brand.jd.key:
+                this.cos = jd;
                 break;
             case brand.minio.key:
                 this.cos = aws;
@@ -124,6 +128,18 @@ export default class CloudObjectStorage {
         } else {
             cos_keys.push(item);
         }
+        await storagePromise.set(KEY_COS, cos_keys);
+        callback && callback();
+    }
+
+    async updateCosKey(item, casllback) {
+        let cos_keys = await storagePromise.get(KEY_COS);
+
+        cos_keys.forEach((_item, index) => {
+            if (_item.uuid === item.uuid) {
+                cos_keys[index] = item;
+            }
+        });
         await storagePromise.set(KEY_COS, cos_keys);
         callback && callback();
     }

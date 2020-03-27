@@ -43,7 +43,7 @@
                         <template v-else>
                             <img v-if="file._icon==='md-image' && file.imgObj.src" class="image" v-lazy="file.imgObj"/>
                             <Icon v-else class="file" :type="file._icon" size="50"></Icon>
-                            <span class="name">{{file.key | getfileNameByUrl}}</span>
+                            <span class="name">{{file.displayName}}</span>
                             <div class="btn">
                                 <Button shape="circle" size="small" icon="md-download"
                                         @click.stop="fileAction(file , 0)"
@@ -175,7 +175,7 @@
 
             this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
                 this.$Loading.update(num * 100);
-                EventBus.$emit(Constants.Event.statusview, {
+                EventBus.$emit(Constants.Event.statusView, {
                     message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
                     progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
                 });
@@ -292,7 +292,7 @@
 
                 let url = this.bucket.generateUrl(file.key, this.setup_deadline);
                 let imageSrc = '';
-                switch (this.$storage.name) {
+                switch (this.$storage.key) {
                     case brand.qiniu.key:
                         if (parseInt(this.bucket.permission) === 1) {//如果是私密空间直接显示原图
                             imageSrc = url;

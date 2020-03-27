@@ -131,17 +131,19 @@ class baseBucket {
      * @param url
      */
     generateUrl(url) {
-        if (!url){
-            return '' ;
+        if (!url) {
+            return '';
         }
 
         //默认添加http
         if (!/^https?:\/\//.test(url)) {
             url = `${this.https ? 'https' : 'http'}://${url}`;
+        }
+
+        if (this.https) {
+            url = url.replace('http://', 'https://');
         } else {
-            if (this.https && url.startsWith('http://')) {
-                return url.replace('http://', 'https://');
-            }
+            url = url.replace('https://', 'http://');
         }
 
         return url;

@@ -26,6 +26,10 @@ export default {
         key: 'aws',
         name: '亚马逊S3',
     },
+    jd: {
+        key: 'jd',
+        name: '京东云',
+    },
     minio: {
         key: 'minio',
         name: 'MinIO'

@@ -5,6 +5,11 @@ import brand from '@/cos/brand';
 
 class Bucket extends baseBucket {
 
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.aliyun.key;
+    }
+
     /**
      * 获取bucket访问权限
      * 获取资源

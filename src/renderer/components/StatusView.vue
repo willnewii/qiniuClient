@@ -21,11 +21,11 @@
             };
         },
         created() {
-            EventBus.$on(Constants.Event.statusview, (option) => {
+            EventBus.$on(Constants.Event.statusView, (option) => {
                 this.status = ('show' in option && !option.show) ? this.$options.data().status : Object.assign(this.status, option);
             });
             this.$once('hook:beforeDestroy', function () {
-                EventBus.$off(Constants.Event.statusview);
+                EventBus.$off(Constants.Event.statusView);
             });
         },
         methods: {}

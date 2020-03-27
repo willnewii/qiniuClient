@@ -72,7 +72,7 @@
 
         </div>
 
-        <template v-if="brands.qiniu.key === $storage.name">
+        <template v-if="brands.qiniu.key === $storage.key">
             <div class="item">
                 预览图片样式：
                 <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
@@ -88,7 +88,7 @@
             </div>
         </template>
         <template
-                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.minio.key === $storage.key">
+                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.jd.key === $storage.key || brands.minio.key === $storage.key">
             <div class="item">
                 私有空间：
                 <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
@@ -225,10 +225,10 @@
             },
             saveDir: function () {
                 this.$electron.ipcRenderer.send(Constants.Listener.setBrand, {
-                    key: this.$storage.name
+                    key: this.$storage.key
                 });
-                this.brand = this.$storage.name;
-                this[types.setup.a_savedir]([this.bucketname, this.bucketdir, this.$storage.name]);
+                this.brand = this.$storage.key;
+                this[types.setup.a_savedir]([this.bucketname, this.bucketdir, this.$storage.key]);
                 this.$Message.success('托盘保存路径修改成功');
             },
             saveImagestyle: function () {
