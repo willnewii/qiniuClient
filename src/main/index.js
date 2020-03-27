@@ -18,6 +18,7 @@ import * as diffFolder from './util/diffFolder';
 let mainWindow, aboutWindow;
 
 const DEFAULT_PATH = path.join(app.getPath('downloads'), pkg.name);
+const iconPath = path.join(__dirname, '/assets/logo.png');
 
 app.on('ready', initApp);
 
@@ -57,6 +58,7 @@ function createMainWindow() {
         width: 1000,
         title: pkg.cnname,
         titleBarStyle: 'hidden',
+        icon: iconPath,
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true
@@ -316,6 +318,7 @@ const getMenuData = function () {
                     resizable: false,
                     autoHideMenuBar: true,
                     title: '关于',
+                    icon: iconPath,
                     webPreferences: {
                         webSecurity: false,
                         backgroundThrottling: false,

@@ -110,24 +110,24 @@ npm run build:all
 # 构建对应你的平台的安装包
 npm run build:mac
 npm run build:win32
-npm run build:linux            # 同时构建deb, rpm, appimage
+npm run build:linux            # 同时构建deb, rpm, appimage, zip
 npm run build:linux:deb        # 只构建deb
 npm run build:linux:rpm        # 只构建rpm
 npm run build:linux:appimage   # 只构建appimage
+npm run build:linux:zip        # 只构建zip
 ```
 
-> **Linux已知问题**:
->
-> 1. 不能用 `root` 身份运行
-> 1. 直接运行可能会出现错误: `2277:1015/203314.529451:FATAL:setuid_sandbox_host.cc(157)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now.`，需要执行
->
->     ```bash
->     sudo sysctl kernel.unprivileged_userns_clone=1
->     ```
->
->     永久生效可以添加 `kernel.unprivileged_userns_clone=1` 到 `/etc/sysctl.conf`, 然后执行 `sudo sysctl -p`
->
->     参考issue: https://github.com/electron/electron/issues/17972
+### Linux NOTE
+
+默认不能使用`root`身份运行，如果非用`root`身份不可，只能关闭`sandbox`，在命令行参数追加`--no-sandbox`：`./qiniuclient --no-sandbox`。
+
+如果以普通用户身份运行出现`The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now. You need to make sure that /path/to/chrome-sandbox is owned by root and has mode 4755.` 这样的错误时，以下解决方案任选其一:
+
+- 添加`kernel.unprivileged_userns_clone = 1`到`/etc/sysct.conf`，然后执行`sudo sysctl -p`即可
+- 上述方法需要内核参数开启`CONFIG_USER_NS=y`才会有效。如果上述方法报错（内核版本太低不支持，或未编译 user ns 功能支持），可以按照错误提示给`chrome-sandbox`添加`SUID`权限: `sudo chown root chrome-sandbox && sudo chmod 4755 chrome-sandbox`
+- 如果以上两种方案都无效，那么只能关闭`sandbox`。在命令行参数追加`--no-sandbox`参数：`./qiniuclient --no-sandbox`
+
+有关详情请参考官方[issue](https://github.com/electron/electron/issues/17972)
 
 # 字段说明
 package,添加了一个cdnPath字段.你可以将资源上传至该路径下.这样可以实现简单的renderer资源的动态更新.默认为空读取本地.
