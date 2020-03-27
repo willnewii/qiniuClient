@@ -132,6 +132,18 @@ export default class CloudObjectStorage {
         callback && callback();
     }
 
+    async updateCosKey(item, casllback) {
+        let cos_keys = await storagePromise.get(KEY_COS);
+
+        cos_keys.forEach((_item, index) => {
+            if (_item.uuid === item.uuid) {
+                cos_keys[index] = item;
+            }
+        });
+        await storagePromise.set(KEY_COS, cos_keys);
+        callback && callback();
+    }
+
     /**
      * 删除当前cos key信息
      * @param item

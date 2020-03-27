@@ -67,9 +67,13 @@ export default {
                         item.__action = action;
                         return item;
                     }));
-                    this.status_total = this.bucket.fileQueue.length;
-                    this.status_count = 0;
-                    this.queueTask();
+                    if (!isTaskPending) {
+                        this.status_total = this.bucket.fileQueue.length;
+                        this.status_count = 0;
+                        this.queueTask();
+                    } else {
+                        this.status_total += files.length;
+                    }
                     break;
                 case Constants.ActionType.remove:
                     this.resourceRemove(files, true);
