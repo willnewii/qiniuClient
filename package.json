@@ -17,6 +17,7 @@
         "build:linux:deb": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux deb",
         "build:linux:rpm": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux rpm",
         "build:linux:appimage": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux appimage",
+        "build:linux:zip": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder --linux zip",
         "build:dir": "cross-env ENV_DLL=true node --max_old_space_size=4096 .electron-vue/build.js && electron-builder --dir",
         "build:only-build-dir": "cross-env ENV_DLL=true electron-builder --dir",
         "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
@@ -74,7 +75,7 @@
         "del": "^5.1.0",
         "devtron": "^1.4.0",
         "electron": "^6.0.7",
-        "electron-builder": "^21.2.0",
+        "electron-builder": "^22.4.1",
         "electron-debug": "^3.0.1",
         "electron-devtools-installer": "^2.2.0",
         "extract-text-webpack-plugin": "^3.0.0",
@@ -133,9 +134,10 @@
             "target": [
                 "deb",
                 "rpm",
-                "AppImage"
+                "AppImage",
+                "zip"
             ],
-            "icon": "./build/icons",
+            "icon": "./build/icons/",
             "category": "Network"
         },
         "nsis": {
