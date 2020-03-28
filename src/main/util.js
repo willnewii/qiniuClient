@@ -26,6 +26,10 @@ export const isWin = function () {
     return process.platform === 'win32';
 };
 
+export const isLinux = function () {
+    return process.platform === 'linux';
+};
+
 /**
  * 根据选取的文件和文件夹,返回文件列表
  * path：文件绝对路径

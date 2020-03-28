@@ -225,8 +225,11 @@
         mounted() {
             this.fileFilter();
 
-            this.remain0 = this.$refs['content'].offsetHeight / 29;
-            this.remain1 = this.$refs['content'].offsetHeight / 123;
+            this.$nextTick(() => {
+                let height = this.$refs['content'].offsetHeight;
+                this.remain0 = height / 29;
+                this.remain1 = height / 123;
+            });
 
             this.step = parseInt(this.$refs['content'].offsetWidth / 123);
 

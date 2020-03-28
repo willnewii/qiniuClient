@@ -1,6 +1,7 @@
 .DS_Store
 app/dist/*
 builds/*
+.history/
 
 !.vscode/
 dist/electron/*

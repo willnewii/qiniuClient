@@ -1,6 +1,10 @@
 <template>
     <div class="page">
         <h4 class="title">全局设置</h4>
+        <!-- <div class="item" v-if="isShowMenuBarItem">
+            <span class="item-title">隐藏菜单栏</span>
+            <i-switch :value="setup_showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
+        </div> -->
         <div class="item">
             <span class="item-title">开启Https</span>
             <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
@@ -115,6 +119,7 @@
 <script>
     import {mapGetters, mapActions} from 'vuex';
     import {Constants, util, EventBus} from '../service';
+    import * as utilMain from '../../main/util';
     import * as types from '../vuex/mutation-types';
     import brands from '@/cos/brand';
 
@@ -130,7 +135,8 @@
                 deadline: 0,
                 privates: [],
                 theme: '',
-                brands: brands
+                brands: brands,
+                isShowMenuBarItem: utilMain.isWin() || utilMain.isLinux()
             };
         },
         computed: {
@@ -138,6 +144,7 @@
                 buckets_info: types.app.buckets_info,
                 setup_copyType: types.setup.copyType,
                 setup_deleteNoAsk: types.setup.deleteNoAsk,
+                setup_showMenuBar: types.setup.showMenuBar,
                 setup_https: types.setup.https,
                 setup_paging: types.setup.paging,
                 setup_uploadNoAsk: types.setup.uploadNoAsk,
@@ -178,6 +185,7 @@
                 types.app.a_update_buckets_info,
                 types.setup.a_copyType,
                 types.setup.a_https,
+                types.setup.a_showMenuBar,
                 types.setup.a_paging,
                 types.setup.a_deleteNoAsk,
                 types.setup.a_uploadNoAsk,
@@ -191,6 +199,10 @@
             ]),
             pagingChange: function (state) {
                 this[types.setup.a_paging](state);
+            },
+            showMenuBarChange: function (state) {
+                this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, state);
+                this[types.setup.a_showMenuBar](state);
             },
             httpsChange: function (state) {
                 this[types.setup.a_https](state);
