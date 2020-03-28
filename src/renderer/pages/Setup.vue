@@ -1,10 +1,10 @@
 <template>
     <div class="page">
         <h4 class="title">全局设置</h4>
-        <div class="item" v-if="isShowMenuBarItem">
+        <!-- <div class="item" v-if="isShowMenuBarItem">
             <span class="item-title">隐藏菜单栏</span>
             <i-switch :value="setup_showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
-        </div>
+        </div> -->
         <div class="item">
             <span class="item-title">开启Https</span>
             <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>

@@ -167,6 +167,7 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.showMenuBar, function (event, option) {
+        //win1页面会卡死
         mainWindow.setMenuBarVisibility(option);
     });
 
