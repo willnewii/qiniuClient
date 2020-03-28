@@ -16,6 +16,9 @@ export const setup = {
     downloaddir: 'downloaddir',
     a_downloaddir: 'a_downloaddir',
 
+    showMenuBar: 'showMenuBar',
+    a_showMenuBar: 'a_showMenuBar',
+
     https: 'https',
     a_https: 'a_https',
 

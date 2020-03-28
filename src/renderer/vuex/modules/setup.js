@@ -14,6 +14,7 @@ function setAppSetup(app) {
 const setup = {
     paging: true,                                           //是否开启分页
     https: false,                                           //是否支持Https
+    showMenuBar: false,                                     //是否显示菜单栏(win&Linux)
     deleteNoAsk: false,                                     //文件删除前是否弹出对话框
     uploadNoAsk: true,                                      //文件上传时是否弹出对话框
     isOverwrite: true,                                      //上传时是否直接覆盖文件
@@ -57,7 +58,7 @@ const mutations = {
         state.setup = value;
     },
 };
-const mutationsKeys = [types.setup.privatebucket, types.setup.isOverwrite, types.setup.downloaddir, types.setup.paging, types.setup.https, types.setup.deleteNoAsk, types.setup.copyType, types.setup.showType, types.setup.imagestyle, types.setup.theme, types.setup.recent];
+const mutationsKeys = [types.setup.privatebucket, types.setup.isOverwrite, types.setup.downloaddir, types.setup.paging, types.setup.showMenuBar,types.setup.https, types.setup.deleteNoAsk, types.setup.copyType, types.setup.showType, types.setup.imagestyle, types.setup.theme, types.setup.recent];
 mutationsKeys.forEach((key) => {
     mutations[key] = function (state, value) {
         state.setup[key] = value;
@@ -74,7 +75,7 @@ const actions = {
         }
     },
 };
-const actionsKey = [types.setup.a_isOverwrite, types.setup.a_deadline, types.setup.a_privatebucket, types.setup.a_imagestyle, types.setup.a_paging, types.setup.a_https, types.setup.a_deleteNoAsk, types.setup.a_uploadNoAsk, types.setup.a_downloaddir, types.setup.a_copyType, types.setup.a_showType, types.setup.a_savedir, types.setup.a_customedomain, types.setup.a_theme, types.setup.a_recent];
+const actionsKey = [types.setup.a_isOverwrite, types.setup.a_deadline, types.setup.a_privatebucket, types.setup.a_imagestyle, types.setup.a_paging, types.setup.a_showMenuBar,types.setup.a_https, types.setup.a_deleteNoAsk, types.setup.a_uploadNoAsk, types.setup.a_downloaddir, types.setup.a_copyType, types.setup.a_showType, types.setup.a_savedir, types.setup.a_customedomain, types.setup.a_theme, types.setup.a_recent];
 actionsKey.forEach((key) => {
     actions[key] = function (context, value) {
         context.commit(key.substring(2, key.length), value);
@@ -86,7 +87,7 @@ const getters = {
         return ('expiresTime' in state.setup) ? state.setup.expiresTime : 3600;
     }
 };
-const gettersKeys = [types.setup.isOverwrite, types.setup.privatebucket, types.setup.downloaddir, types.setup.imagestyle, types.setup.https, types.setup.paging, types.setup.deleteNoAsk, types.setup.uploadNoAsk, types.setup.copyType, types.setup.showType, types.setup.brand, types.setup.bucket_name, types.setup.bucket_dir, types.setup.customedomain, types.setup.theme, types.setup.recent];
+const gettersKeys = [types.setup.isOverwrite, types.setup.privatebucket, types.setup.downloaddir, types.setup.imagestyle, types.setup.showMenuBar,types.setup.https, types.setup.paging, types.setup.deleteNoAsk, types.setup.uploadNoAsk, types.setup.copyType, types.setup.showType, types.setup.brand, types.setup.bucket_name, types.setup.bucket_dir, types.setup.customedomain, types.setup.theme, types.setup.recent];
 gettersKeys.forEach((key) => {
     getters[key] = function (state) {
         return (key in state.setup) ? state.setup[key] : setup[key];

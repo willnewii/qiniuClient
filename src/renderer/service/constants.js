@@ -82,6 +82,7 @@ export const Listener = {
     preview: 'preview',
     syncDirectory: 'syncDirectory',
     darkMode: 'darkMode',
+    showMenuBar: 'showMenuBar',
     exportUrl: 'exportUrl'
 };
 

@@ -159,12 +159,15 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
-        console.log(arg);
         trayUtil.setTrayIcon('tray_' + arg.key + '.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
         event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+    });
+
+    ipcMain.on(Constants.Listener.showMenuBar, function (event, option) {
+        mainWindow.setMenuBarVisibility(option);
     });
 
     //导出URL链接
