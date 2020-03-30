@@ -12,10 +12,8 @@ import {Notification} from "electron";
 
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
-const iconPath = path.join(__dirname, 'assets/');
-
 export const getIconPath = function (filename) {
-    return path.join(iconPath, filename);
+    return path.join(__dirname, 'assets/', filename);
 };
 
 export const isMac = function () {
