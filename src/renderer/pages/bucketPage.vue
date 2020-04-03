@@ -122,6 +122,8 @@
 
                     <Button class="button-margin" size="small" @click="allSelection()">全选</Button>
 
+                    <Button v-if="bucket.key == 'qiniu'" class="button-margin" size="small" @click="callRefreshUrls()" icon="md-sync">刷新缓存({{bucket.selection.length}})</Button>
+
                     <Button class="button-margin" size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
 
                     <Button class="button-margin" type="error" size="small" @click="askRemove()" icon="md-trash">删除({{bucket.selection.length}})</Button>
@@ -264,6 +266,10 @@
             },
             callRemove() {
                 EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.remove);
+                this.bucket.selection = [];
+            },
+            callRefreshUrls() {
+                EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.refreshUrls);
                 this.bucket.selection = [];
             },
             //取消选择

@@ -168,6 +168,10 @@ class Bucket extends baseBucket {
         });
     }
 
+    refreshUrls(items, callback) {
+        qiniu.refreshUrls(items, callback);
+    }
+
     /**
      * 返回资源真实链接,无域名时,返回空链接.
      * @param index

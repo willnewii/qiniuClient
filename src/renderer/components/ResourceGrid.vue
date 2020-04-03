@@ -3,6 +3,10 @@
         <v-contextmenu ref="folderMenu" @contextmenu="handleFolderMenu">
             <v-contextmenu-item @click="handleFolderMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <template v-if="bucket.key === 'qiniu'">
+                <v-contextmenu-item @click="handleFolderMenuClick(5)">刷新CDN</v-contextmenu-item>
+                <v-contextmenu-item divider></v-contextmenu-item>
+            </template>
             <v-contextmenu-item @click="handleFolderMenuClick(2)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
@@ -15,6 +19,10 @@
         <v-contextmenu ref="fileMenu" @contextmenu="handleFileMenu">
             <v-contextmenu-item @click="handleFileMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <template v-if="bucket.key === 'qiniu'">
+                <v-contextmenu-item @click="handleFileMenuClick(8)">刷新CDN</v-contextmenu-item>
+                <v-contextmenu-item divider></v-contextmenu-item>
+            </template>
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>

@@ -78,6 +78,9 @@ export default {
                 case Constants.ActionType.remove:
                     this.resourceRemove(files, true);
                     break;
+                case Constants.ActionType.refreshUrls:
+                    this.resourceRefreshUrls(files);
+                    break;
             }
 
 
@@ -208,6 +211,20 @@ export default {
             } else {
                 this.$parent.askRemove();
             }
+        },
+        resourceRefreshUrls(file) {
+            file = Array.isArray(file) ? file : [file];
+
+            let urls = file.map((item) => {
+                return this.getResourceUrl(item);
+            });
+            this.bucket.refreshUrls(urls, (error) => {
+                if (error) {
+                    this.$Message.info('CDN刷新失败:' + error);
+                } else {
+                    this.$Message.info('CDN刷新成功');
+                }
+            });
         },
     }
 };

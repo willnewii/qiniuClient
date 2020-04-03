@@ -53,6 +53,7 @@ export const ActionType = {
     upload: 'upload',
     rename: 'rename',
     remove: 'remove',
+    refreshUrls: 'refreshUrls',
 };
 
 export const PageSize = 5000;

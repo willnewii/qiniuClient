@@ -201,8 +201,35 @@ function _batch(operations, callback) {
 
 }
 
+function refreshUrls(urls, callback) {
+    let cdnManager = new qiniu.cdn.CdnManager(getToken());
+
+    const _callback = function (err, respBody, respInfo) {
+        if (respBody.code === 200) {
+            callback();
+        } else {
+            callback(respBody.error);
+        }
+    };
+
+    let array1 = urls.filter((url) => {
+        return url.lastIndexOf('/') === (url.length - 1);
+    });
+    if (array1 && array1.length > 0) {
+        cdnManager.refreshDirs(array1, _callback);
+    }
+
+    let array2 = urls.filter((url) => {
+        return url.lastIndexOf('/') !== (url.length - 1);
+    });
+    if (array2 && array2.length > 0) {
+        cdnManager.refreshUrls(array2, _callback);
+    }
+}
+
+
 function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, generateUrl, _httpAuthorization, list, remove, rename, upload, fetch, methods};
+export {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};

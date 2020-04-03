@@ -105,6 +105,9 @@ export default {
                 case 4://全选
                     this.$parent.allSelection();
                     break;
+                case 5://刷新CDN
+                    this.resourceRefreshUrls({path: path + '/'});
+                    break;
             }
         },
         handleFileMenu(ref) {
@@ -143,6 +146,9 @@ export default {
                     break;
                 case 7://全选
                     this.$parent.allSelection();
+                    break;
+                case 8://刷新CDN
+                    this.resourceRefreshUrls(file);
                     break;
             }
         },
