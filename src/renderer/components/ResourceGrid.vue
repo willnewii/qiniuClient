@@ -182,10 +182,9 @@
             });
 
             this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
-                this.$Loading.update(num * 100);
                 EventBus.$emit(Constants.Event.statusView, {
                     message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
-                    progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
+                    progress: this.status_total === 1 ? num * 100 : parseInt(this.status_count / this.status_total * 100)
                 });
                 if (num === 1) {
                     this.queueTask();
@@ -565,6 +564,7 @@
             }
 
             &-select {
+                font-weight: 500;
                 color: white;
                 background-color: $primary !important;
             }

@@ -16,6 +16,7 @@
                     show: false,
                     path: '',
                     message: '',
+                    // 单个文件时 表示文件的进度. 多文件时表示总进度
                     progress: 0
                 },
             };
@@ -43,7 +44,7 @@
         text-align: left;
         background-color: rgba(0, 0, 0, 0.51);
         color: #FFFFFF;
-        padding: 10px;
+        padding: 5px 10px;
         font-size: 12px;
         z-index: 901;
         transition: opacity 1s;

@@ -108,7 +108,7 @@ export default {
                         break;
                 }
 
-                this.$Loading.start();
+                // this.$Loading.start();
                 EventBus.$emit(Constants.Event.statusView, {
                     show: true,
                     message: `${message}(${++this.status_count}/${this.status_total})...`,
@@ -122,7 +122,7 @@ export default {
                     this.copyFileUrl(lastTask);
                 }
 
-                this.$Loading.finish();
+                // this.$Loading.finish();
                 EventBus.$emit(Constants.Event.statusView, {
                     show: false
                 });
@@ -173,7 +173,7 @@ export default {
                 progressCallback: (progress) => {
                     EventBus.$emit(Constants.Event.statusView, {
                         message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
-                        progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
+                        progress: this.status_total === 1 ? progress : parseInt(this.status_count / this.status_total * 100)
                     });
                 }
             };
