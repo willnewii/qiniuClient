@@ -265,7 +265,6 @@
                                 keyword: file._path
                             });
                         }
-                        console.log(file, file._path);
                         this.bucket.folderPath = file._path;
                     } else {
                         this.preview(file);
@@ -274,9 +273,12 @@
                     if (this.itemClickTime === 0) {
                         setTimeout(() => {
                             if (this.itemClickTime !== 0) {
+                                this.itemClickTime = 0;
+                                if (file && file._icon === 'md-return-left') {
+                                    return;
+                                }
                                 this.selectFile(index);
                             }
-                            this.itemClickTime = 0;
                         }, CLICKTIME);
                     } else {
                         console.log('nothing');

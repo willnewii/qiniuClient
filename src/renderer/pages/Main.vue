@@ -108,6 +108,7 @@
                 coses: [],//已登录的cos列表
                 cos: {name: ''},
                 cosChoiceModel: false,
+                menuName: '',
                 bucketName: '',
                 menuState: true,            //menu是否折叠
                 appVersion: pkg.version,
@@ -218,7 +219,7 @@
 
                 document.getElementById("title") && (document.getElementById("title").innerText = item.name);
                 this.cos = item;
-                this.changeAliasDialog.name = this.cos.name ;
+                this.changeAliasDialog.name = this.cos.name;
                 this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
@@ -262,11 +263,11 @@
                     }
                 });
             },
-            showChangeAlias(){
+            showChangeAlias() {
                 this.changeAliasDialog.show = true;
             },
             changeAlias() {
-                this.cos.name = this.changeAliasDialog.name ;
+                this.cos.name = this.changeAliasDialog.name;
                 this.$storage.updateCosKey(this.cos);
             },
             toggleMenu() {
@@ -275,6 +276,7 @@
             onMenuSelect(name) {
                 switch (name) {
                     default:
+                        this.menuName = name ;
                         this.bucketName = name;
                         this[types.setup.a_recent]({
                             uuid: this.cos.uuid,
@@ -283,14 +285,22 @@
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
+                        this.$nextTick(() => {
+                            this.$refs['menu'].currentActiveName = this.menuName;
+                            this.$refs['menu'].updateActiveName();
+                        });
                         this.$storage.getBindCoses(({coses}) => {
                             this.coses = coses;
                             this.cosChoiceModel = true;
                         });
                         break;
                     case Constants.Key.app_logout:
+                        this.$nextTick(() => {
+                            this.$refs['menu'].currentActiveName = this.menuName;
+                            this.$refs['menu'].updateActiveName();
+                        });
                         this.$Modal.confirm({
-                            title: '登出该账号?',
+                            title: '注销当前账号?(对应的授权信息将被移除)',
                             render: (h) => {
                                 return h('div', {
                                     style: {
@@ -315,6 +325,7 @@
                         });
                         break;
                     case Constants.Key.app_setup:
+                        this.menuName = name ;
                         this.$router.push({name: Constants.PageName.setup});
                         break;
                 }
