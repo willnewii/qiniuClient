@@ -55,13 +55,13 @@ class baseBucket {
      * 0: 正常 1：私有
      * @param permission
      */
-    setPermission(permission) {
+    setPermission(permission = 0) {
         this.permission = permission;
         if (this.vm) {
             this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
         }
 
-        this.https = this.vm[types.setup.https];
+        this.https = this.vm['setup_https'];
     }
 
     /**
@@ -134,7 +134,6 @@ class baseBucket {
         if (!url) {
             return '';
         }
-
         //默认添加http
         if (!/^https?:\/\//.test(url)) {
             url = `${this.https ? 'https' : 'http'}://${url}`;

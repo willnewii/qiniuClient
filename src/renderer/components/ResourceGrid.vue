@@ -3,6 +3,10 @@
         <v-contextmenu ref="folderMenu" @contextmenu="handleFolderMenu">
             <v-contextmenu-item @click="handleFolderMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <template v-if="bucket.key === 'qiniu'">
+                <v-contextmenu-item @click="handleFolderMenuClick(5)">刷新CDN</v-contextmenu-item>
+                <v-contextmenu-item divider></v-contextmenu-item>
+            </template>
             <v-contextmenu-item @click="handleFolderMenuClick(2)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
@@ -15,6 +19,10 @@
         <v-contextmenu ref="fileMenu" @contextmenu="handleFileMenu">
             <v-contextmenu-item @click="handleFileMenuClick(1)">详情</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <template v-if="bucket.key === 'qiniu'">
+                <v-contextmenu-item @click="handleFileMenuClick(8)">刷新CDN</v-contextmenu-item>
+                <v-contextmenu-item divider></v-contextmenu-item>
+            </template>
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>
@@ -166,7 +174,11 @@
                 this.fileFilter(option);
             });
             EventBus.$on(Constants.Event.refreshFiles, (action) => {
-                this.bucket.getResources();
+                if (this.$storage.key === brand.upyun.key) {
+                    this.bucket.getResources({keyword: this.bucket.folderPath, refresh: true});
+                } else {
+                    this.bucket.getResources();
+                }
             });
 
             EventBus.$on(Constants.Event.resourceAction, (files, action) => {
@@ -174,10 +186,9 @@
             });
 
             this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
-                this.$Loading.update(num * 100);
                 EventBus.$emit(Constants.Event.statusView, {
                     message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
-                    progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
+                    progress: this.status_total === 1 ? num * 100 : parseInt(this.status_count / this.status_total * 100)
                 });
                 if (num === 1) {
                     this.queueTask();
@@ -258,7 +269,6 @@
                                 keyword: file._path
                             });
                         }
-                        console.log(file, file._path);
                         this.bucket.folderPath = file._path;
                     } else {
                         this.preview(file);
@@ -267,9 +277,12 @@
                     if (this.itemClickTime === 0) {
                         setTimeout(() => {
                             if (this.itemClickTime !== 0) {
+                                this.itemClickTime = 0;
+                                if (file && file._icon === 'md-return-left') {
+                                    return;
+                                }
                                 this.selectFile(index);
                             }
-                            this.itemClickTime = 0;
                         }, CLICKTIME);
                     } else {
                         console.log('nothing');
@@ -557,6 +570,7 @@
             }
 
             &-select {
+                font-weight: 500;
                 color: white;
                 background-color: $primary !important;
             }

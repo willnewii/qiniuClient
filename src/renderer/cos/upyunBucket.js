@@ -9,6 +9,7 @@ class Bucket extends baseBucket {
         super(name, cos);
         this.key = brand.upyun.key;
     }
+
     /**
      * 获取bucket访问权限
      * 获取资源
@@ -19,6 +20,7 @@ class Bucket extends baseBucket {
 
         this.paging = true;
         this.getDomains();
+        this.setPermission();
         this.getResources();
     }
 
@@ -30,7 +32,6 @@ class Bucket extends baseBucket {
         if (customeDomains && customeDomains[this.name]) {
             this.domains = [customeDomains[this.name]];
             this.domain = customeDomains[this.name];
-            this.https = false;
         }
     }
 
@@ -62,6 +63,10 @@ class Bucket extends baseBucket {
         let params = {
             'limit': this.limit,
         };
+
+        if (option.refresh) {
+            this.marker = null;
+        }
 
         if (this.marker) {
             params.iter = this.marker;

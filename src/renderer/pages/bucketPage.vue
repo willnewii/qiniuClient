@@ -46,10 +46,8 @@
             align-items: center;
             flex-shrink: 0;
             margin-right: 10px;
-
-            .icon {
-                font-size: 14px;
-            }
+            font-weight: 500;
+            font-size: 12px;
 
             .count {
                 margin-right: 5px;
@@ -65,8 +63,10 @@
             display: flex;
             flex-direction: row;
             flex-shrink: 0;
-            .button-margin {
+            button {
                 margin-right: 10px;
+                font-size: 12px;
+                font-weight: 500;
             }
         }
     }
@@ -113,18 +113,20 @@
                 <span class="icon iconfont icon-wenjian"></span>
                 <span class="count">共{{totalCount}}个 文件</span>
                 <span class="icon iconfont icon-fuwuqi"></span>
-                <span class="size">共{{totalSize}} 存储量</span>
+                <span class="count">共{{totalSize}} 存储量</span>
             </div>
 
             <div class="header-button-view">
                 <template v-if="bucket.selection.length > 0">
-                    <Button class="button-margin" size="small" @click="cleanSelection()">取消</Button>
+                    <Button size="small" @click="cleanSelection()">取消</Button>
 
-                    <Button class="button-margin" size="small" @click="allSelection()">全选</Button>
+                    <Button size="small" @click="allSelection()">全选</Button>
 
-                    <Button class="button-margin" size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
+                    <Button size="small" @click="callRefreshUrls()" icon="md-sync" v-if="bucket.key == 'qiniu'">刷新缓存({{bucket.selection.length}})</Button>
 
-                    <Button class="button-margin" type="error" size="small" @click="askRemove()" icon="md-trash">删除({{bucket.selection.length}})</Button>
+                    <Button size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
+
+                    <Button size="small" @click="askRemove()" icon="md-trash" type="error">删除({{bucket.selection.length}})</Button>
                 </template>
 
                 <Button class="button-margin" size="small" @click="showFilter" icon="md-funnel"></Button>
@@ -264,6 +266,10 @@
             },
             callRemove() {
                 EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.remove);
+                this.bucket.selection = [];
+            },
+            callRefreshUrls() {
+                EventBus.$emit(Constants.Event.resourceAction, this.bucket.selection, Constants.ActionType.refreshUrls);
                 this.bucket.selection = [];
             },
             //取消选择

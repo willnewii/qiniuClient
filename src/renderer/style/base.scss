@@ -50,6 +50,10 @@ body {
   box-shadow: none;
 }
 
+.ivu-menu-item-active {
+  font-weight: 500;
+}
+
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
   width: 2px !important;
 }

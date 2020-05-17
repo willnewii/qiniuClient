@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences, globalShortcut , nativeTheme} from 'electron';
 
 const storage = require('electron-json-storage');
 // import EAU from 'electron-asar-hot-updater';
@@ -15,25 +15,27 @@ import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
 import * as diffFolder from './util/diffFolder';
 
+let isClose = false;
 let mainWindow, aboutWindow;
 
 const DEFAULT_PATH = path.join(app.getPath('downloads'), pkg.name);
 
 app.on('ready', initApp);
 
-app.on('window-all-closed', () => {
-    if (!util.isMac()) {
-        app.quit();
-    }
-});
-
 app.on('activate', () => {
+    console.log(mainWindow);
     if (mainWindow === null) {
         createMainWindow();
+    } else {
+        mainWindow.show();
     }
 });
 
 function initApp() {
+    globalShortcut.register('CommandOrControl+Q', () => {
+        isClose = true;
+        app.quit();
+    });
     //win10 ,不设置没有通知显示
     app.setAppUserModelId(pkg.build.appId);
 
@@ -66,9 +68,15 @@ function createMainWindow() {
 
     mainWindow.loadURL(util.mainURL);
 
+    mainWindow.on('close', (event) => {
+        if (!isClose) {
+            event.preventDefault();
+            mainWindow.hide();
+        }
+    });
+
     mainWindow.on('closed', () => {
-        // mainWindow = null;
-        app.quit();
+        mainWindow = null;
     });
 
     /*try {
@@ -163,7 +171,7 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
-        event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+        event.sender.send(Constants.Listener.darkMode, nativeTheme.shouldUseDarkColors);
     });
 
     ipcMain.on(Constants.Listener.showMenuBar, function (event, option) {
@@ -348,7 +356,12 @@ const getMenuData = function () {
                 {role: 'hideothers', label: '隐藏其他'},
                 {role: 'unhide', label: '显示全部'},
                 {type: 'separator'},
-                {role: 'quit', label: '关闭'}
+                {
+                    label: '关闭', click: () => {
+                        isClose = true;
+                        app.quit();
+                    }
+                }
             ]
         });
 

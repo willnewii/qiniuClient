@@ -206,6 +206,7 @@
             },
             httpsChange: function (state) {
                 this[types.setup.a_https](state);
+                this.$Message.success('请重启应用');
             },
             deleteNoAskChange: function (state) {
                 this[types.setup.a_deleteNoAsk](state);

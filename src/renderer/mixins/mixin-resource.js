@@ -78,6 +78,9 @@ export default {
                 case Constants.ActionType.remove:
                     this.resourceRemove(files, true);
                     break;
+                case Constants.ActionType.refreshUrls:
+                    this.resourceRefreshUrls(files);
+                    break;
             }
 
 
@@ -105,7 +108,7 @@ export default {
                         break;
                 }
 
-                this.$Loading.start();
+                // this.$Loading.start();
                 EventBus.$emit(Constants.Event.statusView, {
                     show: true,
                     message: `${message}(${++this.status_count}/${this.status_total})...`,
@@ -119,7 +122,7 @@ export default {
                     this.copyFileUrl(lastTask);
                 }
 
-                this.$Loading.finish();
+                // this.$Loading.finish();
                 EventBus.$emit(Constants.Event.statusView, {
                     show: false
                 });
@@ -170,7 +173,7 @@ export default {
                 progressCallback: (progress) => {
                     EventBus.$emit(Constants.Event.statusView, {
                         message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
-                        progress: this.status_total === 1 ? 0 : parseInt(this.status_count / this.status_total * 100)
+                        progress: this.status_total === 1 ? progress : parseInt(this.status_count / this.status_total * 100)
                     });
                 }
             };
@@ -208,6 +211,20 @@ export default {
             } else {
                 this.$parent.askRemove();
             }
+        },
+        resourceRefreshUrls(file) {
+            file = Array.isArray(file) ? file : [file];
+
+            let urls = file.map((item) => {
+                return this.getResourceUrl(item);
+            });
+            this.bucket.refreshUrls(urls, (error) => {
+                if (error) {
+                    this.$Message.info('CDN刷新失败:' + error);
+                } else {
+                    this.$Message.info('CDN刷新成功');
+                }
+            });
         },
     }
 };

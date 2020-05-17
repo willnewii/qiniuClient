@@ -64,7 +64,6 @@ class Bucket extends baseBucket {
 
             if (customeDomains && customeDomains[this.name]) {
                 this.domain = customeDomains[this.name];
-                this.https = false;
             }
         }).catch((error) => {
             console.log(error);
@@ -166,6 +165,10 @@ class Bucket extends baseBucket {
         qiniu.rename(this.name, items, (ret) => {
             callback && callback(ret);
         });
+    }
+
+    refreshUrls(items, callback) {
+        qiniu.refreshUrls(items, callback);
     }
 
     /**
