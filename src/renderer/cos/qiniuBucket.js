@@ -64,7 +64,6 @@ class Bucket extends baseBucket {
 
             if (customeDomains && customeDomains[this.name]) {
                 this.domain = customeDomains[this.name];
-                this.https = false;
             }
         }).catch((error) => {
             console.log(error);

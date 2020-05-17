@@ -174,7 +174,11 @@
                 this.fileFilter(option);
             });
             EventBus.$on(Constants.Event.refreshFiles, (action) => {
-                this.bucket.getResources();
+                if (this.$storage.key === brand.upyun.key) {
+                    this.bucket.getResources({keyword: this.bucket.folderPath, refresh: true});
+                } else {
+                    this.bucket.getResources();
+                }
             });
 
             EventBus.$on(Constants.Event.resourceAction, (files, action) => {

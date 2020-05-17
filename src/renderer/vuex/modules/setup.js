@@ -58,7 +58,7 @@ const mutations = {
         state.setup = value;
     },
 };
-const mutationsKeys = [types.setup.privatebucket, types.setup.isOverwrite, types.setup.downloaddir, types.setup.paging, types.setup.showMenuBar,types.setup.https, types.setup.deleteNoAsk, types.setup.copyType, types.setup.showType, types.setup.imagestyle, types.setup.theme, types.setup.recent];
+const mutationsKeys = [types.setup.privatebucket, types.setup.isOverwrite, types.setup.downloaddir, types.setup.paging, types.setup.showMenuBar,types.setup.https, types.setup.deleteNoAsk,types.setup.uploadNoAsk, types.setup.copyType, types.setup.showType, types.setup.imagestyle, types.setup.theme, types.setup.recent];
 mutationsKeys.forEach((key) => {
     mutations[key] = function (state, value) {
         state.setup[key] = value;
