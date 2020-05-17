@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences, globalShortcut} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences, globalShortcut , nativeTheme} from 'electron';
 
 const storage = require('electron-json-storage');
 // import EAU from 'electron-asar-hot-updater';
@@ -171,7 +171,7 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
-        event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+        event.sender.send(Constants.Listener.darkMode, nativeTheme.shouldUseDarkColors);
     });
 
     ipcMain.on(Constants.Listener.showMenuBar, function (event, option) {
