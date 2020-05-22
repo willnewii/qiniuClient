@@ -1,4 +1,4 @@
-import {util} from '@/service/index';
+import {Constants, EventBus, util} from '@/service/index';
 import baseBucket from './baseBucket';
 import brand from '@/cos/brand';
 
@@ -128,6 +128,12 @@ class Bucket extends baseBucket {
 
             data.items = files;
             this.appendResources(data, option);
+        }).catch((e)=>{
+            EventBus.$emit(Constants.Event.loading, {
+                show: false,
+                flag: 'getResources'
+            });
+            alert(e)
         });
     }
 
