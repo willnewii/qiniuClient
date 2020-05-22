@@ -99,8 +99,8 @@ const registerIPC = function () {
 
     //选择下载目录
     ipcMain.on(Constants.Listener.choiceDownloadFolder, function (event, option) {
-        dialog.showOpenDialog(option, function (files) {
-            if (files) event.sender.send(Constants.Listener.choiceDownloadFolder, files);
+        dialog.showOpenDialog(option).then((result)=>{
+            if (result.filePaths) event.sender.send(Constants.Listener.choiceDownloadFolder, result.filePaths);
         });
     });
 
@@ -134,9 +134,9 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
         dialog.showOpenDialog({
             properties: option.properties
-        }, function (_files) {
-            if (_files) {
-                event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(_files));
+        }).then((result)=>{
+            if (result.filePaths) {
+                event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(result.filePaths));
             }
         });
     });
@@ -152,9 +152,9 @@ const registerIPC = function () {
             title: '请选择需要同步的目录(beta)',
             buttonLabel: '同步',
             properties: option.properties
-        }, async function (directory) {
-            console.dir(directory);
-            let results = await diffFolder.diff(directory[0], option.files, option.type, option.mergeType);
+        }).then(async (result)=>{
+            console.dir(result.filePaths);
+            let results = await diffFolder.diff(result.filePaths[0], option.files, option.type, option.mergeType);
             console.dir(results);
 
             event.sender.send(Constants.Listener.syncDirectory, results);
@@ -346,7 +346,7 @@ const getMenuData = function () {
 
     if (process.platform === 'darwin') {
         template.unshift({
-            label: app.getName(),
+            label: app.name,
             submenu: [
                 aboutMenu,
                 {type: 'separator'},
