@@ -18,6 +18,7 @@ let mainConfig = {
             {
                 test: /\.js$/,
                 use: 'babel-loader',
+                include: ["electron-dl"],
                 exclude: /node_modules/
             },
             {

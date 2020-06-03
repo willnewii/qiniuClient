@@ -1,6 +1,6 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences, globalShortcut , nativeTheme} from 'electron';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, globalShortcut , nativeTheme} from 'electron';
 
 const storage = require('electron-json-storage');
 // import EAU from 'electron-asar-hot-updater';
@@ -31,6 +31,12 @@ app.on('activate', () => {
     }
 });
 
+app.on('window-all-closed', () => {
+    if (util.isWin()) {
+        app.quit();
+    }
+});
+
 function initApp() {
     globalShortcut.register('CommandOrControl+Q', () => {
         isClose = true;
@@ -53,6 +59,11 @@ function initApp() {
     //updateAsar();
 }
 
+/**
+ * mainWindow
+ * 在win下是直接关闭,然后如果app触发"window-all-closed",关闭应用.
+ * 在mac下默认是隐藏,只有cmd+Q 或者菜单点击退出,关闭应用.
+ */
 function createMainWindow() {
     mainWindow = new BrowserWindow({
         height: 750,
@@ -69,8 +80,9 @@ function createMainWindow() {
     mainWindow.loadURL(util.mainURL);
 
     mainWindow.on('close', (event) => {
-        if (!isClose) {
+        if (!isClose && !util.isWin()) {
             event.preventDefault();
+            //win10调用hide后,窗口没有关闭,不过也找不到了...
             mainWindow.hide();
         }
     });
@@ -344,7 +356,7 @@ const getMenuData = function () {
         }
     };
 
-    if (process.platform === 'darwin') {
+    if (util.isMac()) {
         template.unshift({
             label: app.name,
             submenu: [

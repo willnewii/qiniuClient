@@ -44,14 +44,14 @@
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
                :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="margin: 10px;min-width: 80px;" v-for="(item,index) in coses"
+                <Card :bordered="false"  v-for="(item,index) in coses"
                       :key="index">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px">
+                <Card :bordered="false" >
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
@@ -417,6 +417,7 @@
     .choice-cos {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-around;
 
         .choice-view {
@@ -428,6 +429,10 @@
                 font-size: 13px;
                 margin-top: 5px;
             }
+        }
+
+        .ivu-card {
+            margin-right: 10px;
         }
     }
 

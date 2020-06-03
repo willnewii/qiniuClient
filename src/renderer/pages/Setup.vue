@@ -1,50 +1,57 @@
 <template>
     <div class="page">
-        <h4 class="title">全局设置</h4>
         <!-- <div class="item" v-if="isShowMenuBarItem">
             <span class="item-title">隐藏菜单栏</span>
             <i-switch :value="setup_showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
         </div> -->
-        <div class="item">
-            <span class="item-title">开启Https</span>
-            <i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch>
-        </div>
-        <div class="item">
-            <span class="item-title">开启分页</span>
-            <i-switch :value="setup_paging" size="small" @on-change="pagingChange"></i-switch>
-            <Button @click="openBrowser(2)" size="small">关于数据加载方式</Button>
-        </div>
-        <div class="item">
-            <span class="item-title">直接删除,不显示确认框</span>
-            <i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch>
-        </div>
-        <div class="item">
-            <span class="item-title">直接上传,不显示确认框</span>
-            <i-switch :value="setup_uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch>
-        </div>
-
-        <div class="item">
-            <span class="item-title">如果文件已存在,是否覆盖上传</span>
-            <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
-        </div>
-        <div class="item">
-            <span class="item-title">复制到粘贴板格式</span>
-            <Radio-group :value="setup_copyType" @on-change="copyTypeChange">
+        <Divider orientation="left" >全局设置</Divider>
+        <Row class="row">
+            <Col :span="rowSpan"><span class="item-title">开启Https</span></Col>
+            <Col span="12"><i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">开启分页</Col>
+            <Col span="12"><i-switch :value="setup_paging" size="small" @on-change="pagingChange"></i-switch><Icon class="help" @click="openBrowser(2)" type="md-help" /></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">直接删除,不显示确认框</Col>
+            <Col span="12"><i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">直接上传,不显示确认框</Col>
+            <Col span="12"><i-switch :value="setup_uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">如果文件已存在,是否覆盖上传</Col>
+            <Col span="12"> <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">复制到粘贴板格式</Col>
+            <Col span="12"><Radio-group :value="setup_copyType" @on-change="copyTypeChange">
                 <Radio label="url"></Radio>
                 <Radio label="markdown"></Radio>
-            </Radio-group>
-        </div>
-        <div class="item">
-            <span class="item-title">主题</span>
-            <Radio-group :value="theme" @on-change="themesChange">
-                <Radio label="auto">自动</Radio>
-                <Radio label="light"></Radio>
-                <Radio label="dark"></Radio>
-            </Radio-group>
-        </div>
+            </Radio-group></Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">主题</Col>
+            <Col span="12">
+                <Radio-group :value="theme" @on-change="themesChange">
+                    <Radio label="auto">自动</Radio>
+                    <Radio label="light"></Radio>
+                    <Radio label="dark"></Radio>
+                </Radio-group>
+            </Col>
+        </Row>
+        <Row class="row">
+            <Col :span="rowSpan">下载目录</Col>
+            <Col span="12">
+                <Input v-model="downloaddir" size="small" placeholder="默认download目录" style="width: 80%;" disabled/>
+                <Button @click="choiceDownloadolder" size="small" class="save-btn" icon="ios-folder-outline"/>
+            </Col>
+        </Row>
 
-        <h4 class="title">托盘设置<span class="title-tips" v-if="setup_bucket_name">(文件将会被上传至{{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
-                '/' : ''}}目录下)</span></h4>
+        <Divider orientation="left" >托盘设置<span class="title-tips" v-if="setup_bucket_name">(文件将会被上传至{{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
+                '/' : ''}}目录下)</span></Divider>
         <div class="item">
             <Row class="row-line">
                 <Col span="12">
@@ -61,26 +68,9 @@
             </Row>
         </div>
 
-        <div class="item">
-            <span class="item-title">下载目录</span>
-            <Row class="row-line">
-                <Col span="12">
-                    <Input v-model="downloaddir" size="small" placeholder="默认download目录" style="width: 100%;"
-                           disabled/>
-                </Col>
-                <Col span="11" offset="1">
-                    <Button @click="choiceDownloadolder" size="small" class="save-btn"
-                            icon="ios-folder-outline"/>
-                </Col>
-            </Row>
-
-        </div>
-
         <template v-if="brands.qiniu.key === $storage.key">
             <div class="item">
-                预览图片样式：
-                <Button @click="openBrowser(0)" size="small">什么是图片样式?</Button>
-                <br>
+                预览图片样式：<Icon class="help" @click="openBrowser(0)" type="md-help" />
                 <Row class="row-line">
                     <Col span="12">
                         <Input v-model="imagestyle" size="small" placeholder="七牛图片样式" style="width: 100%;"/>
@@ -94,12 +84,10 @@
         <template
                 v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.jd.key === $storage.key || brands.minio.key === $storage.key">
             <div class="item">
-                私有空间：
-                <Button @click="openBrowser(1)" size="small">什么是私有空间?</Button>
-                <br>
+                私有空间：<Icon class="help" @click="openBrowser(1)" type="md-help" />
                 <CheckboxGroup v-model="privates" @on-change="privatesChange">
                     <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">
-                        <span>{{item.name}}</span>
+                        <span style="margin-left: 5px;">{{item.name}}</span>
                     </Checkbox>
                 </CheckboxGroup>
                 <Row class="row-line">
@@ -127,6 +115,7 @@
         name: 'setup-page',
         data() {
             return {
+                rowSpan: 8,
                 brand: '',
                 bucketname: '',
                 bucketdir: '',
@@ -307,6 +296,9 @@
             padding-top: 0px;
         }
 
+        .row {
+            padding: 15px 0;
+        }
         .item {
             padding: 15px 0;
 
@@ -321,9 +313,16 @@
         }
     }
 
+    .help {
+        margin-left: 10px;
+        border: 1px $fontColor solid;
+        border-radius: 50%;
+        padding: 5px;
+        transform: scale(0.7);
+    }
 
     .row-line {
-        padding-top: 10px;
+        padding-top: 20px;
     }
 
     .save-btn {
