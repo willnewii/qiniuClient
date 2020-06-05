@@ -8,6 +8,7 @@
     "license": "MIT",
     "main": "./dist/electron/main.js",
     "scripts": {
+        "render": "webpack-dev-server --hot --colors --config .electron-vue/webpack.renderer.config.js --port 9080 --content-base app/dist",
         "dev": "cross-env ENV_DLL=false node .electron-vue/dev-runner.js",
         "build": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder",
         "build:all": "cross-env ENV_DLL=true node .electron-vue/build.js && electron-builder -mwl",

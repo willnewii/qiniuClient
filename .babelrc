@@ -8,7 +8,7 @@
                 [
                     "env",
                     {
-                        "modules": false,
+                        // "modules": false,
                         "targets": {
                             "Node": "12.4.0"
                         }
