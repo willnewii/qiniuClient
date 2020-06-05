@@ -24,14 +24,16 @@ export const createTray = function (_mainWindowId) {
         toggleTrayWindow();
     });
 
-    mTray.on('drop-files', async (event, files) => {
-        setTrayIcon(icon_upload);
-        mTrayWindow.webContents.send(Constants.Listener.uploadFile, await util.wrapperFiles(files));
-    });
+    // mTray.on('drop-files', async (event, files) => {
+    //     const originIcon = icon_brand;
+    //     setTrayIcon(icon_upload);
+    //     icon_brand = originIcon
+    //     mTrayWindow.webContents.send(Constants.Listener.uploadFile, await util.wrapperFiles(files));
+    // });
 
     ipcMain.on(Constants.Listener.updateTrayTitle, function (event, title) {
         if (title.length === 0) {
-            setTrayIcon(icon_tray);
+            setTrayIcon(icon_brand);
         }
         setTrayTitle(title);
     });
@@ -130,6 +132,8 @@ export const setTrayTitle = function (title) {
 
 export const setTrayIcon = function (image) {
     icon_brand = image;
-    mTray.setImage(util.getIconPath(icon_brand));
+    if (util.isMac()) {
+        mTray.setImage(util.getIconPath(image));
+    }
 };
 

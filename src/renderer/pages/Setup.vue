@@ -43,7 +43,7 @@
             </Radio-group>
         </div>
 
-        <h4 class="title">托盘设置<span class="title-tips" v-if="setup_bucket_name">(文件将会被上传至{{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
+        <!-- <h4 class="title">托盘设置<span class="title-tips" v-if="setup_bucket_name">(文件将会被上传至{{brands[brand] && brands[brand].name}}：{{setup_bucket_name}}/{{setup_bucket_dir ? setup_bucket_dir +
                 '/' : ''}}目录下)</span></h4>
         <div class="item">
             <Row class="row-line">
@@ -59,7 +59,7 @@
                     <Button @click="saveDir" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
-        </div>
+        </div> -->
 
         <div class="item">
             <span class="item-title">下载目录</span>

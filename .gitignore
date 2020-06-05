@@ -12,4 +12,3 @@ node_modules/
 !.gitkeep
 .idea
 static/styles-dark.css
-package-lock.json
