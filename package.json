@@ -44,6 +44,7 @@
         "log4js": "^3.0.6",
         "mime-types": "^2.1.24",
         "multispinner": "^0.2.1",
+        "plist": "^3.0.1",
         "qingstor-sdk": "^3.0.1",
         "qiniu": "^7.3.0",
         "qs": "^6.8.0",

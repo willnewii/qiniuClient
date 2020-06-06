@@ -8,7 +8,6 @@
                 [
                     "env",
                     {
-                        "modules": false,
                         "targets": {
                             "Node": "12.4.0"
                         }
@@ -21,9 +20,8 @@
                 [
                     "env",
                     {
-                        "modules": false,
                         "targets": {
-                            "Electron": "6.0.7"
+                            "Electron": "8.3.0"
                         }
                     }
                 ]
