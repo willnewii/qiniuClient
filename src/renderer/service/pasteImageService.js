@@ -41,27 +41,31 @@ export default class PasteImageService {
       if (content) {
         try {
           filePaths = plist.parse(content)
-          electron.ipcRenderer.send(Constants.Listener.readDirectory, {
-            files: filePaths
-          })
-          return ;
         } catch (e) {
           console.error(e)
         }
       }
+    } else if (process.platform === "win32") {
+      //中文有问题
+      /* let content = electron.clipboard.read("FileNameW")*/
+      //https://github.com/electron/electron/issues/12141#issuecomment-386223681
+      let content = electron.clipboard.readBuffer("FileNameW").toString("ucs2")
+      if (content) filePaths = [content.replace(new RegExp(String.fromCharCode(0), "g"), "")]
     }
 
-    const fileList = Array.from(event.clipboardData.items)
-      .map((o) => {
-        if (!/image\/.*/.test(o.type)) {
-          return
-        }
-        return o.getAsFile()
-      })
-      .filter((file) => !!file)
+    if (filePaths.length === 0) {
+      const fileList = Array.from(event.clipboardData.items)
+        .map((o) => {
+          if (!/image\/.*/.test(o.type)) {
+            return
+          }
+          return o.getAsFile()
+        })
+        .filter((file) => !!file)
 
-    for (const file of fileList) {
-      filePaths.push(await this.writeFile(file))
+      for (const file of fileList) {
+        filePaths.push(await this.writeFile(file))
+      }
     }
 
     electron.ipcRenderer.send(Constants.Listener.readDirectory, {
