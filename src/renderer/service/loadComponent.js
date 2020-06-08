@@ -3,14 +3,14 @@ import Vue from 'vue';
 
 import Electron from 'vue-electron';
 import VueLazyload from 'vue-lazyload';
-import iView from 'iview';
+import ViewUI from 'view-design';
 import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
 import Viewer from "v-viewer/src/component.vue";
 
 import 'v-contextmenu/dist/index.css';
-import 'iview/dist/styles/iview.css';
+import 'view-design/dist/styles/iview.css';
 import 'viewerjs/dist/viewer.css';
 
 
@@ -32,4 +32,4 @@ menuDirective.inserted = function (el, binding, vnode) {
 };
 
 Vue.use(contextmenu);
-Vue.use(iView);
+Vue.use(ViewUI);
