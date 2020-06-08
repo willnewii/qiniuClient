@@ -1,46 +1,58 @@
 export const setup = {
-    setup_init: 'setup_init',
+    init: 'init',
 
-    setup_deadline: 'setup_deadline',
-    setup_a_deadline: 'setup_a_deadline',
+    deadline: 'deadline',
+    a_deadline: 'a_deadline',
 
-    setup_isOverwrite: 'setup_isOverwrite',
-    setup_a_isOverwrite: 'setup_a_isOverwrite',
+    isOverwrite: 'isOverwrite',
+    a_isOverwrite: 'a_isOverwrite',
 
-    setup_privatebucket: 'setup_privatebucket',
-    setup_a_privatebucket: 'setup_a_privatebucket',
+    privatebucket: 'privatebucket',
+    a_privatebucket: 'a_privatebucket',
 
-    setup_imagestyle: 'setup_imagestyle',
-    setup_a_imagestyle: 'setup_a_imagestyle',
+    imagestyle: 'imagestyle',
+    a_imagestyle: 'a_imagestyle',
 
-    setup_downloaddir: 'setup_downloaddir',
-    setup_a_downloaddir: 'setup_a_downloaddir',
+    downloaddir: 'downloaddir',
+    a_downloaddir: 'a_downloaddir',
 
-    setup_deleteNoAsk: 'setup_deleteNoAsk',
-    setup_a_deleteNoAsk: 'setup_a_deleteNoAsk',
+    showMenuBar: 'showMenuBar',
+    a_showMenuBar: 'a_showMenuBar',
 
-    setup_uploadNoAsk: 'setup_uploadNoAsk',
-    setup_a_uploadNoAsk: 'setup_a_uploadNoAsk',
+    https: 'https',
+    a_https: 'a_https',
+
+    paging: 'paging',
+    a_paging: 'a_paging',
+
+    deleteNoAsk: 'deleteNoAsk',
+    a_deleteNoAsk: 'a_deleteNoAsk',
+
+    uploadNoAsk: 'uploadNoAsk',
+    a_uploadNoAsk: 'a_uploadNoAsk',
 
 
-    setup_copyType: 'setup_copyType',
-    setup_a_copyType: 'setup_a_copyType',
+    copyType: 'copyType',
+    a_copyType: 'a_copyType',
 
-    setup_savedir: 'setup_savedir',
-    setup_a_savedir: 'setup_a_savedir',
+    showType: 'showType',
+    a_showType: 'a_showType',
 
-    setup_brand: 'setup_brand',
-    setup_bucket_name: 'setup_bucket_name',
-    setup_bucket_dir: 'setup_bucket_dir',
+    savedir: 'savedir',
+    a_savedir: 'a_savedir',
 
-    setup_customedomain: 'setup_customedomain',
-    setup_a_customedomain: 'setup_a_customedomain',
+    brand: 'brand',
+    bucket_name: 'bucket_name',
+    bucket_dir: 'bucket_dir',
 
-    setup_theme: 'setup_theme',
-    setup_a_theme: 'setup_a_theme',
+    customedomain: 'customedomain',
+    a_customedomain: 'a_customedomain',
 
-    setup_recentname: 'setup_recentname',
-    setup_a_recentname: 'setup_a_recentname',
+    theme: 'theme',
+    a_theme: 'a_theme',
+
+    recent: 'recent',
+    a_recent: 'a_recent',
 };
 
 export const app = {

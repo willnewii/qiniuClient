@@ -1,8 +1,14 @@
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import Client from 'ali-oss/lib/client';
+import brand from '@/cos/brand';
 
 class Bucket extends baseBucket {
+
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.aliyun.key;
+    }
 
     /**
      * 获取bucket访问权限
@@ -31,7 +37,7 @@ class Bucket extends baseBucket {
         this.cos.getBucketInfo(this.name).then((res) => {
 
             this.cos.options.region = res.bucket.Location;
-            //TODO: 未找到api获取状态
+            //未找到api获取状态
             this.cos.options.secure = false;
             delete this.cos.options.endpoint;
             this.cos.options = Client.initOptions(this.cos.options);
@@ -66,14 +72,15 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
+        super.getResources();
         //delimiter
         let params = {
             'max-keys': this.limit,
         };
 
-        if (keyword) {
-            params.prefix = keyword;
+        if (option.keyword) {
+            params.prefix = option.keyword;
         }
 
         if (this.marker) {
@@ -85,15 +92,21 @@ class Bucket extends baseBucket {
                 this.files = [];
             }
             let files = [];
-            data.objects.forEach((item) => {
-                if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, 3));
-                }
-            });
+            // TODO:空记录检测
+            if (data.objects) {
+                data.objects.forEach((item) => {
+                    if (parseInt(item.Size) !== 0) {
+                        files.push(util.convertMeta(item, brand.aliyun.key));
+                    }
+                });
+            }
 
-            data.items = files;
-            data.marker = data.nextMarker;
-            this.appendResources(data, keyword);
+            // data.items = files;
+            // data.marker = data.nextMarker;
+            this.appendResources({
+                items: files,
+                marker: data.nextMarker
+            }, option);
         });
     }
 
@@ -105,13 +118,15 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
+        let url;
         if (this.permission === 1) {
-            return this.cos.signatureUrl(key, {
+            url = this.cos.signatureUrl(key, {
                 expires: parseInt(deadline)
             });
         } else {
-            return this.cos.generateObjectUrl(key);
+            url = this.cos.generateObjectUrl(key);
         }
+        return super.generateUrl(url);
     }
 }
 

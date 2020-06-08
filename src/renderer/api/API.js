@@ -3,6 +3,8 @@
  */
 import axios from 'axios';
 import config from './config';
+import * as util from '../service/util';
+import {_httpAuthorization} from '../cos/qiniu';
 
 import Qs from 'qs';
 
@@ -10,6 +12,7 @@ class API {
 
     constructor(view) {
         this.view = view;
+        this.config = util.deepCopy(config);
     }
 
     post(url, param) {
@@ -20,29 +23,26 @@ class API {
         if (param)
             url = url + '?' + Qs.stringify(param);
 
+        if (/(qiniu.com|qbox.me)/g.test(url)) { // 七牛api
+            this.setAuthorization(_httpAuthorization(url));
+        }
         return this._request(url, 'get');
     }
 
     setAuthorization(authorization) {
-        config.headers.Authorization = authorization;
+        this.config.headers.Authorization = authorization;
     }
 
     _request(url, type, param) {
         this.view && this.view.$Loading.start();
 
-        let regStr = /^http.*(qiniu.com|qbox.me)/g;
-        if (regStr.test(url) && this.view) {
-            if (this.view.$storage.cos._httpAuthorization)
-                config.headers.Authorization = this.view.$storage.cos._httpAuthorization(url);
-        }
-
-        config.method = type;
+        this.config.method = type;
 
         let request;
         if (type === 'get') {
-            request = axios.get(url, config);
+            request = axios.get(url, this.config);
         } else {
-            request = axios[type](url, param, config);
+            request = axios[type](url, param, this.config);
         }
 
         request.then((response) => {

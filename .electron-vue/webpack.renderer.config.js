@@ -4,7 +4,7 @@ process.env.BABEL_ENV = 'renderer';
 
 const path = require('path');
 const fs = require('fs');
-const {dependencies} = require('../package.json');
+const pkg = require('../package.json');
 const utils = require('../.electron-vue/utils');
 const webpack = require('webpack');
 
@@ -14,8 +14,11 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const commonExtract = new ExtractTextPlugin('./static/commonStyle.css');
-const appExtract = new ExtractTextPlugin('./static/styles.css');
+const commonExtract = new ExtractTextPlugin('static/commonStyle.css');
+const appExtract = new ExtractTextPlugin('static/styles.css');
+
+const libMainfest = path.join(__dirname, '..', 'static/dll/libs-mainfest.json');
+const cosMainfest = path.join(__dirname, '..', 'static/dll/cos-mainfest.json');
 
 /**
  * List of node_modules to include in webpack bundle
@@ -25,10 +28,11 @@ const appExtract = new ExtractTextPlugin('./static/styles.css');
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
 let rendererConfig = {
-    devtool: '#cheap-module-eval-source-map',
+    devtool: 'cheap-module-eval-source-map',
     entry: {
         renderer: path.join(__dirname, '../src/renderer/main.js')
     },
+    externals: ['worker_threads'],
     module: {
         rules: [
             {
@@ -50,20 +54,6 @@ let rendererConfig = {
             {
                 test: /\.node$/,
                 use: 'node-loader'
-            },
-            {
-                test: /\.vue$/,
-                use: {
-                    loader: 'vue-loader',
-                    options: {
-                        loaders: utils.cssLoaders({
-                            extract: process.env.NODE_ENV === 'production',
-                            appExtract,
-                            theme: 'light'
-                        })
-                    }
-
-                }
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -101,8 +91,6 @@ let rendererConfig = {
         __filename: process.env.NODE_ENV !== 'production'
     },
     plugins: [
-        commonExtract,
-        appExtract,
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, '../index.ejs'),
@@ -112,14 +100,15 @@ let rendererConfig = {
                 removeComments: true
             },
             nodeModules: process.env.NODE_ENV !== 'production'
-                ? path.resolve(__dirname, '../node_modules')
-                : false
+                    ? path.resolve(__dirname, '../node_modules')
+                    : false
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
     ],
     output: {
         filename: '[name].js',
+        publicPath: pkg.cdnPath,
         libraryTarget: 'commonjs2',
         path: path.join(__dirname, '../dist/electron')
     },
@@ -133,12 +122,16 @@ let rendererConfig = {
     target: 'electron-renderer'
 };
 
-let jsonPath = path.join(__dirname, '..', 'static/dll/core-mainfest.json');
-if (process.env.ENV_DLL && fs.existsSync(jsonPath)) {
+if (process.env.ENV_DLL === 'true' && fs.existsSync(libMainfest) && fs.existsSync(cosMainfest)) {
     console.log('build with DllReferencePlugin');
     rendererConfig.plugins.push(new webpack.DllReferencePlugin({
         context: __dirname,
-        manifest: require('../static/dll/core-mainfest.json') // 指向这个json
+        manifest: require('../static/dll/libs-mainfest.json')
+    }));
+
+    rendererConfig.plugins.push(new webpack.DllReferencePlugin({
+        context: __dirname,
+        manifest: require('../static/dll/cos-mainfest.json')
     }));
 } else {
     console.log('build without DllReferencePlugin');
@@ -149,9 +142,9 @@ if (process.env.ENV_DLL && fs.existsSync(jsonPath)) {
  */
 if (process.env.NODE_ENV !== 'production') {
     rendererConfig.plugins.push(
-        new webpack.DefinePlugin({
-            '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-        })
+            new webpack.DefinePlugin({
+                '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+            })
     );
 }
 
@@ -162,27 +155,52 @@ if (process.env.NODE_ENV === 'production') {
     rendererConfig.devtool = '';
 
     rendererConfig.plugins.push(
-        new MinifyPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: path.join(__dirname, '../static'),
-                to: path.join(__dirname, '../dist/electron/static'),
-                ignore: ['.*']
-            }
-        ]),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-        }),
-        new webpack.LoaderOptionsPlugin({
-            minimize: true
-        })
+            new MinifyPlugin({
+                removeConsole: true,
+            }),
+
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': '"production"'
+            }),
+            new webpack.LoaderOptionsPlugin({
+                minimize: true
+            })
     );
 
     if (process.env.ANALYZER === 'true') {
         rendererConfig.plugins.push(
-            new BundleAnalyzerPlugin(),
+                new BundleAnalyzerPlugin(),
         );
     }
+}
+
+if (!process.env.DLL_NAME) {
+    rendererConfig.plugins.push(
+            commonExtract,
+            appExtract,
+            new CopyWebpackPlugin([
+                {
+                    from: path.join(__dirname, '../static'),
+                    to: path.join(__dirname, '../dist/electron/static'),
+                    ignore: ['.*']
+                }
+            ])
+    );
+
+    rendererConfig.module.rules.push({
+        test: /\.vue$/,
+        use: {
+            loader: 'vue-loader',
+            options: {
+                loaders: utils.cssLoaders({
+                    extract: process.env.NODE_ENV === 'production',
+                    appExtract,
+                    theme: 'light'
+                })
+            }
+
+        }
+    });
 }
 
 module.exports = rendererConfig;

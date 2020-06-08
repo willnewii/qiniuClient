@@ -6,18 +6,16 @@ import Request from '../api/API';
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
-//默认文件的分隔符
-const DELIMITER = '/';
 //独立于各COS的配置
 const PROTOCOL = 'http://';
 
 const methods = {
-    //空间列表
-    buckets: 'https://rs.qbox.me/buckets',
-    //空间对应的域名列表(授权空间域名返回为空)
-    domains: 'https://api.qiniu.com/v6/domain/list',
-    //获取目录(是通过公共前缀模拟出的效果)
-    resources: 'https://rsf.qbox.me/list',
+    buckets: 'https://rs.qbox.me/buckets',                  //空间列表
+    domains: 'https://api.qiniu.com/v6/domain/list',        //空间对应的域名列表(授权空间域名返回为空)
+    count: 'https://api.qiniu.com/v6/count',                //统计文件数量(标准存储)
+    count_line: 'https://api.qiniu.com/v6/count_line',      //统计文件数量(低频存储)
+    space: 'https://api.qiniu.com/v6/space',                //统计文件空间(低频存储)
+    space_line: 'https://api.qiniu.com/v6/space_line',      //统计文件空间(低频存储)
 };
 
 function init(param) {
@@ -29,10 +27,9 @@ function init(param) {
 function getBuckets(callback) {
     let error = null;
     let request = new Request();
-    request.setAuthorization(_httpAuthorization(methods.buckets));
     request.get(methods.buckets).then((result) => {
         let datas = [];
-        for (let name of result.data) {
+        for (let name of result) {
             datas.push({name});
         }
         callback(null, {datas});
@@ -68,9 +65,9 @@ function generateUrl(domain, key, deadline) {
         let config = new qiniu.conf.Config();
         let bucketManager = new qiniu.rs.BucketManager(getToken(), config);
         deadline = parseInt(Date.now() / 1000) + deadline;
-        return bucketManager.privateDownloadUrl(PROTOCOL + domain, key, deadline);
+        return bucketManager.privateDownloadUrl(domain, key, deadline);
     } else {
-        return PROTOCOL + domain + '/' + encodeURI(key);
+        return domain + '/' + encodeURI(key);
     }
 }
 
@@ -204,8 +201,35 @@ function _batch(operations, callback) {
 
 }
 
+function refreshUrls(urls, callback) {
+    let cdnManager = new qiniu.cdn.CdnManager(getToken());
+
+    const _callback = function (err, respBody, respInfo) {
+        if (respBody.code === 200) {
+            callback();
+        } else {
+            callback(respBody.error);
+        }
+    };
+
+    let array1 = urls.filter((url) => {
+        return url.lastIndexOf('/') === (url.length - 1);
+    });
+    if (array1 && array1.length > 0) {
+        cdnManager.refreshDirs(array1, _callback);
+    }
+
+    let array2 = urls.filter((url) => {
+        return url.lastIndexOf('/') !== (url.length - 1);
+    });
+    if (array2 && array2.length > 0) {
+        cdnManager.refreshUrls(array2, _callback);
+    }
+}
+
+
 function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, _httpAuthorization, generateUrl, list, remove, rename, upload, fetch, methods, DELIMITER};
+export {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};

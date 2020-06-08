@@ -32,7 +32,7 @@ export default {
     onDownloadProgress: function (progressEvent) {
         // Do whatever you want with the native progress event
     },
-    maxContentLength: 2000,
+    maxContentLength: 5000,
     validateStatus: function (status) {
         return status >= 200 && status < 300; // default
     },

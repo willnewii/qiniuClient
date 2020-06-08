@@ -1,4 +1,5 @@
 import * as Constants from "@/service/constants";
+import brand from '@/cos/brand';
 
 const fs = require('fs');
 import {util} from '../service/index';
@@ -8,6 +9,11 @@ import * as qing from './qing';
 const mime = require('mime-types');
 
 class Bucket extends baseBucket {
+
+    constructor(name, cos) {
+        super(name, cos);
+        this.key = brand.qingstor.key;
+    }
 
     /**
      * 获取bucket访问权限
@@ -32,7 +38,7 @@ class Bucket extends baseBucket {
      * 获取Bucket访问权限状态
      */
     getACL() {
-        this.bucket.getACL((err, data) => {
+        this.bucket.getACL().then((data) => {
             let flag = true;
             if (data && data.acl.length > 0) {
                 for (let item of data.acl) {
@@ -60,8 +66,8 @@ class Bucket extends baseBucket {
                 'Content-Type': mime.lookup(_param.key)
             };
         }
-        this.bucket.putObject(_param.key, params, function (err, data) {
-            callback(err, {key: _param.key});
+        this.bucket.putObject(_param.key, params).then((data) => {
+            callback(null, {key: _param.key});
         });
     }
 
@@ -84,33 +90,30 @@ class Bucket extends baseBucket {
         callback && callback();
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
+        super.getResources();
         let params = {
             limit: this.limit,
         };
 
-        if (keyword) {
-            params.prefix = keyword;
+        if (option.keyword) {
+            params.prefix = option.keyword;
         }
 
         if (this.marker) {
             params.marker = this.marker;
         }
 
-        this.cos.Bucket(this.name, this.location).listObjects(params, (err, data) => {
+        this.cos.Bucket(this.name, this.location).listObjects(params).then((data) => {
             if (!this.marker) {
                 this.files = [];
             }
-            let files = [];
-            data.keys.forEach((item) => {
-                if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, 2));
-                }
-            });
 
-            data.items = files;
-            data.marker = data.next_marker;
-            this.appendResources(data, keyword);
+            data.items = data.keys.map((item) => {
+                return util.convertMeta(item, brand.qingstor.key);
+            });
+            data.marker = data.has_more ? data.next_marker : '';
+            this.appendResources(data, option);
         });
     }
 
@@ -121,12 +124,14 @@ class Bucket extends baseBucket {
      * @param deadline  私有模式,文件有效期
      * @returns {*}
      */
-    generateUrl(key, deadline) {
+    generateUrl(key, deadline = 3600) {
+        let url;
         if (this.permission === 1) {
-            return this.cos.Bucket(this.name, this.location).getObjectRequest(key).signQuery(parseInt(Date.now() / 1000) + parseInt(deadline)).operation.uri;
+            url = qing.generateUrl(null, key, deadline, this.cos.Bucket(this.name, this.location).getObjectRequest(key));
         } else {
-            return qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
+            url = qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
         }
+        return super.generateUrl(url);
     }
 }
 

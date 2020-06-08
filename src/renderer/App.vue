@@ -15,7 +15,8 @@
         },
         computed: {
             ...mapGetters({
-                setup_theme: types.setup.setup_theme,
+                setup_theme: types.setup.theme,
+                setup_showMenuBar: types.setup.showMenuBar,
             }),
             appHeight() {
                 if (document.getElementById('title'))
@@ -24,14 +25,11 @@
                     return '100%';
             }
         },
-        created: function () {
-            /*if (process.platform !== 'darwin') {
-                document.getElementById('title').remove();
-            }*/
-
-            this[types.setup.setup_init](() => {
+        created: async function () {
+            await this[types.setup.init](() => {
+                //this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, this.setup_showMenuBar);
                 if (this.setup_theme === 'auto') {
-                    this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
+                    this.$electron.ipcRenderer.once(Constants.Listener.darkMode, (event, arg) => {
                         util.loadTheme(arg ? 'dark' : 'light');
                     });
                     this.$electron.ipcRenderer.send(Constants.Listener.darkMode);
@@ -42,7 +40,7 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_init,
+                types.setup.init,
             ]),
         }
     };

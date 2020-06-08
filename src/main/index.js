@@ -1,7 +1,9 @@
 'use strict';
 
-import {app, BrowserWindow, Menu, ipcMain, dialog, shell, systemPreferences} from 'electron';
-import EAU from 'electron-asar-hot-updater';
+import {app, BrowserWindow, Menu, ipcMain, dialog, shell, globalShortcut , nativeTheme} from 'electron';
+
+const storage = require('electron-json-storage');
+// import EAU from 'electron-asar-hot-updater';
 
 const path = require('path');
 const fs = require('fs-extra');
@@ -13,25 +15,33 @@ import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
 import * as diffFolder from './util/diffFolder';
 
+let isClose = false;
 let mainWindow, aboutWindow;
 
 const DEFAULT_PATH = path.join(app.getPath('downloads'), pkg.name);
 
 app.on('ready', initApp);
 
+app.on('activate', () => {
+    console.log(mainWindow);
+    if (mainWindow === null) {
+        createMainWindow();
+    } else {
+        mainWindow.show();
+    }
+});
+
 app.on('window-all-closed', () => {
-    if (!util.isMac()) {
+    if (util.isWin()) {
         app.quit();
     }
 });
 
-app.on('activate', () => {
-    if (mainWindow === null) {
-        createMainWindow();
-    }
-});
-
 function initApp() {
+    globalShortcut.register('CommandOrControl+Q', () => {
+        isClose = true;
+        app.quit();
+    });
     //win10 ,不设置没有通知显示
     app.setAppUserModelId(pkg.build.appId);
 
@@ -42,29 +52,52 @@ function initApp() {
     //创建主窗口
     createMainWindow();
     //托盘处理
-    util.isMac() && trayUtil.createTray(mainWindow.id);
+    // util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
 
     //updateAsar();
 }
 
+/**
+ * mainWindow
+ * 在win下是直接关闭,然后如果app触发"window-all-closed",关闭应用.
+ * 在mac下默认是隐藏,只有cmd+Q 或者菜单点击退出,关闭应用.
+ */
 function createMainWindow() {
     mainWindow = new BrowserWindow({
         height: 750,
         width: 1000,
         title: pkg.cnname,
         titleBarStyle: 'hidden',
+        icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
         webPreferences: {
-            webSecurity: false
+            webSecurity: false,
+            nodeIntegration: true
         }
     });
 
     mainWindow.loadURL(util.mainURL);
 
+    mainWindow.on('close', (event) => {
+        if (!isClose && !util.isWin()) {
+            event.preventDefault();
+            //win10调用hide后,窗口没有关闭,不过也找不到了...
+            mainWindow.hide();
+        }
+    });
+
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
+    /*try {
+        mainWindow.webContents.debugger.attach('1.3');
+    } catch (err) {
+        console.log('Debugger attach failed : ', err);
+    }
+    console.log("debugger.isAttached():" + mainWindow.webContents.debugger.isAttached());*/
+
 }
 
 /**
@@ -78,13 +111,13 @@ const registerIPC = function () {
 
     //选择下载目录
     ipcMain.on(Constants.Listener.choiceDownloadFolder, function (event, option) {
-        dialog.showOpenDialog(option, function (files) {
-            if (files) event.sender.send(Constants.Listener.choiceDownloadFolder, files);
+        dialog.showOpenDialog(option).then((result)=>{
+            if (result.filePaths) event.sender.send(Constants.Listener.choiceDownloadFolder, result.filePaths);
         });
     });
 
     //下载文件
-    ipcMain.on(Constants.Listener.downloadFile, function (event, file, option) {
+    ipcMain.on(Constants.Listener.downloadFile, function (event, url, option) {
         option.onProgress = function (num) {
             if (num !== 1) {
                 event.sender.send(Constants.Listener.updateDownloadProgress, num);
@@ -97,13 +130,14 @@ const registerIPC = function () {
             option.directory = path.join(option.directory, option.folder);
         }
 
-        download(mainWindow, file, option).then(dl => {
+        download(mainWindow, url, option).then(dl => {
             if (option.count === 1) {
                 shell.showItemInFolder(dl.getSavePath());
             }
-            event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         }).catch(error => {
             console.error(error);
+        }).finally(() => {
+            // console.log(file.path, 1);
             event.sender.send(Constants.Listener.updateDownloadProgress, 1);
         });
     });
@@ -112,9 +146,9 @@ const registerIPC = function () {
     ipcMain.on(Constants.Listener.openFileDialog, function (event, option) {
         dialog.showOpenDialog({
             properties: option.properties
-        }, function (_files) {
-            if (_files) {
-                event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(_files));
+        }).then((result)=>{
+            if (result.filePaths) {
+                event.sender.send(Constants.Listener.readDirectory, util.wrapperFiles(result.filePaths));
             }
         });
     });
@@ -130,9 +164,9 @@ const registerIPC = function () {
             title: '请选择需要同步的目录(beta)',
             buttonLabel: '同步',
             properties: option.properties
-        }, async function (directory) {
-            console.dir(directory);
-            let results = await diffFolder.diff(directory[0], option.files, option.type, option.mergeType);
+        }).then(async (result)=>{
+            console.dir(result.filePaths);
+            let results = await diffFolder.diff(result.filePaths[0], option.files, option.type, option.mergeType);
             console.dir(results);
 
             event.sender.send(Constants.Listener.syncDirectory, results);
@@ -145,12 +179,16 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
-        console.log(arg);
         trayUtil.setTrayIcon('tray_' + arg.key + '.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
-        event.sender.send(Constants.Listener.darkMode, systemPreferences.isDarkMode());
+        event.sender.send(Constants.Listener.darkMode, nativeTheme.shouldUseDarkColors);
+    });
+
+    ipcMain.on(Constants.Listener.showMenuBar, function (event, option) {
+        //win1页面会卡死
+        mainWindow.setMenuBarVisibility(option);
     });
 
     //导出URL链接
@@ -168,7 +206,7 @@ const registerIPC = function () {
 
 
 /**
- * 检测更新asar
+ * 检测更新asar(未调用)
  */
 function updateAsar() {
 
@@ -227,7 +265,7 @@ const getMenuData = function () {
             ]
         },
         {
-            label: '视图',
+            label: '设置',
             submenu: [
                 {
                     label: '重新加载',
@@ -237,7 +275,25 @@ const getMenuData = function () {
                         }
                     }
                 },
-                {role: 'forcereload'},
+                {
+                    label: '清除缓存&重新加载',
+                    click() {
+                        //
+                        if (mainWindow) {
+                            //console.log(path.join(app.getPath('userData'), 'Cache'));
+                            mainWindow.webContents.session.clearCache(function () {
+                                mainWindow.loadURL(util.mainURL);
+                            });
+                        }
+                    }
+                },
+                {
+                    label: '设置目录',
+                    click() {
+                        shell.showItemInFolder(storage.getDefaultDataPath());
+                    }
+                },
+                // {role: 'forcereload'},
                 {role: 'toggledevtools', label: '开发者工具'},
                 /*{type: 'separator'},
                 {role: 'resetzoom'},
@@ -258,9 +314,15 @@ const getMenuData = function () {
             label: '帮助',
             submenu: [
                 {
+                    label: 'wiki',
+                    click() {
+                        shell.openExternal('https://github.com/willnewii/qiniuClient/wiki');
+                    }
+                },
+                {
                     label: '提交异常或需求',
                     click() {
-                        shell.openExternal('mailto:support@paocdn.com');
+                        shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
                     }
                 }
             ]
@@ -279,9 +341,11 @@ const getMenuData = function () {
                     resizable: false,
                     autoHideMenuBar: true,
                     title: '关于',
+                    icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
                     webPreferences: {
                         webSecurity: false,
-                        backgroundThrottling: false
+                        backgroundThrottling: false,
+                        nodeIntegration: true
                     }
                 });
                 aboutWindow.loadURL(util.mainURL + '#/about');
@@ -292,9 +356,9 @@ const getMenuData = function () {
         }
     };
 
-    if (process.platform === 'darwin') {
+    if (util.isMac()) {
         template.unshift({
-            label: app.getName(),
+            label: app.name,
             submenu: [
                 aboutMenu,
                 {type: 'separator'},
@@ -304,11 +368,15 @@ const getMenuData = function () {
                 {role: 'hideothers', label: '隐藏其他'},
                 {role: 'unhide', label: '显示全部'},
                 {type: 'separator'},
-                {role: 'quit', label: '关闭'}
+                {
+                    label: '关闭', click: () => {
+                        isClose = true;
+                        app.quit();
+                    }
+                }
             ]
         });
 
-        // Window menu
         template[3].submenu = [
             {role: 'close'},
             {role: 'minimize', label: '最小化'},

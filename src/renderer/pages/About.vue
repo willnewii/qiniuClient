@@ -2,7 +2,9 @@
     <div class="about-view">
         <img class="logo" src="../assets/img/logo.jpg">
         <div class="name">{{info.cnname}}</div>
-        <div>Version. {{info.version}}</div>
+        <div>v{{info.version}}</div>
+        <div>{{platform}}</div>
+        <div>electron: {{versions.electron}}</div>
     </div>
 </template>
 <script>
@@ -14,6 +16,8 @@
         data() {
             return {
                 info: pkg,
+                versions: process.versions,
+                platform: process.platform
             };
         },
         created() {
@@ -29,10 +33,12 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
+
         .logo {
             width: 100px;
             height: 100px;
         }
+
         .name {
             font-weight: bold;
             font-size: 20px;

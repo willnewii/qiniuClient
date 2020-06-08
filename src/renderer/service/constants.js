@@ -1,19 +1,7 @@
 //默认文件的分隔符
 export const DELIMITER = '/';
 
-export const protocol = 'http://';
-
-export const method = {
-    //列举一个账号的所有空间
-    getBuckets: 'https://rs.qbox.me/buckets',
-    //获取一个空间绑定的域名列表
-    getDomains: 'https://api.qiniu.com/v6/domain/list',
-    //获取目录(是通过公共前缀模拟出的效果)
-    getResources: 'https://rsf.qbox.me/list',
-};
-
 export const Key = {
-    withoutDelimiter: '__withoutDelimiter__',
     filter: '__filter__',
     app_setup: '__app__setup__',
     app_switch: '__app__switch__',
@@ -37,13 +25,13 @@ export const URL = {
 };
 
 export const Event = {
-    removes: 'removes',
-    remove: 'remove',
-    download: 'download',
-    statusview: 'statusview',
-    dropview: 'dropview',
+    statusView: 'statusView',
+    dropView: 'dropView',
     loading: 'loading',
-    updateFiles: 'updateFiles'
+    updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据
+    refreshFiles: 'refreshFiles',           //更新文件列表
+    resourceAction: 'resourceAction',       //下载/上传事件
+    changePrivate: 'changePrivate',
 };
 
 export const CopyType = {
@@ -55,6 +43,20 @@ export const UploadType = {
     UPLOAD: 'upload',
     FETCH: 'fetch'
 };
+
+export const FileType = {
+    folder: 'F',
+};
+
+export const ActionType = {
+    download: 'download',
+    upload: 'upload',
+    rename: 'rename',
+    remove: 'remove',
+    refreshUrls: 'refreshUrls',
+};
+
+export const PageSize = 5000;
 
 /**
  * 以本地为基准,云对应不上的文件会被删除
@@ -81,5 +83,7 @@ export const Listener = {
     preview: 'preview',
     syncDirectory: 'syncDirectory',
     darkMode: 'darkMode',
+    showMenuBar: 'showMenuBar',
     exportUrl: 'exportUrl'
 };
+

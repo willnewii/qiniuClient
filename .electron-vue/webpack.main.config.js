@@ -5,21 +5,20 @@ process.env.BABEL_ENV = 'main';
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 let mainConfig = {
     entry: {
         main: path.join(__dirname, '../src/main/index.js')
     },
-    externals: [
-        'node-notifier'
-    ],
+    externals: ['node-notifier', 'worker_threads'],
     module: {
         rules: [
             {
                 test: /\.js$/,
                 use: 'babel-loader',
+                include: ["electron-dl"],
                 exclude: /node_modules/
             },
             {
@@ -54,9 +53,9 @@ let mainConfig = {
  */
 if (process.env.NODE_ENV !== 'production') {
     mainConfig.plugins.push(
-        new webpack.DefinePlugin({
-            '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
-        })
+            new webpack.DefinePlugin({
+                '__static': `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`
+            })
     );
 }
 
@@ -65,11 +64,17 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
     mainConfig.plugins.push(
-        new MinifyPlugin(),
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"production"'
-        })
+            new MinifyPlugin(),
+            new webpack.DefinePlugin({
+                'process.env.NODE_ENV': '"production"'
+            })
     );
+
+    if (process.env.ANALYZER === 'true') {
+        mainConfig.plugins.push(
+                new BundleAnalyzerPlugin(),
+        );
+    }
 }
 
 if (process.env.NODE_ENV !== 'production') {

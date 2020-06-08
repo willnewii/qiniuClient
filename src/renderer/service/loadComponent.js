@@ -4,6 +4,7 @@ import Vue from 'vue';
 import Electron from 'vue-electron';
 import VueLazyload from 'vue-lazyload';
 import ViewUI from 'view-design';
+
 import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';

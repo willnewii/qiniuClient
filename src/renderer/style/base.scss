@@ -5,6 +5,40 @@ body {
   color: $fontColor;
 }
 
+.ivu-menu-vertical {
+  flex-grow: 1;
+
+  .ivu-menu-item {
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+
+    .layout-text {
+      margin-left: 0;
+      line-height: 25px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .layout-icon {
+      margin-left: 0;
+      line-height: 25px;
+      background: rgba(255, 255, 255, .7);
+      width: 25px;
+      color: $fontColor;
+      text-align: center;
+      text-transform: capitalize;
+    }
+  }
+}
+
+.ivu-breadcrumb-item-link {
+  > .ivu-icon {
+    line-height: 1.5;
+  }
+}
+
 //表格 多选 图标边距修改
 .ivu-table-cell {
   .ivu-checkbox-wrapper {
@@ -16,8 +50,12 @@ body {
   box-shadow: none;
 }
 
+.ivu-menu-item-active {
+  font-weight: 500;
+}
+
 .ivu-menu-light.ivu-menu-vertical .ivu-menu-item-active:not(.ivu-menu-submenu):after {
-  width: 4px !important;
+  width: 2px !important;
 }
 
 .spin-icon-load {
@@ -37,26 +75,47 @@ body {
   }
 }
 
-/* 自定义scrollbar 效果不好
-::-webkit-scrollbar
-{
-  width: 4px;
-  height: 4px;
-  background-color: #F5F5F5;
+.client-link {
+  color: #2d8cf0;
 }
 
-!*定义滚动条轨道 内阴影+圆角*!
-::-webkit-scrollbar-track
-{
-  border-radius: 3px;
-  //-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #F5F5F5;
+@if ($platform != 'darwin') {
+
 }
 
-!*定义滑块 内阴影+圆角*!
-::-webkit-scrollbar-thumb
-{
-  border-radius: 3px;
-  //-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-  background-color: #A9A5A5;
-}*/
+//自定义scrollbar 效果不好
+::-webkit-scrollbar {
+  width: 2px;
+  background-color: $bg-resource;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track {
+  //border-radius: 3px;
+  background-color: $bg-resource;
+}
+
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+  //border-radius: 3px;
+  height: 2px;
+  background-color: #C1C1C1;
+}
+
+//横向滑块设置
+.horizontal::-webkit-scrollbar {
+  height: 2px;
+}
+
+.horizontal::-webkit-scrollbar-thumb {
+  width: 2px;
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
+
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}

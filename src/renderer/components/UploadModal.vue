@@ -4,18 +4,14 @@
 -->
 <template>
     <div>
-        <Modal v-model="uploadModal.isShow" title="上传文件" @on-ok="preUploadFile"
-               @on-cancel="initModal" class-name="upload-modal">
+        <Modal v-model="uploadModal.isShow" title="上传文件" :mask-closable="false"
+               @on-ok="preUploadFile" @on-cancel="initModal" class-name="upload-modal">
 
             <Input class='modal-url' v-if="uploadModal.type == 'fetch'" v-model="uploadModal.path"
                    placeholder="请输入你要上传的文件链接" @on-change="handleURLPath"
                    icon="trash-b" @on-click="uploadModal.path = '';filePaths=[]"/>
 
             <div class="modal-input">
-                <!--<Select v-model="uploadModal.prepend" style="width: 100px">
-                    <Option value="">无</Option>
-                    <Option v-for="item of bucket.getDirArray()" :key="item" :value="item">{{item}}</Option>
-                </Select>-->
                 <Input v-model="uploadModal.input"/>
             </div>
 
@@ -30,16 +26,12 @@
 <script>
     import {mapGetters} from 'vuex';
     import * as types from '../vuex/mutation-types';
-    import {Constants, util, EventBus, mixins} from '../service/index';
+    import {Constants, util, EventBus} from '../service';
+    import {resource, base} from '../mixins/index';
 
     export default {
         name: 'UploadModal',
-        mixins: [mixins.base, mixins.resource],
-        props: {
-            bucket: {
-                type: Object
-            }
-        },
+        mixins: [base],
         data() {
             return {
                 uploadModal: {
@@ -57,9 +49,14 @@
                 filePaths: [],
             };
         },
+        props: {
+            bucket: {
+                type: Object
+            }
+        },
         computed: {
             ...mapGetters({
-                setup_isOverwrite: types.setup.setup_isOverwrite,
+                setup_isOverwrite: types.setup.isOverwrite,
             })
         },
         created() {
@@ -99,7 +96,7 @@
             window.ondragleave = (e) => {
                 e.preventDefault();
                 if (e.screenY === e.screenX && e.screenX === 0) {
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: false,
                     });
                 }
@@ -109,9 +106,9 @@
                 e.preventDefault();
                 if (!this.messageFlag) {
                     this.messageFlag = true;
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: true,
-                        message: `文件将会被上传至 ${this.bucket.name} 存储桶下的: ${this.bucket.folderPath }/`,
+                        message: `文件将会被上传至 ${this.bucket.name} 存储桶下的: ${this.bucket.folderPath}/`,
                     });
                     setTimeout(() => {
                         this.messageFlag = false;
@@ -127,7 +124,7 @@
                         path.push(file.path);
                     });
 
-                    EventBus.$emit(Constants.Event.dropview, {
+                    EventBus.$emit(Constants.Event.dropView, {
                         show: false,
                     });
                     EventBus.$emit(Constants.Event.loading, {
@@ -202,68 +199,19 @@
                 this.uploadModal.isShow = true;
             },
             preUploadFile() {//上传文件前处理
-                this.status_count = 0;
-                this.status_total = this.filePaths.length;
-                EventBus.$emit(Constants.Event.statusview, {
-                    show: true,
-                    message: `文件上传中...`,
+                let list = this.filePaths.map((item) => {
+                    item.key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') + item.key;
+                    return item;
                 });
+                EventBus.$emit(Constants.Event.resourceAction, list, Constants.ActionType.upload);
+                /*this.resourceAction(this.filePaths.map((item) => {
+                    item.key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') + item.key;
+                    return item;
+                }), Constants.ActionType.upload);*/
 
-                this.uploadFile();
+                this.uploadModal.path = '';
+                this.uploadModal.input = '';
             },
-            uploadFile() {
-                let file = this.filePaths[0];
-                //处理文件的虚拟路径
-                file.key = (this.uploadModal.prepend ? this.uploadModal.prepend : '') + (this.uploadModal.input ? this.uploadModal.input + '/' : '') + file.key;
-
-                this.status_count += 1;
-
-                EventBus.$emit(Constants.Event.statusview, {
-                    message: `文件上传中(${this.status_count}/${this.status_total})...0%`,
-                    path: file.path
-                });
-
-                this.resourceCreate(file, {
-                    isOverwrite: this.setup_isOverwrite,
-                    uploadType: this.uploadModal.type,
-                    progressCallback: (progress) => {
-                        EventBus.$emit(Constants.Event.statusview, {
-                            message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
-                        });
-                    },
-                    callback: this.handleResult
-                });
-            },
-            handleResult(err, ret) {
-                if (!err) {
-                    util.notification({
-                        title: '上传成功',
-                        icon: this.bucket.generateUrl(ret.key, this.setup_deadline),
-                        body: ret.key,
-                    });
-                } else {
-                    util.notification({
-                        title: '上传失败',
-                        body: err.error,
-                    });
-                }
-
-                this.filePaths.shift();
-                if (this.filePaths.length > 0) {
-                    this.uploadFile();
-                } else {
-                    EventBus.$emit(Constants.Event.statusview, {
-                        message: '上传完成',
-                        path: '',
-                        show: false,
-                    });
-
-                    this.uploadModal.path = '';
-                    this.uploadModal.input = '';
-
-                    this.$parent.$emit('on-update', ret, 'upload', event);
-                }
-            }
         }
     };
 </script>

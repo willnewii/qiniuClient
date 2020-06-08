@@ -64,7 +64,9 @@ const createTrayWindow = () => {
             // Prevents renderer process code from not running when window is
             // hidden
             webSecurity: false,
-            backgroundThrottling: false
+            backgroundThrottling: false,
+            devTools: false,
+            nodeIntegration: true
         }
     });
 
@@ -81,15 +83,20 @@ const createTrayWindow = () => {
 };
 
 const toggleTrayWindow = () => {
-    if (mTrayWindow.isVisible()) {
-        mTrayWindow.hide();
-        if (mainWindowId !== -1 && BrowserWindow.fromId(mainWindowId)) {
-            BrowserWindow.fromId(mainWindowId).show();
-            BrowserWindow.fromId(mainWindowId).focus();
+    if (mainWindowId !== -1 && BrowserWindow.fromId(mainWindowId)) {
+        let win = BrowserWindow.fromId(mainWindowId);
+
+        if (win.isVisible()) {
+            win.minimize();
+        } else {
+            win.show();
         }
+    }
+    /*if (mTrayWindow.isVisible()) {
+        mTrayWindow.hide();
     } else {
         showTrayWindow();
-    }
+    }*/
 };
 
 const showTrayWindow = () => {

@@ -1,22 +1,15 @@
-import * as types from "@/vuex/mutation-types";
-
 const fs = require('fs');
+
 import {util} from '../service/index';
+import brand from '@/cos/brand';
 import baseBucket from './baseBucket';
 import * as tencent from './tencent';
-import * as qing from "@/cos/qing";
 
 class Bucket extends baseBucket {
 
     constructor(name, cos) {
         super(name, cos);
-    }
-
-    reset() {
-        super.reset();
-
-        //腾讯COS字段
-        this.location = '';
+        this.key = brand.tencent.key;
     }
 
     /**
@@ -37,6 +30,7 @@ class Bucket extends baseBucket {
 
         if (this.location) {
             this.getACL();
+            this.getDomains();
         }
     }
 
@@ -53,6 +47,14 @@ class Bucket extends baseBucket {
             this.setPermission(data.ACL === 'private' ? 1 : 0);
             this.getResources();
         });
+    }
+
+    getDomains() {
+        let customeDomains = this.vm.customeDomains;
+        if (customeDomains && customeDomains[this.name]) {
+            this.domain = customeDomains[this.name];
+            this.https = false ;
+        }
     }
 
     createFile(_param, type, callback) {
@@ -91,15 +93,16 @@ class Bucket extends baseBucket {
         tencent.rename(params, items, callback);
     }
 
-    getResources(keyword) {
+    getResources(option = {}) {
+        super.getResources();
         let params = {
             Bucket: this.name,
             Region: this.location,
             MaxKeys: this.limit,
         };
 
-        if (keyword) {
-            params.Prefix = keyword;
+        if (option.keyword) {
+            params.Prefix = option.keyword;
         }
 
         if (this.marker) {
@@ -116,12 +119,12 @@ class Bucket extends baseBucket {
                 let files = [];
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
-                        files.push(util.convertMeta(item, 1));
+                        files.push(util.convertMeta(item, brand.tencent.key));
                     }
                 });
 
                 data.items = files;
-                this.appendResources(data, keyword);
+                this.appendResources(data, option);
             }
         });
     }
@@ -142,7 +145,14 @@ class Bucket extends baseBucket {
             Sign: this.permission === 1 //是否需要签名
         };
 
-        return this.cos.getObjectUrl(params);
+        let url = this.cos.getObjectUrl(params);
+
+        if (this.domain) {
+            let obj = new URL(url);
+            url = url.replace(obj.origin, this.domain);
+        }
+
+        return super.generateUrl(url);
     }
 }
 

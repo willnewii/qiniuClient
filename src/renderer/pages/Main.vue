@@ -1,24 +1,17 @@
 <template>
     <div class="layout">
-        <!--<v-contextmenu ref="bucketMenu" @contextmenu="handleBucketMenu">
-            <v-contextmenu-item @click="handleBucketMenuClick(0)">同步</v-contextmenu-item>
-            <v-contextmenu-item divider></v-contextmenu-item>
-            <v-contextmenu-item @click="handleBucketMenuClick(1)">批量导出URL</v-contextmenu-item>
-        </v-contextmenu>-->
-        <Row type="flex">
-            <i-col :span="menuSpace.left" class="layout-menu-left">
-                <i-button type="text" class="navicon_btn" @click="toggleMenu">
-                    <!--<Icon class="icon iconfont" :class="'icon-' + cos_key" size="24"></Icon>-->
-                    {{menuState ? cos.name : ''}}
+        <div class="content">
+            <div class="layout-menu">
+                <i-button type="text" class="navicon_btn">
+                    <Icon @click="toggleMenu" class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
+                    <span @click="showChangeAlias">{{menuState ? cos.name : ''}}</span>
                 </i-button>
-                <Menu width="auto" v-if="buckets_info && buckets_info.length > 0"
-                      @on-select="onMenuSelect" :active-name="bucketName">
+                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
                     <Menu-group class="buckets-menu" title="存储空间">
-                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name"
-                                   :index="index">
+                        <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name" :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="item.permission === 1 ? 'md-lock' : 'md-folder'"></Icon>
+                                      :type="item.permission === 1 ? 'md-lock' : (bucketName === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
                                 <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
@@ -27,7 +20,7 @@
                         </Menu-item>
                     </Menu-group>
                     <Menu-group title="设置">
-                        <Menu-item v-for="(item,index) of menus " :name="item.name" :key="item.name">
+                        <Menu-item v-for="(item,index) of menus " :index="index" :key="item.name" :name="item.name">
                             <Icon :size="item.size ? item.icon : 25" :type="item.icon"></Icon>
                             <span class="layout-text" v-if="menuState">{{item.title}}</span>
                         </Menu-item>
@@ -40,22 +33,25 @@
                         <span class="version-new" @click="openBrowser(version.url)">有新版啦~</span>
                     </Poptip>
                 </div>
-            </i-col>
-            <i-col :span="menuSpace.right">
-                <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
-            </i-col>
-        </Row>
+            </div>
+            <div class="layout-content">
+                <keep-alive>
+                    <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                </keep-alive>
+            </div>
+        </div>
         <!-- cos选择框-->
         <Modal v-model="cosChoiceModel" class-name="cosModel vertical-center-modal" :closable="true"
-               :mask-closable="false">
+               :mask-closable="false" width="auto">
             <div class="choice-cos">
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-for="item in coss" :key="item.key">
+                <Card :bordered="false"  v-for="(item,index) in coses"
+                      :key="index">
                     <div class="choice-view" @click="selectCOS(item)">
                         <Icon class="iconfont" :class="`icon-${item.key}`" size="32"></Icon>
                         <span class="name">{{item.name}}</span>
                     </div>
                 </Card>
-                <Card :bordered="false" style="flex-grow: 1;margin: 10px" v-if="coss.length < 4">
+                <Card :bordered="false" >
                     <div class="choice-view" @click="selectCOS()">
                         <Icon type="md-add-circle" size="32"></Icon>
                         <span class="name">登陆其它</span>
@@ -69,35 +65,52 @@
             <Icon type="ios-loading" size=20 class="spin-icon-load"></Icon>
             <span>{{loading.message}}</span>
         </Spin>
+        <!-- 分页加载提示框-->
+        <Modal v-model="paging.show" class-name="vertical-center-modal"
+               ok-text="开启" :closable="true" :mask-closable="false">
+            <div class="paging-view">
+                <p>当前bucket数据量过大,加载时间过久.是否开启分页加载? </p>
+
+                <p class="client-link"
+                   @click="openBrowser('https://github.com/willnewii/qiniuClient/wiki/%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%BD%BD%E6%96%B9%E5%BC%8F')">
+                    数据加载方式区别</p>
+            </div>
+        </Modal>
         <!-- 上传/下载进度提示框-->
-        <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
-            <div>{{status.message}}</div>
-            <div>{{status.path}}</div>
-        </div>
+        <status-view></status-view>
         <!-- 文件拖拽提示框-->
-        <div class="drop-view" v-if="drop.show">
+        <div class="drop-view" v-show="drop.show">
             <div class="drop-sub">
                 <span>{{drop.message}}</span>
             </div>
         </div>
+        <!-- 别名修改提示框-->
+        <Modal v-model="changeAliasDialog.show" class-name="vertical-center-modal"
+               ok-text="修改" :closable="true" :mask-closable="false" @on-ok="changeAlias">
+            <p>请输入你要修改的别名</p>
+            <Input class='modal-url' v-model="changeAliasDialog.name"></Input>
+        </Modal>
     </div>
 </template>
 <script>
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
+    import StatusView from '@/components/StatusView';
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
     export default {
-        mixins: [mixins.base],
+        mixins: [mixins.base, mixins.request],
+        components: {StatusView},
         data() {
             return {
-                coss: [],//已登录的cos列表
+                coses: [],//已登录的cos列表
                 cos: {name: ''},
                 cosChoiceModel: false,
+                menuName: '',
                 bucketName: '',
-                menuState: true,
+                menuState: true,            //menu是否折叠
                 appVersion: pkg.version,
                 version: {
                     github: Constants.URL.github,
@@ -106,6 +119,10 @@
                     info: ''
                 },
                 menus: [{
+                    name: Constants.Key.app_switch,
+                    icon: 'md-switch',
+                    title: '切换'
+                }, {
                     name: Constants.Key.app_setup,
                     icon: 'md-cog',
                     title: '设置'
@@ -114,81 +131,96 @@
                     icon: 'md-exit',
                     title: '注销'
                 }],
-                status: {
-                    show: false,
-                    path: '',
-                    message: '',
-                },
                 loading: {
                     show: false,
                     message: '',
                     flag: '' //可以用作统计计时的标记
                 },
+                paging: {
+                    show: false,
+                },
                 drop: {
                     show: false,
                     message: ''
                 },
+                changeAliasDialog: {
+                    show: false
+                }
                 // contextBucketMenuIndex: 0
             };
         },
         computed: {
             ...mapGetters({
                 buckets_info: types.app.buckets_info,
-                privatebucket: types.setup.setup_privatebucket,
-                setup_recentname: types.setup.setup_recentname,
+                recent: types.setup.recent,
             }),
-            menuSpace() {
-                return {
-                    left: this.menuState ? 5 : 2,
-                    right: this.menuState ? 19 : 22
-                };
-            }
         },
         /**
-         * 初始化COSkey
-         * 初始化设置项
          * 检查是否有新版本
+         * 初始化设置项
+         * 初始化COSkey
          */
         created: function () {
-            this.initCOS();
+            this.checkVersion();
 
-            // this[types.setup.setup_init]();
-
-            //this.checkVersion();
-
-            EventBus.$on(Constants.Event.statusview, (option) => {
-                this.status = Object.assign(this.status, option);
-            });
-            EventBus.$on(Constants.Event.dropview, (option) => {
+            EventBus.$on(Constants.Event.dropView, (option) => {
                 this.drop = Object.assign(this.drop, option);
             });
             EventBus.$on(Constants.Event.loading, (option) => {
                 this.loading = Object.assign(this.loading, option);
+                /*if (this.loading.show) {
+                    console.time(option.flag);
+                } else {
+                    console.timeEnd(option.flag);
+                }*/
             });
+
+            let cos = this.$route.params.cos;
+            if (cos) {
+                this.selectCOS(cos);
+            } else {
+                this.initCOS();
+            }
         },
         methods: {
             ...mapActions([
                 types.app.a_buckets_info,
-                types.setup.setup_a_recentname,
+                types.setup.a_recent,
             ]),
             initCOS() {
-                this.$storage.getCOS(({cos, _cos}) => {
-                    if (_cos.length === 0) {
+                this.$storage.getBindCoses(({coses}) => {
+                    if (coses.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
-                    } else if (_cos.length === 1) {
-                        this.selectCOS(_cos[0]);
                     } else {
-                        this.coss = _cos;
-                        this.cosChoiceModel = true;
+                        let recentCOS = null;
+                        for (let i = 0; i < coses.length; i++) {
+                            if (coses[i].uuid === this.recent.uuid) {
+                                recentCOS = coses[i];
+                                break;
+                            }
+                        }
+
+                        if (recentCOS) {
+                            this.selectCOS(recentCOS);
+                        } else if (coses.length === 1) {
+                            this.selectCOS(coses[0]);
+                        } else {
+                            this.coses = coses;
+                            this.cosChoiceModel = true;
+                        }
                     }
                 });
             },
             selectCOS(item) {
-                this.cos_name = pkg.cnname;
-                document.getElementById("title") && (document.getElementById("title").innerText = item.name + "COS客户端");
-                this.cos_key = item.key;
-                this.$storage.setName(item.key);
-                this.$storage.initCOS((result) => {
+                if (item === undefined) {
+                    this.$router.push({path: Constants.PageName.login});
+                    return;
+                }
+
+                document.getElementById("title") && (document.getElementById("title").innerText = item.name);
+                this.cos = item;
+                this.changeAliasDialog.name = this.cos.name;
+                this.$storage.initCOS(item, (result) => {
                     this.cosChoiceModel = false;
                     if (result) {
                         this.getBuckets();
@@ -208,19 +240,22 @@
                         let defaultIndex = 0;
 
                         data.datas.forEach((item, index) => {
-                            data.datas[index].permission = 0;
-                            if (this.setup_recentname === item.name) {
+                            item.permission = 0;
+                            if (this.recent.bucket === item.name) {
                                 defaultIndex = index;
                             }
                         });
                         this[types.app.a_buckets_info](data.datas);
+
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
+                        this.$nextTick(() => {// COS切换后,menu没有active样式,手动调用一下
+                            this.$refs['menu'].updateActiveName();
+                        });
                     }
                 });
             },
             checkVersion() {
-                this.doRequset(Constants.URL.releases, null, (response) => {
-                    let result = response.data;
+                this.doRequset(Constants.URL.releases, null, (result) => {
                     if (result.tag_name > pkg.version) {
                         this.version.url = result.html_url;
                         this.version.version = result.tag_name;
@@ -228,25 +263,44 @@
                     }
                 });
             },
+            showChangeAlias() {
+                this.changeAliasDialog.show = true;
+            },
+            changeAlias() {
+                this.cos.name = this.changeAliasDialog.name;
+                this.$storage.updateCosKey(this.cos);
+            },
             toggleMenu() {
                 this.menuState = !this.menuState;
             },
             onMenuSelect(name) {
                 switch (name) {
                     default:
+                        this.menuName = name ;
                         this.bucketName = name;
-                        this.setup_a_recentname(name);
+                        this[types.setup.a_recent]({
+                            uuid: this.cos.uuid,
+                            bucket: name
+                        });
                         this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
                         break;
                     case Constants.Key.app_switch:
-                        this.$storage.getCOS(({_cos}) => {
-                            this.coss = _cos;
+                        this.$nextTick(() => {
+                            this.$refs['menu'].currentActiveName = this.menuName;
+                            this.$refs['menu'].updateActiveName();
+                        });
+                        this.$storage.getBindCoses(({coses}) => {
+                            this.coses = coses;
                             this.cosChoiceModel = true;
                         });
                         break;
                     case Constants.Key.app_logout:
+                        this.$nextTick(() => {
+                            this.$refs['menu'].currentActiveName = this.menuName;
+                            this.$refs['menu'].updateActiveName();
+                        });
                         this.$Modal.confirm({
-                            title: '登出该账号?',
+                            title: '注销当前账号?(对应的授权信息将被移除)',
                             render: (h) => {
                                 return h('div', {
                                     style: {
@@ -264,32 +318,18 @@
                                 ]);
                             },
                             onOk: () => {
-                                this.$storage.cleanCosKey(() => {
+                                this.$storage.cleanCosKey(this.$storage.info, () => {
                                     this.$router.push({path: Constants.PageName.login});
                                 });
                             }
                         });
                         break;
                     case Constants.Key.app_setup:
+                        this.menuName = name ;
                         this.$router.push({name: Constants.PageName.setup});
                         break;
                 }
             },
-            /*handleBucketMenu(ref) {
-                this.contextBucketMenuIndex = ref.data.attrs.index;
-            },
-            handleBucketMenuClick(action) {
-                switch (action) {
-                    case 0://同步操作
-                        if(this.$refs['bucketPage']){
-                            this.$refs['bucketPage'].showSyncFolder();
-                        }
-                        break;
-                    case 1://批量导出
-                        console.log(this.$refs['bucketPage']);
-                        break;
-                }
-            },*/
         }
     };
 </script>
@@ -298,113 +338,102 @@
 
     .layout {
         height: 100%;
-        .ivu-row-flex {
+
+        .content {
             height: 100%;
-        }
-
-        .layout-menu-left {
-            background: $menu-bg;
-            color: $menu-color;
             display: flex;
-            flex-direction: column;
-            border-bottom-right-radius: 4px;
-            padding-top: 20px;
-            z-index: 1;
-            box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
-            -webkit-app-region: drag;
+            flex-direction: row;
 
-            .navicon_btn {
-                font-weight: bold;
-                text-align: left;
-                padding-left: 22px;
+            .layout-menu {
+                background: $menu-bg;
                 color: $menu-color;
-                &:hover {
-                    color: $primary;
+                display: flex;
+                flex-direction: column;
+                border-bottom-right-radius: 4px;
+                padding-top: 20px;
+                z-index: 1;
+                box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
+                -webkit-app-region: drag;
+                max-width: 180px;
+
+                .navicon_btn {
+                    font-weight: bold;
+                    text-align: left;
+                    padding-left: 22px;
+                    color: $menu-color;
+
+                    &:hover {
+                        color: $primary;
+                    }
+
+                    & > span {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
                 }
-                & > span {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+
+                .buckets-menu {
+                    overflow-y: auto;
+                    max-height: 400px;
+
+                    /*
+                    overflow-y: auto;
+
+                    &:hover {//鼠标放上去的时候才显示滚动条.但是由于滚动条的显示与消失,会产生页面的抖动
+                        overflow-y: scroll;
+                    }*/
+                }
+
+                .version {
+                    padding: 10px 20px;
+                    /*color: #c5c5c5;*/
+                    &-new {
+                        color: #ff3605;
+                        cursor: pointer;
+                    }
+
+                    &-new-info {
+                        color: #555;
+                    }
                 }
             }
 
-            .buckets-menu {
-                overflow-y: scroll;
-                max-height: 400px;
-            }
-
-            .ivu-menu-vertical {
+            .layout-content {
                 flex-grow: 1;
-                .ivu-menu-item {
-                    padding: 8px 24px;
-                    display: flex;
-                    align-items: center;
-                    .layout-text {
-                        margin-left: 0;
-                        line-height: 25px;
-                        white-space: nowrap;
-                        text-overflow: ellipsis;
-                        overflow: hidden;
-                    }
-                    .layout-icon {
-                        margin-left: 0;
-                        line-height: 25px;
-                        background: rgba(255, 255, 255, .7);
-                        width: 25px;
-                        color: $fontColor;
-                        text-align: center;
-                        text-transform: capitalize;
-                    }
-                }
-            }
-
-            .version {
-                padding: 10px 20px;
-                /*color: #c5c5c5;*/
-                &-new {
-                    color: #ff3605;
-                    cursor: pointer;
-                }
-                &-new-info {
-                    color: #555;
-                }
+                overflow-x: auto;
             }
         }
+
+    }
+
+    .paging-view {
+        //display: flex;
+        //flex-direction: row;
+        //justify-content: space-around;
+        font-size: 14px;
     }
 
     .choice-cos {
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         justify-content: space-around;
+
         .choice-view {
             text-align: center;
             display: flex;
             flex-direction: column;
+
             .name {
                 font-size: 13px;
                 margin-top: 5px;
             }
         }
-    }
 
-    .status-view {
-        opacity: 1;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        left: 0;
-        text-align: left;
-        background-color: rgba(0, 0, 0, 0.51);
-        color: #FFFFFF;
-        padding: 10px;
-        font-size: 12px;
-        z-index: 901;
-        transition: opacity 1s;
-    }
-
-    .status-view-none {
-        opacity: 0;
-        transition: opacity .5s;
+        .ivu-card {
+            margin-right: 10px;
+        }
     }
 
     .drop-view {
@@ -420,6 +449,7 @@
         justify-content: center;
         align-items: center;
         font-size: 16px;
+
         .drop-sub {
             border: 2px dashed;
             border-radius: 10px;
@@ -440,6 +470,7 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+
             & > span {
                 margin-left: 6px;
             }

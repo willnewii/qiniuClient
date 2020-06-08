@@ -5,13 +5,14 @@
     "env": {
         "main": {
             "presets": [
-                "env",
-                {
-                    "modules": false,
-                    "targets": {
-                        "node": 7
+                [
+                    "env",
+                    {
+                        "targets": {
+                            "Node": "12.4.0"
+                        }
                     }
-                }
+                ]
             ]
         },
         "renderer": {
@@ -19,13 +20,11 @@
                 [
                     "env",
                     {
-                        "modules": false,
                         "targets": {
-                            "electron": "3.0.4"
+                            "Electron": "8.3.0"
                         }
                     }
-                ],
-                "stage-0"
+                ]
             ]
         }
     },

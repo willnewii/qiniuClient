@@ -1,5 +1,5 @@
 import Vue from 'vue';
-
+import * as Constants from './service/constants';
 import Router from 'vue-router';
 import axios from 'axios';
 
@@ -7,13 +7,15 @@ import axios from 'axios';
 import "@/service/loadComponent";
 import CloudObjectStorage from "@/cos/CloudObjectStorage";
 
+Vue.prototype.$storage = new CloudObjectStorage();
+
 
 Vue.use(Router);
 
-Vue.prototype.$storage = new CloudObjectStorage();
+import PasteImageService from "./service/pasteImageService";
 
-//import brand from "@/cos/brand";
-// Vue.prototype.$storage.setName(brand.qiniu);
+const pasteImageService = new PasteImageService();
+
 // Vue.config.debug = false;
 
 import routes from './routes';
@@ -27,6 +29,11 @@ const router = new Router({
 router.afterEach((to, from) => {
     if (to.meta && to.meta.hideTitle) {
         document.getElementById('title') && document.getElementById('title').remove();
+    }
+    if (to.name === Constants.PageName.login) {
+        pasteImageService.setEnable(false);
+    } else {
+        pasteImageService.setEnable(true);
     }
 });
 
@@ -45,9 +52,12 @@ Vue.filter('formatFileSize', function (value) {
     return util.formatFileSize(value);
 });
 
-//拦截器
+//拦截器(会影响到青云的请求)
 axios.interceptors.response.use((response) => {
-    return response;
+    if (response.data) {
+        return typeof (response.data) === 'object' ? response.data : JSON.parse(response.data);
+    }
+    return response.data;
 }, (error) => {
     if (error && error.response && error.response.status === 401) {
         router.push({path: '/login'});
@@ -63,4 +73,3 @@ new Vue({
     store,
     render: h => h(App)
 });
-

@@ -7,17 +7,20 @@
     .list {
         height: 260px;
         overflow: scroll;
+
         .item {
             display: flex;
             flex-direction: row;
             align-items: flex-end;
             padding: 10px;
             border-bottom: 1px #CCC solid;
+
             .image {
                 width: 50px;
                 height: 50px;
                 margin-right: 10px;
             }
+
             .btn {
                 margin-right: 5px;
             }
@@ -39,7 +42,7 @@
                     <div>{{item.key}}</div>
                     <div>
                         <i-button class='btn' type="primary" size="small" @click="show(item.key)">查看</i-button>
-                        <i-button class='btn' type="primary" size="small" @click="copy(item.key)">复制路径</i-button>
+                        <i-button class='btn' type="primary" size="small" @click="copyFileUrl(item.key)">复制路径</i-button>
                         <i-button class='btn' type="primary" size="small" @click="openInFolder(item.path)">源文件
                         </i-button>
                     </div>
@@ -57,7 +60,7 @@
     import * as types from '../vuex/mutation-types';
     import {util, Constants, storagePromise, mixins} from '../service';
     import storage from 'electron-json-storage';
-    import brand from "@/cos/brand";
+    import Request from "@/api/API";
 
     let ipc;
 
@@ -75,23 +78,29 @@
         },
         computed: {
             ...mapGetters({
-                bucket_name: types.setup.setup_bucket_name
+                bucket_name: types.setup.bucket_name
             })
         },
         async created() {
+            //TODO: 托盘目前逻辑有问题,需要重写
             ipc = this.$electron.ipcRenderer;
 
             let app = await storagePromise.get(Constants.Key.configuration);
+            console.log(app);
             if (app && app.brand && app.bucket_name) {
-                this.$storage.setName(app.brand);
-                this.$storage.initCOS((result) => {
+                this.$storage.initCOS(app, (result) => {
                     if (result) {
                         ipc.send(Constants.Listener.setBrand, {
                             key: app.brand
                         });
-                        this.doRequset(this.$storage.cos.methods.domains, {tbl: app.bucket_name}, (response) => {
-                            this.domains = response.data;
-                        });
+
+                        if (this.$storage.cos.methods) {//七牛需要加载域名列表
+                            let request = new Request();
+                            let url = `${this.$storage.cos.methods.domains}?tbl=${app.bucket_name}`;
+                            request.get(url).then((result) => {
+                                this.domains = result;
+                            });
+                        }
                     } else {
                         console.log('key 注册失败');
                     }
@@ -118,23 +127,15 @@
         },
         methods: {
             ...mapActions([
-                types.setup.setup_init,
+                types.setup.init,
             ]),
             updateStatus(title) {
-                console.log('title:', title);
                 ipc.send(Constants.Listener.updateTrayTitle, title);
-            },
-            sendNotify() {
-                /*ipc.send(Constants.Listener.showNotifier, {
-                    title: '上传完成',
-                    icon: 'notify-success.png'
-                });*/
             },
             doUploadFile() {
                 if (this.current === this.files.length) {
                     this.updateStatus('');
                     this.current = 0;
-                    this.sendNotify();
                 } else {
                     this.uploadFile(this.files[this.current]);
                 }
@@ -186,7 +187,7 @@
                 let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 this.$electron.shell.openExternal(url);
             },
-            copy(key) {
+            copyFileUrl(key) {
                 let url = this.$storage.cos.generateUrl(this.domains[0], key);
                 util.getClipboardText(this.config.copyType, url);
             },

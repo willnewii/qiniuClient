@@ -2,16 +2,21 @@ import {mapGetters} from 'vuex';
 import {Constants, EventBus, util} from '../service/index';
 import * as types from '../vuex/mutation-types';
 
+
+//作为ResourceGrid的扩展,不应该被其他页面引用
+//queue 执行中的标识符
+let isTaskPending = false;
+
 export default {
     computed: {
         ...mapGetters({
-            setup_copyType: types.setup.setup_copyType,
-            setup_deleteNoAsk: types.setup.setup_deleteNoAsk,
-            setup_uploadNoAsk: types.setup.setup_uploadNoAsk,
-            setup_imagestyle: types.setup.setup_imagestyle,
-            setup_downloaddir: types.setup.setup_downloaddir,
-            setup_deadline: types.setup.setup_deadline,
-        })
+            setup_copyType: types.setup.copyType,
+            setup_deleteNoAsk: types.setup.deleteNoAsk,
+            setup_uploadNoAsk: types.setup.uploadNoAsk,
+            setup_imagestyle: types.setup.imagestyle,
+            setup_downloaddir: types.setup.downloaddir,
+            setup_deadline: types.setup.deadline,
+        }),
     },
     props: {
         bucket: {
@@ -25,254 +30,200 @@ export default {
             status_count: 0,
             //同步文件时,缓存文件父路径
             baseDir: '',
-            //上传,下载,删除任务完成数
-            finishCount: -1,
         };
     },
     created: function () {
-        EventBus.$off(Constants.Event.remove);
-        EventBus.$on(Constants.Event.remove, () => {
-            this.remove();
-        });
 
-        EventBus.$off(Constants.Event.removes);
-        EventBus.$on(Constants.Event.removes, () => {
-            this.removes();
-        });
-
-        EventBus.$off(Constants.Event.download);
-        EventBus.$on(Constants.Event.download, () => {
-            this.status_total = this.bucket.selection.length;
-            this.status_count = 0;
-            EventBus.$emit(Constants.Event.statusview, {
-                show: true,
-                message: '文件下载中',
-            });
-
-            this.bucket.downloads = this.bucket.selection;
-            this.bucket.selection = [];
-            this.resourceDownload();
-        });
-
-        this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.updateDownloadProgress);
-        this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.syncDirectory);
-
-        this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
-            this.$Loading.update(num * 100);
-            EventBus.$emit(Constants.Event.statusview, {
-                message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
-            });
-            if (num === 1) {
-                this.$Loading.finish();
-                this.bucket.downloads.shift();
-                this.resourceDownload();
-            }
-        });
-
-        this.$electron.ipcRenderer.on(Constants.Listener.syncDirectory, (event, results) => {
-            this.finishCount = 0;
-            //  下载任务
-            if (results.downloads && results.downloads.length > 0) {
-                this.status_total = this.bucket.downloads.length;
-                this.status_count = 0;
-                EventBus.$emit(Constants.Event.statusview, {
-                    show: true,
-                    message: '文件下载中',
-                });
-
-                this.bucket.downloads = results.downloads;
-                this.baseDir = results.baseDir;
-                this.status_total = this.bucket.downloads.length;
-                this.status_count = 0;
-                this.resourceDownload();
-            } else {
-                this.syncFinish();
-            }
-
-            //  上传任务
-            if (results.uploads && results.uploads.length > 0) {
-                this.bucket.uploads = results.uploads;
-                console.log(this.bucket.uploads);
-                this.syncUpload();
-            } else {
-                this.syncFinish();
-            }
-
-            //  删除任务
-            if (results.deletes && results.deletes.length > 0) {
-                this.bucket.deletes = results.deletes;
-                this.bucket.removeFile(this.bucket.deletes, (ret) => {
-                    if (ret.error) {
-                        this.$Message.error('移除失败：' + ret.error);
-                    } else {
-                        this.$Message.info('文件移除成功');
-                        this.$emit('on-update', null, 'remove');
-                    }
-                    this.syncFinish();
-                });
-            } else {
-                this.syncFinish();
-            }
-
-        });
     },
     methods: {
         /**
          * 获取资源链接
          */
-        getResoureUrl(file) {
+        getResourceUrl(file) {
+            if (!file.key && file.path) {
+                file.key = util.getPrefix(file.path);
+            }
             return this.bucket.generateUrl(file.key, this.setup_deadline);
         },
-        show(file) {
-        },
-        showImage(file, images) {
-            this.previewImages = [];
-            if (images && images.length > 0) {
-                images.forEach((item) => {
-                    this.previewImages.push(this.getResoureUrl(item));
-                });
-
-                this.$nextTick(() => {
-                    this.$nextTick(() => {
-                        this.$nextTick(() => {
-                            this.$viewer.view(images.indexOf(file));
-                        });
-                    });
-                });
-            }
-        },
-        copy(file, copyType) {
-            let text = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResoureUrl(file), file);
-            this.$electron.clipboard.writeText(text);
-            this.$Message.info('文件路径以复制到剪贴板');
-        },
-        syncUpload() {
-            let file = this.bucket.uploads[0];
-            file.key = file.path.replace(file.dir + '/', '');
-
-            this.resourceCreate(file, {
-                isOverwrite: true,
-                uploadType: Constants.UploadType.UPLOAD,
-                progressCallback: (progress) => {
-                },
-                callback: (err, ret) => {
-                    if (!err) {
-                        this.$Notice.success({
-                            title: '上传成功',
-                            desc: ret.key,
-                        });
-                    } else {
-                        this.$Notice.error({
-                            title: '上传失败',
-                            desc: err.error,
-                        });
-                    }
-
-                    this.bucket.uploads.shift();
-                    if (this.bucket.uploads.length > 0) {
-                        this.syncUpload();
-                    } else {
-                        EventBus.$emit(Constants.Event.statusview, {
-                            message: '上传完成',
-                            path: '',
-                            show: false,
-                        });
-                        // 更新数据
-                        this.$emit('on-update', ret, 'upload', event);
-                        this.syncFinish();
-                    }
-                }
-            });
-        },
-        syncFinish() {
-            if (this.finishCount >= 0) {
-                ++this.finishCount;
-                if (this.finishCount === 3) {
-                    this.finishCount = -1;
-                    util.notification({
-                        body: '同步完成'
-                    });
-                }
-            }
-        },
-        resourceDownload() {
-            if (this.bucket.downloads.length > 0) {
-                this.$Loading.start();
-
-                this.status_count += 1;
-                EventBus.$emit(Constants.Event.statusview, {
-                    show: true,
-                    message: `文件下载中(${this.status_count}/${this.status_total})...0%`,
-                });
-
-                let option = {};
-                option.count = this.bucket.downloads.length;
-
-                if (this.baseDir) {//指定下载目录
-                    option.directory = this.baseDir;
-                    option.folder = '/' + util.getFakeFolder(this.bucket.downloads[0].key);
-                } else {//默认下载地址   downloaddir + 'bucket.name' + 'file folder'
-                    if (this.setup_downloaddir) {
-                        option.directory = this.setup_downloaddir;
-                    }
-                    option.folder = '/' + this.bucket.name + '/' + util.getFakeFolder(this.bucket.downloads[0].key);
-                }
-
-                this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResoureUrl(this.bucket.downloads[0]), option);
+        preview(file) {
+            if (util.isSupportImage(file.mimeType)) {
+                this.$viewer.view(this.previewImages.indexOf(this.getResourceUrl(file)));
             } else {
-                this.$refs['table'] && this.$refs['table'].selectAll(false);
-                EventBus.$emit(Constants.Event.statusview, {
-                    message: '',
-                    path: '',
+                this.$Message.info('不支持预览的文件格式');
+            }
+        },
+        copyFileUrl(file, copyType) {
+            let text = util.getClipboardText(copyType ? copyType : this.setup_copyType, this.getResourceUrl(file), file);
+            this.$electron.clipboard.writeText(text);
+            this.$Message.info('文件路径已复制到剪贴板');
+        },
+        resourceAction(files, action) {
+            files = Array.isArray(files) ? files : [files];
+
+            switch (action) {
+                case Constants.ActionType.download:
+                case Constants.ActionType.upload:
+                    this.bucket.fileQueue.push(...files.map((item) => {
+                        item.__action = action;
+                        return item;
+                    }));
+                    if (!isTaskPending) {
+                        this.status_total = this.bucket.fileQueue.length;
+                        this.status_count = 0;
+                        this.queueTask();
+                    } else {
+                        this.status_total += files.length;
+                    }
+                    break;
+                case Constants.ActionType.remove:
+                    this.resourceRemove(files, true);
+                    break;
+                case Constants.ActionType.refreshUrls:
+                    this.resourceRefreshUrls(files);
+                    break;
+            }
+
+
+        },
+        queueTask() {
+            let lastTask;
+            if (isTaskPending) {
+                lastTask = this.bucket.fileQueue.shift();
+            } else {
+                isTaskPending = true;
+            }
+
+            let list = this.bucket.fileQueue;
+            let file = list[0];
+            if (list.length > 0) {
+                let message = "";
+                switch (file.__action) {
+                    case Constants.ActionType.download:
+                        message = '文件下载中';
+                        this.resourceDownload(file);
+                        break;
+                    case Constants.ActionType.upload:
+                        message = '文件上传中';
+                        this.resourceUpload(file);
+                        break;
+                }
+
+                // this.$Loading.start();
+                EventBus.$emit(Constants.Event.statusView, {
+                    show: true,
+                    message: `${message}(${++this.status_count}/${this.status_total})...`,
+                });
+
+            } else {
+                isTaskPending = false;
+                if (lastTask && lastTask.__action === Constants.ActionType.upload) {
+                    // 上传成功后： 1.刷新列表 2.复制路径
+                    EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.upload);
+                    this.copyFileUrl(lastTask);
+                }
+
+                // this.$Loading.finish();
+                EventBus.$emit(Constants.Event.statusView, {
                     show: false
                 });
 
                 this.baseDir = '';
-                this.$Message.info('文件下载完成');
-                this.syncFinish();
+                util.notification({body: '任务完成'});
             }
         },
+        resourceDownload(file) {
+            let option = {
+                // TODO: 用来标识最后一个文件，打开文件目录用,如果是队列方式，这样处理有问题
+                count: this.bucket.fileQueue.length
+            };
+            //指定下载目录(默认下载地址:下载目录 + bucket.name + file.key)
+            if (this.baseDir) {
+                option.directory = this.baseDir;
+                option.folder = Constants.DELIMITER + util.getFakeFolder(file.key);
+            } else {
+                if (this.setup_downloaddir) {
+                    option.directory = this.setup_downloaddir;
+                }
+                option.folder = Constants.DELIMITER + this.bucket.name + Constants.DELIMITER + util.getFakeFolder(file.key);
+            }
+
+            this.$electron.ipcRenderer.send(Constants.Listener.downloadFile, this.getResourceUrl(file), option);
+        },
+        resourceUpload(file) {
+            let callback = (err, ret) => {
+                if (err) {
+                    this.$Notice.error({title: '上传失败', desc: err.error,});
+                }
+                //批量上传的时候提示信息会干扰
+                /*else {
+                    this.$Notice.success({title: '上传成功', desc: ret.key,});
+                }*/
+
+                this.queueTask();
+            };
+
+            if (!file.key && file.path) {
+                file.key = util.getPrefix(file.path);
+            }
+
+            let param = {
+                path: file.path,
+                key: file.key,
+                isOverwrite: true,
+                progressCallback: (progress) => {
+                    EventBus.$emit(Constants.Event.statusView, {
+                        message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
+                        progress: this.status_total === 1 ? progress : parseInt(this.status_count / this.status_total * 100)
+                    });
+                }
+            };
+
+            this.bucket.createFile(param, Constants.UploadType.UPLOAD, callback);
+        },
         resourceRename(files) {
+            EventBus.$emit(Constants.Event.loading, {
+                show: true,
+                message: '更新中...',
+            });
+
             this.bucket.renameFile(files, () => {
                 EventBus.$emit(Constants.Event.loading, {
                     show: false,
                 });
 
                 this.$Message.info('文件修改成功');
-                this.$emit('on-update', null, 'change');
+                EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.rename, files);
             });
         },
-        resourceCreate(file, option) {
-            let param = {
-                path: file.path,
-                key: file.key,
-                isOverwrite: option.isOverwrite,
-                progressCallback: option.progressCallback
-            };
-
-            this.bucket.createFile(param, option.uploadType, option.callback);
-        },
-        /**
-         *
-         * 删除按钮点击事件
-         * @param file
-         */
-        resourceRemove(file) {
+        resourceRemove(file, noAsk = false) {
             this.bucket.selection = Array.isArray(file) ? file : [file];
-            this.$parent.askRemove();
-        },
-        /**
-         * 删除文件
-         */
-        removes() {
-            this.bucket.removeFile(this.bucket.selection, (ret) => {
-                if (ret && ret.error) {
-                    this.$Message.error('移除失败：' + ret.error);
-                } else {
-                    this.$Message.info('文件移除成功');
-                    this.$emit('on-update', null, 'remove');
-                }
+            if (this.setup_deleteNoAsk || noAsk) {
+                this.bucket.removeFile(this.bucket.selection, (ret) => {
+                    if (ret && ret.error) {
+                        this.$Message.error('移除失败：' + ret.error);
+                    } else {
+                        this.$Message.info('文件移除成功');
+                        EventBus.$emit(Constants.Event.refreshFiles, Constants.ActionType.remove);
+                    }
+
+                });
                 this.bucket.selection = [];
+            } else {
+                this.$parent.askRemove();
+            }
+        },
+        resourceRefreshUrls(file) {
+            file = Array.isArray(file) ? file : [file];
+
+            let urls = file.map((item) => {
+                return this.getResourceUrl(item);
+            });
+            this.bucket.refreshUrls(urls, (error) => {
+                if (error) {
+                    this.$Message.info('CDN刷新失败:' + error);
+                } else {
+                    this.$Message.info('CDN刷新成功');
+                }
             });
         },
     }
