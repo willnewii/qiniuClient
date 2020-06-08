@@ -64,21 +64,7 @@
             <TabPane v-for="(item) in brands" :key="item.key" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
-                    <template v-if="item.key === brands.upyun.key">
-                        <Form-item label="别名" prop="name">
-                            <Input v-model="formItem.name" placeholder="别名"/>
-                        </Form-item>
-                        <Form-item label="服务名称" prop="service_name">
-                            <Input v-model="formItem.service_name" placeholder="请填入服务名称"/>
-                        </Form-item>
-                        <Form-item label="操作员名" prop="access_key">
-                            <Input v-model="formItem.access_key" placeholder="请填入操作员名"/>
-                        </Form-item>
-                        <Form-item label="操作员密码" prop="secret_key">
-                            <Input v-model="formItem.secret_key" placeholder="请填入操作员密码"/>
-                        </Form-item>
-                    </template>
-                    <template v-else>
+                    <template>
                         <Form-item label="别名" prop="name">
                             <Input v-model="formItem.name" placeholder="别名"/>
                         </Form-item>
@@ -88,18 +74,6 @@
                         <Form-item label="SECRET_KEY" prop="secret_key">
                             <Input v-model="formItem.secret_key" placeholder="请填入你的SECRET_KEY"/>
                         </Form-item>
-                        <Form-item label="ENDPOINT" prop="endpoint" v-if="item.key === brands.minio.key">
-                            <Input v-model="formItem.endpoint" placeholder="请填入服务的endpoint"/>
-                        </Form-item>
-                        <Form-item label="区域" prop="region" v-if="item.key === brands.aws.key || item.key === brands.jd.key">
-                            <Select v-model="formItem.region">
-                                <Option v-for="item in regions" :value="item.region" :key="item.region">{{ item.name }}
-                                </Option>
-                            </Select>
-                        </Form-item>
-                        <Form-item label="内网访问" prop="internal" v-if="item.key === brands.aliyun.key">
-                            <i-switch v-model="formItem.internal"/>
-                        </Form-item>
                     </template>
 
                     <Form-item>
@@ -108,25 +82,7 @@
                             <Button @click="handleReset(item.key)" style="margin-left: 8px">重置</Button>
                         </div>
                     </Form-item>
-                    <div style="margin-left: 150px">＊如何获取密钥信息:登录
-                        <template v-if="item.key === brands.qiniu.key">
-                            <a @click="openBrowser('https://portal.qiniu.com/user/key')">{{item.name}}</a>->个人面板->密钥管理
-                        </template>
-                        <template v-else-if="item.key === brands.tencent.key">
-                            <a @click="openBrowser('https://console.cloud.tencent.com/cos5')">{{item.name}}</a>->密钥管理
-                        </template>
-                        <template v-else-if="item.key === brands.qingstor.key">
-                            <a @click="openBrowser('https://console.qingcloud.com/')">{{item.name}}</a>->头像->API密钥
-                        </template>
-                        <template v-else-if="item.key === brands.aliyun.key">
-                            <a @click="openBrowser('https://oss.console.aliyun.com/')">{{item.name}}</a>->Access
-                            Key
-                        </template>
-                        <template v-else-if="item.key === brands.upyun.key">
-                            <a @click="openBrowser('https://console.upyun.com/dashboard/')">{{item.name}}</a>->Access
-                            Key
-                        </template>
-                    </div>
+                   
                 </Form>
             </TabPane>
         </Tabs>
@@ -157,7 +113,7 @@
                     region: [{required: true, message: 'region不能为空', trigger: 'blur'}],
                     service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
                 },
-                brands: brand,
+                brands:brand,
                 coses: [],
                 regions: [],
             };
@@ -175,16 +131,9 @@
                     this.selectBrand = this.brands[key];
                     this.handleReset();
                 }
-                if (key === this.brands.aws.key) {
-                    this.regions = Regions.s3;
-                } else if (key === this.brands.jd.key) {
-                    this.regions = Regions.jd;
-                }
+              
             },
             handleSubmit(key) {
-                if (key !== brand.upyun.key) {
-                    this.formItem.service_name = '-';
-                }
                 this.$refs[key][0].validate((valid) => {
                     if (valid) {
                         this.validateKey();

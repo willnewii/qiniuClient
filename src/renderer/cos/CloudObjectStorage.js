@@ -3,12 +3,6 @@ import * as storagePromise from '../service/storagePromise';
 const uuid = require('uuid/v1');
 
 import * as qiniu from '../cos/qiniu';
-import * as tencent from '../cos/tencent';
-import * as qing from '../cos/qing';
-import * as ali from '../cos/ali';
-import * as upyun from '../cos/upyun';
-import * as aws from '../cos/aws';
-import * as jd from '../cos/jd';
 
 import brand from '../cos/brand';
 
@@ -36,27 +30,6 @@ export default class CloudObjectStorage {
         switch (key) {
             case brand.qiniu.key:
                 this.cos = qiniu;
-                break;
-            case brand.tencent.key:
-                this.cos = tencent;
-                break;
-            case brand.qingstor.key:
-                this.cos = qing;
-                break;
-            case brand.aliyun.key:
-                this.cos = ali;
-                break;
-            case brand.upyun.key:
-                this.cos = upyun;
-                break;
-            case brand.aws.key:
-                this.cos = aws;
-                break;
-            case brand.jd.key:
-                this.cos = jd;
-                break;
-            case brand.minio.key:
-                this.cos = aws;
                 break;
         }
     }

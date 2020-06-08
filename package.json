@@ -1,8 +1,8 @@
 {
-    "name": "fastcache",
-    "cnname": "速网云存储客户端",
+    "name": "cloudbrowser",
+    "cnname": "云存储客户端",
     "version": "0.2.2",
-    "description": "速网云存储客户端",
+    "description": "云存储客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
     "main": "./dist/electron/main.js",
@@ -96,7 +96,7 @@
         "webpack-hot-middleware": "^2.24.3"
     },
     "build": {
-        "productName": "速网云存储客户端",
+        "productName": "云存储客户端",
         "appId": "com.github.willnewii.fastcache",
         "asar": true,
         "compression": "normal",

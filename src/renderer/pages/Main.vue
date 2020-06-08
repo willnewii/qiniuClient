@@ -161,7 +161,7 @@
          * 初始化COSkey
          */
         created: function () {
-            this.checkVersion();
+            //this.checkVersion();
 
             EventBus.$on(Constants.Event.dropView, (option) => {
                 this.drop = Object.assign(this.drop, option);
