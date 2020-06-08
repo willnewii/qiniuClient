@@ -1,6 +1,6 @@
 <template>
     <div class="about-view">
-        <img class="logo" src="../assets/img/logo.jpg">
+        <img class="logo" src="../../main/assets/icons/icon.png">
         <div class="name">{{info.cnname}}</div>
         <div>v{{info.version}}</div>
         <div>{{platform}}</div>
