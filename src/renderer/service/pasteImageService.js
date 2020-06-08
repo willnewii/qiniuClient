@@ -46,9 +46,11 @@ export default class PasteImageService {
         }
       }
     } else if (process.platform === "win32") {
-      let content = electron.clipboard.read("FileNameW")
-      if (content)
-        filePaths = [content.replace(new RegExp(String.fromCharCode(0), 'g'), '')]
+      //中文有问题
+      /* let content = electron.clipboard.read("FileNameW")*/
+      //https://github.com/electron/electron/issues/12141#issuecomment-386223681
+      let content = electron.clipboard.readBuffer("FileNameW").toString("ucs2")
+      if (content) filePaths = [content.replace(new RegExp(String.fromCharCode(0), "g"), "")]
     }
 
     if (filePaths.length === 0) {

@@ -70,7 +70,7 @@ function createMainWindow() {
         width: 1000,
         title: pkg.cnname,
         titleBarStyle: 'hidden',
-        icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
+        icon: util.isWin() ? util.getIconPath('icon.ico') : util.getIconPath('icon.png'),
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true
@@ -341,7 +341,7 @@ const getMenuData = function () {
                     resizable: false,
                     autoHideMenuBar: true,
                     title: '关于',
-                    icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
+                    icon: util.isWin() ? util.getIconPath('icon.ico') : util.getIconPath('icon.png'),
                     webPreferences: {
                         webSecurity: false,
                         backgroundThrottling: false,
