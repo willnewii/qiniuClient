@@ -2,7 +2,7 @@
     "name": "qiniuclient",
     "cnname": "云存储管理客户端",
     "cdnPath": "",
-    "version": "0.4.7",
+    "version": "0.4.8",
     "description": "云存储管理客户端。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
@@ -44,6 +44,7 @@
         "log4js": "^3.0.6",
         "mime-types": "^2.1.24",
         "multispinner": "^0.2.1",
+        "plist": "^3.0.1",
         "qingstor-sdk": "^3.0.1",
         "qiniu": "^7.3.0",
         "qs": "^6.8.0",
@@ -109,7 +110,7 @@
         ],
         "win": {
             "target": "nsis",
-            "icon": "./build/icons/icon.ico"
+            "icon": "./src/main/assets/icons/icon.ico"
         },
         "dmg": {
             "title": "qiniu client ${version}",
@@ -128,7 +129,7 @@
             ]
         },
         "mac": {
-            "icon": "./build/icons/icon.icns"
+            "icon": "./src/main/assets/icons/icon.icns"
         },
         "linux": {
             "target": [
@@ -137,7 +138,7 @@
                 "AppImage",
                 "zip"
             ],
-            "icon": "./build/icons/",
+            "icon": "./src/main/assets/icons/",
             "category": "Network"
         },
         "nsis": {

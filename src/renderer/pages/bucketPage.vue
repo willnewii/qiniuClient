@@ -64,7 +64,6 @@
             flex-direction: row;
             flex-shrink: 0;
             button {
-                margin-right: 10px;
                 font-size: 12px;
                 font-weight: 500;
             }
@@ -129,7 +128,7 @@
                     <Button size="small" @click="askRemove()" icon="md-trash" type="error">删除({{bucket.selection.length}})</Button>
                 </template>
 
-                <Button class="button-margin" size="small" @click="showFilter" icon="md-funnel"></Button>
+                <Button class="button-margin" style="margin-right: 10px" size="small" @click="showFilter" icon="md-funnel"></Button>
 
                 <Button-group size="small">
                     <Button :type="showType === 0 ? 'primary' : 'default'" @click="changeShowType(0)" icon="md-list"></Button>

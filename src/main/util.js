@@ -13,7 +13,7 @@ import {Notification} from "electron";
 export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`;
 
 export const getIconPath = function (filename) {
-    return path.join(__dirname, 'assets/', filename);
+    return path.join(__dirname, 'assets/icons', filename);
 };
 
 export const isMac = function () {
