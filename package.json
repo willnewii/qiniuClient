@@ -97,7 +97,7 @@
     },
     "build": {
         "productName": "云存储客户端",
-        "appId": "com.github.willnewii.fastcache",
+        "appId": "com.github.willnewii.cloudbrowser",
         "asar": true,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
@@ -125,7 +125,7 @@
                     "path": "/Applications"
                 }
             ],
-            "title": "fastcache ${version}"
+            "title": "cloudbrowser ${version}"
         },
         "mac": {
             "icon": "./build/icons/icon.icns"
