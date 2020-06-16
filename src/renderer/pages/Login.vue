@@ -1,5 +1,4 @@
 <style lang="scss" scoped>
-    @import "../style/params";
 
     .layout {
         display: flex;
@@ -38,7 +37,7 @@
         }
 
         &:nth-child(2n) {
-            background-color: $bg-item-selected;
+            background-color: var(--bg-item-selected);
         }
 
         &:hover {

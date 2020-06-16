@@ -267,10 +267,9 @@
     };
 </script>
 <style lang="scss" scoped>
-    @import "../style/params";
 
     .layout-header {
-        background: $bg-header;
+        background: var(--bg-header);
         box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
         flex-shrink: 0;
         display: flex;
@@ -294,7 +293,7 @@
         }
 
         .button {
-            color: $fontColor;
+            color: var(--fontColor);
         }
     }
 </style>

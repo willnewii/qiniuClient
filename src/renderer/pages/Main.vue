@@ -345,8 +345,8 @@
             flex-direction: row;
 
             .layout-menu {
-                background: $menu-bg;
-                color: $menu-color;
+                background: var(--menu-bg);
+                color: var(--menu-color);
                 display: flex;
                 flex-direction: column;
                 border-bottom-right-radius: 4px;
@@ -360,7 +360,7 @@
                     font-weight: bold;
                     text-align: left;
                     padding-left: 22px;
-                    color: $menu-color;
+                    color: var(--menu-color);
 
                     &:hover {
                         color: $primary;
@@ -463,7 +463,6 @@
     }
 </style>
 <style lang="scss">
-    @import "../style/params";
 
     .navicon_btn {
         & > span {

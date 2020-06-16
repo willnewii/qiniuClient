@@ -275,7 +275,7 @@
     @import '../style/params';
 
     .page {
-        background-color: $bg-resource;
+        background-color: var(--bg-resource);
         height: 100%;
         padding: 30px;
         overflow-y: scroll;
@@ -315,7 +315,7 @@
 
     .help {
         margin-left: 10px;
-        border: 1px $fontColor solid;
+        border: 1px var(--fontColor) solid;
         border-radius: 50%;
         padding: 5px;
         transform: scale(0.7);

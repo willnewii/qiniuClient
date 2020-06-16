@@ -228,20 +228,8 @@ export function convertMeta(item, brandKey = 'qiniu') {
  * @param name
  */
 export function loadTheme(name) {
-    if (process.env.NODE_ENV === 'production') {
-        let head = document.getElementsByTagName("head")[0];
-
-        const style = document.createElement('link');
-        style.setAttribute("rel", "stylesheet");
-        style.setAttribute("type", "text/css");
-
-        if (name === 'dark') {
-            style.setAttribute("href", pkg.cdnPath + 'static/styles-dark.css');
-        } else {
-            style.setAttribute("href", pkg.cdnPath + 'static/styles.css');
-        }
-        head.appendChild(style);
-    }
+    let ele = document.querySelector("html");
+    ele.className = `theme-${name}`
 }
 
 /**
