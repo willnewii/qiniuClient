@@ -61,7 +61,7 @@
                     <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)"/>
                 </div>
             </TabPane>
-            <TabPane v-for="(item) in brands" :key="item.key" :name="item.key" :label="item.name">
+            <TabPane v-for="(item) in brands" v-if="item.show" :key="item.key" :name="item.key" :label="item.name">
                 <h3 class="title">设置{{item.name}}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
                     <template>

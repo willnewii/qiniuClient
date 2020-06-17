@@ -97,7 +97,7 @@
     },
     "build": {
         "productName": "云存储客户端",
-        "appId": "com.github.willnewii.cloudbrowser",
+        "appId": "com.github.willnewii.CloudBrowser",
         "asar": true,
         "compression": "normal",
         "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
@@ -125,7 +125,7 @@
                     "path": "/Applications"
                 }
             ],
-            "title": "cloudbrowser ${version}"
+            "title": "CloudBrowser ${version}"
         },
         "mac": {
             "icon": "./build/icons/icon.icns"
