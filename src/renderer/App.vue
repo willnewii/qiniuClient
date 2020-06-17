@@ -27,7 +27,7 @@
         },
         created: async function () {
             await this[types.setup.init](() => {
-                //this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, this.setup_showMenuBar);
+                //this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, this.setup_showMenuBar);               
                 if (this.setup_theme === 'auto') {
                     this.$electron.ipcRenderer.once(Constants.Listener.darkMode, (event, arg) => {
                         util.loadTheme(arg ? 'dark' : 'light');
