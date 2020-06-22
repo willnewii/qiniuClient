@@ -1,8 +1,8 @@
 @import './params';
 
-body {
+#app {
   background-color: #FFFFFF;
-  color: $fontColor;
+  color: var(--fontColor);
 }
 
 .ivu-menu-vertical {
@@ -26,7 +26,7 @@ body {
       line-height: 25px;
       background: rgba(255, 255, 255, .7);
       width: 25px;
-      color: $fontColor;
+      color: var(--fontColor);
       text-align: center;
       text-transform: capitalize;
     }
@@ -79,20 +79,16 @@ body {
   color: #2d8cf0;
 }
 
-@if ($platform != 'darwin') {
-
-}
-
 //自定义scrollbar 效果不好
 ::-webkit-scrollbar {
   width: 2px;
-  background-color: $bg-resource;
+  background-color: var(--bg-resource);
 }
 
 /*定义滚动条轨道 内阴影+圆角*/
 ::-webkit-scrollbar-track {
   //border-radius: 3px;
-  background-color: $bg-resource;
+  background-color: var(--bg-resource);
 }
 
 /*定义滑块 内阴影+圆角*/
@@ -111,11 +107,37 @@ body {
   width: 2px;
 }
 
-.drag {
-  -webkit-app-region: drag;
+.no-drag {
+  -webkit-app-region: no-drag;
 }
 
 
-.no-drag {
-  -webkit-app-region: no-drag;
+.theme-light {
+  --fontColor :#495060;
+  --bg-bucketpage: #f5f7f9;
+  --bg-header: #FFFFFF;
+  --bg-resource: #FFFFFF;
+  --bg-item-selected: #F5F5F5;
+  --menu-bg: #FFFFFF;
+  --menu-bg-selectedd: #f5f7f9;
+  --menu-color: #515a6e;
+  --bg-input: #FFFFFF;
+  --input-border-width: 1px;
+  --bg-card-hover: rgba(0, 0, 0, .01);
+  --bg-spin: rgba(255, 255, 255, 0.7);
+}
+
+.theme-dark {
+  --fontColor :rgba(255, 255, 255, .8);
+  --bg-bucketpage: #323639;
+  --bg-header: #202124;
+  --bg-resource: #202124;
+  --bg-item-selected: #2f3133;
+  --menu-bg: #202124;
+  --menu-bg-selectedd: #323639;
+  --menu-color: rgba(255, 255, 255, .8);
+  --bg-input: #3C4043;
+  --input-border-width: 0px;
+  --bg-card-hover: rgba(255, 255, 255, 0.01);
+  --bg-spin: rgba(0, 0, 0, 0.7);
 }

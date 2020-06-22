@@ -25,13 +25,14 @@ function init(param) {
 }
 
 function getBuckets(callback) {
-    let error = null;
     let request = new Request();
     request.get(methods.buckets).then((result) => {
-        let datas = [];
-        for (let name of result) {
-            datas.push({name});
+        if (!result){
+            throw new Error('获取存储桶失败');
         }
+        let datas = result.map((name)=>{
+            return {name};
+        });
         callback(null, {datas});
     }).catch((error) => {
         callback(error);

@@ -1,7 +1,7 @@
 @import './params';
 
 #app, .ivu-message-notice-content, .ivu-modal-content {
-  background-color: $bg-header;
+  background-color: var(--bg-header);
 }
 
 $barPadding: 0;
@@ -15,7 +15,7 @@ $barPadding: 0;
 }
 
 .ivu-menu {
-  color: $menu-color;
+  color: var(--menu-color);
   background: none !important;
 
   &:after {
@@ -30,7 +30,7 @@ $barPadding: 0;
   }
 
   .ivu-menu-item-active:not(.ivu-menu-submenu) {
-    background-color: $menu-bg-selected !important;
+    background-color: var(--menu-bg-selectedd) !important;
   }
 }
 
@@ -38,19 +38,19 @@ $barPadding: 0;
   background-color: transparent;
 
   &:hover {
-    background-color: $bg-card-hover;
+    background-color: var(--bg-card-hover);
     box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
   }
 }
 
 .ivu-spin-fix {
-  background-color: $bg-spin;
+  background-color: var(--bg-spin);
 }
 
 .ivu-select-selection, .ivu-select-dropdown, .ivu-input {
-  background-color: $bg-input;
-  border-width: $input-border-width;
-  color: $fontColor;
+  background-color: var(--bg-input);
+  border-width: var(--input-border-width);
+  color: var(--fontColor);
 }
 
 .ivu-btn-text:hover {
@@ -61,6 +61,6 @@ $barPadding: 0;
   user-select: text;
 
   .ivu-modal-confirm-head-title, .ivu-modal-header-inner {
-    color: $fontColor;
+    color: var(--fontColor);
   }
 }

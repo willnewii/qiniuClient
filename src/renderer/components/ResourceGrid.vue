@@ -450,7 +450,7 @@
     .layout-content {
         margin: 0 15px 15px 15px;
         overflow: hidden;
-        background: $bg-resource;
+        background: var(--bg-resource);
         flex-grow: 1;
         border-radius: 4px;
 
@@ -529,7 +529,7 @@
                 flex-direction: row;
                 padding: 5px 10px 5px 10px;
                 align-items: center;
-                border-bottom: 1px solid $bg-item-selected;
+                border-bottom: 1px solid var(--bg-item-selected);
 
                 .name {
                     flex-grow: 1;
@@ -549,7 +549,7 @@
                 }
 
                 &:nth-child(2n) {
-                    background-color: $bg-item-selected;
+                    background-color: var(--bg-item-selected);
                 }
 
                 &:hover {
@@ -558,7 +558,7 @@
             }
 
             .item-even {
-                background-color: $bg-item-selected;
+                background-color: var(--bg-item-selected);
             }
         }
 

@@ -9,7 +9,7 @@
                     "env",
                     {
                         "targets": {
-                            "Node": "12.4.0"
+                            "node": "12.4.0"
                         }
                     }
                 ]
@@ -21,7 +21,7 @@
                     "env",
                     {
                         "targets": {
-                            "Electron": "8.3.0"
+                            "electron": "8.3.0"
                         }
                     }
                 ]

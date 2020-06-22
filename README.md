@@ -13,12 +13,18 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
+2020.06.08
+***
+- mac&win下支持剪贴板上传
+
 2020.03.27
+***
 - 新增支持**京东云**
 - change: 上传和下载为队列调用错误
 - 点击左上角服务名称可直接修改别名
 
 2020.03.04
+***
 - fix: 青云请求处理错误
 - fix: contextmenu 绑定事件异常
 - change: 优化过滤文件模块
@@ -26,6 +32,7 @@
 - change: 优化事件调用&组件间依赖
 
 2019.12.19
+***
 - 新增支持**minIO**
 - fix: 阿里云数据空时异常
 - change: 默认保存最近选择的域名
@@ -111,7 +118,9 @@ npm i
 npm run dev
 
 # 构建全平台的安装包, 非Windows平台构建Windows软件包需要安装wine 32位, dmg只有Mac OS才能构建成功
-npm run build:all
+npm run build:all  编译js代码&构建应用&生成安装包
+npm run build:dir  编译js代码&构建应用&不生成安装包
+npm run build:only-build-dir  不编译js代码&构建应用&不生成安装包
 
 # 构建对应你的平台的安装包
 npm run build:mac

@@ -88,7 +88,7 @@
         <Modal v-model="changeAliasDialog.show" class-name="vertical-center-modal"
                ok-text="修改" :closable="true" :mask-closable="false" @on-ok="changeAlias">
             <p>请输入你要修改的别名</p>
-            <Input class='modal-url' v-model="changeAliasDialog.name"></Input>
+            <Input class='modal-url' v-model="changeAliasDialog.name"/>
         </Modal>
     </div>
 </template>
@@ -345,22 +345,20 @@
             flex-direction: row;
 
             .layout-menu {
-                background: $menu-bg;
-                color: $menu-color;
+                background: var(--menu-bg);
+                color: var(--menu-color);
                 display: flex;
                 flex-direction: column;
                 border-bottom-right-radius: 4px;
-                padding-top: 20px;
                 z-index: 1;
-                box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
-                -webkit-app-region: drag;
+                box-shadow: 2px 3px 3px 0 rgba(0, 0, 0, 0.1);
                 max-width: 180px;
 
                 .navicon_btn {
                     font-weight: bold;
                     text-align: left;
                     padding-left: 22px;
-                    color: $menu-color;
+                    color: var(--menu-color);
 
                     &:hover {
                         color: $primary;
@@ -463,7 +461,6 @@
     }
 </style>
 <style lang="scss">
-    @import "../style/params";
 
     .navicon_btn {
         & > span {

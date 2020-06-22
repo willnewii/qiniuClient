@@ -163,11 +163,6 @@
                 this.downloaddir = path[0];
                 this.saveDownloadolder();
             });
-
-            this.$electron.ipcRenderer.on(Constants.Listener.darkMode, (event, arg) => {
-                util.loadTheme(arg ? 'dark' : 'light');
-                this[types.setup.a_theme]('auto');
-            });
         },
         methods: {
             ...mapActions([
@@ -218,12 +213,8 @@
                 EventBus.$emit(Constants.Event.changePrivate, privatebucket);
             },
             themesChange(item) {
-                if (item === 'auto') {
-                    this.$electron.ipcRenderer.send(Constants.Listener.darkMode);
-                } else {
-                    util.loadTheme(item);
-                    this[types.setup.a_theme](item);
-                }
+                EventBus.$emit(Constants.Event.changeTheme, item);
+                this[types.setup.a_theme](item);
             },
             saveDir: function () {
                 this.$electron.ipcRenderer.send(Constants.Listener.setBrand, {
@@ -275,7 +266,7 @@
     @import '../style/params';
 
     .page {
-        background-color: $bg-resource;
+        background-color: var(--bg-resource);
         height: 100%;
         padding: 30px;
         overflow-y: scroll;
@@ -315,7 +306,7 @@
 
     .help {
         margin-left: 10px;
-        border: 1px $fontColor solid;
+        border: 1px var(--fontColor) solid;
         border-radius: 50%;
         padding: 5px;
         transform: scale(0.7);

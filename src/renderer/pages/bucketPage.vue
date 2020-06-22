@@ -2,7 +2,7 @@
     @import '../style/params';
 
     .bucketpage {
-        background-color: $bg-bucketpage;
+        background-color: var(--bg-bucketpage);
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -24,13 +24,13 @@
             .ivu-breadcrumb {
                 display: flex;
                 flex-direction: row;
-                color: $fontColor;
+                color: var(--fontColor);
 
                 .bread-sub {
                     flex-shrink: 0;
 
                     .ivu-breadcrumb-item-separator {
-                        color: $fontColor;
+                        color: var(--fontColor);
                     }
                 }
             }
@@ -83,7 +83,7 @@
 
     .bread-sub {
         .ivu-breadcrumb-item-separator {
-            color: $fontColor;
+            color: var(--fontColor);
         }
     }
 </style>
