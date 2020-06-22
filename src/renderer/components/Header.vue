@@ -7,7 +7,7 @@
             </Select>
             <!-- TODO:添加自定义域名功能-->
             <Input class="input no-drag" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
-                   :placeholder="domainPlaceholder" @on-blur="saveDomain" placeholder="自定义域名" error="链接不合法"/>
+                   :placeholder="domainPlaceholder" @on-blur="saveDomain" error="链接不合法"/>
         </div>
 
         <template v-if="bucket.name">
@@ -276,7 +276,6 @@
         align-items: center;
         padding-top: 10px;
         padding-right: 15px;
-        -webkit-app-region: drag;
 
         .full {
             flex-grow: 1;

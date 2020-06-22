@@ -34,6 +34,7 @@
         "aws-sdk": "^2.525.0",
         "axios": "^0.19.0",
         "cos-nodejs-sdk-v5": "^2.5.12",
+        "custom-electron-titlebar": "^3.2.2-hotfix62",
         "dayjs": "^1.8.16",
         "electron-asar-hot-updater": "0.0.2",
         "electron-dl": "^1.14.0",

@@ -224,15 +224,6 @@ export function convertMeta(item, brandKey = 'qiniu') {
 }
 
 /**
- * 开发模式请直接修改params.scss
- * @param name
- */
-export function loadTheme(name = 'light') {
-    let ele = document.querySelector("html");
-    ele.className = `theme-${name}`
-}
-
-/**
  * notification api
  * @param option
  */
