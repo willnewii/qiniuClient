@@ -1,34 +1,23 @@
 <template>
-    <div class="status-view" v-bind:class="{'status-view-none' : !status.show}">
-        <div v-if="status.progress > 0" :style="{width: status.progress + '%'}" class="progress"></div>
-        <div>{{status.message}}</div>
-        <div>{{status.path}}</div>
+    <div class="status-view" v-bind:class="{'status-view-none' : !visible}">
+        <div v-if="progress > 0" :style="{width: progress + '%'}" class="progress"></div>
+        <div>{{message}}</div>
+        <div>{{path}}</div>
     </div>
 </template>
 <script>
-    import {Constants, EventBus} from '../service/index';
-
     export default {
         name: 'StatusView',
         data() {
             return {
-                status: {
-                    show: false,
-                    path: '',
-                    message: '',
-                    // 单个文件时 表示文件的进度. 多文件时表示总进度
-                    progress: 0
-                },
+                visible: false,
+                path: '',
+                message: '',
+                // 单个文件时 表示文件的进度. 多文件时表示总进度
+                progress: 0
             };
         },
-        created() {
-            EventBus.$on(Constants.Event.statusView, (option) => {
-                this.status = ('show' in option && !option.show) ? this.$options.data().status : Object.assign(this.status, option);
-            });
-            this.$once('hook:beforeDestroy', function () {
-                EventBus.$off(Constants.Event.statusView);
-            });
-        },
+        created() {},
         methods: {}
     };
 </script>

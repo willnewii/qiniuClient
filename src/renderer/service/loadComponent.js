@@ -9,6 +9,7 @@ import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
 import Viewer from "v-viewer/src/component.vue";
+import StatusView from '../components/StatusView.js'
 
 import 'v-contextmenu/dist/index.css';
 import 'view-design/dist/styles/iview.css';
@@ -34,3 +35,5 @@ menuDirective.inserted = function (el, binding, vnode) {
 
 Vue.use(contextmenu);
 Vue.use(ViewUI);
+
+Vue.prototype.$statusView = StatusView;

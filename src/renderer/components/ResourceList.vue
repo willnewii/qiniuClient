@@ -105,7 +105,7 @@
     import {EventBus, Constants, util, brand} from "@/service/index";
 
     export default {
-        name: 'ResourceGrid',
+        name: 'ResourceList',
         components: {},
         mixins: [resource, base, contextmenu],
         props: {
@@ -184,9 +184,14 @@
             EventBus.$on(Constants.Event.resourceAction, (files, action) => {
                 this.resourceAction(files, action);
             });
+            this.$once('hook:beforeDestroy', function () {
+                EventBus.$off(Constants.Event.updateFiles);
+                EventBus.$off(Constants.Event.refreshFiles);
+                EventBus.$off(Constants.Event.resourceAction);
+            });
 
             this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
-                EventBus.$emit(Constants.Event.statusView, {
+                this.$statusView.show({
                     message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
                     progress: this.status_total === 1 ? num * 100 : parseInt(this.status_count / this.status_total * 100)
                 });

@@ -109,9 +109,10 @@ export default {
                 }
 
                 // this.$Loading.start();
-                EventBus.$emit(Constants.Event.statusView, {
-                    show: true,
+                this.$statusView.show({
+                    visible:true,
                     message: `${message}(${++this.status_count}/${this.status_total})...`,
+                    progress: (this.status_count / this.status_total) * 100
                 });
 
             } else {
@@ -123,9 +124,7 @@ export default {
                 }
 
                 // this.$Loading.finish();
-                EventBus.$emit(Constants.Event.statusView, {
-                    show: false
-                });
+                this.$statusView.destroy();
 
                 this.baseDir = '';
                 util.notification({body: '任务完成'});
@@ -171,7 +170,7 @@ export default {
                 key: file.key,
                 isOverwrite: true,
                 progressCallback: (progress) => {
-                    EventBus.$emit(Constants.Event.statusView, {
+                    this.$statusView.show({
                         message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
                         progress: this.status_total === 1 ? progress : parseInt(this.status_count / this.status_total * 100)
                     });
