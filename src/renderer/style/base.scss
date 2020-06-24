@@ -8,7 +8,11 @@
 }
 
 .layout {
-  height: calc(100% - 22px);
+  @if $platform == darwin {
+    height: calc(100% - 22px);
+  } @else {
+    height: 100%;
+  }
 }
 
 .ivu-menu-vertical {

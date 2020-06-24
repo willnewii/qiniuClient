@@ -26,6 +26,11 @@
             }),
         },
         created: async function () {
+            if (process.platform === 'win32'){
+                this.$Notice.config({
+                    top: 40
+                });
+            }
             EventBus.$on(Constants.Event.changeTheme, (theme) => {
                 this.doChangeTheme(theme)
             });
