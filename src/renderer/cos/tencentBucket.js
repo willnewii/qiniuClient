@@ -28,9 +28,14 @@ class Bucket extends baseBucket {
             }
         });
 
+        this.param = {
+            Bucket: this.name,
+            Region: this.location,
+        }
+
         if (this.location) {
             this.getACL();
-            this.getDomains();
+            // this.getDomains();
         }
     }
 
@@ -38,29 +43,36 @@ class Bucket extends baseBucket {
      * 获取Bucket访问权限状态
      */
     getACL() {
-        let param = {
-            Bucket: this.name,
-            Region: this.location,
-        };
-
-        this.cos.getBucketAcl(param, (err, data) => {
+        this.cos.getBucketAcl(this.param, (err, data) => {
             this.setPermission(data.ACL === 'private' ? 1 : 0);
-            this.getResources();
+            this.getDomains();
         });
     }
 
     getDomains() {
-        let customeDomains = this.vm.customeDomains;
-        if (customeDomains && customeDomains[this.name]) {
-            this.domain = customeDomains[this.name];
-            this.https = false ;
-        }
+        this.cos.getBucketDomain(this.param, (err, data) => {
+            if (!err){
+                let domains = data.DomainRule.filter((domain)=>{
+                    return domain.Status === 'ENABLED'
+                })
+                this.domains = domains.map((domain)=>{
+                    return domain.Name;
+                })
+
+                //匹配最近使用过的域名
+                super.setRecentDomain();
+                this.getResources();
+            }else{
+                console.error(err);
+                this.getResources();
+            }
+        });
+
     }
 
     createFile(_param, type, callback) {
         let param = {
-            Bucket: this.name,
-            Region: this.location,
+            ...this.param,
             Key: _param.key,
             // Body: fs.readFileSync(_param.path),//onProgress 无响应
             Body: fs.createReadStream(_param.path),
@@ -76,28 +88,17 @@ class Bucket extends baseBucket {
     }
 
     removeFile(item, callback) {
-        let params = {
-            Bucket: this.name,
-            Region: this.location,
-        };
-
-        tencent.remove(params, item, callback);
+        tencent.remove(this.param, item, callback);
     }
 
     renameFile(items, callback) {
-        let params = {
-            Bucket: this.name,
-            Region: this.location,
-        };
-
-        tencent.rename(params, items, callback);
+        tencent.rename(this.param, items, callback);
     }
 
     getResources(option = {}) {
         super.getResources();
         let params = {
-            Bucket: this.name,
-            Region: this.location,
+            ...this.param,
             MaxKeys: this.limit,
         };
 
@@ -111,12 +112,13 @@ class Bucket extends baseBucket {
 
         this.cos.getBucket(params, (err, data) => {
             if (err) {
-                console.log(err);
+                console.error(err);
             } else {
                 if (!this.marker) {
                     this.files = [];
                 }
                 let files = [];
+                data.marker = data.NextMarker ;
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
                         files.push(util.convertMeta(item, brand.tencent.key));
@@ -138,8 +140,7 @@ class Bucket extends baseBucket {
      */
     generateUrl(key, deadline) {
         let params = {
-            Bucket: this.name,
-            Region: this.location,
+            ...this.param,
             Key: key,
             Expires: deadline,
             Sign: this.permission === 1 //是否需要签名

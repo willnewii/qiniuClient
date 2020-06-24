@@ -1,8 +1,14 @@
 @import './params';
 
 #app {
-  background-color: #FFFFFF;
+  //background-color: #FFFFFF;
   color: var(--fontColor);
+  display: flex;
+  flex-direction: column;
+}
+
+.layout {
+  height: calc(100% - 22px);
 }
 
 .ivu-menu-vertical {

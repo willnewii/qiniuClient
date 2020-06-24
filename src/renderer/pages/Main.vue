@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="layout-content">
-                <keep-alive>
+                <keep-alive exclude="setup-page">
                     <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
                 </keep-alive>
             </div>
@@ -338,8 +338,6 @@
     @import "../style/params";
 
     .layout {
-        height: 100%;
-
         .content {
             height: 100%;
             display: flex;

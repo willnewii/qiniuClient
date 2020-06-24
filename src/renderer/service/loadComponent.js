@@ -15,6 +15,7 @@ import 'v-contextmenu/dist/index.css';
 import 'view-design/dist/styles/iview.css';
 import 'viewerjs/dist/viewer.css';
 
+import '../directives/feature'
 
 Vue.use(Electron);
 Vue.use(VueLazyload, {

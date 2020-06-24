@@ -50,6 +50,7 @@
         position: absolute;
         top: 0;
         left: 0;
+        transition: width 1s;
         z-index: -1;
     }
 </style>

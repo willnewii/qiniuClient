@@ -108,11 +108,9 @@ export default {
                         break;
                 }
 
-                // this.$Loading.start();
                 this.$statusView.show({
                     visible:true,
                     message: `${message}(${++this.status_count}/${this.status_total})...`,
-                    progress: (this.status_count / this.status_total) * 100
                 });
 
             } else {
@@ -123,7 +121,6 @@ export default {
                     this.copyFileUrl(lastTask);
                 }
 
-                // this.$Loading.finish();
                 this.$statusView.destroy();
 
                 this.baseDir = '';
@@ -170,6 +167,7 @@ export default {
                 key: file.key,
                 isOverwrite: true,
                 progressCallback: (progress) => {
+                    progress = parseInt(progress);
                     this.$statusView.show({
                         message: `文件上传中(${this.status_count}/${this.status_total})...${progress}%`,
                         progress: this.status_total === 1 ? progress : parseInt(this.status_count / this.status_total * 100)

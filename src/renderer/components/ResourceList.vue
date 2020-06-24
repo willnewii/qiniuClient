@@ -242,15 +242,17 @@
             this.fileFilter();
 
             this.$nextTick(() => {
+                this.step = parseInt(this.$refs['content'].offsetWidth / 123);
                 let height = this.$refs['content'].offsetHeight;
                 this.remain0 = height / 29;
                 this.remain1 = height / 123;
             });
 
-            this.step = parseInt(this.$refs['content'].offsetWidth / 123);
-
             window.onresize = () => {
                 this.step = parseInt(this.$refs['content'].offsetWidth / 123);
+                let height = this.$refs['content'].offsetHeight;
+                this.remain0 = height / 29;
+                this.remain1 = height / 123;
             };
         },
         methods: {
