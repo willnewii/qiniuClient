@@ -25,26 +25,22 @@
             flex-direction: column;
         }
 
-        #title {
-            width: 100%;
-            height: 22px;
-            line-height: 22px;
-            text-align: center;
-            -webkit-app-region: drag;
-        }
-
         #app {
             width: 100%;
         }
     </style>
     <link rel="stylesheet" type="text/css" href="static/iconfont.css">
+    <% if (htmlWebpackPlugin.options.prod) { %>
     <link rel="stylesheet" type="text/css" href="static/dll/libs.css">
+    <% }%>
 </head>
 <body>
 <!--<div id="title">COS客户端</div>-->
 <div id="app"></div>
+<% if (htmlWebpackPlugin.options.prod) { %>
 <script src="./static/dll/libs.js"></script>
 <script src="./static/dll/cos.js"></script>
+<% }%>
 <!-- webpack builds are automatically injected -->
 </body>
 </html>

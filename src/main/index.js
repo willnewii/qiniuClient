@@ -65,17 +65,27 @@ function initApp() {
  * 在mac下默认是隐藏,只有cmd+Q 或者菜单点击退出,关闭应用.
  */
 function createMainWindow() {
-    mainWindow = new BrowserWindow({
+
+    let options = {
         height: 750,
         width: 1000,
         title: pkg.cnname,
-        titleBarStyle: 'hidden',
-        icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
+        icon: util.getIconPath('icon.png'),
         webPreferences: {
             webSecurity: false,
             nodeIntegration: true
         }
-    });
+    }
+
+    if (util.isWin()){
+        options.icon = util.getIconPath('icon.ico')
+        options.frame = false 
+    } else if (util.isMac()){
+        options.icon =  util.getIconPath('icon.png')
+        options.titleBarStyle = 'hidden'
+    }
+
+    mainWindow = new BrowserWindow(options);
 
     mainWindow.loadURL(util.mainURL);
 
@@ -341,7 +351,7 @@ const getMenuData = function () {
                     resizable: false,
                     autoHideMenuBar: true,
                     title: '关于',
-                    icon: util.isWin() ? util.getIconPath('logo.ico') : util.getIconPath('logo.png'),
+                    icon: util.isWin() ? util.getIconPath('icon.ico') : util.getIconPath('icon.png'),
                     webPreferences: {
                         webSecurity: false,
                         backgroundThrottling: false,

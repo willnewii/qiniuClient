@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="layout-content">
-                <keep-alive>
+                <keep-alive exclude="setup-page">
                     <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
                 </keep-alive>
             </div>
@@ -76,8 +76,6 @@
                     数据加载方式区别</p>
             </div>
         </Modal>
-        <!-- 上传/下载进度提示框-->
-        <status-view></status-view>
         <!-- 文件拖拽提示框-->
         <div class="drop-view" v-show="drop.show">
             <div class="drop-sub">
@@ -88,7 +86,7 @@
         <Modal v-model="changeAliasDialog.show" class-name="vertical-center-modal"
                ok-text="修改" :closable="true" :mask-closable="false" @on-ok="changeAlias">
             <p>请输入你要修改的别名</p>
-            <Input class='modal-url' v-model="changeAliasDialog.name"></Input>
+            <Input class='modal-url' v-model="changeAliasDialog.name"/>
         </Modal>
     </div>
 </template>
@@ -96,13 +94,12 @@
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '../vuex/mutation-types';
     import pkg from '../../../package.json';
-    import StatusView from '@/components/StatusView';
 
     import {Constants, mixins, EventBus, util} from '../service/index';
 
     export default {
         mixins: [mixins.base, mixins.request],
-        components: {StatusView},
+        components: {},
         data() {
             return {
                 coses: [],//已登录的cos列表
@@ -132,7 +129,7 @@
                     title: '注销'
                 }],
                 loading: {
-                    show: false,
+                    show: true,
                     message: '',
                     flag: '' //可以用作统计计时的标记
                 },
@@ -173,6 +170,10 @@
                 } else {
                     console.timeEnd(option.flag);
                 }*/
+            });
+            this.$once('hook:beforeDestroy', function () {
+                EventBus.$off(Constants.Event.loading);
+                EventBus.$off(Constants.Event.dropView);
             });
 
             let cos = this.$route.params.cos;
@@ -337,30 +338,26 @@
     @import "../style/params";
 
     .layout {
-        height: 100%;
-
         .content {
             height: 100%;
             display: flex;
             flex-direction: row;
 
             .layout-menu {
-                background: $menu-bg;
-                color: $menu-color;
+                background: var(--menu-bg);
+                color: var(--menu-color);
                 display: flex;
                 flex-direction: column;
                 border-bottom-right-radius: 4px;
-                padding-top: 20px;
                 z-index: 1;
-                box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.1);
-                -webkit-app-region: drag;
+                box-shadow: 2px 3px 3px 0 rgba(0, 0, 0, 0.1);
                 max-width: 180px;
 
                 .navicon_btn {
                     font-weight: bold;
                     text-align: left;
                     padding-left: 22px;
-                    color: $menu-color;
+                    color: var(--menu-color);
 
                     &:hover {
                         color: $primary;
@@ -463,7 +460,6 @@
     }
 </style>
 <style lang="scss">
-    @import "../style/params";
 
     .navicon_btn {
         & > span {

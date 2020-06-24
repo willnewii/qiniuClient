@@ -1,11 +1,9 @@
 <style lang="scss" scoped>
-    @import "../style/params";
 
     .layout {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100%;
     }
 
     .title {
@@ -38,7 +36,7 @@
         }
 
         &:nth-child(2n) {
-            background-color: $bg-item-selected;
+            background-color: var(--bg-item-selected);
         }
 
         &:hover {
@@ -154,10 +152,7 @@
                 this.$storage.initCOS(item);
                 this.$storage.getBuckets((error) => {
                     if (error) {
-                        util.notification({
-                            title: this.selectBrand.name,
-                            body: error.message
-                        });
+                        this.$Notice.error({title: this.selectBrand.name, desc: error.message,});
                     } else {
                         this.$storage.saveCosKey(item, () => {
                             this.openCOS(item);

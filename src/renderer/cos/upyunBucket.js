@@ -28,11 +28,7 @@ class Bucket extends baseBucket {
      * 又拍云没有获取绑定域名的api,只能手动设置
      */
     getDomains() {
-        let customeDomains = this.vm.customeDomains;
-        if (customeDomains && customeDomains[this.name]) {
-            this.domains = [customeDomains[this.name]];
-            this.domain = customeDomains[this.name];
-        }
+        super.setRecentDomain();
     }
 
     createFile(_param, type, callback) {

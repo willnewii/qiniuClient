@@ -12,7 +12,6 @@ const Multispinner = require('multispinner');
 
 const mainConfig = require('./webpack.main.config');
 const rendererConfig = require('./webpack.renderer.config');
-const rendererThemeConfig = require('./webpack.renderer.theme.config');
 const webConfig = require('./webpack.web.config');
 
 const doneLog = chalk.bgGreen.white(' DONE ') + ' ';
@@ -36,7 +35,8 @@ function build() {
 
     del.sync(['dist/electron/*', '!.gitkeep']);
 
-    const tasks = ['main', 'renderer-theme', 'renderer'];
+    // const tasks = ['main', 'renderer-theme', 'renderer'];
+    const tasks = ['main',  'renderer'];
     const m = new Multispinner(tasks, {
         preText: 'building',
         postText: 'process'
@@ -62,22 +62,11 @@ function build() {
         process.exit(1);
     });
 
-    pack(rendererThemeConfig).then(result => {
+    pack(rendererConfig).then(result => {
         results += result + '\n\n';
-        m.success('renderer-theme');
-
-        pack(rendererConfig).then(result => {
-            results += result + '\n\n';
-            m.success('renderer');
-        }).catch(err => {
-            m.error('renderer');
-            console.log(`\n  ${errorLog}failed to build renderer process`);
-            console.error(`\n${err}\n`);
-            process.exit(1);
-        });
-
+        m.success('renderer');
     }).catch(err => {
-        m.error('renderer-theme');
+        m.error('renderer');
         console.log(`\n  ${errorLog}failed to build renderer process`);
         console.error(`\n${err}\n`);
         process.exit(1);
@@ -86,6 +75,7 @@ function build() {
 
 function pack(config) {
     return new Promise((resolve, reject) => {
+        config.mode = 'production'
         webpack(config, (err, stats) => {
             if (err) reject(err.stack || err);
             else if (stats.hasErrors()) {
@@ -113,6 +103,7 @@ function pack(config) {
 
 function web() {
     del.sync(['dist/web/*', '!.gitkeep']);
+    webConfig.mode = 'production'
     webpack(webConfig, (err, stats) => {
         if (err || stats.hasErrors()) console.log(err);
 

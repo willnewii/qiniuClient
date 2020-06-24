@@ -6,8 +6,8 @@
                 <Option v-for="item of bucket.domains" :value="item" :key="item">{{ item }}</Option>
             </Select>
             <!-- TODO:添加自定义域名功能-->
-            <Input class="input no-drag" v-model="bucket.domain" v-if="bucket.domains.length === 0 && isSupportDomain"
-                   :placeholder="domainPlaceholder" @on-blur="saveDomain" placeholder="自定义域名" error="链接不合法"/>
+            <Input class="input no-drag" v-model="bucket.domain" v-if="bucket.domains.length === 0 " v-feature:customDomain="bucket.name"
+                   :placeholder="domainPlaceholder" @on-blur="saveDomain" error="链接不合法"/>
         </div>
 
         <template v-if="bucket.name">
@@ -32,7 +32,7 @@
                 </i-button>
             </div>
 
-            <div v-if="isSupportUrlUpload" @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
+            <div v-feature:urlUpload @mouseenter="toggleShow($event)" @mouseleave="toggleShow($event)">
                 <i-button class="button" type="text" @click="actionBtn(1)">
                     <Tooltip content="通过url直接上传文件" placement="bottom">
                         <Icon type="md-link" size="24"/>
@@ -108,8 +108,6 @@
                 search: '',
                 isMac: process.platform === 'darwin',
                 isWin: process.platform === 'win32',
-                isSupportUrlUpload: false,
-                isSupportDomain: false,
                 model_merge: {
                     show: false,
                     mode: 0
@@ -136,16 +134,7 @@
                 type: Object
             },
         },
-        watch: {
-            'bucket.key': function (val) {
-                if (val) {
-                    this.updateSupport();
-                }
-            },
-        },
         created() {
-            console.log(this.bucket);
-            this.updateSupport();
             EventBus.$on(Constants.Event.changePrivate, (data) => {
                 this.bucket.getACL();
                 this.actionBtn(5);
@@ -166,10 +155,6 @@
             ...mapActions([
                 types.setup.a_customedomain,
             ]),
-            updateSupport() {
-                this.isSupportUrlUpload = [brand.qiniu.key, brand.qingstor.key].indexOf(this.$storage.key) !== -1;
-                this.isSupportDomain = [brand.qiniu.key, brand.tencent.key, brand.upyun.key].indexOf(this.$storage.key) !== -1;
-            },
             onChangeDomain(e) {
                 let obj = Object.create(null);
                 obj[this.bucket.name] = e;
@@ -183,17 +168,13 @@
                 let val = this.bucket.domain;
 
                 if (val.length === 0) {
-                    let obj = Object.create(null);
-                    obj[this.bucket.name] = '';
-                    this[types.setup.a_customedomain](obj);
+                    this.onChangeDomain('');
                     return;
                 }
 
                 try {
                     if (this.bucket && val) {
-                        let obj = Object.create(null);
-                        obj[this.bucket.name] = val;
-                        this[types.setup.a_customedomain](obj);
+                        this.onChangeDomain(val);
                         this.bucket.domain = val;
                         this.$Message.success('自定义域名保存成功,请刷新页面');
                     }
@@ -267,17 +248,14 @@
     };
 </script>
 <style lang="scss" scoped>
-    @import "../style/params";
 
     .layout-header {
-        background: $bg-header;
+        background: var(--bg-header);
         box-shadow: 2px 2px 1px rgba(0, 0, 0, .1);
         flex-shrink: 0;
         display: flex;
         align-items: center;
-        padding-top: 10px;
         padding-right: 15px;
-        -webkit-app-region: drag;
 
         .full {
             flex-grow: 1;
@@ -294,7 +272,7 @@
         }
 
         .button {
-            color: $fontColor;
+            color: var(--fontColor);
         }
     }
 </style>

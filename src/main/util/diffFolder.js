@@ -5,8 +5,6 @@ const log4js = require('log4js');
 const util = require('../util.js');
 
 import * as Constants from '../../renderer/service/constants';
-import brand from '../../renderer/cos/brand';
-
 
 /**
  *
@@ -16,7 +14,7 @@ import brand from '../../renderer/cos/brand';
  * @param mergeType     mergeType   0：普通 1：以云为基准,本地对应不上的文件会被删除 2：以本地为基准,云对应不上的文件会被删除
  * @returns {Promise<{uploads: Array, downloads: Array}>}
  */
-export async function diff(localDir, cloudFiles = [], platformType = brand.qiniu.key, mergeType = 0) {
+export async function diff(localDir, cloudFiles = [], platformType = 'qiniu', mergeType = 0) {
     log4js.configure({
         appenders: {
             node: {

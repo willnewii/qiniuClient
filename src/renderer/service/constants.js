@@ -25,12 +25,12 @@ export const URL = {
 };
 
 export const Event = {
-    statusView: 'statusView',
     dropView: 'dropView',
     loading: 'loading',
     updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据
     refreshFiles: 'refreshFiles',           //更新文件列表
     resourceAction: 'resourceAction',       //下载/上传事件
+    changeTheme: 'changeTheme',
     changePrivate: 'changePrivate',
 };
 

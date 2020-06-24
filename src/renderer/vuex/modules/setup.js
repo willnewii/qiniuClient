@@ -71,8 +71,8 @@ const actions = {
         let app = await storagePromise.get(Constants.Key.configuration);
         if (!util.isEmptyObject(app)) {
             context.commit(types.setup.init, app);
-            callback && callback();
         }
+        callback && callback();
     },
 };
 const actionsKey = [types.setup.a_isOverwrite, types.setup.a_deadline, types.setup.a_privatebucket, types.setup.a_imagestyle, types.setup.a_paging, types.setup.a_showMenuBar,types.setup.a_https, types.setup.a_deleteNoAsk, types.setup.a_uploadNoAsk, types.setup.a_downloaddir, types.setup.a_copyType, types.setup.a_showType, types.setup.a_savedir, types.setup.a_customedomain, types.setup.a_theme, types.setup.a_recent];

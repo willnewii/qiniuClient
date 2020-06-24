@@ -10,7 +10,6 @@ class Bucket extends baseBucket {
     constructor(name, cos) {
         super(name, cos);
         this.key = brand.qiniu.key;
-        this.paging = false;
     }
 
     /**
@@ -28,9 +27,7 @@ class Bucket extends baseBucket {
             if (info) {
                 this.space = info.space;
                 this.count = info.count;
-                if (this.vm.paging && info.count > Constants.PageSize) {
-                    this.paging = true;
-                }
+                this.paging = this.vm.paging && info.count > Constants.PageSize
             }
             this.getResources();
         });
@@ -52,7 +49,6 @@ class Bucket extends baseBucket {
     getDomains() {
         let request = new Request();
         request.get(qiniu.methods.domains, {tbl: this.name}).then((result) => {
-            let customeDomains = this.vm.customeDomains;
             this.domain = '';
 
             if (result && result.length > 0) {
@@ -62,9 +58,7 @@ class Bucket extends baseBucket {
                 this.domain = this.domains[this.domains.length - 1];
             }
 
-            if (customeDomains && customeDomains[this.name]) {
-                this.domain = customeDomains[this.name];
-            }
+            super.setRecentDomain();
         }).catch((error) => {
             console.log(error);
         });

@@ -105,7 +105,7 @@
     import {EventBus, Constants, util, brand} from "@/service/index";
 
     export default {
-        name: 'ResourceGrid',
+        name: 'ResourceList',
         components: {},
         mixins: [resource, base, contextmenu],
         props: {
@@ -184,9 +184,14 @@
             EventBus.$on(Constants.Event.resourceAction, (files, action) => {
                 this.resourceAction(files, action);
             });
+            this.$once('hook:beforeDestroy', function () {
+                EventBus.$off(Constants.Event.updateFiles);
+                EventBus.$off(Constants.Event.refreshFiles);
+                EventBus.$off(Constants.Event.resourceAction);
+            });
 
             this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
-                EventBus.$emit(Constants.Event.statusView, {
+                this.$statusView.show({
                     message: `文件下载中(${this.status_count}/${this.status_total})...${parseFloat(num * 100).toFixed(2)}%`,
                     progress: this.status_total === 1 ? num * 100 : parseInt(this.status_count / this.status_total * 100)
                 });
@@ -237,15 +242,17 @@
             this.fileFilter();
 
             this.$nextTick(() => {
+                this.step = parseInt(this.$refs['content'].offsetWidth / 123);
                 let height = this.$refs['content'].offsetHeight;
                 this.remain0 = height / 29;
                 this.remain1 = height / 123;
             });
 
-            this.step = parseInt(this.$refs['content'].offsetWidth / 123);
-
             window.onresize = () => {
                 this.step = parseInt(this.$refs['content'].offsetWidth / 123);
+                let height = this.$refs['content'].offsetHeight;
+                this.remain0 = height / 29;
+                this.remain1 = height / 123;
             };
         },
         methods: {
@@ -450,7 +457,7 @@
     .layout-content {
         margin: 0 15px 15px 15px;
         overflow: hidden;
-        background: $bg-resource;
+        background: var(--bg-resource);
         flex-grow: 1;
         border-radius: 4px;
 
@@ -529,7 +536,7 @@
                 flex-direction: row;
                 padding: 5px 10px 5px 10px;
                 align-items: center;
-                border-bottom: 1px solid $bg-item-selected;
+                border-bottom: 1px solid var(--bg-item-selected);
 
                 .name {
                     flex-grow: 1;
@@ -549,7 +556,7 @@
                 }
 
                 &:nth-child(2n) {
-                    background-color: $bg-item-selected;
+                    background-color: var(--bg-item-selected);
                 }
 
                 &:hover {
@@ -558,7 +565,7 @@
             }
 
             .item-even {
-                background-color: $bg-item-selected;
+                background-color: var(--bg-item-selected);
             }
         }
 
