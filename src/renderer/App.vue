@@ -26,17 +26,16 @@
             }),
         },
         created: async function () {
+            if (process.platform === 'win32'){
+                this.$Notice.config({
+                    top: 40
+                });
+            }
             EventBus.$on(Constants.Event.changeTheme, (theme) => {
                 this.doChangeTheme(theme)
             });
             await this[types.setup.init](() => {
                 this.doChangeTheme(this.setup_theme)
-
-                let ele = document.querySelector('.drag-view')
-                if (ele)
-                    this.appHeight = (window.innerHeight - ele.offsetHeight) + 'px';
-                else
-                    this.appHeight = '100%';
             });
         },
         methods: {

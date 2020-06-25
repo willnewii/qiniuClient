@@ -25,7 +25,6 @@ export const URL = {
 };
 
 export const Event = {
-    statusView: 'statusView',
     dropView: 'dropView',
     loading: 'loading',
     updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据

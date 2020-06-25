@@ -9,7 +9,7 @@
             <Col :span="rowSpan"><span class="item-title">开启Https</span></Col>
             <Col span="12"><i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch></Col>
         </Row>
-        <Row class="row">
+        <Row class="row" v-feature:paging>
             <Col :span="rowSpan">开启分页</Col>
             <Col span="12"><i-switch :value="setup_paging" size="small" @on-change="pagingChange"></i-switch><Icon class="help" @click="openBrowser(2)" type="md-help" /></Col>
         </Row>
@@ -68,8 +68,8 @@
             </Row>
         </div>
 
-        <template v-if="brands.qiniu.key === $storage.key">
-            <div class="item">
+        <template >
+            <div class="item" v-feature:imageStyle>
                 预览图片样式：<Icon class="help" @click="openBrowser(0)" type="md-help" />
                 <Row class="row-line">
                     <Col span="12">
@@ -81,9 +81,8 @@
                 </Row>
             </div>
         </template>
-        <template
-                v-if="brands.qiniu.key === $storage.key || brands.aws.key === $storage.key || brands.jd.key === $storage.key || brands.minio.key === $storage.key">
-            <div class="item">
+        <template >
+            <div class="item" v-feature:manualPrivateBucket>
                 私有空间：<Icon class="help" @click="openBrowser(1)" type="md-help" />
                 <CheckboxGroup v-model="privates" @on-change="privatesChange">
                     <Checkbox v-for="item,index in buckets_info" :key="index" :label="item.name">

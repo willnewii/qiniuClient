@@ -2,7 +2,7 @@
     "name": "qiniuclient",
     "cnname": "云存储管理客户端",
     "cdnPath": "",
-    "version": "0.4.8",
+    "version": "0.4.9",
     "description": "云存储管理客户端。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
@@ -29,11 +29,11 @@
         "postinstall": ""
     },
     "dependencies": {
-        "ali-oss": "^6.1.1",
+        "ali-oss": "^6.9.1",
         "animate.css": "^3.7.2",
         "aws-sdk": "^2.525.0",
         "axios": "^0.19.0",
-        "cos-nodejs-sdk-v5": "^2.5.12",
+        "cos-nodejs-sdk-v5": "^2.6.2",
         "custom-electron-titlebar": "^3.2.2-hotfix62",
         "dayjs": "^1.8.16",
         "electron-asar-hot-updater": "0.0.2",

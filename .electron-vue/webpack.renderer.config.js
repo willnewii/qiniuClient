@@ -19,6 +19,7 @@ rendererConfig.plugins = rendererConfig.plugins.concat([
       removeAttributeQuotes: true,
       removeComments: true
     },
+    prod: process.env.NODE_ENV === "production",
     nodeModules: process.env.NODE_ENV !== "production" ? path.resolve(__dirname, "../node_modules") : false
   }),
   new webpack.HotModuleReplacementPlugin(),
@@ -27,13 +28,13 @@ rendererConfig.plugins = rendererConfig.plugins.concat([
 
 if (process.env.NODE_ENV === "production") {
   rendererConfig.plugins.push(
-          new CopyWebpackPlugin([
-            {
-              from: path.join(__dirname, "../static"),
-              to: path.join(__dirname, "../dist/electron/static"),
-              ignore: [".*"]
-            }
-          ])
+    new CopyWebpackPlugin([
+      {
+        from: path.join(__dirname, "../static"),
+        to: path.join(__dirname, "../dist/electron/static"),
+        ignore: [".*"]
+      }
+    ])
   )
 }
 

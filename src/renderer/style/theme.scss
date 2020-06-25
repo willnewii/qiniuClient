@@ -15,6 +15,7 @@ $barPadding: 0;
 }
 
 .ivu-menu {
+  overflow-y: auto;
   color: var(--menu-color);
   background: none !important;
 

@@ -9,11 +9,13 @@ import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
 import Viewer from "v-viewer/src/component.vue";
+import StatusView from '../components/StatusView.js'
 
 import 'v-contextmenu/dist/index.css';
 import 'view-design/dist/styles/iview.css';
 import 'viewerjs/dist/viewer.css';
 
+import '../directives/feature'
 
 Vue.use(Electron);
 Vue.use(VueLazyload, {
@@ -34,3 +36,5 @@ menuDirective.inserted = function (el, binding, vnode) {
 
 Vue.use(contextmenu);
 Vue.use(ViewUI);
+
+Vue.prototype.$statusView = StatusView;

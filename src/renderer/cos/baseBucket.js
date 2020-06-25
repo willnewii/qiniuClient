@@ -73,6 +73,13 @@ class baseBucket {
         this.setPermission(permission);
     }
 
+    setRecentDomain(){
+        let recentDomains = this.vm.customeDomains;
+        if (recentDomains && recentDomains[this.name]) {
+            this.domain = recentDomains[this.name];
+        }
+    }
+
     getResources() {
         let txt = '数据加载中,请稍后';
 

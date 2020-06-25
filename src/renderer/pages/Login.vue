@@ -4,7 +4,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100%;
     }
 
     .title {
@@ -204,10 +203,7 @@
                 this.$storage.initCOS(item);
                 this.$storage.getBuckets((error) => {
                     if (error) {
-                        util.notification({
-                            title: this.selectBrand.name,
-                            body: error.message
-                        });
+                        this.$Notice.error({title: this.selectBrand.name, desc: error.message,});
                     } else {
                         this.$storage.saveCosKey(item, () => {
                             this.openCOS(item);

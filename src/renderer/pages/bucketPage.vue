@@ -67,6 +67,10 @@
                 font-size: 12px;
                 font-weight: 500;
             }
+
+            .btn {
+                margin-right: 10px;
+            }
         }
     }
 
@@ -117,15 +121,15 @@
 
             <div class="header-button-view">
                 <template v-if="bucket.selection.length > 0">
-                    <Button size="small" @click="cleanSelection()">取消</Button>
+                    <Button class="btn" size="small" @click="cleanSelection()">取消</Button>
 
-                    <Button size="small" @click="allSelection()">全选</Button>
+                    <Button class="btn" size="small" @click="allSelection()">全选</Button>
 
-                    <Button size="small" @click="callRefreshUrls()" icon="md-sync" v-if="bucket.key == 'qiniu'">刷新缓存({{bucket.selection.length}})</Button>
+                    <Button class="btn" size="small" @click="callRefreshUrls()" icon="md-sync" v-if="bucket.key == 'qiniu'">刷新缓存({{bucket.selection.length}})</Button>
 
-                    <Button size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
+                    <Button class="btn" size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
 
-                    <Button size="small" @click="askRemove()" icon="md-trash" type="error">删除({{bucket.selection.length}})</Button>
+                    <Button class="btn" size="small" @click="askRemove()" icon="md-trash" type="error">删除({{bucket.selection.length}})</Button>
                 </template>
 
                 <Button class="button-margin" style="margin-right: 10px" size="small" @click="showFilter" icon="md-funnel"></Button>
@@ -142,7 +146,7 @@
         </div>
 
         <!--<resource-table v-if="showType === 0" :bucket="bucket" ></resource-table>-->
-        <resource-grid ref="resource-grid" :bucket="bucket" :type="showType" key="1"></resource-grid>
+        <resource-list ref="resource-grid" :bucket="bucket" :type="showType" key="1"></resource-list>
 
         <resource-filter ref="resource-filter" :bucket="bucket"></resource-filter>
 
@@ -159,7 +163,7 @@
 </template>
 <script>
     import Header from '@/components/Header';
-    import ResourceGrid from "@/components/ResourceGrid.vue";
+    import ResourceList from "@/components/ResourceList.vue";
     import ResourceFilter from "@/components/ResourceFilter";
 
     import {mapGetters, mapActions} from 'vuex';
@@ -171,7 +175,7 @@
     export default {
         name: 'bucketPage',
         components: {
-            Header, ResourceGrid, ResourceFilter,
+            Header, ResourceList, ResourceFilter,
         },
         mixins: [mixins.base],
         props: {
