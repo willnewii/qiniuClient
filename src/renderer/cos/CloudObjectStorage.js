@@ -154,7 +154,7 @@ export default class CloudObjectStorage {
 
         cos_keys.forEach((_item, index) => {
             if (_item.uuid === item.uuid) {
-                cos_keys.splice(index);
+                cos_keys.splice(index, 1);
             }
         });
         await storagePromise.set(KEY_COS, cos_keys);
