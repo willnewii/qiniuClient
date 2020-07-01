@@ -8,8 +8,7 @@ import dayjs from 'dayjs';
 class Bucket extends baseBucket {
 
     constructor(name, cos) {
-        super(name, cos);
-        this.key = brand.qiniu.key;
+        super(name, cos, brand.qiniu.key);
     }
 
     /**
@@ -27,7 +26,7 @@ class Bucket extends baseBucket {
             if (info) {
                 this.space = info.space;
                 this.count = info.count;
-                this.paging = this.vm.paging && info.count > Constants.PageSize
+                this.paging = this.vm.paging
             }
             this.getResources();
         });
@@ -93,8 +92,8 @@ class Bucket extends baseBucket {
         });
     }
 
-    getResources(option = {}) {
-        super.getResources();
+    async getResources(option = {}) {
+        await super.preResources();
         //重置多选数组
         this.selection = [];
 
@@ -116,7 +115,7 @@ class Bucket extends baseBucket {
             param.marker = this.marker;
         }
 
-        qiniu.list(param, (respErr, respBody, respInfo) => {
+        qiniu.list(param, async (respErr, respBody, respInfo) => {
             if (respErr) {
                 console.error(respErr);
                 return;
@@ -133,7 +132,7 @@ class Bucket extends baseBucket {
                 });
             });
 
-            this.appendResources(respInfo.data, option);
+            await this.postResources(respInfo.data, option);
         });
     }
 

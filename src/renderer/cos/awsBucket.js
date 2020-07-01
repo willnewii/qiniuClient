@@ -99,7 +99,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
-        super.getResources();
+        super.preResources();
         //delimiter
         let params = {
             'Bucket': this.name,
@@ -127,7 +127,7 @@ class Bucket extends baseBucket {
             });
 
             data.items = files;
-            this.appendResources(data, option);
+            this.postResources(data, option);
         }).catch((e)=>{
             EventBus.$emit(Constants.Event.loading, {
                 show: false,

@@ -138,7 +138,6 @@ function upload(params, callback) {
  * 批量修改文件名
  * @param bucket    名称
  * @param items     需要处理的文件
- * @param replace   需要处理的文件
  * @param callback
  */
 function rename(bucket, items, callback) {

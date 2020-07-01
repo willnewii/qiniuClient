@@ -27,7 +27,10 @@
                     </Menu-group>
                 </Menu>
                 <div class="version">
-                    <span @click="openBrowser(version.github)">v{{appVersion}}</span>
+                    <template v-if="isSyncing">
+                        <Spin size="small"></Spin><span style="margin-left: 5px">同步中...</span>
+                    </template>
+                    <span v-else @click="openBrowser(version.github)">v{{appVersion}}</span>
                     <Poptip trigger="hover" v-if="version.url" placement="top-start" :title="version.version">
                         <pre slot="content" class="version-new-info">{{version.info}}</pre>
                         <span class="version-new" @click="openBrowser(version.url)">有新版啦~</span>
@@ -129,7 +132,7 @@
                     title: '注销'
                 }],
                 loading: {
-                    show: true,
+                    show: false,
                     message: '',
                     flag: '' //可以用作统计计时的标记
                 },
@@ -142,7 +145,8 @@
                 },
                 changeAliasDialog: {
                     show: false
-                }
+                },
+                isSyncing: false,
                 // contextBucketMenuIndex: 0
             };
         },
@@ -171,8 +175,12 @@
                     console.timeEnd(option.flag);
                 }*/
             });
+            EventBus.$on(Constants.Event.syncing, (option) => {
+                this.isSyncing = option;
+            });
             this.$once('hook:beforeDestroy', function () {
                 EventBus.$off(Constants.Event.loading);
+                EventBus.$off(Constants.Event.syncing);
                 EventBus.$off(Constants.Event.dropView);
             });
 
@@ -384,7 +392,9 @@
 
                 .version {
                     padding: 10px 20px;
-                    /*color: #c5c5c5;*/
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                     &-new {
                         color: #ff3605;
                         cursor: pointer;

@@ -73,7 +73,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
-        super.getResources();
+        super.preResources();
         //delimiter
         let params = {
             'max-keys': this.limit,
@@ -103,7 +103,7 @@ class Bucket extends baseBucket {
 
             // data.items = files;
             // data.marker = data.nextMarker;
-            this.appendResources({
+            this.postResources({
                 items: files,
                 marker: data.nextMarker
             }, option);

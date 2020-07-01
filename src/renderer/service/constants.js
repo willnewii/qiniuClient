@@ -27,6 +27,7 @@ export const URL = {
 export const Event = {
     dropView: 'dropView',
     loading: 'loading',
+    syncing: 'syncing',                     //indexedDB 数据同步中
     updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据
     refreshFiles: 'refreshFiles',           //更新文件列表
     resourceAction: 'resourceAction',       //下载/上传事件
@@ -54,6 +55,14 @@ export const ActionType = {
     rename: 'rename',
     remove: 'remove',
     refreshUrls: 'refreshUrls',
+};
+
+export const DBAction = {
+    create: 'C',
+    retrieve: 'R',
+    update: 'U',
+    delete: 'D',
+    rename: 'rename',
 };
 
 export const PageSize = 5000;

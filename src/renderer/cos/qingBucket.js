@@ -91,7 +91,7 @@ class Bucket extends baseBucket {
     }
 
     getResources(option = {}) {
-        super.getResources();
+        super.preResources();
         let params = {
             limit: this.limit,
         };
@@ -113,7 +113,7 @@ class Bucket extends baseBucket {
                 return util.convertMeta(item, brand.qingstor.key);
             });
             data.marker = data.has_more ? data.next_marker : '';
-            this.appendResources(data, option);
+            this.postResources(data, option);
         });
     }
 
