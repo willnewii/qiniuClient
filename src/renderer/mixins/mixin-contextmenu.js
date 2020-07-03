@@ -10,13 +10,17 @@ export default {
                 title: '',
                 info: ''
             },
+            //修改文件(夹)名称
             changeFileNameDialog: {
                 show: false,
-                title: '',
-                info: '',
-                key: '',
-                input: ''
+                input: '',
+                file: null
             },
+            //移动文件夹
+            moveFilesDialog: {
+                show: false,
+                input: '',
+            }
         };
     },
     methods: {
@@ -49,29 +53,44 @@ export default {
                 }
             }
         },
-        changeFileName() {
-            let files = [];
-            let path = this.changeFileNameDialog.file.key;
-            if (this.changeFileNameDialog.file._directory) {
-                path = this.changeFileNameDialog.file._path;
-            }
-            let array = path.split(Constants.DELIMITER);
-            array[array.length - 1] = this.changeFileNameDialog.input;
-            let newPath = array.join(Constants.DELIMITER);
+        // 0：修改文件（夹）名称 1: 移动文件（夹）
+        changeFileName(action = 0) {
+            let files = [], file, oldPath, newPath;
 
-            if (!this.changeFileNameDialog.file._directory) {
-                this.changeFileNameDialog.file._key = newPath;
-                files.push(this.changeFileNameDialog.file);
-            } else {
-                for (let file of this.bucket.files) {
-                    if (file.key.indexOf(path + Constants.DELIMITER) === 0) {
-                        file._key = file.key.replace(path, newPath);
-                        files.push(file);
+
+            switch (action) {
+                case 0 :
+                    file = this.changeFileNameDialog.file ;
+                    oldPath = file._directory ? file._path : file.key;
+                    // 拼接新路径
+                    let array = oldPath.split(Constants.DELIMITER);
+                    array[array.length - 1] = this.changeFileNameDialog.input;
+                    newPath = array.join(Constants.DELIMITER);
+                    break;
+                case 1 :
+                    file = this.moveFilesDialog.file ;
+                    oldPath = file._directory ? file._path : file.key;
+                    newPath = this.moveFilesDialog.input
+                    break;
+            }
+
+            if (file._directory) {
+                files = this.bucket.files.filter((file)=>{
+                    if (file.key.indexOf(oldPath + Constants.DELIMITER) === 0) {
+                        file._key = file.key.replace(oldPath, newPath);
+                        return true ;
                     }
-                }
+                    return false ;
+                });
+            }else{
+                file._key = newPath;
+                files.push(file);
             }
 
             this.resourceRename(files);
+        },
+        moveFiles(){
+            this.changeFileName(1);
         },
         handleFolderMenu(ref) {
             this.contextFolderMenuIndex = ref.data.attrs.index;
@@ -94,7 +113,7 @@ export default {
                     this.folderInfoDialog.title = `${path}简介`;
                     this.folderInfoDialog.info = `共${files.length}个文件\n大小：${util.formatFileSize(size)}`;
                     break;
-                case 2://修改文件夹
+                case 2://修改文件夹名称
                     this.changeFileNameDialog.show = true;
                     this.changeFileNameDialog.input = this.contextFolderMenuIndex._name;
                     this.changeFileNameDialog.file = this.contextFolderMenuIndex;
@@ -107,6 +126,13 @@ export default {
                     break;
                 case 5://刷新CDN
                     this.resourceRefreshUrls({path: path + '/'});
+                    break;
+                case 6://移动文件夹
+                    this.moveFilesDialog = {
+                        show: true ,
+                        input: this.contextFolderMenuIndex._path,
+                        file: this.contextFolderMenuIndex
+                    }
                     break;
             }
         },
@@ -149,6 +175,13 @@ export default {
                     break;
                 case 8://刷新CDN
                     this.resourceRefreshUrls(file);
+                    break;
+                case 9://移动文件
+                    this.moveFilesDialog = {
+                        show: true ,
+                        input: file.key,
+                        file: file
+                    }
                     break;
             }
         },

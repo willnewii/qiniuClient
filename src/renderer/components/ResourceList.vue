@@ -9,6 +9,8 @@
             </template>
             <v-contextmenu-item @click="handleFolderMenuClick(2)">重命名</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFolderMenuClick(6)">移动</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(3)">选择</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFolderMenuClick(4)">全选</v-contextmenu-item>
@@ -24,6 +26,8 @@
                 <v-contextmenu-item divider></v-contextmenu-item>
             </template>
             <v-contextmenu-item @click="handleFileMenuClick(4)">重命名</v-contextmenu-item>
+            <v-contextmenu-item divider></v-contextmenu-item>
+            <v-contextmenu-item @click="handleFileMenuClick(9)">移动</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
             <v-contextmenu-item @click="handleFileMenuClick(5)">选择</v-contextmenu-item>
             <v-contextmenu-item divider></v-contextmenu-item>
@@ -93,7 +97,9 @@
         <Modal v-model="changeFileNameDialog.show" title="重命名" @on-ok="changeFileName">
             <Input v-model="changeFileNameDialog.input"/>
         </Modal>
-
+        <Modal v-model="moveFilesDialog.show" title="移动" @on-ok="moveFiles">
+            <Input v-model="moveFilesDialog.input"/>
+        </Modal>
         <viewer :options="options" :images="previewImages" ref="viewer" @inited="inited" style="display: none">
             <img class="image-wrapper" v-for="src in previewImages" :key="src"
                  :src="src" :data-source="src" :alt="src.split('?image=').pop()">
