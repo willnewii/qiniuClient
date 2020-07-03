@@ -44,4 +44,4 @@ function generateBucket(name) {
     return new QingBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket, generateUrl};
+export default {init, getBuckets, generateBucket, generateUrl};

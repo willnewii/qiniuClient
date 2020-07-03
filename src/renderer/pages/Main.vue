@@ -123,10 +123,6 @@
                     name: Constants.Key.app_setup,
                     icon: 'md-cog',
                     title: '设置'
-                }, {
-                    name: Constants.Key.app_logout,
-                    icon: 'md-exit',
-                    title: '注销'
                 }],
                 loading: {
                     show: true,

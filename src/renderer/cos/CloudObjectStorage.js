@@ -2,13 +2,13 @@ import * as storagePromise from '../service/storagePromise';
 
 const uuid = require('uuid/v1');
 
-import * as qiniu from '../cos/qiniu';
-import * as tencent from '../cos/tencent';
-import * as qing from '../cos/qing';
-import * as ali from '../cos/ali';
-import * as upyun from '../cos/upyun';
-import * as aws from '../cos/aws';
-import * as jd from '../cos/jd';
+import qiniu from '../cos/qiniu';
+import tencent from '../cos/tencent';
+import qing from '../cos/qing';
+import ali from '../cos/ali';
+import upyun from '../cos/upyun';
+import aws from '../cos/aws';
+import jd from '../cos/jd';
 
 import brand from '../cos/brand';
 

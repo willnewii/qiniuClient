@@ -14,8 +14,8 @@ function init(param) {
     if (param.endpoint) {
         AWS.config.update({
             endpoint: param.endpoint,
-            signatureVersion: 'v4',
             s3ForcePathStyle: true,
+            signatureVersion: 'v4',
         });
     }
 
@@ -23,6 +23,10 @@ function init(param) {
 }
 
 function getBuckets(callback) {
+    _getBuckets(s3, callback)
+}
+
+function _getBuckets(s3, callback) {
     s3.listBuckets().promise().then((data) => {
         data.Buckets.forEach((item, index) => {
             data.Buckets[index].name = data.Buckets[index].Name;
@@ -37,4 +41,4 @@ function generateBucket(name) {
     return new AWSBucket(name, s3);
 }
 
-export {init, getBuckets, generateBucket};
+export default {init, getBuckets, _getBuckets, generateBucket};

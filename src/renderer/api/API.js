@@ -4,7 +4,7 @@
 import axios from 'axios';
 import config from './config';
 import * as util from '../service/util';
-import {_httpAuthorization} from '../cos/qiniu';
+import qiniu from '../cos/qiniu';
 
 import Qs from 'qs';
 
@@ -24,7 +24,7 @@ class API {
             url = url + '?' + Qs.stringify(param);
 
         if (/(qiniu.com|qbox.me)/g.test(url)) { // 七牛api
-            this.setAuthorization(_httpAuthorization(url));
+            this.setAuthorization(qiniu._httpAuthorization(url));
         }
         return this._request(url, 'get');
     }

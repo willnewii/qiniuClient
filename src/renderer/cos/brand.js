@@ -23,7 +23,7 @@ export default {
   tencent: {
     key: "tencent",
     name: "腾讯云",
-    features: []
+    features: ["urlUpload"]
   },
   qingstor: {
     key: "qingstor",

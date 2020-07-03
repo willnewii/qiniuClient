@@ -27,4 +27,4 @@ function generateBucket(name) {
     return new upyunBucket(name, cos);
 }
 
-export {init, getBuckets, generateBucket};
+export default {init, getBuckets, generateBucket};

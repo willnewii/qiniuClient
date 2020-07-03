@@ -4,7 +4,7 @@ import brand from '@/cos/brand';
 const fs = require('fs');
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
-import * as qing from './qing';
+import qing from './qing';
 
 const mime = require('mime-types');
 

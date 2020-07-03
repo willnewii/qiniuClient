@@ -1,15 +1,14 @@
-import {Constants, util} from '../service/index';
-import * as qiniu from '../cos/qiniu';
-import baseBucket from './baseBucket';
-import Request from "@/api/API";
-import brand from "../cos/brand";
-import dayjs from 'dayjs';
+import { Constants, util } from "../service/index"
+import qiniu from "../cos/qiniu"
+import baseBucket from "./baseBucket"
+import Request from "@/api/API"
+import brand from "../cos/brand"
+import dayjs from "dayjs"
 
 class Bucket extends baseBucket {
-
     constructor(name, cos) {
-        super(name, cos);
-        this.key = brand.qiniu.key;
+        super(name, cos)
+        this.key = brand.qiniu.key
     }
 
     /**
@@ -20,24 +19,24 @@ class Bucket extends baseBucket {
      * @param vm => bucketPage
      */
     bindPage(vm) {
-        this.vm = vm;
-        this.getACL();
-        this.getDomains();
+        this.vm = vm
+        this.getACL()
+        this.getDomains()
         this.getTotal((info) => {
             if (info) {
-                this.space = info.space;
-                this.count = info.count;
+                this.space = info.space
+                this.count = info.count
                 this.paging = this.vm.paging && info.count > Constants.PageSize
             }
-            this.getResources();
-        });
+            this.getResources()
+        })
     }
 
     /**
      * 检测是否属于私密空间
      */
     getACL() {
-        this.getLocalPermission();
+        this.getLocalPermission()
     }
 
     /**
@@ -47,23 +46,25 @@ class Bucket extends baseBucket {
      * 如果设置了自定义域名,https 默认设置为false
      */
     getDomains() {
-        let request = new Request();
-        request.get(qiniu.methods.domains, {tbl: this.name}).then((result) => {
-            this.domain = '';
+        let request = new Request()
+        request
+            .get(qiniu.methods.domains, { tbl: this.name })
+            .then((result) => {
+                this.domain = ""
 
-            if (result && result.length > 0) {
-                this.domains = result;
+                if (result && result.length > 0) {
+                    this.domains = result
 
-                //默认选择最后一个域名
-                this.domain = this.domains[this.domains.length - 1];
-            }
+                    //默认选择最后一个域名
+                    this.domain = this.domains[this.domains.length - 1]
+                }
 
-            super.setRecentDomain();
-        }).catch((error) => {
-            console.log(error);
-        });
+                super.setRecentDomain()
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
-
 
     /**
      * 空间统计
@@ -71,98 +72,110 @@ class Bucket extends baseBucket {
      * @param callback
      */
     async getTotal(callback) {
-        const formatStr = 'YYYYMMDD000000';
-        let day = dayjs();
-        let param = `?bucket=${this.name}&begin=${day.add(-1, 'day').format(formatStr)}&end=${day.format(formatStr)}&g=day`;
+        const formatStr = "YYYYMMDD000000"
+        let day = dayjs()
+        let param = `?bucket=${this.name}&begin=${day.add(-1, "day").format(formatStr)}&end=${day.format(
+            formatStr
+        )}&g=day`
 
-        let requests = [qiniu.methods.count, qiniu.methods.count_line, qiniu.methods.space, qiniu.methods.space_line].map((url) => {
-            return new Request().get(`${url}${param}`);
-        });
+        let requests = [
+            qiniu.methods.count,
+            qiniu.methods.count_line,
+            qiniu.methods.space,
+            qiniu.methods.space_line
+        ].map((url) => {
+            return new Request().get(`${url}${param}`)
+        })
 
-        Promise.all(requests).then((result) => {
-            callback && callback({
-                count: result[0].datas[0] || result[1].datas[0],
-                space: result[2].datas[0] || result[3].datas[0]
-            });
-        }).catch((error) => {
-            console.log(error);
-            callback && callback({
-                count: 0,
-                space: 0
-            });
-        });
+        Promise.all(requests)
+            .then((result) => {
+                callback &&
+                    callback({
+                        count: result[0].datas[0] || result[1].datas[0],
+                        space: result[2].datas[0] || result[3].datas[0]
+                    })
+            })
+            .catch((error) => {
+                console.log(error)
+                callback &&
+                    callback({
+                        count: 0,
+                        space: 0
+                    })
+            })
     }
 
     getResources(option = {}) {
-        super.getResources();
+        super.getResources()
         //重置多选数组
-        this.selection = [];
+        this.selection = []
 
         let param = {
             bucket: this.name,
             limit: this.limit
-        };
+        }
 
         if (option.keyword) {
-            param.prefix = option.keyword;
+            param.prefix = option.keyword
         }
 
         if (this.paging) {
-            param.delimiter = '/';
-            param.prefix && (param.prefix += '/');
+            param.delimiter = "/"
+            param.prefix && (param.prefix += "/")
         }
 
         if (this.marker) {
-            param.marker = this.marker;
+            param.marker = this.marker
         }
 
         qiniu.list(param, (respErr, respBody, respInfo) => {
             if (respErr) {
-                console.error(respErr);
-                return;
+                console.error(respErr)
+                return
             }
             respInfo.data.items.forEach((item, index) => {
-                respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key);
-            });
+                respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key)
+            })
             //commonPrefixes 文件夹
-            respInfo.data.commonPrefixes && respInfo.data.commonPrefixes.forEach((item) => {
-                respInfo.data.items.push({
-                    key: item.substring(0, item.length - 1),
-                    type: Constants.FileType.folder,
-                    fsize: 0,
-                });
-            });
+            respInfo.data.commonPrefixes &&
+                respInfo.data.commonPrefixes.forEach((item) => {
+                    respInfo.data.items.push({
+                        key: item.substring(0, item.length - 1),
+                        type: Constants.FileType.folder,
+                        fsize: 0
+                    })
+                })
 
-            this.appendResources(respInfo.data, option);
-        });
+            this.appendResources(respInfo.data, option)
+        })
     }
 
     createFile(_param, type, callback) {
         let param = {
             bucket: this.name
-        };
-        Object.assign(param, _param);
+        }
+        Object.assign(param, _param)
         if (type === Constants.UploadType.FETCH) {
-            qiniu.fetch(param, callback);
+            qiniu.fetch(param, callback)
         } else if (type === Constants.UploadType.UPLOAD) {
-            qiniu.upload(param, callback);
+            qiniu.upload(param, callback)
         }
     }
 
     removeFile(items, callback) {
         qiniu.remove(this.name, items, (ret) => {
-            callback && callback(ret);
-        });
+            callback && callback(ret)
+        })
     }
 
     renameFile(items, callback) {
         qiniu.rename(this.name, items, (ret) => {
-            callback && callback(ret);
-        });
+            callback && callback(ret)
+        })
     }
 
     refreshUrls(items, callback) {
-        qiniu.refreshUrls(items, callback);
+        qiniu.refreshUrls(items, callback)
     }
 
     /**
@@ -173,10 +186,9 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let url = this.domain ? qiniu.generateUrl(this.domain, key, (this.permission === 1 ? deadline : null)) : '';
-        return super.generateUrl(url);
+        let url = this.domain ? qiniu.generateUrl(this.domain, key, this.permission === 1 ? deadline : null) : ""
+        return super.generateUrl(url)
     }
 }
 
-
-export default Bucket;
+export default Bucket

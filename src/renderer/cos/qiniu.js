@@ -233,4 +233,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};
+export default {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};
