@@ -1,5 +1,5 @@
 const fs = require('fs');
-import brand from '@/cos/brand';
+import brand from './brand';
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 

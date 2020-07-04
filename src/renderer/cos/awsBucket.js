@@ -1,6 +1,6 @@
-import {Constants, EventBus, util} from '@/service/index';
+import {Constants, EventBus, util} from '../service/index';
 import baseBucket from './baseBucket';
-import brand from '@/cos/brand';
+import brand from './brand';
 
 const fs = require('fs');
 

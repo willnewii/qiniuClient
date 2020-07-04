@@ -1,7 +1,7 @@
 import {util} from '../service/index';
 import baseBucket from './baseBucket';
 import Client from 'ali-oss/lib/client';
-import brand from '@/cos/brand';
+import brand from './brand';
 
 class Bucket extends baseBucket {
 

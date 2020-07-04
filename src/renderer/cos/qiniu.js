@@ -1,5 +1,5 @@
 import qiniu from 'qiniu';
-import QiniuBucket from "@/cos/qiniuBucket";
+import QiniuBucket from "./qiniuBucket";
 
 import Request from '../api/API';
 

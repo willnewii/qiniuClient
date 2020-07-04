@@ -1,4 +1,4 @@
-import {Constants, util, EventBus} from "@/service/index";
+import {Constants, util, EventBus} from "../service/index";
 
 export default {
     data() {

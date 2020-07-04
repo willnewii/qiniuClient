@@ -1,5 +1,5 @@
 import {Constants, EventBus} from '../service/index';
-import * as types from "@/vuex/mutation-types";
+import * as types from "../vuex/mutation-types";
 
 //由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
 const MAXCOUNT = 5;

@@ -1,5 +1,5 @@
-import * as Constants from "@/service/constants";
-import brand from '@/cos/brand';
+import * as Constants from "../service/constants";
+import brand from './brand';
 
 const fs = require('fs');
 import {util} from '../service/index';

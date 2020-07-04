@@ -3,7 +3,7 @@ const request = require("request")
 
 cosUtil.isBrowser = false
 import tencent from "cos-nodejs-sdk-v5"
-import TencentBucket from "@/cos/tencentBucket"
+import TencentBucket from "./tencentBucket"
 
 let cos = null
 

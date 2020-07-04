@@ -1,7 +1,7 @@
 import { Constants, util } from "../service/index"
 import qiniu from "../cos/qiniu"
 import baseBucket from "./baseBucket"
-import Request from "@/api/API"
+import Request from "../api/API"
 import brand from "../cos/brand"
 import dayjs from "dayjs"
 

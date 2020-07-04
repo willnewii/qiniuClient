@@ -1,7 +1,7 @@
 const fs = require("fs")
 
 import { Constants, util } from "../service/index"
-import brand from "@/cos/brand"
+import brand from "./brand"
 import baseBucket from "./baseBucket"
 import tencent from "./tencent"
 
