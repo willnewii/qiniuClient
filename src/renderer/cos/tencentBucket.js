@@ -7,8 +7,7 @@ import tencent from "./tencent"
 
 class Bucket extends baseBucket {
     constructor(name, cos) {
-        super(name, cos)
-        this.key = brand.tencent.key
+        super(name, cos, brand.tencent.key)
     }
 
     /**
@@ -60,11 +59,11 @@ class Bucket extends baseBucket {
 
                 //匹配最近使用过的域名
                 super.setRecentDomain()
-                this.getResources()
             } else {
                 console.error(err)
-                this.getResources()
             }
+            //有些可能没有获取domain的权限，但不代表没有获取资源列表的权限
+            this.getResources()
         })
     }
 
@@ -88,16 +87,22 @@ class Bucket extends baseBucket {
         }
     }
 
-    removeFile(item, callback) {
-        tencent.remove(this.param, item, callback)
+    removeFile(items, callback) {
+        tencent.remove(this.param, items, async (err, data) => {
+            await super.syncDB(items, Constants.DBAction.delete)
+            callback && callback(err, data)
+        })
     }
 
     renameFile(items, callback) {
-        tencent.rename(this.param, items, callback)
+        tencent.rename(this.param, items, async (err, data) => {
+            await super.syncDB(items, Constants.DBAction.rename)
+            callback && callback(err, data)
+        })
     }
 
     getResources(option = {}) {
-        super.getResources()
+        super.preResources()
         let params = {
             ...this.param,
             MaxKeys: this.limit
@@ -127,7 +132,7 @@ class Bucket extends baseBucket {
                 })
 
                 data.items = files
-                this.appendResources(data, option)
+                this.postResources(data, option)
             }
         })
     }

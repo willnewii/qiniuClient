@@ -60,10 +60,9 @@ function fetch(params, callback) {
 }
 
 /**
- * 批量修改文件名
+ * 批量修改文件名(先拷贝到指定目录，在删除源文件)
  * @param bucket    名称
  * @param items     需要处理的文件
- * @param replace   需要处理的文件
  * @param callback
  */
 function rename(params, items, callback) {
@@ -82,9 +81,8 @@ function rename(params, items, callback) {
             ".myqcloud.com/" +
             encodeURIComponent(item.key).replace(/%2F/g, "/")
 
-        cos.sliceCopyFile(params, (error, data) => {
-            console.log(error, data)
-            if (!error) {
+        cos.sliceCopyFile(params, (err, data) => {
+            if (!err) {
                 files.push(item)
             }
             index++
@@ -116,11 +114,8 @@ function remove(params, items, callback) {
     })
 
     cos.deleteMultipleObject(params, function (err, data) {
-        if (err) {
-            console.log(err)
-        } else {
-            callback && callback(data)
-        }
+        err && console.log(err)
+        callback && callback(err, data)
     })
 }
 

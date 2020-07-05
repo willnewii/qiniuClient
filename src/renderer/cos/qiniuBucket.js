@@ -7,8 +7,7 @@ import dayjs from "dayjs"
 
 class Bucket extends baseBucket {
     constructor(name, cos) {
-        super(name, cos)
-        this.key = brand.qiniu.key
+        super(name, cos, brand.qiniu.key);
     }
 
     /**
@@ -24,9 +23,9 @@ class Bucket extends baseBucket {
         this.getDomains()
         this.getTotal((info) => {
             if (info) {
-                this.space = info.space
-                this.count = info.count
-                this.paging = this.vm.paging && info.count > Constants.PageSize
+                this.space = info.space;
+                this.count = info.count;
+                this.paging = this.vm.paging
             }
             this.getResources()
         })
@@ -105,8 +104,8 @@ class Bucket extends baseBucket {
             })
     }
 
-    getResources(option = {}) {
-        super.getResources()
+    async getResources(option = {}) {
+        await super.preResources();
         //重置多选数组
         this.selection = []
 
@@ -128,7 +127,7 @@ class Bucket extends baseBucket {
             param.marker = this.marker
         }
 
-        qiniu.list(param, (respErr, respBody, respInfo) => {
+        qiniu.list(param, async (respErr, respBody, respInfo) => {
             if (respErr) {
                 console.error(respErr)
                 return
@@ -137,17 +136,16 @@ class Bucket extends baseBucket {
                 respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key)
             })
             //commonPrefixes 文件夹
-            respInfo.data.commonPrefixes &&
-                respInfo.data.commonPrefixes.forEach((item) => {
-                    respInfo.data.items.push({
-                        key: item.substring(0, item.length - 1),
-                        type: Constants.FileType.folder,
-                        fsize: 0
-                    })
-                })
+            respInfo.data.commonPrefixes && respInfo.data.commonPrefixes.forEach((item) => {
+                respInfo.data.items.push({
+                    key: item.substring(0, item.length - 1),
+                    type: Constants.FileType.folder,
+                    fsize: 0,
+                });
+            });
 
-            this.appendResources(respInfo.data, option)
-        })
+            await this.postResources(respInfo.data, option);
+        });
     }
 
     createFile(_param, type, callback) {

@@ -1,54 +1,73 @@
-import {Constants, EventBus} from '../service/index';
-import * as types from "../vuex/mutation-types";
+import { Constants, EventBus } from "../service/index"
+import * as types from "../vuex/mutation-types"
+import * as indexedDBHelper from "../service/indexedDBHelper"
+import brand from "./brand"
 
 //由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
-const MAXCOUNT = 5;
-let loadCount = 0;
+const limitPageSize = 1000
+
+let loadState = -1 // 1：同步中 2：加载中
+let message = null
+let tempFiles = []
 
 class baseBucket {
+    constructor(name, cos, key) {
+        this.init()
 
-    constructor(name, cos) {
-        this.init();
+        name && (this.name = name)
+        key && (this.key = key)
+        this.cos = cos
 
-        name && (this.name = name);
-        this.cos = cos;
+        loadState = -1
+        message = null
 
-        //单次请求加载条数
-        this.limit = 1000;
+        if (this.key === brand.qiniu.key || this.key === brand.tencent.key) {
+            indexedDBHelper.openDatabase(this.key, [this.name]).then((db) => {
+                window.cosDB = db
+            })
+        }
     }
 
     init() {
-        this.brand = '';                //服务商
-        this.space = '';                //空间容量
-        this.count = '';                //文件个数
-        this.name = '';
-        this.location = '';
+        if (window.cosDB) {
+            window.cosDB.close()
+            window.cosDB = null
+        }
+        this.key = "" //服务商
+        this.space = "" //空间容量
+        this.count = "" //文件个数
+
+        //单次请求加载条数
+        this.limit = limitPageSize
+
+        this.name = ""
+        this.location = ""
         //操作权限 0：正常 1：私有
-        this.permission = 0;
+        this.permission = 0
 
         //当前bucket 的可用域名列表
-        this.domains = [];
+        this.domains = []
         //当前选择domain
-        this.domain = '';
+        this.domain = ""
         //缓存请求时返回的marker
-        this.marker = '';
+        this.marker = ""
 
         //当前bucket源数据
-        this.files = [];
+        this.files = []
         //分页加载,数据加载后先保存在tempFiles,加载完毕后在使用files
-        this.tempFiles = [];
+        this.tempFiles = []
         //已选的文件列表,批处理时使用
-        this.selection = [];
+        this.selection = []
         //当前路径
-        this.folderPath = '';
+        this.folderPath = ""
 
         // 文件队列(整合上传&下载)
-        this.fileQueue = [];
+        this.fileQueue = []
 
         //在generateUrl 返回https
-        this.https = false;
+        this.https = false
         //分页加载
-        this.paging = false;
+        this.paging = false
     }
 
     /**
@@ -56,47 +75,60 @@ class baseBucket {
      * @param permission
      */
     setPermission(permission = 0) {
-        this.permission = permission;
+        this.permission = permission
         if (this.vm) {
-            this.vm[types.app.a_update_buckets_info]({name: this.name, permission: this.permission});
+            this.vm[types.app.a_update_buckets_info]({ name: this.name, permission: this.permission })
         }
 
-        this.https = this.vm['setup_https'];
+        this.https = this.vm["setup_https"]
     }
 
     /**
      * qiniu,aws,minio 需要手动设置
      */
     getLocalPermission() {
-        let privateBuckets = this.vm.privatebucket;
-        let permission = (privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1) ? 1 : 0;
-        this.setPermission(permission);
+        let privateBuckets = this.vm.privatebucket
+        let permission = privateBuckets && privateBuckets.length > 0 && privateBuckets.indexOf(this.name) !== -1 ? 1 : 0
+        this.setPermission(permission)
     }
 
-    setRecentDomain(){
-        let recentDomains = this.vm.customeDomains;
+    setRecentDomain() {
+        let recentDomains = this.vm.customeDomains
         if (recentDomains && recentDomains[this.name]) {
-            this.domain = recentDomains[this.name];
+            this.domain = recentDomains[this.name]
         }
     }
 
-    getResources() {
-        let txt = '数据加载中,请稍后';
-
-        if (this.count !== '') {
-            txt += `(${parseFloat(this.tempFiles.length / this.count * 100).toFixed(2)}%)`;
+    async preResources() {
+        if (loadState === -1 && window.cosDB) {
+            this.files = await indexedDBHelper.getRecords(cosDB, this.name)
+            console.log(this.files)
+            if (this.files.length > 0) {
+                loadState = 1
+                this.paging = false //如果是同步状态，则关闭分页模式
+                EventBus.$emit(Constants.Event.syncing, true)
+            }
         }
 
-        console.log(this.tempFiles.length, this.count, txt);
-        if (this.paging) {
-            txt += '  分页加载';
+        if (loadState !== 1) {
+            loadState = 2
+            let txt = "数据加载中,请稍后"
+
+            if (this.count !== "") {
+                txt += `(${parseFloat((tempFiles.length / this.count) * 100).toFixed(2)}%)`
+            }
+
+            console.log(this.tempFiles.length, this.count, txt)
+            if (this.paging) {
+                txt += "  分页加载"
+            }
+
+            EventBus.$emit(Constants.Event.loading, {
+                show: true,
+                message: txt,
+                flag: "getResources"
+            })
         }
-        EventBus.$emit(Constants.Event.loading, {
-            show: true,
-            message: txt,
-            flag: 'getResources'
-        });
-        loadCount++;
     }
 
     /**
@@ -105,31 +137,39 @@ class baseBucket {
      * @param data
      * @param option
      */
-    appendResources(data, option) {
-        this.tempFiles = this.marker ? this.tempFiles.concat(data.items) : data.items;
-        this.marker = data.marker ? data.marker : '';
+    async postResources(data, option) {
+        tempFiles = this.marker ? tempFiles.concat(data.items) : data.items
+        this.marker = data.marker || ""
 
-        //开启分页模式&文件数大于阀值&marker不为空
-        console.log(`分页模式:${this.paging} tempFiles:${this.tempFiles.length} marker:${this.marker}`);
-        if (this.paging && loadCount >= MAXCOUNT && this.marker) {
+        console.log(`${this.paging ? "开启" : "未开启"}分页； Files:${tempFiles.length}； marker:${this.marker}`)
+        //开启分页模式&marker不为空
+        if (this.paging && this.marker) {
+            loadState = -1
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
-                flag: 'getResources'
-            });
+                flag: "getResources"
+            })
 
-            this.files = this.files.concat(Object.freeze(this.tempFiles));
-            this.tempFiles = [];
-            loadCount = 0;
+            this.files = this.files.concat(Object.freeze(tempFiles))
+            tempFiles = []
         } else if (this.marker) {
-            this.getResources(option);
+            this.getResources(option)
         } else {
-            EventBus.$emit(Constants.Event.loading, {
-                show: false,
-                flag: 'getResources'
-            });
+            if (loadState !== 1) {
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                    flag: "getResources"
+                })
+            }
 
-            this.files = Object.freeze(this.tempFiles);
-            this.tempFiles = [];
+            if (window.cosDB) {
+                await indexedDBHelper.clearRecord(cosDB, this.name)
+                await indexedDBHelper.addRecord(cosDB, this.name, tempFiles, true)
+                EventBus.$emit(Constants.Event.syncing, false)
+            }
+            this.files = Object.freeze(tempFiles)
+            tempFiles = []
+            loadState = -1
         }
     }
 
@@ -139,21 +179,41 @@ class baseBucket {
      */
     generateUrl(url) {
         if (!url) {
-            return '';
-        }
-        //默认添加http
-        if (!/^https?:\/\//.test(url)) {
-            url = `${this.https ? 'https' : 'http'}://${url}`;
+            return ""
         }
 
-        if (this.https) {
-            url = url.replace('http://', 'https://');
+        const protocol = (this.https ? "https" : "http") + "://"
+
+        if (/^https?:\/\//.test(url)) {
+            url = url.replace(/^https?:\/\//, protocol)
         } else {
-            url = url.replace('https://', 'http://');
+            url = `${protocol}${url}`
         }
 
-        return url;
+        return url
+    }
+
+    /**
+     * 处理存储桶的CRUD 同步数据库
+     * C 目前处理不了,文件创建时，并不会返回文件信息
+     * TODO：同步后，只是修改了文件名,涉及文件ETag比对的模块，会出现异常
+     */
+    async syncDB(items, action) {
+        switch (action) {
+            case Constants.DBAction.rename:
+                for (let i = 0; i < items.length; i++) {
+                    let newItem = JSON.parse(JSON.stringify(items[i]))
+                    newItem.key = newItem._key
+                    await indexedDBHelper.putRecord(cosDB, this.name, items[i].key, newItem)
+                }
+                break
+            case Constants.DBAction.delete:
+                for (let i = 0; i < items.length; i++) {
+                    await indexedDBHelper.deleteRecord(cosDB, this.name, items[i])
+                }
+                break
+        }
     }
 }
 
-export default baseBucket;
+export default baseBucket

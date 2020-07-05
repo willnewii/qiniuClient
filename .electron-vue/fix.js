@@ -1,5 +1,10 @@
-const path = require('path')
+const path = require("path")
 const fs = require("fs")
+
+/**
+ * electron-renderer默认读取的是ali-oss browser 文件,没有bucket相关操作.需要修改一下
+ * @type {string}
+ */
 
 let packagePaths = [
     path.join(__dirname, "..", "node_modules/ali-oss/package.json"),

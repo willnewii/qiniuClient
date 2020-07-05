@@ -125,7 +125,7 @@
 
                     <Button class="btn" size="small" @click="allSelection()">全选</Button>
 
-                    <Button class="btn" size="small" @click="callRefreshUrls()" icon="md-sync" v-if="bucket.key == 'qiniu'">刷新缓存({{bucket.selection.length}})</Button>
+                    <Button class="btn" size="small" @click="callRefreshUrls()" icon="md-sync" v-feature:refreshCDN="bucket.key">刷新缓存({{bucket.selection.length}})</Button>
 
                     <Button class="btn" size="small" @click="downloads()" icon="md-download">下载({{bucket.selection.length}})</Button>
 
