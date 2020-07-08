@@ -118,9 +118,9 @@ class Bucket extends baseBucket {
             param.prefix = option.keyword
         }
 
-        if (this.paging) {
-            param.delimiter = "/"
-            param.prefix && (param.prefix += "/")
+        if (this.paging) {// 仅返回指定目录下的文件
+            param.prefix && (param.prefix += Constants.DELIMITER)
+            param.delimiter = Constants.DELIMITER
         }
 
         if (this.marker) {

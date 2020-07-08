@@ -33,7 +33,7 @@ function getBuckets(callback) {
         let datas = result.map((name)=>{
             return {name};
         });
-        callback(null, {datas});
+        callback(null, datas);
     }).catch((error) => {
         callback(error);
     });

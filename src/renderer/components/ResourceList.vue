@@ -379,15 +379,14 @@
                     let temp_key = file.key;
                     if (folderPath === '' || temp_key.indexOf(folderPath + Constants.DELIMITER) === 0) {
 
-                        if (option.keyWord) {
-                            if (file.displayName.toLowerCase().indexOf(option.keyWord.toLowerCase()) === -1) {
+                        if (option.keyWord) {//搜索应该针对的是文件的文件名
+                            if (file.type !== Constants.FileType.folder && file.displayName.toLowerCase().indexOf(option.keyWord.toLowerCase()) === -1) {
                                 return;
                             } else {
                                 resultCount++;
                             }
                         }
 
-                        //又拍云 && 七牛云(自定义) 通过type参数判断文件夹
                         if (file.type === Constants.FileType.folder) {
                             let temp = {
                                 key: temp_key.replace(folderPath + Constants.DELIMITER, ''),

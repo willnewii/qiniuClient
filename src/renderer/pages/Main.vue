@@ -235,7 +235,7 @@
                 });
             },
             getBuckets() {
-                this.$storage.getBuckets((error, data) => {
+                this.$storage.getBuckets((error, result) => {
                     if (error) {
                         util.notification({
                             body: `获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`
@@ -244,13 +244,13 @@
                     } else {
                         let defaultIndex = 0;
 
-                        data.datas.forEach((item, index) => {
+                        result.forEach((item, index) => {
                             item.permission = 0;
                             if (this.recent.bucket === item.name) {
                                 defaultIndex = index;
                             }
                         });
-                        this[types.app.a_buckets_info](data.datas);
+                        this[types.app.a_buckets_info](result);
 
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
                         this.$nextTick(() => {// COS切换后,menu没有active样式,手动调用一下

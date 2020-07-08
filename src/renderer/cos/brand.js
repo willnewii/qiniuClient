@@ -27,13 +27,12 @@ export default {
     qingstor: {
         key: "qingstor",
         name: "青云",
-        location: ["gd2", "pek3a", "sh1a"],
         features: ["urlUpload"]
     },
     aliyun: {
         key: "aliyun",
         name: "阿里云",
-        features: []
+        features: ["paging"]
     },
     upyun: {
         key: "upyun",

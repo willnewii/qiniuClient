@@ -21,7 +21,11 @@ class baseBucket {
         loadState = -1
         message = null
 
-        if (this.key === brand.qiniu.key || this.key === brand.tencent.key) {
+        if (
+            typeof window !== "undefined" &&
+            window.cosDB &&
+            (this.key === brand.qiniu.key || this.key === brand.tencent.key)
+        ) {
             indexedDBHelper.openDatabase(this.key, [this.name]).then((db) => {
                 window.cosDB = db
             })
@@ -29,7 +33,7 @@ class baseBucket {
     }
 
     init() {
-        if (window.cosDB) {
+        if (typeof window !== "undefined" && window.cosDB) {
             window.cosDB.close()
             window.cosDB = null
         }

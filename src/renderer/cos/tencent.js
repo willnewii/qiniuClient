@@ -25,7 +25,7 @@ function getBuckets(callback) {
             data.Buckets.forEach((item, index) => {
                 data.Buckets[index].name = item.Name
             })
-            callback && callback(null, { datas: data.Buckets })
+            callback && callback(null, data.Buckets)
         }
     })
 }

@@ -19,7 +19,7 @@ class Bucket extends baseBucket {
      */
     bindPage(vm) {
         this.vm = vm
-
+        this.paging = this.vm.paging
         this.vm.buckets_info.forEach((item) => {
             if (item.Name === this.name) {
                 this.location = item.Location
@@ -112,6 +112,11 @@ class Bucket extends baseBucket {
             params.Prefix = option.keyword
         }
 
+        if (this.paging) {
+            params.Prefix && (params.Prefix += Constants.DELIMITER)
+            params.Delimiter = Constants.DELIMITER
+        }
+
         if (this.marker) {
             params.Marker = this.marker
         }
@@ -130,6 +135,16 @@ class Bucket extends baseBucket {
                         files.push(util.convertMeta(item, brand.tencent.key))
                     }
                 })
+                //commonPrefixes 文件夹
+                data.CommonPrefixes && data.CommonPrefixes.forEach((item) => {
+                    files.push({
+                        key: item.Prefix.substring(0, item.Prefix.length - 1),
+                        // key: item.Prefix,
+                        type: Constants.FileType.folder,
+                        fsize: 0,
+                    });
+                });
+                console.log(files);
 
                 data.items = files
                 this.postResources(data, option)
