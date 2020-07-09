@@ -5,8 +5,6 @@ import QingBucket from "./qingBucket"
 let cos = null
 let signer = null
 let qinKey = null
-//独立于各COS的配置
-const PROTOCOL = "http://"
 
 function init(param) {
     cos = new QingStor(
@@ -33,13 +31,15 @@ function getBuckets(callback) {
 
 function generateUrl(domain, key, deadline, request) {
     key = key.trim()
+    let url
     if (deadline) {
         const { operation } = request
         operation.expires = parseInt(Date.now() / 1000) + parseInt(deadline)
-        return signer.signQuery(operation).uri
+        url = signer.signQuery(operation).uri
     } else {
-        return PROTOCOL + domain + "/" + encodeURI(key)
+        url = domain + "/" + encodeURI(key)
     }
+    return url
 }
 
 function generateBucket(name) {

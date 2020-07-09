@@ -27,7 +27,7 @@ export default {
     qingstor: {
         key: "qingstor",
         name: "青云",
-        features: ["urlUpload"]
+        features: ["urlUpload", "paging"]
     },
     aliyun: {
         key: "aliyun",
@@ -42,16 +42,16 @@ export default {
     aws: {
         key: "aws",
         name: "亚马逊S3",
-        features: ["manualPrivateBucket"]
+        features: ["paging", "manualPrivateBucket"]
     },
     jd: {
         key: "jd",
         name: "京东云",
-        features: ["manualPrivateBucket"]
+        features: ["paging", "manualPrivateBucket"]
     },
     minio: {
         key: "minio",
         name: "MinIO",
-        features: ["manualPrivateBucket"]
+        features: ["paging", "manualPrivateBucket"]
     }
 }

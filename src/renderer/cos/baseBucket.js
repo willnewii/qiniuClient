@@ -6,26 +6,23 @@ import brand from "./brand"
 //由于七牛返回目录的接口不确定,直接通过PageSIze,内容不定.分页模式下,只加载5次
 const limitPageSize = 1000
 
-let loadState = -1 // 1：同步中 2：加载中
+let loadState = -1 // 1：同步中(不显示loading,只显示左下角的sync...) 2：加载中
 let message = null
 let tempFiles = []
 
 class baseBucket {
-    constructor(name, cos, key) {
+    constructor(bucketInfo, cos, key) {
         this.init()
 
-        name && (this.name = name)
+        bucketInfo && (this.name = bucketInfo.name)
+        bucketInfo && (this.location = bucketInfo.location)
         key && (this.key = key)
         this.cos = cos
 
         loadState = -1
         message = null
 
-        if (
-            typeof window !== "undefined" &&
-            window.cosDB &&
-            (this.key === brand.qiniu.key || this.key === brand.tencent.key)
-        ) {
+        if (typeof window !== "undefined" && (this.key === brand.qiniu.key || this.key === brand.tencent.key)) {
             indexedDBHelper.openDatabase(this.key, [this.name]).then((db) => {
                 window.cosDB = db
             })
@@ -70,7 +67,10 @@ class baseBucket {
 
         //在generateUrl 返回https
         this.https = false
-        //分页加载
+        /**
+         * 分页加载(只会加载当前目录的文件，且是分页加载)
+         * @type {boolean}
+         */
         this.paging = false
     }
 
@@ -103,10 +103,33 @@ class baseBucket {
         }
     }
 
+    _handleParams(params, option, key = {}) {
+        key = Object.assign({ prefix: "prefix", delimiter: "delimiter", marker: "marker", limit: "limit" }, key)
+
+        params[key.limit] = this.limit
+
+        if (option.keyword) {
+            params[key.prefix] = option.keyword
+        }
+
+        if (this.paging) {
+            // 仅返回指定目录下的文件
+            params[key.prefix] && (params[key.prefix] += Constants.DELIMITER)
+            params[key.delimiter] = Constants.DELIMITER
+        }
+
+        if (this.marker) {
+            params[key.marker] = this.marker
+        }
+    }
+
     async preResources() {
-        if (loadState === -1 && window.cosDB) {
-            this.files = await indexedDBHelper.getRecords(cosDB, this.name)
-            console.log(this.files)
+        //重置多选数组
+        this.selection = []
+
+        if (loadState === -1 && typeof window !== "undefined" && window.cosDB) {
+            this.files = Object.freeze(await indexedDBHelper.getRecords(cosDB, this.name))
+            console.log("indexedDB 数据读取")
             if (this.files.length > 0) {
                 loadState = 1
                 this.paging = false //如果是同步状态，则关闭分页模式
@@ -133,6 +156,7 @@ class baseBucket {
                 flag: "getResources"
             })
         }
+        console.time("load data")
     }
 
     /**
@@ -142,13 +166,40 @@ class baseBucket {
      * @param option
      */
     async postResources(data, option) {
+        console.timeEnd("load data")
+        if (!this.marker && loadState !== 1) {
+            this.files = []
+        }
         tempFiles = this.marker ? tempFiles.concat(data.items) : data.items
         this.marker = data.marker || ""
 
-        console.log(`${this.paging ? "开启" : "未开启"}分页； Files:${tempFiles.length}； marker:${this.marker}`)
-        //开启分页模式&marker不为空
-        if (this.paging && this.marker) {
+        console.log(`${this.paging ? "开启" : "未开启"}分页； 文件数:${tempFiles.length}； 分页标识:${this.marker}`)
+
+        if (this.marker && !this.paging) {
+            await this.getResources(option)
+        } else {
+            EventBus.$emit(Constants.Event.loading, {
+                show: false,
+                flag: "getResources"
+            })
+
+            if (this.paging) {
+                this.files = this.files.concat(Object.freeze(tempFiles))
+            } else {
+                if (loadState === 1 && typeof window !== "undefined" && window.cosDB) {
+                    await indexedDBHelper.clearRecord(cosDB, this.name)
+                    await indexedDBHelper.addRecord(cosDB, this.name, tempFiles, true)
+                    EventBus.$emit(Constants.Event.syncing, false)
+                    console.log("indexedDB 数据替换")
+                }
+                this.files = Object.freeze(tempFiles)
+            }
+            tempFiles = []
             loadState = -1
+            option.success && option.success()
+        }
+
+        /*if (this.paging) {
             EventBus.$emit(Constants.Event.loading, {
                 show: false,
                 flag: "getResources"
@@ -156,25 +207,28 @@ class baseBucket {
 
             this.files = this.files.concat(Object.freeze(tempFiles))
             tempFiles = []
+            loadState = -1
+            option.success && option.success();
         } else if (this.marker) {
-            this.getResources(option)
-        } else {
-            if (loadState !== 1) {
-                EventBus.$emit(Constants.Event.loading, {
-                    show: false,
-                    flag: "getResources"
-                })
-            }
 
-            if (window.cosDB) {
+        } else {
+            EventBus.$emit(Constants.Event.loading, {
+                show: false,
+                flag: "getResources"
+            })
+
+            if (loadState === 1 && typeof window !== "undefined" && window.cosDB) {
                 await indexedDBHelper.clearRecord(cosDB, this.name)
                 await indexedDBHelper.addRecord(cosDB, this.name, tempFiles, true)
                 EventBus.$emit(Constants.Event.syncing, false)
+                console.log("indexedDB 数据替换")
             }
+
             this.files = Object.freeze(tempFiles)
             tempFiles = []
             loadState = -1
-        }
+            option.success && option.success();
+        }*/
     }
 
     /**

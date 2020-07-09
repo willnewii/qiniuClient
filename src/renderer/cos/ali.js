@@ -2,8 +2,6 @@ const aliOSS = require("ali-oss")
 import AliBucket from "./aliBucket"
 
 let cos = null
-//独立于各COS的配置
-const PROTOCOL = "http://"
 
 function init(param) {
     cos = aliOSS({
@@ -25,8 +23,8 @@ function getBuckets(callback) {
 
 function generateUrl(domain, key, deadline) {}
 
-function generateBucket(name) {
-    return new AliBucket(name, cos)
+function generateBucket(bucketInfo) {
+    return new AliBucket(bucketInfo, cos)
 }
 
 export default { init, getBuckets, generateBucket, generateUrl }

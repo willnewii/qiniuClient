@@ -24,6 +24,7 @@ function getBuckets(callback) {
         } else {
             data.Buckets.forEach((item, index) => {
                 data.Buckets[index].name = item.Name
+                data.Buckets[index].location = item.Location
             })
             callback && callback(null, data.Buckets)
         }

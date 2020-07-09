@@ -179,9 +179,9 @@
         },
         mixins: [mixins.base],
         props: {
-            bucketName: {
-                type: String,
-                default: ''
+            bucketInfo: {
+                type: Object,
+                default: {}
             }
         },
         data() {
@@ -227,15 +227,15 @@
             }
         },
         watch: {
-            bucketName: function (val, oldVal) {
+            bucketInfo: function (val, oldVal) {
                 if (val && oldVal !== val) {
                     this.initBucket(val);
                 }
             }
         },
         mounted() {
-            if (this.$route.query && this.$route.query.bucketName) {
-                this.initBucket(this.$route.query.bucketName);
+            if (this.$route.query && this.$route.query.bucketInfo) {
+                this.initBucket(this.$route.query.bucketInfo);
             } else {
                 console.log('mounted: error');
             }
@@ -248,9 +248,9 @@
             /**
              * 初始化空间信息
              */
-            initBucket(bucketName) {
+            initBucket(bucketInfo) {
                 if (this.$storage.cos) {
-                    this.bucket = this.$storage.cos.generateBucket(bucketName);
+                    this.bucket = this.$storage.cos.generateBucket(bucketInfo);
                     this.bucket.bindPage(this);
                     this.showType = this.setup_showType;
                 }

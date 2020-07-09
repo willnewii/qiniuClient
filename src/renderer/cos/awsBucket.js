@@ -1,14 +1,12 @@
-import {Constants, EventBus, util} from '../service/index';
-import baseBucket from './baseBucket';
-import brand from './brand';
+import { Constants, EventBus, util } from "../service/index"
+import baseBucket from "./baseBucket"
+import brand from "./brand"
 
-const fs = require('fs');
+const fs = require("fs")
 
 class Bucket extends baseBucket {
-
     constructor(name, cos) {
-        super(name, cos);
-        this.key = brand.aws.key;
+        super(name, cos, brand.aws.key)
     }
 
     /**
@@ -17,14 +15,10 @@ class Bucket extends baseBucket {
      * @param vm => page
      */
     bindPage(vm) {
-        this.vm = vm;
+        this.vm = vm
+        this.paging = this.vm.paging
 
-        this.vm.buckets_info.forEach((item) => {
-            if (item.name === this.name) {
-            }
-        });
-
-        this.getACL();
+        this.getACL()
         // this.getDomains();
     }
 
@@ -34,8 +28,8 @@ class Bucket extends baseBucket {
      * https://docs.aws.amazon.com/AmazonS3/latest/API/API_Grant.html
      */
     getACL() {
-        this.getLocalPermission();
-        this.getResources();
+        this.getLocalPermission()
+        this.getResources()
 
         // BucketAcl 策略看不懂😂...
         /*this.cos.getBucketAcl({Bucket: this.name}, (err, data) => {
@@ -57,16 +51,19 @@ class Bucket extends baseBucket {
 
     createFile(_param, type, callback) {
         let params = {
-            Bucket: this.name, Key: _param.key,
+            Bucket: this.name,
+            Key: _param.key,
             Body: fs.createReadStream(_param.path),
-            ContentLength: fs.statSync(_param.path).size,
-        };
-        this.cos.upload(params, function (err, data) {
-            callback(err, {key: _param.key});
-        }).on('httpUploadProgress', (progress) => {
-            console.log(progress);
-            _param.progressCallback(parseInt(progress.loaded / progress.total * 100));
-        });
+            ContentLength: fs.statSync(_param.path).size
+        }
+        this.cos
+            .upload(params, function (err, data) {
+                callback(err, { key: _param.key })
+            })
+            .on("httpUploadProgress", (progress) => {
+                console.log(progress)
+                _param.progressCallback(parseInt((progress.loaded / progress.total) * 100))
+            })
     }
 
     async removeFile(items, callback) {
@@ -75,66 +72,78 @@ class Bucket extends baseBucket {
             Delete: {
                 Objects: []
             }
-        };
-        for (let file of items) {
-            params.Delete.Objects.push({Key: file.key});
         }
-        await this.cos.deleteObjects(params).promise();
-        callback && callback();
+        for (let file of items) {
+            params.Delete.Objects.push({ Key: file.key })
+        }
+        await this.cos.deleteObjects(params).promise()
+        callback && callback()
     }
 
     async renameFile(items, callback) {
         for (let file of items) {
-            await this.cos.copyObject({
-                CopySource: encodeURIComponent('/' + this.name + '/' + file.key), //bucket name + key
-                Bucket: this.name,
-                Key: file._key
-            }).promise();
-            await this.cos.deleteObject({
-                Bucket: this.name,
-                Key: file.key
-            }).promise();
+            await this.cos
+                .copyObject({
+                    CopySource: encodeURIComponent("/" + this.name + "/" + file.key), //bucket name + key
+                    Bucket: this.name,
+                    Key: file._key
+                })
+                .promise()
+            await this.cos
+                .deleteObject({
+                    Bucket: this.name,
+                    Key: file.key
+                })
+                .promise()
         }
-        callback && callback();
+        callback && callback()
     }
 
-    getResources(option = {}) {
-        super.preResources();
+    async getResources(option = {}) {
+        await super.preResources()
         //delimiter
         let params = {
-            'Bucket': this.name,
-            'MaxKeys': this.limit,
-        };
-
-        if (option.keyword) {
-            params.prefix = option.keyword;
+            Bucket: this.name,
         }
 
-        if (this.marker) {
-            params.marker = this.marker;
-        }
+        this._handleParams(params, option, {
+            prefix: "Prefix",
+            delimiter: "Delimiter",
+            marker: "ContinuationToken",
+            limit: "MaxKeys"
+        })
 
-        this.cos.listObjectsV2(params).promise().then((data) => {
-            if (!this.marker) {
-                this.files = [];
-            }
-            let files = [];
-            console.log(data);
-            data.Contents.forEach((item) => {
-                if (parseInt(item.Size) !== 0) {
-                    files.push(util.convertMeta(item, brand.aws.key));
-                }
-            });
+        this.cos
+            .listObjectsV2(params)
+            .promise()
+            .then((data) => {
+                let files = []
+                data.marker = data.NextContinuationToken
+                data.Contents.forEach((item) => {
+                    if (parseInt(item.Size) !== 0) {
+                        files.push(util.convertMeta(item, brand.aws.key))
+                    }
+                })
 
-            data.items = files;
-            this.postResources(data, option);
-        }).catch((e)=>{
-            EventBus.$emit(Constants.Event.loading, {
-                show: false,
-                flag: 'getResources'
-            });
-            alert(e)
-        });
+                data.CommonPrefixes &&
+                    data.CommonPrefixes.forEach((item) => {
+                        files.push({
+                            key: item.Prefix.substring(0, item.Prefix.length - 1),
+                            type: Constants.FileType.folder,
+                            fsize: 0
+                        })
+                    })
+
+                data.items = files
+                this.postResources(data, option)
+            })
+            .catch((e) => {
+                EventBus.$emit(Constants.Event.loading, {
+                    show: false,
+                    flag: "getResources"
+                })
+                console.log(e)
+            })
     }
 
     /**
@@ -145,16 +154,15 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let params = {Bucket: this.name, Key: key, Expires: deadline};
-        let url = `${this.cos.endpoint.href}${this.name}/${key}`;
+        let params = { Bucket: this.name, Key: key, Expires: deadline }
+        let url = `${this.cos.endpoint.href}${this.name}/${key}`
 
         if (this.permission === 1) {
-            url = this.cos.getSignedUrl('getObject', params);
+            url = this.cos.getSignedUrl("getObject", params)
         }
 
-        return super.generateUrl(url);
+        return super.generateUrl(url)
     }
 }
 
-
-export default Bucket;
+export default Bucket

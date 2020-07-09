@@ -4,8 +4,10 @@ import Client from "ali-oss/lib/client"
 import brand from "./brand"
 
 class Bucket extends baseBucket {
-    constructor(name, cos) {
-        super(name, cos, brand.aliyun.key)
+    constructor(bucketInfo, cos) {
+        super(bucketInfo, cos, brand.aliyun.key)
+
+        this.cos.useBucket(this.name)
     }
 
     /**
@@ -16,13 +18,6 @@ class Bucket extends baseBucket {
     bindPage(vm) {
         this.vm = vm
         this.paging = this.vm.paging
-        this.vm.buckets_info.forEach((item) => {
-            if (item.name === this.name) {
-                this.location = item.location
-                this.cos.useBucket(this.name)
-                //setRegion
-            }
-        })
 
         this.getACL()
         // this.getDomains();
@@ -69,32 +64,14 @@ class Bucket extends baseBucket {
         callback && callback()
     }
 
-    getResources(option = {}) {
-        super.preResources()
+    async getResources(option = {}) {
+        await super.preResources()
         //delimiter
-        let params = {
-            "max-keys": this.limit
-        }
+        let params = {}
 
-        if (option.keyword) {
-            params.prefix = option.keyword
-        }
-
-        if (this.paging) {
-            // 仅返回指定目录下的文件
-            params.prefix && (params.prefix += Constants.DELIMITER)
-            params.delimiter = Constants.DELIMITER
-        }
-
-        if (this.marker) {
-            params.marker = this.marker
-        }
+        this._handleParams(params, option, { limit: "max-keys" })
 
         this.cos.list(params).then((data) => {
-            console.log(data)
-            if (!this.marker) {
-                this.files = []
-            }
             let files = []
             // TODO:空记录检测
             if (data.objects) {

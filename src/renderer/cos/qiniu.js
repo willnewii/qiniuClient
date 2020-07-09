@@ -6,9 +6,6 @@ import Request from '../api/API';
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
 
-//独立于各COS的配置
-const PROTOCOL = 'http://';
-
 const methods = {
     buckets: 'https://rs.qbox.me/buckets',                  //空间列表
     domains: 'https://api.qiniu.com/v6/domain/list',        //空间对应的域名列表(授权空间域名返回为空)
@@ -99,7 +96,6 @@ function fetch(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error, 'status': respBody.status};
         }
-        console.log(params, respErr, respBody);
         callback(respErr, respBody);
     });
 }
@@ -129,7 +125,6 @@ function upload(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }
-        console.log(respErr, respBody, respInfo);
         callback(respErr, respBody);
     });
 }
@@ -145,7 +140,6 @@ function rename(bucket, items, callback) {
         items = [items];
     }
 
-    //批量删除
     let operations = [];
     items.forEach((item) => {
         operations.push(qiniu.rs.moveOp(bucket, item.key, bucket, item._key));
@@ -165,7 +159,6 @@ function remove(bucket, items, callback) {
         items = [items];
     }
 
-    //批量删除
     let operations = [];
     items.forEach((item) => {
         operations.push(qiniu.rs.deleteOp(bucket, item.key));

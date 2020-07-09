@@ -6,12 +6,12 @@
                     <Icon @click="toggleMenu" class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
                     <span @click="showChangeAlias">{{menuState ? cos.name : ''}}</span>
                 </i-button>
-                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
+                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketInfo.name">
                     <Menu-group class="buckets-menu" title="存储空间">
                         <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name" :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="item.permission === 1 ? 'md-lock' : (bucketName === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
+                                      :type="item.permission === 1 ? 'md-lock' : (bucketInfo.name === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
                                 <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
@@ -39,7 +39,7 @@
             </div>
             <div class="layout-content">
                 <keep-alive exclude="setup-page">
-                    <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                    <router-view ref="bucketPage" :bucketInfo="bucketInfo"></router-view>
                 </keep-alive>
             </div>
         </div>
@@ -109,7 +109,7 @@
                 cos: {name: ''},
                 cosChoiceModel: false,
                 menuName: '',
-                bucketName: '',
+                bucketInfo: {},
                 menuState: true,            //menu是否折叠
                 appVersion: pkg.version,
                 version: {
@@ -282,12 +282,17 @@
                 switch (name) {
                     default:
                         this.menuName = name ;
-                        this.bucketName = name;
                         this[types.setup.a_recent]({
                             uuid: this.cos.uuid,
                             bucket: name
                         });
-                        this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        for (let i = 0; i < this.buckets_info.length; i++) {
+                            if (this.buckets_info[i].name === name){
+                                this.bucketInfo = this.buckets_info[i] ;
+                                break;
+                            }
+                        }
+                        this.$router.push({name: Constants.PageName.bucketPage, query: { bucketInfo: this.bucketInfo}});
                         break;
                     case Constants.Key.app_switch:
                         this.$nextTick(() => {
