@@ -69,9 +69,6 @@ class Bucket extends baseBucket {
         }
 
         this.cos.listDir(option.keyword || '/', params).then((data) => {
-            if (!this.marker) {
-                this.files = [];
-            }
             let files = [];
             data.files.forEach((item) => {
                 if (parseInt(item.Size) !== 0) {

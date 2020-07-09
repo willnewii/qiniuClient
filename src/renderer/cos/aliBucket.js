@@ -69,32 +69,14 @@ class Bucket extends baseBucket {
         callback && callback()
     }
 
-    getResources(option = {}) {
-        super.preResources()
+    async getResources(option = {}) {
+        await super.preResources()
         //delimiter
-        let params = {
-            "max-keys": this.limit
-        }
+        let params = {}
 
-        if (option.keyword) {
-            params.prefix = option.keyword
-        }
-
-        if (this.paging) {
-            // 仅返回指定目录下的文件
-            params.prefix && (params.prefix += Constants.DELIMITER)
-            params.delimiter = Constants.DELIMITER
-        }
-
-        if (this.marker) {
-            params.marker = this.marker
-        }
+        this._handleParams(params, option, { limit: "max-keys" })
 
         this.cos.list(params).then((data) => {
-            console.log(data)
-            if (!this.marker) {
-                this.files = []
-            }
             let files = []
             // TODO:空记录检测
             if (data.objects) {

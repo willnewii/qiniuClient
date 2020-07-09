@@ -2,8 +2,6 @@ const aliOSS = require("ali-oss")
 import AliBucket from "./aliBucket"
 
 let cos = null
-//独立于各COS的配置
-const PROTOCOL = "http://"
 
 function init(param) {
     cos = aliOSS({

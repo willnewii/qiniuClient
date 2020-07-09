@@ -7,7 +7,7 @@ import dayjs from "dayjs"
 
 class Bucket extends baseBucket {
     constructor(name, cos) {
-        super(name, cos, brand.qiniu.key);
+        super(name, cos, brand.qiniu.key)
     }
 
     /**
@@ -19,13 +19,13 @@ class Bucket extends baseBucket {
      */
     bindPage(vm) {
         this.vm = vm
+        this.paging = this.vm.paging
         this.getACL()
         this.getDomains()
         this.getTotal((info) => {
             if (info) {
-                this.space = info.space;
-                this.count = info.count;
-                this.paging = this.vm.paging
+                this.space = info.space
+                this.count = info.count
             }
             this.getResources()
         })
@@ -105,29 +105,15 @@ class Bucket extends baseBucket {
     }
 
     async getResources(option = {}) {
-        await super.preResources();
-        //重置多选数组
-        this.selection = []
+        await super.preResources()
 
-        let param = {
-            bucket: this.name,
-            limit: this.limit
+        let params = {
+            bucket: this.name
         }
 
-        if (option.keyword) {
-            param.prefix = option.keyword
-        }
+        this._handleParams(params, option)
 
-        if (this.paging) {// 仅返回指定目录下的文件
-            param.prefix && (param.prefix += Constants.DELIMITER)
-            param.delimiter = Constants.DELIMITER
-        }
-
-        if (this.marker) {
-            param.marker = this.marker
-        }
-
-        qiniu.list(param, async (respErr, respBody, respInfo) => {
+        qiniu.list(params, async (respErr, respBody, respInfo) => {
             if (respErr) {
                 console.error(respErr)
                 return
@@ -136,19 +122,20 @@ class Bucket extends baseBucket {
                 respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key)
             })
             //commonPrefixes 文件夹
-            respInfo.data.commonPrefixes && respInfo.data.commonPrefixes.forEach((item) => {
-                respInfo.data.items.push({
-                    key: item.substring(0, item.length - 1),
-                    type: Constants.FileType.folder,
-                    fsize: 0,
-                });
-            });
+            respInfo.data.commonPrefixes &&
+                respInfo.data.commonPrefixes.forEach((item) => {
+                    respInfo.data.items.push({
+                        key: item.substring(0, item.length - 1),
+                        type: Constants.FileType.folder,
+                        fsize: 0
+                    })
+                })
 
-            await this.postResources(respInfo.data, option);
-        });
+            await this.postResources(respInfo.data, option)
+        })
     }
 
-    createFile(_param, type, callback) {
+    createFile(_param, type = Constants.UploadType.UPLOAD, callback) {
         let param = {
             bucket: this.name
         }

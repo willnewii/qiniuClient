@@ -67,7 +67,7 @@ class Bucket extends baseBucket {
         })
     }
 
-    createFile(_param, type, callback) {
+    createFile(_param, type = Constants.UploadType.UPLOAD, callback) {
         if (type === Constants.UploadType.FETCH) {
             tencent.fetch({ ..._param, ...this.param }, callback)
         } else if (type === Constants.UploadType.UPLOAD) {
@@ -101,33 +101,23 @@ class Bucket extends baseBucket {
         })
     }
 
-    getResources(option = {}) {
-        super.preResources()
+    async getResources(option = {}) {
+        await super.preResources()
         let params = {
-            ...this.param,
-            MaxKeys: this.limit
+            ...this.param
         }
 
-        if (option.keyword) {
-            params.Prefix = option.keyword
-        }
-
-        if (this.paging) {
-            params.Prefix && (params.Prefix += Constants.DELIMITER)
-            params.Delimiter = Constants.DELIMITER
-        }
-
-        if (this.marker) {
-            params.Marker = this.marker
-        }
+        this._handleParams(params, option, {
+            prefix: "Prefix",
+            delimiter: "Delimiter",
+            marker: "Marker",
+            limit: "MaxKeys"
+        })
 
         this.cos.getBucket(params, (err, data) => {
             if (err) {
                 console.error(err)
             } else {
-                if (!this.marker) {
-                    this.files = []
-                }
                 let files = []
                 data.marker = data.NextMarker
                 data.Contents.forEach((item) => {
@@ -136,15 +126,14 @@ class Bucket extends baseBucket {
                     }
                 })
                 //commonPrefixes 文件夹
-                data.CommonPrefixes && data.CommonPrefixes.forEach((item) => {
-                    files.push({
-                        key: item.Prefix.substring(0, item.Prefix.length - 1),
-                        // key: item.Prefix,
-                        type: Constants.FileType.folder,
-                        fsize: 0,
-                    });
-                });
-                console.log(files);
+                data.CommonPrefixes &&
+                    data.CommonPrefixes.forEach((item) => {
+                        files.push({
+                            key: item.Prefix.substring(0, item.Prefix.length - 1),
+                            type: Constants.FileType.folder,
+                            fsize: 0
+                        })
+                    })
 
                 data.items = files
                 this.postResources(data, option)
