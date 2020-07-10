@@ -114,7 +114,6 @@ class Bucket extends baseBucket {
                 console.error(err)
             } else {
                 let files = []
-                data.marker = data.NextMarker
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
                         files.push(util.convertMeta(item, brand.tencent.key))
@@ -123,15 +122,16 @@ class Bucket extends baseBucket {
                 //commonPrefixes 文件夹
                 data.CommonPrefixes &&
                     data.CommonPrefixes.forEach((item) => {
-                        files.push({
-                            key: item.Prefix.substring(0, item.Prefix.length - 1),
-                            type: Constants.FileType.folder,
-                            fsize: 0
-                        })
+                        files.push(this._getFolder(item.Prefix))
                     })
 
-                data.items = files
-                this.postResources(data, option)
+                this.postResources(
+                    {
+                        items: files,
+                        marker: data.NextMarker
+                    },
+                    option
+                )
             }
         })
     }

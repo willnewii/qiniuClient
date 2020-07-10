@@ -68,7 +68,7 @@ class Bucket extends baseBucket {
 
         this.cos
             .listDir(option.keyword || "/", params)
-            .then((data) => {
+            .then(async (data) => {
                 let files = []
                 data.files.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
@@ -79,7 +79,7 @@ class Bucket extends baseBucket {
 
                 data.items = files
                 data.marker = files.length > 0 ? data.next : ""
-                this.postResources(data, option)
+                await this.postResources(data, option)
             })
             .catch((error) => {
                 console.dir(error)

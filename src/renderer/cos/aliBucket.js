@@ -1,4 +1,4 @@
-import { Constants, util } from "../service/index"
+import { util } from "../service/index"
 import baseBucket from "./baseBucket"
 import Client from "ali-oss/lib/client"
 import brand from "./brand"
@@ -84,11 +84,7 @@ class Bucket extends baseBucket {
 
             data.prefixes &&
                 data.prefixes.forEach((item) => {
-                    files.push({
-                        key: item.substring(0, item.length - 1),
-                        type: Constants.FileType.folder,
-                        fsize: 0
-                    })
+                    files.push(this._getFolder(item))
                 })
 
             this.postResources(

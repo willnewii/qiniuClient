@@ -1,10 +1,7 @@
-function get(key) {}
-
-function set(key, params) {}
-
-if (process.env.npm_package_name) {
+let get, set
+if (typeof window !== "undefined") {
     const storage = require("electron-json-storage")
-    get = function get(key) {
+    get = function (key) {
         return new Promise(function (resolve, reject) {
             storage.get(key, function (error, data) {
                 if (error) return reject(error)
@@ -13,7 +10,7 @@ if (process.env.npm_package_name) {
         })
     }
 
-    set = function set(key, params) {
+    set = function (key, params) {
         return new Promise(function (resolve, reject) {
             storage.set(key, params, function (error) {
                 if (error) return reject(error)
@@ -21,6 +18,9 @@ if (process.env.npm_package_name) {
             })
         })
     }
+} else {
+    get = () => {}
+    set = () => {}
 }
 
 export { get, set }

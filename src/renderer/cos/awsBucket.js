@@ -1,4 +1,4 @@
-import { Constants, EventBus, util } from "../service/index"
+import { util } from "../service/index"
 import baseBucket from "./baseBucket"
 import brand from "./brand"
 
@@ -103,7 +103,7 @@ class Bucket extends baseBucket {
         await super.preResources()
         //delimiter
         let params = {
-            Bucket: this.name,
+            Bucket: this.name
         }
 
         this._handleParams(params, option, {
@@ -118,7 +118,6 @@ class Bucket extends baseBucket {
             .promise()
             .then((data) => {
                 let files = []
-                data.marker = data.NextContinuationToken
                 data.Contents.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
                         files.push(util.convertMeta(item, brand.aws.key))
@@ -127,22 +126,19 @@ class Bucket extends baseBucket {
 
                 data.CommonPrefixes &&
                     data.CommonPrefixes.forEach((item) => {
-                        files.push({
-                            key: item.Prefix.substring(0, item.Prefix.length - 1),
-                            type: Constants.FileType.folder,
-                            fsize: 0
-                        })
+                        files.push(this._getFolder(item.Prefix))
                     })
 
-                data.items = files
-                this.postResources(data, option)
+                this.postResources(
+                    {
+                        items: files,
+                        marker: data.NextContinuationToken
+                    },
+                    option
+                )
             })
             .catch((e) => {
-                EventBus.$emit(Constants.Event.loading, {
-                    show: false,
-                    flag: "getResources"
-                })
-                console.log(e)
+                console.error(e)
             })
     }
 

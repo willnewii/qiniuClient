@@ -1,8 +1,7 @@
-import * as Constants from "../service/constants"
 import brand from "./brand"
 
 const fs = require("fs")
-import { util } from "../service/index"
+import { Constants, util } from "../service/index"
 import baseBucket from "./baseBucket"
 import qing from "./qing"
 
@@ -98,22 +97,23 @@ class Bucket extends baseBucket {
             .Bucket(this.name, this.location)
             .listObjects(params)
             .then((data) => {
-                data.items = data.keys.map((item) => {
+                let files = data.keys.map((item) => {
                     return util.convertMeta(item, brand.qingstor.key)
                 })
 
                 //commonPrefixes 文件夹
                 data.common_prefixes &&
                     data.common_prefixes.forEach((item) => {
-                        data.items.push({
-                            key: item.substring(0, item.length - 1),
-                            type: Constants.FileType.folder,
-                            fsize: 0
-                        })
+                        files.push(this._getFolder(item))
                     })
 
-                data.marker = data.has_more ? data.next_marker : ""
-                this.postResources(data, option)
+                this.postResources(
+                    {
+                        items: files,
+                        marker: data.has_more ? data.next_marker : ""
+                    },
+                    option
+                )
             })
     }
 

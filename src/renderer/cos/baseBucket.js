@@ -9,6 +9,7 @@ const limitPageSize = 1000
 let loadState = -1 // 1：同步中(不显示loading,只显示左下角的sync...) 2：加载中
 let message = null
 let tempFiles = []
+const isBrowser = typeof window !== "undefined"
 
 class baseBucket {
     constructor(bucketInfo, cos, key) {
@@ -22,7 +23,7 @@ class baseBucket {
         loadState = -1
         message = null
 
-        if (typeof window !== "undefined" && (this.key === brand.qiniu.key || this.key === brand.tencent.key)) {
+        if (isBrowser && (this.key === brand.qiniu.key || this.key === brand.tencent.key)) {
             indexedDBHelper.openDatabase(this.key, [this.name]).then((db) => {
                 window.cosDB = db
             })
@@ -30,7 +31,7 @@ class baseBucket {
     }
 
     init() {
-        if (typeof window !== "undefined" && window.cosDB) {
+        if (isBrowser && window.cosDB) {
             window.cosDB.close()
             window.cosDB = null
         }
@@ -127,7 +128,7 @@ class baseBucket {
         //重置多选数组
         this.selection = []
 
-        if (loadState === -1 && typeof window !== "undefined" && window.cosDB) {
+        if (loadState === -1 && isBrowser && window.cosDB) {
             this.files = Object.freeze(await indexedDBHelper.getRecords(cosDB, this.name))
             console.log("indexedDB 数据读取")
             if (this.files.length > 0) {
@@ -186,7 +187,7 @@ class baseBucket {
             if (this.paging) {
                 this.files = this.files.concat(Object.freeze(tempFiles))
             } else {
-                if (loadState === 1 && typeof window !== "undefined" && window.cosDB) {
+                if (isBrowser && window.cosDB) {
                     await indexedDBHelper.clearRecord(cosDB, this.name)
                     await indexedDBHelper.addRecord(cosDB, this.name, tempFiles, true)
                     EventBus.$emit(Constants.Event.syncing, false)
@@ -198,37 +199,6 @@ class baseBucket {
             loadState = -1
             option.success && option.success()
         }
-
-        /*if (this.paging) {
-            EventBus.$emit(Constants.Event.loading, {
-                show: false,
-                flag: "getResources"
-            })
-
-            this.files = this.files.concat(Object.freeze(tempFiles))
-            tempFiles = []
-            loadState = -1
-            option.success && option.success();
-        } else if (this.marker) {
-
-        } else {
-            EventBus.$emit(Constants.Event.loading, {
-                show: false,
-                flag: "getResources"
-            })
-
-            if (loadState === 1 && typeof window !== "undefined" && window.cosDB) {
-                await indexedDBHelper.clearRecord(cosDB, this.name)
-                await indexedDBHelper.addRecord(cosDB, this.name, tempFiles, true)
-                EventBus.$emit(Constants.Event.syncing, false)
-                console.log("indexedDB 数据替换")
-            }
-
-            this.files = Object.freeze(tempFiles)
-            tempFiles = []
-            loadState = -1
-            option.success && option.success();
-        }*/
     }
 
     /**
@@ -270,6 +240,14 @@ class baseBucket {
                     await indexedDBHelper.deleteRecord(cosDB, this.name, items[i])
                 }
                 break
+        }
+    }
+
+    _getFolder(name) {
+        return {
+            key: name.substring(0, name.length - 1),
+            type: Constants.FileType.folder,
+            fsize: 0
         }
     }
 }

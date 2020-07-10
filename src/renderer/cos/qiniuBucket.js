@@ -118,20 +118,19 @@ class Bucket extends baseBucket {
                 console.error(respErr)
                 return
             }
-            respInfo.data.items.forEach((item, index) => {
-                respInfo.data.items[index] = util.convertMeta(item, brand.qiniu.key)
+            let files = respInfo.data.items.map((item, index) => {
+                return util.convertMeta(item, brand.qiniu.key)
             })
             //commonPrefixes 文件夹
             respInfo.data.commonPrefixes &&
                 respInfo.data.commonPrefixes.forEach((item) => {
-                    respInfo.data.items.push({
-                        key: item.substring(0, item.length - 1),
-                        type: Constants.FileType.folder,
-                        fsize: 0
-                    })
+                    files.push(this._getFolder(item))
                 })
 
-            await this.postResources(respInfo.data, option)
+            await this.postResources({
+                items: files,
+                marker: respInfo.data.marker
+            }, option)
         })
     }
 
