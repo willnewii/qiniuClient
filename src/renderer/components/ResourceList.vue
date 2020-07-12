@@ -221,7 +221,7 @@ export default {
             this.fileFilter(option)
         })
         EventBus.$on(Constants.Event.refreshFiles, (action) => {
-            if (this.$storage.key === brand.upyun.key) {
+            if (this.$storage.info.key === brand.upyun.key) {
                 this.bucket.getResources({ keyword: this.bucket.folderPath, refresh: true })
             } else {
                 this.bucket.getResources()

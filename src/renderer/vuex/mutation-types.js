@@ -38,12 +38,8 @@ export const setup = {
     showType: 'showType',
     a_showType: 'a_showType',
 
-    savedir: 'savedir',
-    a_savedir: 'a_savedir',
-
-    brand: 'brand',
-    bucket_name: 'bucket_name',
-    bucket_dir: 'bucket_dir',
+    tray: 'tray',
+    a_tray: 'a_tray',
 
     customedomain: 'customedomain',
     a_customedomain: 'a_customedomain',

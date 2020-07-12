@@ -61,25 +61,25 @@
         </Row>
 
         <Divider orientation="left"
-            >托盘设置<span class="title-tips" v-if="setup_bucket_name"
-                >(文件将会被上传至{{ brands[brand] && brands[brand].name }}：{{ setup_bucket_name }}/{{
-                    setup_bucket_dir ? setup_bucket_dir + "/" : ""
-                }}目录下)</span
+            >托盘设置<span class="title-tips" v-if="setup_tray"
+                >(文件将会被上传至{{ brands[setup_tray.brand] && brands[setup_tray.brand].name }}：{{
+                    setup_tray.bucket_name
+                }}/{{ setup_tray.bucket_dir ? setup_tray.bucket_dir + "/" : "" }}目录下)</span
             ></Divider
         >
         <div class="item">
             <Row class="row-line">
                 <Col span="12">
-                    <Select v-model="bucketname" size="small" style="width: 30%;" placeholder="空间名称">
+                    <Select v-model="tray.bucket_name" size="small" style="width: 30%;" placeholder="空间名称">
                         <Option v-for="item in buckets_info" :value="item.name" :key="item.name"
                             >{{ item.name }}
                         </Option>
                     </Select>
                     /
-                    <Input v-model="bucketdir" size="small" style="width: 66%;" placeholder="路径" />
+                    <Input v-model="tray.bucket_dir" size="small" style="width: 66%;" placeholder="路径" />
                 </Col>
                 <Col span="10" offset="1">
-                    <Button @click="saveDir" size="small" class="save-btn">保存</Button>
+                    <Button @click="saveTray" size="small" class="save-btn">保存</Button>
                 </Col>
             </Row>
         </div>
@@ -132,9 +132,7 @@ export default {
     data() {
         return {
             rowSpan: 8,
-            brand: "",
-            bucketname: "",
-            bucketdir: "",
+            tray: {},
             imagestyle: "",
             downloaddir: "",
             deadline: 0,
@@ -154,9 +152,7 @@ export default {
             setup_paging: types.setup.paging,
             setup_uploadNoAsk: types.setup.uploadNoAsk,
             setup_isOverwrite: types.setup.isOverwrite,
-            setup_brand: types.setup.brand,
-            setup_bucket_name: types.setup.bucket_name,
-            setup_bucket_dir: types.setup.bucket_dir,
+            setup_tray: types.setup.tray,
             setup_imagestyle: types.setup.imagestyle,
             setup_downloaddir: types.setup.downloaddir,
             setup_privatebucket: types.setup.privatebucket,
@@ -166,9 +162,7 @@ export default {
     },
     components: {},
     created: function () {
-        this.brand = this.setup_brand
-        this.bucketname = this.setup_bucket_name
-        this.bucketdir = this.setup_bucket_dir
+        this.tray = JSON.parse(JSON.stringify(this.setup_tray))
         this.imagestyle = this.setup_imagestyle
         this.downloaddir = this.setup_downloaddir
         this.privates = this.setup_privatebucket
@@ -189,7 +183,7 @@ export default {
             types.setup.a_paging,
             types.setup.a_deleteNoAsk,
             types.setup.a_uploadNoAsk,
-            types.setup.a_savedir,
+            types.setup.a_tray,
             types.setup.a_imagestyle,
             types.setup.a_downloaddir,
             types.setup.a_privatebucket,
@@ -199,14 +193,11 @@ export default {
         ]),
         pagingChange: function (state) {
             this[types.setup.a_paging](state)
-        },
-        showMenuBarChange: function (state) {
-            this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, state)
-            this[types.setup.a_showMenuBar](state)
+            this.$storage.cos.paging = state
         },
         httpsChange: function (state) {
             this[types.setup.a_https](state)
-            this.$Message.success("请重启应用")
+            this.$storage.cos.https = state
         },
         deleteNoAskChange: function (state) {
             this[types.setup.a_deleteNoAsk](state)
@@ -232,13 +223,17 @@ export default {
             EventBus.$emit(Constants.Event.changeTheme, item)
             this[types.setup.a_theme](item)
         },
-        saveDir: function () {
+        saveTray: function () {
             this.$electron.ipcRenderer.send(Constants.Listener.setBrand, {
-                key: this.$storage.key
+                key: this.$storage.info.key
             })
-            this.brand = this.$storage.key
-            this[types.setup.a_savedir]([this.bucketname, this.bucketdir, this.$storage.key])
-            this.$Message.success("托盘保存路径修改成功")
+            this[types.setup.a_tray]({
+                uuid: this.$storage.info.uuid,
+                brand: this.$storage.info.key,
+                bucket_name: this.tray.bucket_name,
+                bucket_dir: this.tray.bucket_dir
+            })
+            this.$Message.success("托盘设置修改成功，重启应用后生效")
         },
         saveImagestyle: function () {
             this[types.setup.a_imagestyle](this.imagestyle)
@@ -274,6 +269,10 @@ export default {
                     break
             }
             this.$electron.shell.openExternal(url)
+        },
+        showMenuBarChange: function (state) {
+            this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, state)
+            this[types.setup.a_showMenuBar](state)
         }
     }
 }

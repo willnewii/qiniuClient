@@ -42,8 +42,8 @@ function generateUrl(domain, key, deadline, request) {
     return url
 }
 
-function generateBucket(name) {
-    return new QingBucket(name, cos)
+function generateBucket(bucketInfo) {
+    return new QingBucket(bucketInfo, cos)
 }
 
 export default { init, getBuckets, generateBucket, generateUrl }

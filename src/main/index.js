@@ -52,7 +52,7 @@ function initApp() {
     //创建主窗口
     createMainWindow();
     //托盘处理
-    // util.isMac() && trayUtil.createTray(mainWindow.id);
+    util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
 
@@ -79,7 +79,7 @@ function createMainWindow() {
 
     if (util.isWin()){
         options.icon = util.getIconPath('icon.ico')
-        options.frame = false 
+        options.frame = false
     } else if (util.isMac()){
         options.icon =  util.getIconPath('icon.png')
         options.titleBarStyle = 'hidden'
@@ -189,7 +189,7 @@ const registerIPC = function () {
     });
 
     ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
-        trayUtil.setTrayIcon('tray_' + arg.key + '.png');
+        trayUtil.setTrayIcon('tray.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {

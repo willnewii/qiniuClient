@@ -8,8 +8,10 @@ import qing from "./qing"
 const mime = require("mime-types")
 
 class Bucket extends baseBucket {
-    constructor(name, cos) {
-        super(name, cos, brand.qingstor.key)
+    constructor(bucketInfo, cos) {
+        super(bucketInfo, cos, brand.qingstor.key)
+
+        this.bucket = this.cos.Bucket(this.name, this.location)
     }
 
     /**
@@ -22,8 +24,7 @@ class Bucket extends baseBucket {
         this.paging = this.vm.paging
         this.vm.buckets_info.forEach((item) => {
             if (item.name === this.name) {
-                this.location = item.location
-                this.bucket = this.cos.Bucket(this.name, this.location)
+
             }
         })
 
