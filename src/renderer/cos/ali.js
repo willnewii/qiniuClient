@@ -1,32 +1,30 @@
-const aliOSS = require('ali-oss');
-import AliBucket from "./aliBucket";
+const aliOSS = require("ali-oss")
+import AliBucket from "./aliBucket"
 
-
-let cos = null;
-//独立于各COS的配置
-const PROTOCOL = 'http://';
+let cos = null
 
 function init(param) {
     cos = aliOSS({
         accessKeyId: param.access_key,
         accessKeySecret: param.secret_key,
-        internal:param.internal // 是否支持内网访问
-    });
+        internal: param.internal // 是否支持内网访问
+    })
 }
 
 function getBuckets(callback) {
-    cos.listBuckets().then((data) => {
-        callback && callback(null, {datas: data.buckets});
-    }).catch((error) => {
-        callback && callback(error);
-    });
+    cos.listBuckets()
+        .then((data) => {
+            callback && callback(null, data.buckets)
+        })
+        .catch((error) => {
+            callback && callback(error)
+        })
 }
 
-function generateUrl(domain, key, deadline) {
+function generateUrl(domain, key, deadline) {}
+
+function generateBucket(bucketInfo) {
+    return new AliBucket(bucketInfo, cos)
 }
 
-function generateBucket(name) {
-    return new AliBucket(name, cos);
-}
-
-export {init, getBuckets, generateBucket, generateUrl};
+export default { init, getBuckets, generateBucket, generateUrl }

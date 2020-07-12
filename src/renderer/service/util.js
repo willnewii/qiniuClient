@@ -1,5 +1,5 @@
 import * as Constants from '../service/constants';
-import brand from '@/cos/brand';
+import brand from '../cos/brand';
 import pkg from '../../../package';
 import dayjs from 'dayjs';
 

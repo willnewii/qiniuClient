@@ -6,12 +6,12 @@
                     <Icon @click="toggleMenu" class="icon iconfont" :class="'icon-' + cos.key" size="20"></Icon>
                     <span @click="showChangeAlias">{{menuState ? cos.name : ''}}</span>
                 </i-button>
-                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketName">
+                <Menu ref="menu" width="auto" @on-select="onMenuSelect" :active-name="bucketInfo.name">
                     <Menu-group class="buckets-menu" title="存储空间">
                         <Menu-item v-for="(item,index) of buckets_info" :key="index" :name="item.name" :index="index">
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
-                                      :type="item.permission === 1 ? 'md-lock' : (bucketName === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
+                                      :type="item.permission === 1 ? 'md-lock' : (bucketInfo.name === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
                                 <span class="layout-text">{{item.name}}</span>
                             </template>
                             <template v-else>
@@ -27,7 +27,10 @@
                     </Menu-group>
                 </Menu>
                 <div class="version">
-                    <span @click="openBrowser(version.github)">v{{appVersion}}</span>
+                    <template v-if="isSyncing">
+                        <Spin size="small"></Spin><span style="margin-left: 5px">同步中...</span>
+                    </template>
+                    <span v-else @click="openBrowser(version.github)">v{{appVersion}}</span>
                     <Poptip trigger="hover" v-if="version.url" placement="top-start" :title="version.version">
                         <pre slot="content" class="version-new-info">{{version.info}}</pre>
                         <span class="version-new" @click="openBrowser(version.url)">有新版啦~</span>
@@ -36,7 +39,7 @@
             </div>
             <div class="layout-content">
                 <keep-alive exclude="setup-page">
-                    <router-view ref="bucketPage" :bucketName="bucketName"></router-view>
+                    <router-view ref="bucketPage" :bucketInfo="bucketInfo"></router-view>
                 </keep-alive>
             </div>
         </div>
@@ -106,7 +109,7 @@
                 cos: {name: ''},
                 cosChoiceModel: false,
                 menuName: '',
-                bucketName: '',
+                bucketInfo: {},
                 menuState: true,            //menu是否折叠
                 appVersion: pkg.version,
                 version: {
@@ -123,13 +126,9 @@
                     name: Constants.Key.app_setup,
                     icon: 'md-cog',
                     title: '设置'
-                }, {
-                    name: Constants.Key.app_logout,
-                    icon: 'md-exit',
-                    title: '注销'
                 }],
                 loading: {
-                    show: true,
+                    show: false,
                     message: '',
                     flag: '' //可以用作统计计时的标记
                 },
@@ -142,7 +141,8 @@
                 },
                 changeAliasDialog: {
                     show: false
-                }
+                },
+                isSyncing: false,
                 // contextBucketMenuIndex: 0
             };
         },
@@ -171,8 +171,12 @@
                     console.timeEnd(option.flag);
                 }*/
             });
+            EventBus.$on(Constants.Event.syncing, (option) => {
+                this.isSyncing = option;
+            });
             this.$once('hook:beforeDestroy', function () {
                 EventBus.$off(Constants.Event.loading);
+                EventBus.$off(Constants.Event.syncing);
                 EventBus.$off(Constants.Event.dropView);
             });
 
@@ -231,7 +235,7 @@
                 });
             },
             getBuckets() {
-                this.$storage.getBuckets((error, data) => {
+                this.$storage.getBuckets((error, result) => {
                     if (error) {
                         util.notification({
                             body: `获取buckets信息失败. 请确认${this.$storage.name}密钥信息是否正确,且已创建至少一个存储空间`
@@ -240,13 +244,13 @@
                     } else {
                         let defaultIndex = 0;
 
-                        data.datas.forEach((item, index) => {
+                        result.forEach((item, index) => {
                             item.permission = 0;
                             if (this.recent.bucket === item.name) {
                                 defaultIndex = index;
                             }
                         });
-                        this[types.app.a_buckets_info](data.datas);
+                        this[types.app.a_buckets_info](result);
 
                         this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name);
                         this.$nextTick(() => {// COS切换后,menu没有active样式,手动调用一下
@@ -278,12 +282,17 @@
                 switch (name) {
                     default:
                         this.menuName = name ;
-                        this.bucketName = name;
                         this[types.setup.a_recent]({
                             uuid: this.cos.uuid,
                             bucket: name
                         });
-                        this.$router.push({name: Constants.PageName.bucketPage, query: {bucketName: name}});
+                        for (let i = 0; i < this.buckets_info.length; i++) {
+                            if (this.buckets_info[i].name === name){
+                                this.bucketInfo = this.buckets_info[i] ;
+                                break;
+                            }
+                        }
+                        this.$router.push({name: Constants.PageName.bucketPage, query: { bucketInfo: this.bucketInfo}});
                         break;
                     case Constants.Key.app_switch:
                         this.$nextTick(() => {
@@ -384,7 +393,9 @@
 
                 .version {
                     padding: 10px 20px;
-                    /*color: #c5c5c5;*/
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
                     &-new {
                         color: #ff3605;
                         cursor: pointer;

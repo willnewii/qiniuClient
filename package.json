@@ -1,7 +1,7 @@
 {
     "name": "cloudbrowser",
     "cnname": "云存储客户端",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "description": "云存储客户端",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
