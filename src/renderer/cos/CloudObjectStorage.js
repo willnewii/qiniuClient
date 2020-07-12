@@ -5,10 +5,6 @@ const uuid = require("uuid/v1")
 import qiniu from "../cos/qiniu"
 import tencent from "../cos/tencent"
 import ali from "../cos/ali"
-/* import qing from "../cos/qing"
-import upyun from "../cos/upyun"
-import aws from "../cos/aws"
-import jd from "../cos/jd" */
 
 import brand from "../cos/brand"
 
@@ -38,34 +34,11 @@ export default class CloudObjectStorage {
                 this.cos = qiniu
                 break
             case brand.tencent.key:
-<<<<<<< HEAD
-                this.cos = tencent;
-                break;
-            case brand.aliyun.key:
-                this.cos = ali;
-                break;
-=======
                 this.cos = tencent
-                break
-            case brand.qingstor.key:
-                this.cos = qing
                 break
             case brand.aliyun.key:
                 this.cos = ali
                 break
-            case brand.upyun.key:
-                this.cos = upyun
-                break
-            case brand.aws.key:
-                this.cos = aws
-                break
-            case brand.jd.key:
-                this.cos = jd
-                break
-            case brand.minio.key:
-                this.cos = aws
-                break
->>>>>>> 腾讯url上传_移动文件
         }
     }
 

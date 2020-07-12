@@ -58,8 +58,8 @@
                     <Icon type="ios-trash-outline" size="20" @click.stop="removeCOS(item)" />
                 </div>
             </TabPane>
-            <TabPane v-for="(item) in brands" v-if="item.show" :key="item.key" :name="item.key" :label="item.name">
-                <h3 class="title">设置{{item.name}}密钥</h3>
+            <TabPane v-for="item in brands" v-if="item.show" :key="item.key" :name="item.key" :label="item.name">
+                <h3 class="title">设置{{ item.name }}密钥</h3>
                 <Form :model="formItem" :ref="item.key" :rules="ruleItem" :label-width="150">
                     <template>
                         <Form-item label="别名" prop="name">
@@ -79,7 +79,6 @@
                             <Button @click="handleReset(item.key)" style="margin-left: 8px;">重置</Button>
                         </div>
                     </Form-item>
-                   
                 </Form>
             </TabPane>
         </Tabs>
@@ -92,35 +91,55 @@ import brand from "@/cos/brand"
 import Regions from "@/cos/Regions"
 import * as types from "@/vuex/mutation-types"
 
-    export default {
-        mixins: [mixins.base],
-        data() {
-            return {
-                selectBrand: brand.qiniu,
-                formItem: {
-                    service_name: '',
-                    access_key: '',
-                    secret_key: '',
-                    region: '',
-                    endpoint: '',
-                    internal: false,
-                    name: '',
-                },
-                ruleItem: {
-                    access_key: [{required: true, message: 'access_key不能为空', trigger: 'blur'}],
-                    secret_key: [{required: true, message: 'secret_key不能为空', trigger: 'blur'}],
-                    region: [{required: true, message: 'region不能为空', trigger: 'blur'}],
-                    service_name: [{required: true, message: 'service_name不能为空', trigger: 'blur'}]
-                },
-                brands:brand,
-                coses: [],
-                regions: [],
-            };
+export default {
+    mixins: [mixins.base],
+    data() {
+        return {
+            selectBrand: brand.qiniu,
+            formItem: {
+                service_name: "",
+                access_key: "",
+                secret_key: "",
+                region: "",
+                endpoint: "",
+                internal: false,
+                name: ""
+            },
+            ruleItem: {
+                access_key: [{ required: true, message: "access_key不能为空", trigger: "blur" }],
+                secret_key: [{ required: true, message: "secret_key不能为空", trigger: "blur" }],
+                region: [{ required: true, message: "region不能为空", trigger: "blur" }],
+                service_name: [{ required: true, message: "service_name不能为空", trigger: "blur" }]
+            },
+            brands: brand,
+            coses: [],
+            regions: []
+        }
+    },
+    handleSubmit(key) {
+        if (key !== brand.upyun.key) {
+            this.formItem.service_name = "-"
+        }
+        this.$refs[key][0].validate((valid) => {
+            if (valid) {
+                this.validateKey()
+            } else {
+                console.log("表单不能提交")
+            }
+        })
+    },
+    handleReset() {
+        this.formItem = this.$options.data().formItem
+        this.formItem.name = this.selectBrand.name
+    },
+    methods: {
+        onTabClick(key) {
+            if (key !== "已登录") {
+                this.selectBrand = this.brands[key]
+                this.handleReset()
+            }
         },
         handleSubmit(key) {
-            if (key !== brand.upyun.key) {
-                this.formItem.service_name = "-"
-            }
             this.$refs[key][0].validate((valid) => {
                 if (valid) {
                     this.validateKey()
@@ -133,29 +152,9 @@ import * as types from "@/vuex/mutation-types"
             this.formItem = this.$options.data().formItem
             this.formItem.name = this.selectBrand.name
         },
-        methods: {
-            onTabClick(key) {
-                if (key !== '已登录') {
-                    this.selectBrand = this.brands[key];
-                    this.handleReset();
-                }
-              
-            },
-            handleSubmit(key) {
-                this.$refs[key][0].validate((valid) => {
-                    if (valid) {
-                        this.validateKey();
-                    } else {
-                        console.log('表单不能提交');
-                    }
-                });
-            },
-            handleReset() {
-                this.formItem = this.$options.data().formItem;
-                this.formItem.name = this.selectBrand.name;
-            },
-            validateKey() {
-                let item = Object.assign({
+        validateKey() {
+            let item = Object.assign(
+                {
                     key: this.selectBrand.key
                 },
                 this.formItem
