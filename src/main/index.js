@@ -10,7 +10,7 @@ const fs = require('fs-extra');
 const {download} = require('electron-dl');
 
 import pkg from '../../package';
-import * as util from './util';
+import * as util from './util/util';
 import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
 import * as diffFolder from './util/diffFolder';
@@ -52,7 +52,7 @@ function initApp() {
     //创建主窗口
     createMainWindow();
     //托盘处理
-    // util.isMac() && trayUtil.createTray(mainWindow.id);
+    util.isMac() && trayUtil.createTray(mainWindow.id);
 
     registerIPC();
 
@@ -79,7 +79,7 @@ function createMainWindow() {
 
     if (util.isWin()){
         options.icon = util.getIconPath('icon.ico')
-        options.frame = false 
+        options.frame = false
     } else if (util.isMac()){
         options.icon =  util.getIconPath('icon.png')
         options.titleBarStyle = 'hidden'
@@ -186,10 +186,6 @@ const registerIPC = function () {
     //预览文件
     ipcMain.on(Constants.Listener.preview, function (event, arg) {
         mainWindow.previewFile(arg);
-    });
-
-    ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
-        trayUtil.setTrayIcon('tray_' + arg.key + '.png');
     });
 
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
@@ -330,7 +326,7 @@ const getMenuData = function () {
                     }
                 },
                 {
-                    label: '提交异常或需求',
+                    label: 'issues',
                     click() {
                         shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
                     }
@@ -345,7 +341,7 @@ const getMenuData = function () {
             if (aboutWindow) {
                 aboutWindow.show();
             } else {
-                aboutWindow = new BrowserWindow({
+                let options = {
                     width: 300,
                     height: 300,
                     resizable: false,
@@ -357,7 +353,14 @@ const getMenuData = function () {
                         backgroundThrottling: false,
                         nodeIntegration: true
                     }
-                });
+                }
+                if (util.isWin()){
+                    options.frame = false
+                } else if (util.isMac()){
+                    options.titleBarStyle = 'hidden'
+                }
+
+                aboutWindow = new BrowserWindow(options);
                 aboutWindow.loadURL(util.mainURL + '#/about');
                 aboutWindow.on('closed', () => {
                     aboutWindow = null;

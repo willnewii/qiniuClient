@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const klaw = require('klaw-sync');
 const log4js = require('log4js');
-const util = require('../util.js');
+const util = require('./util.js');
 
 import * as Constants from '../../renderer/service/constants';
 

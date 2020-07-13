@@ -6,7 +6,7 @@
 </template>
 
 <script>
-    import {Constants, util, EventBus} from '@/service';
+    import {Constants, EventBus} from '@/service';
     import {mapGetters, mapActions} from 'vuex';
     import * as types from '@/vuex/mutation-types';
     const customTitlebar = require('custom-electron-titlebar');
@@ -22,7 +22,6 @@
         computed: {
             ...mapGetters({
                 setup_theme: types.setup.theme,
-                setup_showMenuBar: types.setup.showMenuBar,
             }),
         },
         created: async function () {
@@ -34,7 +33,7 @@
             EventBus.$on(Constants.Event.changeTheme, (theme) => {
                 this.doChangeTheme(theme)
             });
-            await this[types.setup.init](() => {
+            this[types.setup.init](() => {
                 this.doChangeTheme(this.setup_theme)
             });
         },

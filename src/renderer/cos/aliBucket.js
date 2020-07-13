@@ -1,13 +1,13 @@
-import {util} from '../service/index';
-import baseBucket from './baseBucket';
-import Client from 'ali-oss/lib/client';
-import brand from '@/cos/brand';
+import { util } from "../service/index"
+import baseBucket from "./baseBucket"
+import Client from "ali-oss/lib/client"
+import brand from "./brand"
 
 class Bucket extends baseBucket {
+    constructor(bucketInfo, cos) {
+        super(bucketInfo, cos, brand.aliyun.key)
 
-    constructor(name, cos) {
-        super(name, cos);
-        this.key = brand.aliyun.key;
+        this.cos.useBucket(this.name)
     }
 
     /**
@@ -16,17 +16,10 @@ class Bucket extends baseBucket {
      * @param vm => page
      */
     bindPage(vm) {
-        this.vm = vm;
+        this.vm = vm
+        this.paging = this.vm.paging
 
-        this.vm.buckets_info.forEach((item) => {
-            if (item.name === this.name) {
-                this.location = item.location;
-                this.cos.useBucket(this.name);
-                //setRegion
-            }
-        });
-
-        this.getACL();
+        this.getACL()
         // this.getDomains();
     }
 
@@ -35,79 +28,73 @@ class Bucket extends baseBucket {
      */
     getACL() {
         this.cos.getBucketInfo(this.name).then((res) => {
-
-            this.cos.options.region = res.bucket.Location;
+            this.cos.options.region = res.bucket.Location
             //未找到api获取状态
-            this.cos.options.secure = false;
-            delete this.cos.options.endpoint;
-            this.cos.options = Client.initOptions(this.cos.options);
+            this.cos.options.secure = false
+            delete this.cos.options.endpoint
+            this.cos.options = Client.initOptions(this.cos.options)
 
-            this.setPermission(res.bucket.AccessControlList.Grant === 'private' ? 1 : 0);
-            this.getResources();
-        });
+            this.setPermission(res.bucket.AccessControlList.Grant === "private" ? 1 : 0)
+            this.getResources()
+        })
     }
 
     createFile(_param, type, callback) {
         this.cos.put(_param.key, _param.path).then((result) => {
-            callback(null, {key: _param.key});
-        });
+            callback(null, { key: _param.key })
+        })
     }
 
     async removeFile(item, callback) {
-        let keys = [];
+        let keys = []
         for (let file of item) {
-            keys.push(file.key);
+            keys.push(file.key)
         }
-        const result = await this.cos.deleteMulti(keys);
-        console.log(result);
-        callback && callback();
+        const result = await this.cos.deleteMulti(keys)
+        console.log(result)
+        callback && callback()
     }
 
     async renameFile(items, callback) {
         for (let file of items) {
-            let data = await this.cos.copy(file._key, file.key);
-            let result = await this.cos.delete(file.key);
-            console.log(data, result);
+            let data = await this.cos.copy(file._key, file.key)
+            let result = await this.cos.delete(file.key)
+            console.log(data, result)
         }
-        callback && callback();
+        callback && callback()
     }
 
-    getResources(option = {}) {
-        super.getResources();
+    async getResources(option = {}) {
+        await super.preResources()
         //delimiter
-        let params = {
-            'max-keys': this.limit,
-        };
+        let params = {}
 
-        if (option.keyword) {
-            params.prefix = option.keyword;
-        }
-
-        if (this.marker) {
-            params.marker = this.marker;
-        }
+        this._handleParams(params, option, { limit: "max-keys" })
 
         this.cos.list(params).then((data) => {
-            if (!this.marker) {
-                this.files = [];
-            }
-            let files = [];
+            let files = []
             // TODO:空记录检测
             if (data.objects) {
                 data.objects.forEach((item) => {
                     if (parseInt(item.Size) !== 0) {
-                        files.push(util.convertMeta(item, brand.aliyun.key));
+                        files.push(util.convertMeta(item, brand.aliyun.key))
                     }
-                });
+                })
             }
 
-            // data.items = files;
-            // data.marker = data.nextMarker;
-            this.appendResources({
-                items: files,
-                marker: data.nextMarker
-            }, option);
-        });
+            data.prefixes &&
+                data.prefixes.forEach((item) => {
+                    files.push(this._getFolder(item))
+                })
+
+            this.postResources(
+                {
+                    items: files,
+                    marker: data.nextMarker
+                },
+                option
+            )
+        })
     }
 
     /**
@@ -118,17 +105,16 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline) {
-        let url;
+        let url
         if (this.permission === 1) {
             url = this.cos.signatureUrl(key, {
                 expires: parseInt(deadline)
-            });
+            })
         } else {
-            url = this.cos.generateObjectUrl(key);
+            url = this.cos.generateObjectUrl(key)
         }
-        return super.generateUrl(url);
+        return super.generateUrl(url)
     }
 }
 
-
-export default Bucket;
+export default Bucket

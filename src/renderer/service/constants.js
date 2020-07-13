@@ -27,6 +27,7 @@ export const URL = {
 export const Event = {
     dropView: 'dropView',
     loading: 'loading',
+    syncing: 'syncing',                     //indexedDB 数据同步中
     updateFiles: 'updateFiles',             //Filter&Search组件更新文件列表,不修改源数据
     refreshFiles: 'refreshFiles',           //更新文件列表
     resourceAction: 'resourceAction',       //下载/上传事件
@@ -56,7 +57,13 @@ export const ActionType = {
     refreshUrls: 'refreshUrls',
 };
 
-export const PageSize = 5000;
+export const DBAction = {
+    create: 'C',
+    retrieve: 'R',
+    update: 'U',
+    delete: 'D',
+    rename: 'rename',
+};
 
 /**
  * 以本地为基准,云对应不上的文件会被删除
@@ -70,20 +77,18 @@ export const mergeType = {
 };
 
 export const Listener = {
-    uploadFile: 'upload-Files',
+    trayUploadFile: 'trayUploadFile',
+    trayUpdateTitle: 'update-TrayTitle',
     downloadFile: 'downloadFile',
-    showNotifier: 'show-Notifier',
-    updateTrayTitle: 'update-TrayTitle',
     choiceDownloadFolder: 'choiceDownloadFolder',
     updateDownloadProgress: 'updateDownloadProgress',
     openFileDialog: 'open-file-dialog',
-    selectedDirectory: 'selected-directory',
     readDirectory: 'read-directory',
-    setBrand: 'setBrand',
     preview: 'preview',
     syncDirectory: 'syncDirectory',
     darkMode: 'darkMode',
-    showMenuBar: 'showMenuBar',
-    exportUrl: 'exportUrl'
+    exportUrl: 'exportUrl',
+    showNotifier: 'show-Notifier',
+    showMenuBar: 'showMenuBar'
 };
 

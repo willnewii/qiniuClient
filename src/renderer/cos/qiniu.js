@@ -1,13 +1,10 @@
 import qiniu from 'qiniu';
-import QiniuBucket from "@/cos/qiniuBucket";
+import QiniuBucket from "./qiniuBucket";
 
 import Request from '../api/API';
 
 qiniu.conf.ACCESS_KEY = '';
 qiniu.conf.SECRET_KEY = '';
-
-//独立于各COS的配置
-const PROTOCOL = 'http://';
 
 const methods = {
     buckets: 'https://rs.qbox.me/buckets',                  //空间列表
@@ -33,7 +30,7 @@ function getBuckets(callback) {
         let datas = result.map((name)=>{
             return {name};
         });
-        callback(null, {datas});
+        callback(null, datas);
     }).catch((error) => {
         callback(error);
     });
@@ -99,7 +96,6 @@ function fetch(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error, 'status': respBody.status};
         }
-        console.log(params, respErr, respBody);
         callback(respErr, respBody);
     });
 }
@@ -129,7 +125,6 @@ function upload(params, callback) {
         if (respBody.error) {
             respErr = {"error": respBody.error};
         }
-        console.log(respErr, respBody, respInfo);
         callback(respErr, respBody);
     });
 }
@@ -138,7 +133,6 @@ function upload(params, callback) {
  * 批量修改文件名
  * @param bucket    名称
  * @param items     需要处理的文件
- * @param replace   需要处理的文件
  * @param callback
  */
 function rename(bucket, items, callback) {
@@ -146,7 +140,6 @@ function rename(bucket, items, callback) {
         items = [items];
     }
 
-    //批量删除
     let operations = [];
     items.forEach((item) => {
         operations.push(qiniu.rs.moveOp(bucket, item.key, bucket, item._key));
@@ -166,7 +159,6 @@ function remove(bucket, items, callback) {
         items = [items];
     }
 
-    //批量删除
     let operations = [];
     items.forEach((item) => {
         operations.push(qiniu.rs.deleteOp(bucket, item.key));
@@ -233,4 +225,4 @@ function generateBucket(name) {
     return new QiniuBucket(name);
 }
 
-export {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};
+export default {init, getBuckets, generateBucket, generateUrl, refreshUrls, _httpAuthorization, list, remove, rename, upload, fetch, methods};

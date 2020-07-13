@@ -1,18 +1,17 @@
-import * as Constants from "@/service/constants";
-import brand from '@/cos/brand';
+import brand from "./brand"
 
-const fs = require('fs');
-import {util} from '../service/index';
-import baseBucket from './baseBucket';
-import * as qing from './qing';
+const fs = require("fs")
+import { Constants, util } from "../service/index"
+import baseBucket from "./baseBucket"
+import qing from "./qing"
 
-const mime = require('mime-types');
+const mime = require("mime-types")
 
 class Bucket extends baseBucket {
+    constructor(bucketInfo, cos) {
+        super(bucketInfo, cos, brand.qingstor.key)
 
-    constructor(name, cos) {
-        super(name, cos);
-        this.key = brand.qingstor.key;
+        this.bucket = this.cos.Bucket(this.name, this.location)
     }
 
     /**
@@ -21,16 +20,15 @@ class Bucket extends baseBucket {
      * @param vm => page
      */
     bindPage(vm) {
-        this.vm = vm;
-
+        this.vm = vm
+        this.paging = this.vm.paging
         this.vm.buckets_info.forEach((item) => {
             if (item.name === this.name) {
-                this.location = item.location;
-                this.bucket = this.cos.Bucket(this.name, this.location);
-            }
-        });
 
-        this.getACL();
+            }
+        })
+
+        this.getACL()
         // this.getDomains();
     }
 
@@ -39,82 +37,85 @@ class Bucket extends baseBucket {
      */
     getACL() {
         this.bucket.getACL().then((data) => {
-            let flag = true;
+            let flag = true
             if (data && data.acl.length > 0) {
                 for (let item of data.acl) {
-                    if (item.grantee.name === 'QS_ALL_USERS') {
-                        flag = false;
+                    if (item.grantee.name === "QS_ALL_USERS") {
+                        flag = false
                     }
                 }
             }
-            this.setPermission(flag ? 1 : 0);
-            this.getResources();
-        });
+            this.setPermission(flag ? 1 : 0)
+            this.getResources()
+        })
     }
 
-    createFile(_param, type, callback) {
-        let params = {};
+    createFile(_param, type = Constants.UploadType.UPLOAD, callback) {
+        let params = {}
 
         if (type === Constants.UploadType.FETCH) {
             params = {
-                'X-QS-Fetch-Source': _param.path,
-            };
+                "X-QS-Fetch-Source": _param.path
+            }
         } else if (type === Constants.UploadType.UPLOAD) {
             params = {
-                'body': fs.readFileSync(_param.path),
-                'Content-Length': fs.statSync(_param.path).size,
-                'Content-Type': mime.lookup(_param.key)
-            };
+                body: fs.readFileSync(_param.path),
+                "Content-Length": fs.statSync(_param.path).size,
+                "Content-Type": mime.lookup(_param.key)
+            }
         }
         this.bucket.putObject(_param.key, params).then((data) => {
-            callback(null, {key: _param.key});
-        });
+            callback(null, { key: _param.key })
+        })
     }
 
     async removeFile(item, callback) {
         for (let file of item) {
-            let data = await this.bucket.deleteObject(file.key);
-            console.log(data);
+            let data = await this.bucket.deleteObject(file.key)
+            console.log(data)
         }
-        callback && callback();
+        callback && callback()
     }
 
     async renameFile(items, callback) {
         for (let file of items) {
-            console.log(this.name, file.key, file._key);
+            console.log(this.name, file.key, file._key)
             let data = await this.bucket.putObject(file._key, {
-                'X-QS-Move-Source': '/' + this.name + '/' + file.key,
-            });
-            console.log(data);
+                "X-QS-Move-Source": "/" + this.name + "/" + file.key
+            })
+            console.log(data)
         }
-        callback && callback();
+        callback && callback()
     }
 
-    getResources(option = {}) {
-        super.getResources();
-        let params = {
-            limit: this.limit,
-        };
+    async getResources(option = {}) {
+        await super.preResources()
+        let params = Object.create(null)
 
-        if (option.keyword) {
-            params.prefix = option.keyword;
-        }
+        this._handleParams(params, option)
 
-        if (this.marker) {
-            params.marker = this.marker;
-        }
+        this.cos
+            .Bucket(this.name, this.location)
+            .listObjects(params)
+            .then((data) => {
+                let files = data.keys.map((item) => {
+                    return util.convertMeta(item, brand.qingstor.key)
+                })
 
-        this.cos.Bucket(this.name, this.location).listObjects(params).then((data) => {
-            if (!this.marker) {
-                this.files = [];
-            }
+                //commonPrefixes 文件夹
+                data.common_prefixes &&
+                    data.common_prefixes.forEach((item) => {
+                        files.push(this._getFolder(item))
+                    })
 
-            data.items = data.keys.map((item) => {
-                return util.convertMeta(item, brand.qingstor.key);
-            });
-            data.marker = data.has_more ? data.next_marker : '';
-            this.appendResources(data, option);
-        });
+                this.postResources(
+                    {
+                        items: files,
+                        marker: data.has_more ? data.next_marker : ""
+                    },
+                    option
+                )
+            })
     }
 
     /**
@@ -125,15 +126,14 @@ class Bucket extends baseBucket {
      * @returns {*}
      */
     generateUrl(key, deadline = 3600) {
-        let url;
+        let url
         if (this.permission === 1) {
-            url = qing.generateUrl(null, key, deadline, this.cos.Bucket(this.name, this.location).getObjectRequest(key));
+            url = qing.generateUrl(null, key, deadline, this.cos.Bucket(this.name, this.location).getObjectRequest(key))
         } else {
-            url = qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null);
+            url = qing.generateUrl(`${this.name}.${this.location}.qingstor.com`, key, null)
         }
-        return super.generateUrl(url);
+        return super.generateUrl(url)
     }
 }
 
-
-export default Bucket;
+export default Bucket
