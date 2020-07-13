@@ -65,8 +65,6 @@ export const DBAction = {
     rename: 'rename',
 };
 
-export const PageSize = 5000;
-
 /**
  * 以本地为基准,云对应不上的文件会被删除
  * 以云为基准,本地对应不上的文件会被删除
@@ -79,20 +77,18 @@ export const mergeType = {
 };
 
 export const Listener = {
-    uploadFile: 'upload-Files',
+    trayUploadFile: 'trayUploadFile',
+    trayUpdateTitle: 'update-TrayTitle',
     downloadFile: 'downloadFile',
-    showNotifier: 'show-Notifier',
-    updateTrayTitle: 'update-TrayTitle',
     choiceDownloadFolder: 'choiceDownloadFolder',
     updateDownloadProgress: 'updateDownloadProgress',
     openFileDialog: 'open-file-dialog',
-    selectedDirectory: 'selected-directory',
     readDirectory: 'read-directory',
-    setBrand: 'setBrand',
     preview: 'preview',
     syncDirectory: 'syncDirectory',
     darkMode: 'darkMode',
-    showMenuBar: 'showMenuBar',
-    exportUrl: 'exportUrl'
+    exportUrl: 'exportUrl',
+    showNotifier: 'show-Notifier',
+    showMenuBar: 'showMenuBar'
 };
 

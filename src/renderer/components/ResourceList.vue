@@ -231,11 +231,6 @@ export default {
         EventBus.$on(Constants.Event.resourceAction, (files, action) => {
             this.resourceAction(files, action)
         })
-        this.$once("hook:beforeDestroy", function () {
-            EventBus.$off(Constants.Event.updateFiles)
-            EventBus.$off(Constants.Event.refreshFiles)
-            EventBus.$off(Constants.Event.resourceAction)
-        })
 
         this.$electron.ipcRenderer.on(Constants.Listener.updateDownloadProgress, (event, num) => {
             this.$statusView.show({
@@ -245,6 +240,14 @@ export default {
             if (num === 1) {
                 this.queueTask()
             }
+        })
+
+        this.$electron.ipcRenderer.on(Constants.Listener.trayUploadFile, (event, files) => {
+            files = files.map((file) => {
+                file.key = util.getPostfix(file.path)
+                return file
+            })
+            this.resourceAction(files, Constants.ActionType.upload)
         })
 
         this.$electron.ipcRenderer.on(Constants.Listener.syncDirectory, (event, results) => {
@@ -281,6 +284,7 @@ export default {
             EventBus.$off(Constants.Event.refreshFiles)
             EventBus.$off(Constants.Event.resourceAction)
 
+            this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.trayUploadFile)
             this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.updateDownloadProgress)
             this.$electron.ipcRenderer.removeAllListeners(Constants.Listener.syncDirectory)
         })

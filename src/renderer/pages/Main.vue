@@ -191,28 +191,32 @@
             ...mapActions([
                 types.app.a_buckets_info,
                 types.setup.a_recent,
+                types.setup.init,
             ]),
             initCOS() {
                 this.$storage.getBindCoses(({coses}) => {
                     if (coses.length === 0) {
                         this.$router.push({path: Constants.PageName.login});
                     } else {
-                        let recentCOS = null;
-                        for (let i = 0; i < coses.length; i++) {
-                            if (coses[i].uuid === this.recent.uuid) {
-                                recentCOS = coses[i];
-                                break;
+                        this[types.setup.init](() => {
+                            let recentCOS = null;
+                            for (let i = 0; i < coses.length; i++) {
+                                if (coses[i].uuid === this.recent.uuid) {
+                                    recentCOS = coses[i];
+                                    break;
+                                }
                             }
-                        }
+                            console.log(this.recent);
 
-                        if (recentCOS) {
-                            this.selectCOS(recentCOS);
-                        } else if (coses.length === 1) {
-                            this.selectCOS(coses[0]);
-                        } else {
-                            this.coses = coses;
-                            this.cosChoiceModel = true;
-                        }
+                            if (recentCOS) {
+                                this.selectCOS(recentCOS);
+                            } else if (coses.length === 1) {
+                                this.selectCOS(coses[0]);
+                            } else {
+                                this.coses = coses;
+                                this.cosChoiceModel = true;
+                            }
+                        });
                     }
                 });
             },

@@ -134,8 +134,8 @@ export default {
             console.error("未设置托盘")
         }
 
-        ipc.removeAllListeners(Constants.Listener.uploadFile)
-        ipc.on(Constants.Listener.uploadFile, (event, files) => {
+        ipc.removeAllListeners(Constants.Listener.trayUploadFile)
+        ipc.on(Constants.Listener.trayUploadFile, (event, files) => {
             storage.get(Constants.Key.configuration, (error, app) => {
                 if (app && app.tray.brand && app.tray.bucket_name) {
                     this.files = files
@@ -153,7 +153,7 @@ export default {
     methods: {
         ...mapActions([types.setup.init]),
         updateStatus(title) {
-            ipc.send(Constants.Listener.updateTrayTitle, title)
+            ipc.send(Constants.Listener.trayUpdateTitle, title)
         },
         doUploadFile() {
             if (this.current === this.files.length) {

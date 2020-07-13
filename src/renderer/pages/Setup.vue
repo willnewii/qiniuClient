@@ -4,7 +4,7 @@
             <span class="item-title">隐藏菜单栏</span>
             <i-switch :value="setup_showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
         </div> -->
-        <Divider orientation="left">全局设置</Divider>
+<!--        <Divider orientation="left">全局设置</Divider>-->
         <Row class="row">
             <Col :span="rowSpan"><span class="item-title">开启Https</span></Col>
             <Col span="12"><i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch></Col>
@@ -60,7 +60,7 @@
             </Col>
         </Row>
 
-        <Divider orientation="left"
+        <!--<Divider orientation="left"
             >托盘设置<span class="title-tips" v-if="setup_tray"
                 >(文件将会被上传至{{ brands[setup_tray.brand] && brands[setup_tray.brand].name }}：{{
                     setup_tray.bucket_name
@@ -83,7 +83,7 @@
                 </Col>
             </Row>
         </div>
-
+-->
         <div class="item" v-feature:imageStyle>
             预览图片样式：<Icon class="help" @click="openBrowser(0)" type="md-help" />
             <Row class="row-line">
@@ -123,7 +123,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex"
 import { Constants, util, EventBus } from "../service"
-import * as utilMain from "../../main/util"
+import * as utilMain from "../../main/util/util"
 import * as types from "../vuex/mutation-types"
 import brands from "@/cos/brand"
 
@@ -224,9 +224,6 @@ export default {
             this[types.setup.a_theme](item)
         },
         saveTray: function () {
-            this.$electron.ipcRenderer.send(Constants.Listener.setBrand, {
-                key: this.$storage.info.key
-            })
             this[types.setup.a_tray]({
                 uuid: this.$storage.info.uuid,
                 brand: this.$storage.info.key,

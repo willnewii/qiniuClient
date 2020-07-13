@@ -1,25 +1,21 @@
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
-import { BrowserWindow, Tray, ipcMain, clipboard, Notification } from "electron"
-import * as util from "./util"
+import { BrowserWindow, Tray, ipcMain } from "electron"
+import * as util from "./util/util"
 import * as Constants from "../renderer/service/constants"
-import pkg from "../../package"
 
-let icon_brand = "tray_qiniu.png"
-// const icon_tray = util.isWin() ? "win_tray.png" : icon_brand
 const icon_tray = "tray.png"
-const icon_upload = util.isWin() ? "win_upload.png" : "upload.png"
+const icon_upload = util.isWin() ? "win_upload.png" : "tray_upload.png"
 
-let mTray, mTrayWindow
-let mainWindowId = -1
+let mTray, mTrayWindow, mainWindown
 
 //托盘部分处理
-export const createTray = function (_mainWindowId) {
-    mainWindowId = _mainWindowId
-    mTray = new Tray(util.getIconPath(icon_tray))
+export const createTray = function (mainWindowId) {
+    mainWindown = BrowserWindow.fromId(mainWindowId)
+    mTray = new Tray(util.getIconPath(`../${icon_tray}`))
 
-    mTrayWindow = createTrayWindow()
+    mTray.setToolTip("试试把文件拖到这里？")
 
     mTray.on("click", () => {
         toggleTrayWindow()
@@ -27,16 +23,18 @@ export const createTray = function (_mainWindowId) {
 
     mTray.on("drop-files", async (event, files) => {
         setTrayIcon(icon_upload)
-        console.log(files);
-        mTrayWindow.webContents.send(Constants.Listener.uploadFile, await util.wrapperFiles(files))
+        mainWindown && mainWindown.webContents.send(Constants.Listener.trayUploadFile, await util.wrapperFiles(files))
     })
 
-    ipcMain.on(Constants.Listener.updateTrayTitle, function (event, title) {
+    ipcMain.on(Constants.Listener.trayUpdateTitle, function (event, title) {
         if (title.length === 0) {
             setTrayIcon(icon_tray)
         }
         setTrayTitle(title)
     })
+
+    /*
+    mTrayWindow = createTrayWindow()
 
     ipcMain.on(Constants.Listener.showNotifier, function (event, option) {
         // option.icon = util.getIconPath(option.icon || 'icon.png');
@@ -48,9 +46,19 @@ export const createTray = function (_mainWindowId) {
         // option.subtitle = 'subtitle';
         // option.body = 'body';
         new Notification(option).show()
-    })
+    })*/
 
     return mTray
+}
+
+const toggleTrayWindow = () => {
+    if (mainWindown) {
+        if (mainWindown.isVisible()) {
+            mainWindown.minimize()
+        } else {
+            mainWindown.show()
+        }
+    }
 }
 
 const createTrayWindow = () => {
@@ -84,23 +92,6 @@ const createTrayWindow = () => {
     return trayWindow
 }
 
-const toggleTrayWindow = () => {
-    if (mainWindowId !== -1 && BrowserWindow.fromId(mainWindowId)) {
-        let win = BrowserWindow.fromId(mainWindowId)
-
-        if (win.isVisible()) {
-            win.minimize()
-        } else {
-            win.show()
-        }
-    }
-    /*if (mTrayWindow.isVisible()) {
-        mTrayWindow.hide()
-    } else {
-        showTrayWindow()
-    }*/
-}
-
 const showTrayWindow = () => {
     const position = getTrayWindowPosition()
     mTrayWindow.setPosition(position.x, position.y, false)
@@ -131,6 +122,5 @@ export const setTrayTitle = function (title) {
 }
 
 export const setTrayIcon = function (image) {
-    icon_brand = image
-    mTray.setImage(util.getIconPath(icon_brand))
+    mTray.setImage(util.getIconPath(`../${image}`))
 }

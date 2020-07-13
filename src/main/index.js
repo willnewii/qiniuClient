@@ -10,7 +10,7 @@ const fs = require('fs-extra');
 const {download} = require('electron-dl');
 
 import pkg from '../../package';
-import * as util from './util';
+import * as util from './util/util';
 import * as trayUtil from './trayUtil';
 import * as Constants from '../renderer/service/constants';
 import * as diffFolder from './util/diffFolder';
@@ -188,10 +188,6 @@ const registerIPC = function () {
         mainWindow.previewFile(arg);
     });
 
-    ipcMain.on(Constants.Listener.setBrand, function (event, arg) {
-        trayUtil.setTrayIcon('tray.png');
-    });
-
     ipcMain.on(Constants.Listener.darkMode, function (event, arg) {
         event.sender.send(Constants.Listener.darkMode, nativeTheme.shouldUseDarkColors);
     });
@@ -330,7 +326,7 @@ const getMenuData = function () {
                     }
                 },
                 {
-                    label: '提交异常或需求',
+                    label: 'issues',
                     click() {
                         shell.openExternal('https://github.com/willnewii/qiniuClient/issues');
                     }
@@ -345,7 +341,7 @@ const getMenuData = function () {
             if (aboutWindow) {
                 aboutWindow.show();
             } else {
-                aboutWindow = new BrowserWindow({
+                let options = {
                     width: 300,
                     height: 300,
                     resizable: false,
@@ -357,7 +353,14 @@ const getMenuData = function () {
                         backgroundThrottling: false,
                         nodeIntegration: true
                     }
-                });
+                }
+                if (util.isWin()){
+                    options.frame = false
+                } else if (util.isMac()){
+                    options.titleBarStyle = 'hidden'
+                }
+
+                aboutWindow = new BrowserWindow(options);
                 aboutWindow.loadURL(util.mainURL + '#/about');
                 aboutWindow.on('closed', () => {
                     aboutWindow = null;

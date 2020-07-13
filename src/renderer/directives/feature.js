@@ -8,20 +8,22 @@ import brand from "../cos/brand"
  *    <i-button v-feature:urlUpload >url上传</a-button>
  */
 const feature = Vue.directive("feature", {
-  inserted: function (el, binding, vnode) {
-    checkFeature(el, binding, vnode)
-  },
-  update: function (el, binding, vnode) {
-    checkFeature(el, binding, vnode)
-  }
+    inserted: function (el, binding, vnode) {
+        checkFeature(el, binding, vnode)
+    },
+    update: function (el, binding, vnode) {
+        checkFeature(el, binding, vnode)
+    }
 })
 
 function checkFeature(el, binding, vnode) {
-  let features = brand[vnode.context.$storage.key].features
+    if (vnode.context.$storage.key) {
+        let features = brand[vnode.context.$storage.key].features
 
-  if (!features || !features.includes(binding.arg)) {
-    ;(el.parentNode && el.parentNode.removeChild(el)) || (el.style.display = "none")
-  }
+        if (!features || !features.includes(binding.arg)) {
+            ;(el.parentNode && el.parentNode.removeChild(el)) || (el.style.display = "none")
+        }
+    }
 }
 
 export default feature

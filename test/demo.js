@@ -71,7 +71,10 @@ function createFile() {
     bucket.createFile(
         {
             key: util.getPostfix(filePath),
-            path: fs.realpathSync(filePath)
+            path: fs.realpathSync(filePath),
+            progressCallback: (progress) => {
+                console.log(`上传进度:${progress}`)
+            }
         },
         undefined,
         (err, result) => {

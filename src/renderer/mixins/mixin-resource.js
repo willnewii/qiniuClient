@@ -122,6 +122,7 @@ export default {
 
                 this.baseDir = ""
                 util.notification({ body: "任务完成" })
+                this.$electron.ipcRenderer.send(Constants.Listener.trayUpdateTitle, "")
             }
         },
         resourceDownload(file) {

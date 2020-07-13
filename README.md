@@ -15,11 +15,12 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
-2020.07.10
+2020.07.13
 ***
 - 使用indexDB缓存数据,对读取几千条数据的存储桶更友好(上万的条的没测试过，不好说).
+- cos模块调整，node可以直接调用cos模块了。[示例](https://github.com/willnewii/qiniuClient/blob/master/test/demo.js).以后可以直接调试各SDK,没准还可以做命令行工具(需要用 babel-node).
 - fix：url上传不能使用(目前支持七牛云、腾讯云、青云)
-- cos模块调整，可以直接使用test目录下的文件，进行node调用了.以后可以调试各SDK+命令行工具.需要用 babel-node
+- fix了一堆bug
 
 2020.06.08
 ***
@@ -115,8 +116,8 @@ old
 
 ## 下载
 
-- [云存储管理客户端-0.4.9-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.9-1-mac.dmg)
-- [云存储管理客户端-0.4.9-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.4.9-1-win.exe)
+- [云存储管理客户端-0.5.0-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.0-mac.dmg)
+- [云存储管理客户端-0.5.0-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.0-win.exe)
 
 ## Build Setup
 ``` bash
