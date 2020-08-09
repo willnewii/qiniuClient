@@ -2,7 +2,7 @@
     "name": "qiniuclient",
     "cnname": "云存储管理客户端",
     "cdnPath": "",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "云存储管理客户端。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能",
     "author": "诗人的咸鱼 <willnewii@163.com>",
     "license": "MIT",
@@ -26,7 +26,7 @@
         "build:dll-cos": "cross-env NODE_ENV=production ANALYZER=false DLL_NAME=cos --max_old_space_size=4096 webpack --config .electron-vue/webpack.renderer.dll.config.js",
         "analyzer:main": "cross-env NODE_ENV=production ENV_DLL=true ANALYZER=true webpack --config .electron-vue/webpack.main.config.js",
         "analyzer:renderer": "cross-env NODE_ENV=production ENV_DLL=true ANALYZER=true webpack --config .electron-vue/webpack.renderer.config.js",
-        "postinstall": ""
+        "postinstall": "node .electron-vue/fix.js"
     },
     "dependencies": {
         "ali-oss": "^6.9.1",
@@ -48,7 +48,7 @@
         "qingstor-sdk": "^3.0.1",
         "qiniu": "^7.3.0",
         "qs": "^6.8.0",
-        "upyun": "^3.3.11",
+        "upyun": "^3.4.4",
         "uuid": "^3.3.3",
         "v-contextmenu": "^2.9.0",
         "v-viewer": "^1.4.2",

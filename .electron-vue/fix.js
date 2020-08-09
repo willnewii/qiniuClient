@@ -7,6 +7,7 @@ const fs = require("fs")
  */
 
 let packagePaths = [
+    path.join(__dirname, "..", "node_modules/upyun/node_modules/axios/package.json"),
     path.join(__dirname, "..", "node_modules/ali-oss/package.json"),
     path.join(__dirname, "..", "node_modules/agentkeepalive/package.json"),
     path.join(__dirname, "..", "node_modules/ali-oss/node_modules/agentkeepalive/package.json")
