@@ -62,7 +62,7 @@
                     >
                         <template v-if="file._directory">
                             <Icon class="file" :type="file._icon" size="50"></Icon>
-                            <span class="name">{{ file._name }}</span>
+                            <span class="name" :title="file._name">{{ file._name }}</span>
                         </template>
                         <template v-else>
                             <img
@@ -71,7 +71,7 @@
                                 v-lazy="file.imgObj"
                             />
                             <Icon v-else class="file" :type="file._icon" size="50"></Icon>
-                            <span class="name">{{ file.displayName }}</span>
+                            <span class="name" :title="file.displayName">{{ file.displayName }}</span>
                             <div class="btn">
                                 <Button
                                     shape="circle"
@@ -112,11 +112,11 @@
             >
                 <template v-if="file._directory">
                     <Icon :type="file._icon" size="15"></Icon>
-                    <span class="name">{{ file._name }}</span>
+                    <span class="name" :title="file._name">{{ file._name }}</span>
                 </template>
                 <template v-else>
                     <Icon :type="file._icon" size="15"></Icon>
-                    <span class="name">{{ file.displayName }}</span>
+                    <span class="name" :title="file.displayName">{{ file.displayName }}</span>
                     <span class="date">{{ file.putTime | formatDate }}</span>
                     <span class="size">{{ file.fsize | formatFileSize }}</span>
                 </template>
