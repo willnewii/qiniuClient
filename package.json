@@ -32,7 +32,7 @@
         "ali-oss": "^6.9.1",
         "animate.css": "^3.7.2",
         "aws-sdk": "^2.525.0",
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "cos-nodejs-sdk-v5": "^2.6.2",
         "custom-electron-titlebar": "^3.2.2-hotfix62",
         "dayjs": "^1.8.16",
