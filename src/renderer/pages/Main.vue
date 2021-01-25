@@ -12,7 +12,7 @@
                             <template v-if="menuState">
                                 <Icon :size="item.size ? item.icon : 25"
                                       :type="item.permission === 1 ? 'md-lock' : (bucketInfo.name === item.name ? 'md-folder-open' : 'md-folder')"></Icon>
-                                <span class="layout-text">{{item.name}}</span>
+                                <span class="layout-text" :title="item.name" >{{item.name}}</span>
                             </template>
                             <template v-else>
                                 <span class="layout-icon">{{item.name.substring(0,1)}}</span>

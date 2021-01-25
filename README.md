@@ -1,6 +1,6 @@
-# 云存储管理客户端 v0.5.1
+# 云存储管理客户端 v0.5.3
 
-![](http://blog-res.mayday5.me/file/icon.png?imageView2/1/w/80/h/80/q/75|imageslim) 朋友给做的新图标
+![](http://blog-res.mayday5.me/file/icon.png?imageView2/1/w/80/h/80/q/75|imageslim) 我老婆(2020.12.03 👩‍❤️‍👨)给做的新图标
 > 云存储管理客户端。支持七牛云、腾讯云、青云、阿里云、又拍云、亚马逊S3、京东云。仿文件夹式管理、图片预览、拖拽上传、文件夹上传、同步、批量导出URL等功能
 
 ## 效果图
@@ -14,6 +14,10 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
+2021.01.25
+***
+- fix aws 文件上传失败
+
 2020.07.13
 ***
 - 使用indexDB缓存数据,对读取几千条数据的存储桶更友好(上万的条的没测试过，不好说).
@@ -115,7 +119,7 @@ old
 
 ## 下载
 
-- [云存储管理客户端-0.5.1-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.1-mac.dmg)
+- [云存储管理客户端-0.5.3-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.3-mac.dmg)
 - [云存储管理客户端-0.5.1-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.1-win.exe)
 
 ## Build Setup

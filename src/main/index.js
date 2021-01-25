@@ -248,7 +248,7 @@ const getMenuData = function () {
                         //
                         if (mainWindow) {
                             //console.log(path.join(app.getPath('userData'), 'Cache'));
-                            mainWindow.webContents.session.clearCache(function () {
+                            mainWindow.webContents.session.clearCache().then(()=>{
                                 mainWindow.loadURL(util.mainURL);
                             });
                         }
