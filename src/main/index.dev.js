@@ -11,24 +11,25 @@
 // process.env.NODE_ENV = 'development';
 // process.env.BABEL_ENV = 'main';
 
-require('babel-register')({
+require("babel-register")({
     ignore: /node_modules/
-});
+})
 
 // Install `electron-debug` with `devtron`
-require('electron-debug')({showDevTools: true});
+require("electron-debug")({ showDevTools: true })
 
 // Install `vue-devtools`
-require('electron').app.on('ready', () => {
-    let installExtension = require('electron-devtools-installer');
-    installExtension.default(installExtension.VUEJS_DEVTOOLS)
+require("electron").app.on("ready", () => {
+    let installExtension = require("electron-devtools-installer")
+    installExtension
+        .default(installExtension.VUEJS_DEVTOOLS)
         .then((name) => {
-            console.log(`install:${name}`);
+            console.log(`install:${name}`)
         })
-        .catch(err => {
-            console.log('Unable to install `vue-devtools`: \n', err);
-        });
-});
+        .catch((err) => {
+            console.log("Unable to install `vue-devtools`: \n", err)
+        })
+})
 
 // Require `main` process to boot app
-require('./index');
+require("./index")
