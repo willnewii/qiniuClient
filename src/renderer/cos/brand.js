@@ -49,6 +49,11 @@ export default {
     name: '京东云',
     features: ['paging', 'manualPrivateBucket'],
   },
+  ks3: {
+    key: 'ks3',
+    name: '金山云',
+    features: ['paging'],
+  },
   minio: {
     key: 'minio',
     name: 'MinIO',

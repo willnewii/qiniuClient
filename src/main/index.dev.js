@@ -10,6 +10,7 @@
 // Set babel `env` and install `babel-register`
 // process.env.NODE_ENV = 'development';
 // process.env.BABEL_ENV = 'main';
+import { BrowserWindow } from 'electron';
 
 require("babel-register")({
     ignore: /node_modules/

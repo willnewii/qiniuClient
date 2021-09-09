@@ -9,6 +9,7 @@ import ali from '../cos/ali'
 import upyun from '../cos/upyun'
 import aws from '../cos/aws'
 import jd from '../cos/jd'
+import ks3 from '../cos/ks3'
 
 import brand from '../cos/brand'
 
@@ -54,6 +55,9 @@ export default class CloudObjectStorage {
         break
       case brand.jd.key:
         this.cos = jd
+        break
+      case brand.ks3.key:
+        this.cos = ks3
         break
       case brand.minio.key:
         this.cos = aws
