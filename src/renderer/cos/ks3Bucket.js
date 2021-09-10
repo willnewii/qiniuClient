@@ -129,19 +129,20 @@ class Bucket extends baseBucket {
     this.cos.bucket.get(params, (error, data) => {
       console.log('list objects: ', data)
       let files = []
-      if(!Array.isArray(data.ListBucketResult.Contents)){
-        data.ListBucketResult.Contents = [data.ListBucketResult.Contents]
-      }
-      data.ListBucketResult.Contents.forEach(item => {
-        if (parseInt(item.Size) !== 0) {
-          files.push(util.convertMeta(item, brand.ks3.key))
+      if(data.ListBucketResult.Contents) {
+        if(!Array.isArray(data.ListBucketResult.Contents)){
+          data.ListBucketResult.Contents = [data.ListBucketResult.Contents]
         }
-      })
-
-      data.CommonPrefixes &&
-        data.CommonPrefixes.forEach(item => {
-          files.push(this._getFolder(item.Prefix))
+        data.ListBucketResult.Contents.forEach(item => {
+          if (parseInt(item.Size) !== 0) {
+            files.push(util.convertMeta(item, brand.ks3.key))
+          }
         })
+      }
+      
+      data.ListBucketResult.CommonPrefixes && data.ListBucketResult.CommonPrefixes.forEach(item => {
+        files.push(this._getFolder(item.Prefix))
+      })
 
       this.postResources(
         {
