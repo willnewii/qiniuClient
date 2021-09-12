@@ -84,7 +84,7 @@
         "html-webpack-plugin": "^3.2.0",
         "mini-css-extract-plugin": "^0.9.0",
         "node-loader": "^0.6.0",
-        "node-sass": "^4.12.0",
+        "node-sass": "^4.13.1",
         "sass-loader": "^7.3.1",
         "style-loader": "^0.18.2",
         "url-loader": "^1.0.1",
