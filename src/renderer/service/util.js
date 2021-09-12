@@ -212,6 +212,11 @@ export function convertMeta(item, brandKey = 'qiniu') {
       item.fsize = parseInt(item.Size)
       item.putTime = new Date(item.LastModified).getTime()
       break
+    case brand.ks3.key:
+      item.key = item.Key
+      item.fsize = parseInt(item.Size)
+      item.putTime = new Date(item.LastModified).getTime()
+      break
   }
 
   item.mimeType = mime.lookup(item.key) || ''

@@ -143,6 +143,10 @@
                             <a @click="openBrowser('https://console.upyun.com/dashboard/')">{{ item.name }}</a
                             >->Access Key
                         </template>
+                        <template v-else-if="item.key === brands.ks3.key">
+                            <a @click="openBrowser('https://ks3.console.ksyun.com/')">{{ item.name }}</a
+                            >->Access Key
+                        </template>
                     </div>
                 </Form>
             </TabPane>
@@ -199,6 +203,8 @@ export default {
                 this.regions = Regions.s3
             } else if (key === this.brands.jd.key) {
                 this.regions = Regions.jd
+            } else if (key === this.brands.ks3.key) {
+                this.regions = Regions.ks3
             }
         },
         handleSubmit(key) {
