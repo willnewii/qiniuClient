@@ -14,6 +14,11 @@
 ![屏幕快照 2018-12-25 下午4.28.47.png](http://blog-res.mayday5.me/img/%E5%B1%8F%E5%B9%95%E5%BF%AB%E7%85%A7%202018-12-25%20%E4%B8%8B%E5%8D%884.28.47.png)
 
 ## 更新说明
+2021.11.25 
+***
+- 添加隐藏删除按钮选项
+- 加载大存储桶时可以手动取消
+
 2021.01.25
 ***
 - fix aws 文件上传失败
@@ -119,7 +124,7 @@ old
 
 ## 下载
 
-- [云存储管理客户端-0.5.4-mac.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.4-mac.dmg)
+- [云存储管理客户端-0.5.5-mac-x64.dmg](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.5-mac-x64.dmg)
 - [云存储管理客户端-0.5.1-win.exe](http://blog-res.mayday5.me/file/%E4%BA%91%E5%AD%98%E5%82%A8%E7%AE%A1%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF-0.5.1-win.exe)
 
 ## Build Setup
