@@ -8,7 +8,7 @@ import ViewUI from 'view-design';
 import menuDirective from 'v-contextmenu/src/directive';
 import contextmenu from 'v-contextmenu/src/index';
 import VirtualScrollList from 'vue-virtual-scroll-list';
-import Viewer from "v-viewer/src/component.vue";
+import Viewer from "v-viewer";
 import StatusView from '../components/StatusView.js'
 
 import 'v-contextmenu/dist/index.css';

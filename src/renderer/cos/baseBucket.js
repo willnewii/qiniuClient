@@ -73,6 +73,9 @@ class baseBucket {
      * @type {boolean}
      */
     this.paging = false
+
+    // 通过点击加载框的取消按钮
+    this.cancel = false
   }
 
   /**
@@ -155,6 +158,10 @@ class baseBucket {
         show: true,
         message: txt,
         flag: 'getResources',
+        cancel: () => {
+          this.cancel = true
+          console.log('取消')
+        },
       })
     }
     console.time('load data')
@@ -176,7 +183,7 @@ class baseBucket {
 
     console.log(`${this.paging ? '开启' : '未开启'}分页； 文件数:${tempFiles.length}； 分页标识:${this.marker}`)
 
-    if (this.marker && !this.paging) {
+    if (this.marker && !this.paging && !this.cancel) {
       await this.getResources(option)
     } else {
       EventBus.$emit(Constants.Event.loading, {
@@ -197,6 +204,7 @@ class baseBucket {
       }
       tempFiles = []
       loadState = -1
+      this.cancel = false
       option.success && option.success()
     }
   }
