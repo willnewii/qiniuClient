@@ -30,7 +30,7 @@ class Bucket extends baseBucket {
   }
 
   createFile(_param, type, callback) {
-    this.cos.putFile(_param.key, fs.createReadStream(_param.path)).then(result => {
+    this.cos.putFile(_param.key, fs.readFileSync(_param.path)).then(result => {
       console.log(result)
       callback(null, { key: _param.key })
     })

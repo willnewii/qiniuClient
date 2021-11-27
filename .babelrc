@@ -2,7 +2,9 @@
     "comments": false,
     "sourceMaps": true,
     "retainLines": true,
-    "presets": ["env"],
+    "presets": [
+        "env"
+    ],
     "env": {
         "main": {
             "presets": [
@@ -10,7 +12,7 @@
                     "env",
                     {
                         "targets": {
-                            "node": "12.4.0"
+                            "node": "16.13.0"
                         }
                     }
                 ]
@@ -22,12 +24,15 @@
                     "env",
                     {
                         "targets": {
-                            "electron": "8.3.0"
+                            "electron": "13.6.2"
                         }
                     }
                 ]
             ]
         }
     },
-    "plugins": ["transform-runtime", "transform-object-rest-spread"]
+    "plugins": [
+        "transform-runtime",
+        "transform-object-rest-spread"
+    ]
 }
