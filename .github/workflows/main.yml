@@ -34,7 +34,7 @@ jobs:
           
       - name: npm dll-cos
         run: |
-          npm build:dll-cos
+          npm run build:dll-cos
           
       - name: build mac
         run: |
