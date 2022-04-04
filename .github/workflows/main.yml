@@ -40,5 +40,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Display structure of downloaded files
-        run: ls -R
+      - name: cleanup artifacts for macos
+        run: |
+          npx rimraf "dist_electron/!(*.dmg)"
+          
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          name: mac
+          path: dist_electron
