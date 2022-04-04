@@ -40,9 +40,10 @@ jobs:
         run: |
           npm install
           
-      - name: build mac
+      - name: build win
+        if: matrix.os == 'windows-latest'
         run: |
-          npm run build:mac
+          npm run build:win64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
@@ -50,6 +51,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           npx rimraf "build/!(*.exe)"     
+          
+      - name: build mac
+        if: matrix.os == 'macos-latest'
+        run: |
+          npm run build:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: cleanup artifacts for macos
         if: matrix.os == 'macos-latest'
