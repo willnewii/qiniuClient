@@ -11,6 +11,6 @@ build/*
 node_modules/
 !.gitkeep
 .idea
-static/dll
+# static/dll
 
 test/Key.js

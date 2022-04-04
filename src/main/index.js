@@ -1,14 +1,13 @@
 'use strict'
 
-import { app, BrowserWindow, Menu, ipcMain, dialog, shell, globalShortcut, nativeTheme } from 'electron'
-
-require('@electron/remote/main').initialize()
-const storage = require('electron-json-storage')
-// import EAU from 'electron-asar-hot-updater';
-
 const path = require('path')
 const fs = require('fs-extra')
 const { download } = require('electron-dl')
+import { app, BrowserWindow, Menu, ipcMain, dialog, shell, globalShortcut, nativeTheme } from 'electron'
+
+require('@electron/remote/main').initialize()
+import storage from 'electron-json-storage'
+// import EAU from 'electron-asar-hot-updater';
 
 import pkg from '../../package'
 import * as util from './util/util'
@@ -214,6 +213,10 @@ const registerIPC = function () {
     util.notification({
       message: 'URL 导出完成',
     })
+  })
+
+  ipcMain.handle('appPath', async (event, someArgument) => {
+    return app.getPath(someArgument)
   })
 }
 

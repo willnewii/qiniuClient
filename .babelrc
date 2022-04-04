@@ -1,38 +1,33 @@
 {
-    "comments": false,
-    "sourceMaps": true,
-    "retainLines": true,
-    "presets": [
-        "env"
-    ],
-    "env": {
-        "main": {
-            "presets": [
-                [
-                    "env",
-                    {
-                        "targets": {
-                            "node": "16.13.0"
-                        }
-                    }
-                ]
-            ]
-        },
-        "renderer": {
-            "presets": [
-                [
-                    "env",
-                    {
-                        "targets": {
-                            "electron": "13.6.2"
-                        }
-                    }
-                ]
-            ]
-        }
+  "comments": false,
+  "sourceMaps": true,
+  "retainLines": true,
+  "presets": ["env"],
+  "env": {
+    "main": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": "16.13.0"
+            }
+          }
+        ]
+      ]
     },
-    "plugins": [
-        "transform-runtime",
-        "transform-object-rest-spread"
-    ]
+    "renderer": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "electron": "13.6.2"
+            }
+          }
+        ]
+      ]
+    }
+  },
+  "plugins": ["transform-runtime", "transform-object-rest-spread"]
 }
