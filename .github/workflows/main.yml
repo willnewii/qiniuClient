@@ -6,9 +6,9 @@ name: Build Electron
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ dev ]
+    branches: [ master ]
   pull_request:
-    branches: [ dev ]
+    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Check out git repository
         uses: actions/checkout@v3
+        with:
+          ref: dev
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.1.0
@@ -37,7 +39,6 @@ jobs:
           npm run build:mac
         env:
           GH_TOKEN: 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
-          
           
       - name: Display structure of downloaded files
         run: ls -R
