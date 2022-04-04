@@ -38,7 +38,7 @@ jobs:
         run: |
           npm run build:mac
         env:
-          GH_TOKEN: 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
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Display structure of downloaded files
         run: ls -R
