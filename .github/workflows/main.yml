@@ -32,16 +32,11 @@ jobs:
         run: |
           npm install
           
-      - name: build dll
-        run: |
-          npm run build:dll
-          npm run build:dll-cos
-          
       - name: build mac
         run: |
           npm run build:mac
         env:
-          GH_TOKEN: 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
+          GH_TOKEN: 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
           
       - name: Display structure of downloaded files
         run: ls -R
