@@ -236,7 +236,7 @@
 
                 this.$electron.ipcRenderer.send(Constants.Listener.syncDirectory, {
                     properties: ['openDirectory'],
-                    files,
+                    files, 
                     type: this.$storage.key,
                     mergeType: this.model_merge.mode,
                 });
