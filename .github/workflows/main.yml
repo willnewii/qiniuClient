@@ -41,7 +41,7 @@ jobs:
         run: |
           npm run build:mac
         env:
-          GH_TOKEN: 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
+          GH_TOKEN: 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
           
       - name: Display structure of downloaded files
         run: ls -R
