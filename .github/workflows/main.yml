@@ -32,6 +32,13 @@ jobs:
         run: |
           npm install
           
+      - name: npm dll-cos
+        run: |
+          npm build:dll-cos
+          
       - name: build mac
         run: |
           npm run build:mac
+          
+      - name: Display structure of downloaded files
+        run: ls -R
