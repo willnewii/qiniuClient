@@ -17,8 +17,14 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: macos-latest
+    # the type of machine to run the job on
+    runs-on: ${{ matrix.os }}
+
+    # create a build matrix for jobs
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -40,12 +46,18 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: cleanup artifacts for windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          npx rimraf "build/!(*.exe)"     
+          
       - name: cleanup artifacts for macos
+        if: matrix.os == 'macos-latest'
         run: |
           npx rimraf "build/!(*.dmg)"
           
       - name: upload artifacts
         uses: actions/upload-artifact@v3.0.0
         with:
-          name: mac
+          name: ${{ matrix.os }}
           path: build
