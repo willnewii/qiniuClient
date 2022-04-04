@@ -32,8 +32,9 @@ jobs:
         run: |
           npm install
           
-      - name: npm dll-cos
+      - name: build dll
         run: |
+          npm run build:dll
           npm run build:dll-cos
           
       - name: build mac
