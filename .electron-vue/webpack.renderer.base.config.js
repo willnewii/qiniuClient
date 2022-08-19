@@ -8,8 +8,8 @@ const pkg = require('../package.json')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const MinifyPlugin = require('babel-minify-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+const TerserPlugin = require("terser-webpack-plugin");
 
 const styleLoaders = [
   process.env.NODE_ENV !== 'production' ? 'vue-style-loader' : MiniCssExtractPlugin.loader,
@@ -99,6 +99,10 @@ let rendererConfig = {
       },
     ],
   },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
   plugins: [new VueLoaderPlugin(), new MiniCssExtractPlugin({ filename: '[name].css' })],
   node: {
     __dirname: process.env.NODE_ENV !== 'production',
@@ -124,9 +128,9 @@ if (process.env.NODE_ENV === 'production') {
   rendererConfig.devtool = ''
 
   rendererConfig.plugins.push(
-    new MinifyPlugin({
+   /*  new MinifyPlugin({
       removeConsole: true,
-    }),
+    }), */
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     })

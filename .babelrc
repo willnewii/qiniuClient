@@ -2,7 +2,7 @@
   "comments": false,
   "sourceMaps": true,
   "retainLines": true,
-  "presets": ["env"],
+  "presets": ["env", "stage-0"],
   "env": {
     "main": {
       "presets": [
@@ -29,5 +29,5 @@
       ]
     }
   },
-  "plugins": ["transform-runtime", "transform-object-rest-spread"]
+  "plugins": ["transform-runtime"]
 }

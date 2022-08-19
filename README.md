@@ -186,3 +186,5 @@ package,添加了一个cdnPath字段.你可以将资源上传至该路径下.这
 - [webpack2 文档](https://doc.webpack-china.org)
 - [Node.js 文档](http://nodejs.cn/api/)
 - [electron.build cli 文档](https://www.electron.build/cli)
+
+// --display-modules

@@ -6,7 +6,7 @@ const path = require('path')
 const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const MinifyPlugin = require('babel-minify-webpack-plugin')
+const TerserPlugin = require("terser-webpack-plugin");
 
 let mainConfig = {
   entry: {
@@ -26,6 +26,10 @@ let mainConfig = {
         use: 'node-loader',
       },
     ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
   },
   node: {
     __dirname: process.env.NODE_ENV !== 'production',
@@ -59,7 +63,6 @@ if (process.env.NODE_ENV !== 'production') {
  */
 if (process.env.NODE_ENV === 'production') {
   mainConfig.plugins.push(
-    new MinifyPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     })
