@@ -163,8 +163,11 @@ import Header from '@/components/Header'
 import ResourceList from '@/components/ResourceList.vue'
 import ResourceFilter from '@/components/ResourceFilter'
 
+import { mapActions as mapActionss, mapState } from 'pinia'
 import { mapGetters, mapActions } from 'vuex'
 import * as types from '../vuex/mutation-types'
+
+import { useAppStore } from '@/stores/app'
 
 import { Constants, util, EventBus, mixins } from '../service/index'
 import dayjs from 'dayjs'
@@ -192,8 +195,8 @@ export default {
     }
   },
   computed: {
+    ...mapState(useAppStore, [types.app.buckets_info]),
     ...mapGetters({
-      buckets_info: types.app.buckets_info,
       privatebucket: types.setup.privatebucket,
       paging: types.setup.paging,
       setup_deleteNoAsk: types.setup.deleteNoAsk,
@@ -241,7 +244,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions([types.app.a_update_buckets_info, types.setup.a_showType]),
+    ...mapActionss(useAppStore, [types.app.update_buckets_info]),
+    ...mapActions([types.setup.a_showType]),
     /**
      * 初始化空间信息
      */

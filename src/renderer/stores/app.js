@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import * as types from '../vuex/mutation-types'
 
-export const useAppStore = defineStore('app_pinia', {
+export const useAppStore = defineStore('app', {
   state: () => {
     return {
       app: {
@@ -13,7 +13,7 @@ export const useAppStore = defineStore('app_pinia', {
     }
   },
   actions: {
-    [types.app.buckets_info](value) {
+    [types.app.set_buckets_info](value) {
       this.app.buckets_info = value
     },
     [types.app.update_buckets_info](value) {

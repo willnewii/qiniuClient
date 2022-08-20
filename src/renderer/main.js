@@ -5,7 +5,6 @@ import axios from 'axios'
 
 import { createPinia, PiniaVuePlugin } from 'pinia'
 Vue.use(PiniaVuePlugin)
-const pinia = console.log(pinia)
 
 import '@/service/loadComponent'
 import CloudObjectStorage from '@/cos/CloudObjectStorage'

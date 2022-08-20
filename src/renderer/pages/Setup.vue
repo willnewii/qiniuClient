@@ -120,11 +120,14 @@
 </template>
 
 <script>
+import { mapActions as mapActionss, mapState } from 'pinia'
 import { mapGetters, mapActions } from 'vuex'
 import { Constants, util, EventBus } from '../service'
 import * as utilMain from '../../main/util/util'
 import * as types from '../vuex/mutation-types'
 import brands from '@/cos/brand'
+
+import { useAppStore } from '@/stores/app'
 
 export default {
   name: 'setup-page',
@@ -142,8 +145,8 @@ export default {
     }
   },
   computed: {
+    ...mapState(useAppStore, [types.app.buckets_info]),
     ...mapGetters({
-      buckets_info: types.app.buckets_info,
       setup_copyType: types.setup.copyType,
       setup_deleteNoAsk: types.setup.deleteNoAsk,
       setup_showMenuBar: types.setup.showMenuBar,
@@ -175,8 +178,8 @@ export default {
     })
   },
   methods: {
+    ...mapActionss(useAppStore, [types.app.update_buckets_info]),
     ...mapActions([
-      types.app.a_update_buckets_info,
       types.setup.a_copyType,
       types.setup.a_https,
       types.setup.a_showMenuBar,
@@ -218,7 +221,7 @@ export default {
     privatesChange: function (privatebucket) {
       this.buckets_info.forEach(item => {
         let permission = privatebucket.indexOf(item.name) !== -1 ? 1 : 0
-        this[types.app.a_update_buckets_info]({ name: item.name, permission: permission })
+        this[types.app.update_buckets_info]({ name: item.name, permission: permission })
       })
       this[types.setup.a_privatebucket](privatebucket)
       EventBus.$emit(Constants.Event.changePrivate, privatebucket)

@@ -85,7 +85,7 @@ class baseBucket {
   setPermission(permission = 0) {
     this.permission = permission
     if (this.vm) {
-      this.vm[types.app.a_update_buckets_info]({ name: this.name, permission: this.permission })
+      this.vm[types.app.update_buckets_info]({ name: this.name, permission: this.permission })
     }
 
     this.https = this.vm['setup_https']

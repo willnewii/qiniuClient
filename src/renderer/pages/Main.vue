@@ -89,6 +89,7 @@
   </div>
 </template>
 <script>
+import { mapActions as mapActionss, mapState } from 'pinia'
 import { mapGetters, mapActions } from 'vuex'
 import * as types from '@/vuex/mutation-types'
 import pkg from '../../../package.json'
@@ -147,8 +148,8 @@ export default {
     }
   },
   computed: {
+    ...mapState(useAppStore, [types.app.buckets_info]),
     ...mapGetters({
-      buckets_info: types.app.buckets_info,
       recent: types.setup.recent,
     }),
   },
@@ -159,9 +160,6 @@ export default {
    */
   created: function () {
     this.checkVersion()
-
-    const appStore = useAppStore()
-    console.log(appStore.app)
 
     EventBus.$on(Constants.Event.dropView, option => {
       this.drop = Object.assign(this.drop, option)
@@ -186,7 +184,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions([types.app.a_buckets_info, types.setup.a_recent, types.setup.init]),
+    ...mapActionss(useAppStore, [types.app.set_buckets_info]),
+    ...mapActions([types.setup.a_recent, types.setup.init]),
     initCOS() {
       this.$storage.getBindCoses(({ coses }) => {
         if (coses.length === 0) {
@@ -200,7 +199,6 @@ export default {
                 break
               }
             }
-            console.log(this.recent)
 
             if (recentCOS) {
               this.selectCOS(recentCOS)
@@ -248,7 +246,7 @@ export default {
               defaultIndex = index
             }
           })
-          this[types.app.a_buckets_info](result)
+          this[types.app.set_buckets_info](result)
 
           this.onMenuSelect(this[types.app.buckets_info][defaultIndex].name)
           this.$nextTick(() => {

@@ -146,7 +146,7 @@ gettersKeys.forEach(key => {
     return key in state.setup ? state.setup[key] : setup[key]
   }
 })
-console.log(actions)
+
 export default {
   state: {
     setup: setup,
