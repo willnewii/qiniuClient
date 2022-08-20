@@ -9,7 +9,7 @@ module.exports = {
       'vue-lazyload',
       'vue-electron',
       'view-design',
-      'uuid',
+      'nanoid',
       'v-viewer',
       'vue-virtual-scroll-list',
       'v-contextmenu/src/directive',

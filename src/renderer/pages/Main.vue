@@ -90,8 +90,10 @@
 </template>
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import * as types from '../vuex/mutation-types'
+import * as types from '@/vuex/mutation-types'
 import pkg from '../../../package.json'
+
+import { useAppStore } from '@/stores/app'
 
 import { Constants, mixins, EventBus, util } from '../service/index'
 
@@ -158,16 +160,14 @@ export default {
   created: function () {
     this.checkVersion()
 
+    const appStore = useAppStore()
+    console.log(appStore.app)
+
     EventBus.$on(Constants.Event.dropView, option => {
       this.drop = Object.assign(this.drop, option)
     })
     EventBus.$on(Constants.Event.loading, option => {
       this.loading = Object.assign(this.loading, option)
-      /*if (this.loading.show) {
-                    console.time(option.flag);
-                } else {
-                    console.timeEnd(option.flag);
-                }*/
     })
     EventBus.$on(Constants.Event.syncing, option => {
       this.isSyncing = option
@@ -329,9 +329,9 @@ export default {
                         },
                       },
                     },
-                    ' issues'
+                    ' issues',
                   ),
-                ]
+                ],
               )
             },
             onOk: () => {

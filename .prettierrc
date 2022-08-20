@@ -4,8 +4,9 @@
   "printWidth": 200,
   "semi": false,
   "singleQuote": true,
+  "trailingComma": "all",
   "tabWidth": 2,
-  "jsxBracketSameLine": false,
+  "jsxBracketSameLine": true,
   "htmlWhitespaceSensitivity": "ignore",
   "useTabs": false
 }

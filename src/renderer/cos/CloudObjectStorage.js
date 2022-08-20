@@ -1,6 +1,6 @@
 import * as storagePromise from '../service/storagePromise'
 
-const uuid = require('uuid/v1')
+const nanoid = require('nanoid')
 
 import qiniu from '../cos/qiniu'
 import tencent from '../cos/tencent'
@@ -113,7 +113,7 @@ export default class CloudObjectStorage {
       for (let item of Object.keys(brand)) {
         let data = await storagePromise.get(brand[item].key + '_key')
         if (data && data.access_key && data.secret_key) {
-          data.uuid = uuid()
+          data.uuid = nanoid()
           cos_keys.push(Object.assign(data, brand[item]))
         }
       }
@@ -128,7 +128,7 @@ export default class CloudObjectStorage {
    * @param callback
    */
   async saveCosKey(item, callback) {
-    item.uuid = uuid()
+    item.uuid = nanoid()
     let cos_keys = await storagePromise.get(KEY_COS)
     if (Object.keys(cos_keys).length === 0) {
       cos_keys = []
