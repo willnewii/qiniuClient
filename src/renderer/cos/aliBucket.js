@@ -92,7 +92,7 @@ class Bucket extends baseBucket {
           items: files,
           marker: data.nextMarker,
         },
-        option
+        option,
       )
     })
   }

@@ -1,7 +1,7 @@
-import Vue from "vue"
-import StatusViewComponent from "./StatusView.vue"
+import Vue from 'vue'
+import StatusViewComponent from './StatusView.vue'
 
-let statusViewInstance = undefined;
+let statusViewInstance = undefined
 const StatusViewConstructor = Vue.extend(StatusViewComponent)
 
 StatusViewConstructor.prototype.destroy = function () {
@@ -28,25 +28,25 @@ StatusViewConstructor.prototype.show = function (options = {}) {
   if (options.progress) this.progress = options.progress
 }
 
-function getInstance (opts = {}) {
-  if (!statusViewInstance){
+function getInstance(opts = {}) {
+  if (!statusViewInstance) {
     // 要挂载的元素
     const parent = document.body
     statusViewInstance = new StatusViewConstructor({
-      el: document.createElement("div"),
-      data: opts
+      el: document.createElement('div'),
+      data: opts,
     })
     parent.appendChild(statusViewInstance.$el)
   }
 
-  return statusViewInstance;
+  return statusViewInstance
 }
 
 export default {
-  show(options = {}){
-    getInstance().show(options);
+  show(options = {}) {
+    getInstance().show(options)
   },
-  destroy(){
-    getInstance().destroy();
-  }
+  destroy() {
+    getInstance().destroy()
+  },
 }
