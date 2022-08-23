@@ -89,12 +89,11 @@
   </div>
 </template>
 <script>
-import { mapActions as mapActionss, mapState } from 'pinia'
-import { mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'pinia'
+import { useAppStore } from '@/stores/app'
+import { useSetupStore } from '@/stores/setup'
 import * as types from '@/vuex/mutation-types'
 import pkg from '../../../package.json'
-
-import { useAppStore } from '@/stores/app'
 
 import { Constants, mixins, EventBus, util } from '../service/index'
 
@@ -149,9 +148,7 @@ export default {
   },
   computed: {
     ...mapState(useAppStore, [types.app.buckets_info]),
-    ...mapGetters({
-      recent: types.setup.recent,
-    }),
+    ...mapState(useSetupStore, [types.setup.setup_info]),
   },
   /**
    * 检查是否有新版本
@@ -184,17 +181,17 @@ export default {
     }
   },
   methods: {
-    ...mapActionss(useAppStore, [types.app.set_buckets_info]),
-    ...mapActions([types.setup.a_recent, types.setup.init]),
+    ...mapActions(useAppStore, [types.app.set_buckets_info]),
+    ...mapActions(useSetupStore, [types.setup.setup_init, types.setup.setup_update]),
     initCOS() {
       this.$storage.getBindCoses(({ coses }) => {
         if (coses.length === 0) {
           this.$router.push({ path: Constants.PageName.login })
         } else {
-          this[types.setup.init](() => {
+          this[types.setup.setup_init](() => {
             let recentCOS = null
             for (let i = 0; i < coses.length; i++) {
-              if (coses[i].uuid === this.recent.uuid) {
+              if (coses[i].uuid === this.setup_info.recent.uuid) {
                 recentCOS = coses[i]
                 break
               }
@@ -242,7 +239,7 @@ export default {
 
           result.forEach((item, index) => {
             item.permission = 0
-            if (this.recent.bucket === item.name) {
+            if (this.setup_info.recent.bucket === item.name) {
               defaultIndex = index
             }
           })
@@ -279,7 +276,8 @@ export default {
       switch (name) {
         default:
           this.menuName = name
-          this[types.setup.a_recent]({
+
+          this[types.setup.setup_update]('recent', {
             uuid: this.cos.uuid,
             bucket: name,
           })

@@ -1,5 +1,8 @@
 export const setup = {
   init: 'init',
+  setup_init: 'setup_init',
+  setup_info: 'setup_info',
+  setup_update: 'setup_update',
 
   deadline: 'deadline',
   a_deadline: 'a_deadline',
@@ -48,6 +51,7 @@ export const setup = {
   theme: 'theme',
   a_theme: 'a_theme',
 
+  // 不可用
   recent: 'recent',
   a_recent: 'a_recent',
 }
