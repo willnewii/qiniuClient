@@ -39,11 +39,12 @@ export const setup = {
   copyType: 'copyType',
   a_copyType: 'a_copyType',
 
-  showType: 'showType',
-  a_showType: 'a_showType',
-
   tray: 'tray',
   a_tray: 'a_tray',
+
+  // 不可用
+  recent: 'recent',
+  a_recent: 'a_recent',
 
   customedomain: 'customedomain',
   a_customedomain: 'a_customedomain',
@@ -51,9 +52,8 @@ export const setup = {
   theme: 'theme',
   a_theme: 'a_theme',
 
-  // 不可用
-  recent: 'recent',
-  a_recent: 'a_recent',
+  showType: 'showType',
+  a_showType: 'a_showType',
 }
 
 export const app = {

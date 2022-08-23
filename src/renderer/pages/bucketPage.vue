@@ -163,11 +163,11 @@ import Header from '@/components/Header'
 import ResourceList from '@/components/ResourceList.vue'
 import ResourceFilter from '@/components/ResourceFilter'
 
-import { mapActions as mapActionss, mapState } from 'pinia'
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions, mapState } from 'pinia'
 import * as types from '../vuex/mutation-types'
 
 import { useAppStore } from '@/stores/app'
+import { useSetupStore } from '@/stores/setup'
 
 import { Constants, util, EventBus, mixins } from '../service/index'
 import dayjs from 'dayjs'
@@ -196,15 +196,26 @@ export default {
   },
   computed: {
     ...mapState(useAppStore, [types.app.buckets_info]),
-    ...mapGetters({
-      privatebucket: types.setup.privatebucket,
-      paging: types.setup.paging,
-      setup_deleteNoAsk: types.setup.deleteNoAsk,
-      setup_hiddenDelBtn: types.setup.hiddenDelBtn,
-      setup_https: types.setup.https,
-      setup_showType: types.setup.showType,
-      setup_deadline: types.setup.deadline,
-      customeDomains: types.setup.customedomain,
+    ...mapState(useSetupStore, {
+      setup_showType: state => {
+        return state.setup.showType
+      },
+
+      setup_hiddenDelBtn: state => {
+        return state.setup.hiddenDelBtn
+      },
+      setup_https: state => {
+        return state.setup.https
+      },
+      customeDomains: state => {
+        return state.setup.customedomain
+      },
+      privatebucket: state => {
+        return state.setup.privatebucket
+      },
+      paging: state => {
+        return state.setup.paging
+      },
     }),
     totalSize() {
       let totalSzie = 0
@@ -244,14 +255,16 @@ export default {
     }
   },
   methods: {
-    ...mapActionss(useAppStore, [types.app.update_buckets_info]),
-    ...mapActions([types.setup.a_showType]),
+    ...mapActions(useAppStore, [types.app.update_buckets_info]),
+    ...mapActions(useSetupStore, [types.setup.setup_update]),
     /**
      * 初始化空间信息
      */
     initBucket(bucketInfo) {
       if (this.$storage.cos) {
         this.bucket = this.$storage.cos.generateBucket(bucketInfo)
+
+        //TODO: 限制参数 {paging,privatebucket,customeDomains,setup_https}
         this.bucket.bindPage(this)
         this.showType = this.setup_showType
       }
@@ -298,7 +311,7 @@ export default {
      */
     changeShowType(type) {
       this.bucket.selection = []
-      this[types.setup.a_showType](type)
+      this[types.setup.setup_update]('showType', type)
 
       this.showType = type
     },
