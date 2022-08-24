@@ -7,8 +7,8 @@
 
 <script>
 import { mapState, mapActions } from 'pinia'
-import * as types from '@/vuex/mutation-types'
 import { useSetupStore } from '@/stores/setup'
+import * as types from '@/stores/mutation-types'
 
 import { Constants, EventBus } from '@/service'
 

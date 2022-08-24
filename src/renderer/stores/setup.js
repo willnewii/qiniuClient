@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import * as types from '../vuex/mutation-types'
+import * as types from './mutation-types'
 import { storagePromise, Constants, util } from '@/service'
 
 const defaultImageStyle = '?imageView2/1/w/100/h/100/format/webp/q/10'
@@ -56,6 +56,8 @@ export const useSetupStore = defineStore('setup', {
           this.setup.customedomain = {}
         }
         this.setup.customedomain = Object.assign(this.setup.customedomain, value)
+      } else if (key == 'deadline') {
+        this.setup.expiresTime = value
       } else {
         this.setup[key] = value
       }

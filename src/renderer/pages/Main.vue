@@ -92,7 +92,7 @@
 import { mapState, mapActions } from 'pinia'
 import { useAppStore } from '@/stores/app'
 import { useSetupStore } from '@/stores/setup'
-import * as types from '@/vuex/mutation-types'
+import * as types from '@/stores/mutation-types'
 import pkg from '../../../package.json'
 
 import { Constants, mixins, EventBus, util } from '../service/index'

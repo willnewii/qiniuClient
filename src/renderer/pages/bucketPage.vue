@@ -164,7 +164,7 @@ import ResourceList from '@/components/ResourceList.vue'
 import ResourceFilter from '@/components/ResourceFilter'
 
 import { mapActions, mapState } from 'pinia'
-import * as types from '../vuex/mutation-types'
+import * as types from '../stores/mutation-types'
 
 import { useAppStore } from '@/stores/app'
 import { useSetupStore } from '@/stores/setup'
@@ -200,7 +200,6 @@ export default {
       setup_showType: state => {
         return state.setup.showType
       },
-
       setup_hiddenDelBtn: state => {
         return state.setup.hiddenDelBtn
       },

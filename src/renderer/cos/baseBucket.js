@@ -1,5 +1,5 @@
 import { Constants, EventBus } from '../service/index'
-import * as types from '../vuex/mutation-types'
+import * as types from '../stores/mutation-types'
 import * as indexedDBHelper from '../service/indexedDBHelper'
 import brand from './brand'
 

@@ -97,7 +97,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import { useSetupStore } from '@/stores/setup'
-import * as types from '../vuex/mutation-types'
+import * as types from '../stores/mutation-types'
 import UploadModal from './UploadModal'
 import { Constants, EventBus } from '../service'
 import brand from '@/cos/brand'

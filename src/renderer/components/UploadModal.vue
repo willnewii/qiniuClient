@@ -1,7 +1,3 @@
-<!--
-三种上传方式
-1.通过URL 2.选择文件 3.拖拽
--->
 <template>
   <div>
     <Modal v-model="uploadModal.isShow" title="上传文件" :mask-closable="false" @on-ok="preUploadFile" @on-cancel="initModal" class-name="upload-modal">
@@ -23,16 +19,23 @@
       </div>
 
       <div class="file-list">
-        <div class="modal-filekey" v-for="_path of filePaths">文件名:{{ uploadModal.prepend }}{{ uploadModal.input ? uploadModal.input + '/' : '' }}{{ _path.key }}</div>
+        <div class="modal-filekey" v-for="_path of filePaths" :key="_path">文件名:{{ uploadModal.prepend }}{{ uploadModal.input ? uploadModal.input + '/' : '' }}{{ _path.key }}</div>
       </div>
     </Modal>
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import * as types from '../vuex/mutation-types'
+/**
+ * 上传方式
+ * 1.通过URL
+ * 2.选择文件
+ * 3.拖拽
+ */
+import { mapState } from 'pinia'
+import { useSetupStore } from '@/stores/setup'
+
 import { Constants, util, EventBus } from '../service'
-import { resource, base } from '../mixins/index'
+import { base } from '../mixins/index'
 
 export default {
   name: 'UploadModal',
@@ -60,8 +63,10 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      setup_isOverwrite: types.setup.isOverwrite,
+    ...mapState(useSetupStore, {
+      setup: state => {
+        return state.setup
+      },
     }),
   },
   created() {
@@ -80,7 +85,7 @@ export default {
           }
         })
 
-        if (this.setup_uploadNoAsk) {
+        if (this.setup.uploadNoAsk) {
           //直接上传
           this.filePaths = files
           this.uploadModal.input = this.bucket.folderPath

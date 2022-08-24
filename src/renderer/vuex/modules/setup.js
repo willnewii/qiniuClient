@@ -2,7 +2,7 @@
  * Created by zhangweiwei on 2018/08/15.
  */
 import { util, storagePromise, Constants } from '@/service'
-import * as types from '@/vuex/mutation-types'
+import * as types from '@/stores/mutation-types'
 
 const defaultImageStyle = '?imageView2/1/w/100/h/100/format/webp/q/10'
 

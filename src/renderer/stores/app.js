@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import * as types from '../vuex/mutation-types'
+import * as types from './mutation-types'
 
 export const useAppStore = defineStore('app', {
   state: () => {

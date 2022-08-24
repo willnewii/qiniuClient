@@ -51,8 +51,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
-import * as types from '../vuex/mutation-types'
 import { util, Constants, storagePromise, mixins, brand } from '../service'
 import storage from 'electron-json-storage'
 import Request from '@/api/API'
@@ -145,7 +143,6 @@ export default {
     })
   },
   methods: {
-    ...mapActions([types.setup.init]),
     updateStatus(title) {
       ipc.send(Constants.Listener.trayUpdateTitle, title)
     },

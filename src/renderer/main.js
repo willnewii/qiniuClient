@@ -20,7 +20,6 @@ const pasteImageService = new PasteImageService()
 // Vue.config.debug = false;
 
 import routes from './routes'
-import store from './vuex/store'
 
 const router = new Router({
   scrollBehavior: () => ({ y: 0 }),
@@ -75,6 +74,5 @@ new Vue({
   el: '#app',
   router,
   render: h => h(App),
-  store,
   pinia: createPinia(),
 })

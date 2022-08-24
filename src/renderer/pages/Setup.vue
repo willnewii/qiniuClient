@@ -2,42 +2,42 @@
   <div class="page">
     <!-- <div class="item" v-if="isShowMenuBarItem">
             <span class="item-title">隐藏菜单栏</span>
-            <i-switch :value="setup_showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
+            <i-switch :value="setup.showMenuBar" size="small" @on-change="showMenuBarChange"></i-switch>
         </div> -->
     <!--        <Divider orientation="left">全局设置</Divider>-->
     <Row class="row">
       <Col :span="rowSpan"><span class="item-title">开启Https</span></Col>
-      <Col span="12"><i-switch :value="setup_https" size="small" @on-change="httpsChange"></i-switch></Col>
+      <Col span="12"><i-switch :value="setup.https" size="small" @on-change="httpsChange"></i-switch></Col>
     </Row>
     <Row class="row" v-feature:paging>
       <Col :span="rowSpan">开启分页</Col>
       <Col span="12">
-        <i-switch :value="setup_paging" size="small" @on-change="pagingChange"></i-switch>
+        <i-switch :value="setup.paging" size="small" @on-change="pagingChange"></i-switch>
         <Icon class="help" @click="openBrowser(2)" type="md-help" />
       </Col>
     </Row>
     <Row class="row">
       <Col :span="rowSpan">隐藏删除按钮</Col>
-      <Col span="12"><i-switch :value="setup_hiddenDelBtn" size="small" @on-change="hiddenDelBtnChange"></i-switch></Col>
+      <Col span="12"><i-switch :value="setup.hiddenDelBtn" size="small" @on-change="hiddenDelBtnChange"></i-switch></Col>
     </Row>
     <Row class="row">
       <Col :span="rowSpan">直接删除,不显示确认框</Col>
-      <Col span="12"><i-switch :value="setup_deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch></Col>
+      <Col span="12"><i-switch :value="setup.deleteNoAsk" size="small" @on-change="deleteNoAskChange"></i-switch></Col>
     </Row>
     <Row class="row">
       <Col :span="rowSpan">直接上传,不显示确认框</Col>
-      <Col span="12"><i-switch :value="setup_uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch></Col>
+      <Col span="12"><i-switch :value="setup.uploadNoAsk" size="small" @on-change="uploadNoAskChange"></i-switch></Col>
     </Row>
     <Row class="row">
       <Col :span="rowSpan">如果文件已存在,是否覆盖上传</Col>
       <Col span="12">
-        <i-switch :value="setup_isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
+        <i-switch :value="setup.isOverwrite" size="small" @on-change="isOverwriteChange"></i-switch>
       </Col>
     </Row>
     <Row class="row">
       <Col :span="rowSpan">复制到粘贴板格式</Col>
       <Col span="12">
-        <Radio-group :value="setup_copyType" @on-change="copyTypeChange">
+        <Radio-group :value="setup.copyType" @on-change="copyTypeChange">
           <Radio label="url"></Radio>
           <Radio label="markdown"></Radio>
         </Radio-group>
@@ -120,14 +120,14 @@
 </template>
 
 <script>
-import { mapActions as mapActionss, mapState } from 'pinia'
-import { mapGetters, mapActions } from 'vuex'
-import { Constants, util, EventBus } from '../service'
-import * as utilMain from '../../main/util/util'
-import * as types from '../vuex/mutation-types'
-import brands from '@/cos/brand'
-
+import { mapActions, mapState } from 'pinia'
 import { useAppStore } from '@/stores/app'
+import { useSetupStore } from '@/stores/setup'
+import * as types from '../stores/mutation-types'
+
+import { Constants, EventBus } from '../service'
+import * as utilMain from '../../main/util/util'
+import brands from '@/cos/brand'
 
 export default {
   name: 'setup-page',
@@ -146,31 +146,20 @@ export default {
   },
   computed: {
     ...mapState(useAppStore, [types.app.buckets_info]),
-    ...mapGetters({
-      setup_copyType: types.setup.copyType,
-      setup_deleteNoAsk: types.setup.deleteNoAsk,
-      setup_showMenuBar: types.setup.showMenuBar,
-      setup_https: types.setup.https,
-      setup_paging: types.setup.paging,
-      setup_uploadNoAsk: types.setup.uploadNoAsk,
-      setup_isOverwrite: types.setup.isOverwrite,
-      setup_tray: types.setup.tray,
-      setup_imagestyle: types.setup.imagestyle,
-      setup_downloaddir: types.setup.downloaddir,
-      setup_privatebucket: types.setup.privatebucket,
-      setup_theme: types.setup.theme,
-      setup_deadline: types.setup.deadline,
-      setup_hiddenDelBtn: types.setup.hiddenDelBtn,
+    ...mapState(useSetupStore, {
+      setup: state => {
+        return state.setup
+      },
     }),
   },
   components: {},
   created: function () {
-    this.tray = JSON.parse(JSON.stringify(this.setup_tray))
-    this.imagestyle = this.setup_imagestyle
-    this.downloaddir = this.setup_downloaddir
-    this.privates = this.setup_privatebucket
-    this.theme = this.setup_theme
-    this.deadline = this.setup_deadline / 60
+    this.tray = JSON.parse(JSON.stringify(this.setup.tray))
+    this.imagestyle = this.setup.imagestyle
+    this.downloaddir = this.setup.downloaddir
+    this.privates = this.setup.privatebucket
+    this.theme = this.setup.theme
+    this.deadline = this.setup.deadline / 60
 
     this.$electron.ipcRenderer.on(Constants.Listener.choiceDownloadFolder, (event, path) => {
       this.downloaddir = path[0]
@@ -178,60 +167,45 @@ export default {
     })
   },
   methods: {
-    ...mapActionss(useAppStore, [types.app.update_buckets_info]),
-    ...mapActions([
-      types.setup.a_copyType,
-      types.setup.a_https,
-      types.setup.a_showMenuBar,
-      types.setup.a_paging,
-      types.setup.a_deleteNoAsk,
-      types.setup.a_uploadNoAsk,
-      types.setup.a_tray,
-      types.setup.a_imagestyle,
-      types.setup.a_downloaddir,
-      types.setup.a_privatebucket,
-      types.setup.a_deadline,
-      types.setup.a_isOverwrite,
-      types.setup.a_theme,
-      types.setup.hiddenDelBtn,
-    ]),
-    pagingChange: function (state) {
-      this[types.setup.a_paging](state)
-      this.$storage.cos.paging = state
+    ...mapActions(useAppStore, [types.app.update_buckets_info]),
+    ...mapActions(useSetupStore, [types.setup.setup_update]),
+    pagingChange: function (payload) {
+      this[types.setup.setup_update]('paging', payload)
+      this.$storage.cos.paging = payload
     },
-    httpsChange: function (state) {
-      this[types.setup.a_https](state)
-      this.$storage.cos.https = state
+    httpsChange: function (payload) {
+      this[types.setup.setup_update]('https', payload)
+      this.$storage.cos.https = payload
     },
-    hiddenDelBtnChange: function (state) {
-      this[types.setup.hiddenDelBtn](state)
+    hiddenDelBtnChange: function (payload) {
+      this[types.setup.setup_update]('hiddenDelBtn', payload)
     },
-    deleteNoAskChange: function (state) {
-      this[types.setup.a_deleteNoAsk](state)
+    deleteNoAskChange: function (payload) {
+      this[types.setup.setup_update]('deleteNoAsk', payload)
     },
-    uploadNoAskChange: function (state) {
-      this[types.setup.a_uploadNoAsk](state)
+    uploadNoAskChange: function (payload) {
+      this[types.setup.setup_update]('uploadNoAsk', payload)
     },
-    isOverwriteChange: function (state) {
-      this[types.setup.a_isOverwrite](state)
+    isOverwriteChange: function (payload) {
+      this[types.setup.setup_update]('isOverwrite', payload)
     },
-    copyTypeChange: function (model) {
-      this[types.setup.a_copyType](model)
+    copyTypeChange: function (payload) {
+      this[types.setup.setup_update]('copyType', payload)
     },
     privatesChange: function (privatebucket) {
       this.buckets_info.forEach(item => {
         let permission = privatebucket.indexOf(item.name) !== -1 ? 1 : 0
         this[types.app.update_buckets_info]({ name: item.name, permission: permission })
       })
-      this[types.setup.a_privatebucket](privatebucket)
+      this[types.setup.setup_update]('privatebucket', privatebucket)
       EventBus.$emit(Constants.Event.changePrivate, privatebucket)
     },
-    themesChange(item) {
-      EventBus.$emit(Constants.Event.changeTheme, item)
-      this[types.setup.a_theme](item)
+    themesChange(payload) {
+      EventBus.$emit(Constants.Event.changeTheme, payload)
+      this[types.setup.setup_update]('theme', payload)
     },
     saveTray: function () {
-      this[types.setup.a_tray]({
+      this[types.setup.tray]('theme', {
         uuid: this.$storage.info.uuid,
         brand: this.$storage.info.key,
         bucket_name: this.tray.bucket_name,
@@ -240,14 +214,14 @@ export default {
       this.$Message.success('托盘设置修改成功，重启应用后生效')
     },
     saveImagestyle: function () {
-      this[types.setup.a_imagestyle](this.imagestyle)
+      this[types.setup.setup_update]('imagestyle', this.imagestyle)
       this.$Message.success('图片样式修改成功')
     },
     saveDeadline: function () {
       if (isNaN(this.deadline)) {
         this.$Message.error('请检查过期时间值格式是否正确')
       } else {
-        this[types.setup.a_deadline](this.deadline * 60)
+        this[types.setup.setup_update]('deadline', this.deadline * 60)
         this.$Message.success('私有空间过期时间已修改为' + this.deadline + '分钟')
       }
     },
@@ -255,7 +229,7 @@ export default {
       this.$electron.ipcRenderer.send(Constants.Listener.choiceDownloadFolder, { properties: ['openDirectory'] })
     },
     saveDownloadolder() {
-      this[types.setup.a_downloaddir](this.downloaddir)
+      this[types.setup.setup_update]('downloaddir', this.downloaddir)
       this.$Message.success('下载路径修改成功')
     },
     openBrowser(index) {
@@ -273,9 +247,9 @@ export default {
       }
       this.$electron.shell.openExternal(url)
     },
-    showMenuBarChange: function (state) {
-      this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, state)
-      this[types.setup.a_showMenuBar](state)
+    showMenuBarChange: function (payload) {
+      this.$electron.ipcRenderer.send(Constants.Listener.showMenuBar, payload)
+      this[types.setup.setup_update]('showMenuBar', payload)
     },
   },
 }

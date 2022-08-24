@@ -3,7 +3,7 @@ module.exports = {
     libs: [
       'vue',
       'vue-router',
-      'vuex',
+      'pinia',
       'axios',
       'qs',
       'vue-lazyload',

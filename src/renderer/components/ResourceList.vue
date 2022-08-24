@@ -99,8 +99,8 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex'
-import * as types from '../vuex/mutation-types'
+import { mapState } from 'pinia'
+import { useSetupStore } from '@/stores/setup'
 
 import { resource, base, contextmenu } from '../mixins/index'
 import { EventBus, Constants, util, brand } from '@/service/index'
@@ -148,8 +148,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      setup_hiddenDelBtn: types.setup.hiddenDelBtn,
+    ...mapState(useSetupStore, {
+      setup_hiddenDelBtn: state => {
+        return state.setup.hiddenDelBtn
+      },
     }),
   },
   watch: {
@@ -319,12 +321,12 @@ export default {
       }
     },
     getImgUrlWithStyle(file) {
-      let imageStyle = this.setup_imagestyle
+      let imageStyle = this.setup.imagestyle
       if (/image\/(svg|gif)/.test(file.mimeType.toLowerCase())) {
         imageStyle = ''
       }
 
-      let url = this.bucket.generateUrl(file.key, this.setup_deadline)
+      let url = this.bucket.generateUrl(file.key, this.setup.deadline)
       let imageSrc = ''
       switch (this.$storage.key) {
         case brand.qiniu.key:
