@@ -48,7 +48,7 @@ function fetch(params, callback) {
         },
         function (err, response, body) {
           console.log(err || body)
-        }
+        },
       )
       request(params.path)
         .pipe(req)
@@ -56,7 +56,7 @@ function fetch(params, callback) {
           console.log('上传完毕')
           callback(err, { key: params.key })
         })
-    }
+    },
   )
 }
 

@@ -66,8 +66,7 @@
         v-bind:class="{ 'item-select': selection.indexOf(index) !== -1 }"
         @click="clickItem(file, index)"
         v-contextmenu="file._directory ? 'folderMenu' : 'fileMenu'"
-        :index="file"
-      >
+        :index="file">
         <template v-if="file._directory">
           <Icon :type="file._icon" size="15"></Icon>
           <span class="name" :title="file._name">{{ file._name }}</span>

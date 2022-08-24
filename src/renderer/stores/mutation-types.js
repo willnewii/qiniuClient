@@ -8,7 +8,7 @@ export const setup = {
   a_isOverwrite: 'a_isOverwrite',
 
   hiddenDelBtn: 'hiddenDelBtn',
-  
+
   // 不可用
   recent: 'recent',
   a_recent: 'a_recent',

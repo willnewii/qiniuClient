@@ -12,8 +12,7 @@
         v-feature:customDomain="bucket.name"
         :placeholder="domainPlaceholder"
         @on-blur="saveDomain"
-        error="链接不合法"
-      />
+        error="链接不合法" />
     </div>
 
     <template v-if="bucket.name">
@@ -98,6 +97,7 @@
 import { mapState, mapActions } from 'pinia'
 import { useSetupStore } from '@/stores/setup'
 import * as types from '../stores/mutation-types'
+
 import UploadModal from './UploadModal'
 import { Constants, EventBus } from '../service'
 import brand from '@/cos/brand'

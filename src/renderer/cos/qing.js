@@ -11,7 +11,7 @@ function init(param) {
     new Config({
       access_key_id: param.access_key,
       secret_access_key: param.secret_key,
-    })
+    }),
   )
   signer = new Signer(param.access_key, param.secret_key)
   qinKey = param

@@ -112,7 +112,7 @@ class Bucket extends baseBucket {
             items: files,
             marker: data.has_more ? data.next_marker : '',
           },
-          option
+          option,
         )
       })
   }

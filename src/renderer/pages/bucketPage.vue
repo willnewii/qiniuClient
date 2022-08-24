@@ -164,10 +164,9 @@ import ResourceList from '@/components/ResourceList.vue'
 import ResourceFilter from '@/components/ResourceFilter'
 
 import { mapActions, mapState } from 'pinia'
-import * as types from '../stores/mutation-types'
-
 import { useAppStore } from '@/stores/app'
 import { useSetupStore } from '@/stores/setup'
+import * as types from '../stores/mutation-types'
 
 import { Constants, util, EventBus, mixins } from '../service/index'
 import dayjs from 'dayjs'

@@ -236,8 +236,8 @@ export function notification(option = {}) {
       {
         silent: true,
       },
-      option
-    )
+      option,
+    ),
   )
 }
 

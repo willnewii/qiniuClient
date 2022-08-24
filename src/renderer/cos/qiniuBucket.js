@@ -125,7 +125,7 @@ class Bucket extends baseBucket {
           items: files,
           marker: respInfo.data.marker,
         },
-        option
+        option,
       )
     })
   }

@@ -1,7 +1,7 @@
 export default {
-    methods: {
-        openBrowser(url) {
-            this.$electron.shell.openExternal(url);
-        }
-    }
-};
+  methods: {
+    openBrowser(url) {
+      this.$electron.shell.openExternal(url)
+    },
+  },
+}

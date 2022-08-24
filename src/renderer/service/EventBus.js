@@ -2,11 +2,11 @@
  * Created by zhangweiwei on 2017/2/28.
  */
 let eventBus = {
-    $emit: () => {}
+  $emit: () => {},
 }
-if (typeof window !== "undefined") {
-    const Vue = require("vue").default
-    eventBus = new Vue()
+if (typeof window !== 'undefined') {
+  const Vue = require('vue').default
+  eventBus = new Vue()
 }
 
 export default eventBus

@@ -11,8 +11,7 @@
         @on-click="
           uploadModal.path = ''
           filePaths = []
-        "
-      />
+        " />
 
       <div class="modal-input">
         <Input v-model="uploadModal.input" />

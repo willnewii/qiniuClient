@@ -1,32 +1,31 @@
-import pkg from "../../../package.json"
+import pkg from '../../../package.json'
 
 /**
  * Created by zhangweiwei on 2017/4/14.
  */
-const path = require("path")
-const fs = require("fs")
-const klaw = require("klaw-sync")
-const qetag = require("./qetag")
-import brand from "../../renderer/cos/brand"
-import { Notification } from "electron"
+const path = require('path')
+const fs = require('fs')
+const klaw = require('klaw-sync')
+const qetag = require('./qetag')
+import brand from '../../renderer/cos/brand'
+import { Notification } from 'electron'
 
-export const mainURL =
-    process.env.NODE_ENV === "development" ? "http://localhost:9080/" : `file://${__dirname}/index.html`
+export const mainURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080/' : `file://${__dirname}/index.html`
 
 export const getIconPath = function (filename) {
-    return path.join(__dirname, process.env.NODE_ENV === "development" ? ".." : "", "/assets/icons", filename)
+  return path.join(__dirname, process.env.NODE_ENV === 'development' ? '..' : '', '/assets/icons', filename)
 }
 
 export const isMac = function () {
-    return process.platform === "darwin"
+  return process.platform === 'darwin'
 }
 
 export const isWin = function () {
-    return process.platform === "win32"
+  return process.platform === 'win32'
 }
 
 export const isLinux = function () {
-    return process.platform === "linux"
+  return process.platform === 'linux'
 }
 
 /**
@@ -37,25 +36,25 @@ export const isLinux = function () {
  * @returns {Array}
  */
 export function wrapperFiles(_files) {
-    let files = []
-    for (const path of _files) {
-        if (isDirectory(path)) {
-            let result = klaw(path, {
-                nodir: true,
-                filter: function (item) {
-                    return !/\.(DS_Store)$/.test(item.path)
-                }
-            })
-            let _path = convertPath(path)
-            for (let file of result) {
-                files.push({ path: convertPath(file.path), dir: _path })
-            }
-        } else {
-            files.push({ path: convertPath(path) })
-        }
+  let files = []
+  for (const path of _files) {
+    if (isDirectory(path)) {
+      let result = klaw(path, {
+        nodir: true,
+        filter: function (item) {
+          return !/\.(DS_Store)$/.test(item.path)
+        },
+      })
+      let _path = convertPath(path)
+      for (let file of result) {
+        files.push({ path: convertPath(file.path), dir: _path })
+      }
+    } else {
+      files.push({ path: convertPath(path) })
     }
+  }
 
-    return files
+  return files
 }
 
 /**
@@ -64,7 +63,7 @@ export function wrapperFiles(_files) {
  * @returns {*}
  */
 export function convertPath(path) {
-    return path.replace(/\\/g, "/")
+  return path.replace(/\\/g, '/')
 }
 
 /**
@@ -74,36 +73,36 @@ export function convertPath(path) {
  * @param callback
  */
 export const getEtag = function (filePath, platformType, callback = null) {
-    return new Promise(function (resolve, reject) {
-        switch (platformType) {
-            case brand.qiniu.key:
-                qetag(filePath, (hash) => {
-                    resolve(hash)
-                })
-                break
-            default:
-                getFileMd5(filePath, (error, hash) => {
-                    resolve(hash)
-                })
-                break
-        }
-    })
+  return new Promise(function (resolve, reject) {
+    switch (platformType) {
+      case brand.qiniu.key:
+        qetag(filePath, hash => {
+          resolve(hash)
+        })
+        break
+      default:
+        getFileMd5(filePath, (error, hash) => {
+          resolve(hash)
+        })
+        break
+    }
+  })
 }
 
 const getFileMd5 = function (filepath, callback) {
-    const md5 = require("crypto").createHash("md5")
-    let readStream = require("fs").createReadStream(filepath)
+  const md5 = require('crypto').createHash('md5')
+  let readStream = require('fs').createReadStream(filepath)
 
-    readStream.on("data", function (chunk) {
-        md5.update(chunk)
-    })
-    readStream.on("error", function (err) {
-        callback(err)
-    })
-    readStream.on("end", function () {
-        let hash = md5.digest("hex")
-        callback(null, `"${hash}"`)
-    })
+  readStream.on('data', function (chunk) {
+    md5.update(chunk)
+  })
+  readStream.on('error', function (err) {
+    callback(err)
+  })
+  readStream.on('end', function () {
+    let hash = md5.digest('hex')
+    callback(null, `"${hash}"`)
+  })
 }
 
 /**
@@ -112,14 +111,14 @@ const getFileMd5 = function (filepath, callback) {
  * @returns {Stats | boolean}
  */
 const isDirectory = function (path) {
-    return fs.statSync(path).isDirectory()
+  return fs.statSync(path).isDirectory()
 }
 
 export const notification = function (option) {
-    option.title = option.title || pkg.cnname
-    option.body = option.message
-    option.silent = true
-    // option.subtitle = 'subtitle';
-    // option.body = 'body';
-    new Notification(option).show()
+  option.title = option.title || pkg.cnname
+  option.body = option.message
+  option.silent = true
+  // option.subtitle = 'subtitle';
+  // option.body = 'body';
+  new Notification(option).show()
 }
