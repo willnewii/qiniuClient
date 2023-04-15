@@ -32,7 +32,7 @@
     "@electron/remote": "^2.0.1",
     "ali-oss": "^6.16.0",
     "animate.css": "^3.7.2",
-    "aws-sdk": "^2.525.0",
+    "aws-sdk": "^2.814.0",
     "axios": "^0.19.2",
     "cos-nodejs-sdk-v5": "^2.6.2",
     "custom-electron-titlebar": "^3.2.7",
